@@ -63,6 +63,18 @@ Keep the project analytics-first, not heavy machine learning.
 
 The warranty dataset is expected to be around 200+ records, so complex ML should be avoided unless it clearly improves the result.
 
+## Latest Proposal Status
+
+The current proposal file is `docs/Nomobug_Capstone_Proposal_CP1_Updated.docx`.
+
+Latest checks:
+
+- 37 total reference entries.
+- 27 literature matrix rows.
+- Around 24 academic/research-like sources, with tool/API documentation kept as technical support references.
+- Literature review expanded with 2020+ sources on pest decision-support systems, DSS adoption, spatial clustering, dashboard design, data quality, rainfall modelling, and AI-assisted pest monitoring.
+- Word export/render check passed after the latest reference expansion.
+
 ## Important Wording Rules
 
 Use:
@@ -110,7 +122,8 @@ Commit:
 ## Next Recommended Work
 
 1. Final read-through of the CP1 proposal before submission.
-2. Create a data source mapping sheet from actual Google Sheets tabs.
-3. Confirm which exact Google Calendar fields are reliable.
-4. Build safe synthetic samples for GitHub.
-5. Prepare CP2 starter tasks: BigQuery project setup, Superset local Docker setup, and Python ETL skeleton.
+2. If supervisor requests more depth, add short paragraphs for selected literature matrix papers rather than adding more random references.
+3. Create a data source mapping sheet from actual Google Sheets tabs.
+4. Confirm which exact Google Calendar fields are reliable.
+5. Build safe synthetic samples for GitHub.
+6. Prepare CP2 starter tasks: BigQuery project setup, Superset local Docker setup, and Python ETL skeleton.
