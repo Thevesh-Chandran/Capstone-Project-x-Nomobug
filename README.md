@@ -59,13 +59,15 @@ Recommendation explanations and recommendation log
 .
   README.md
   PROJECT_BRIEF.md
+  PROJECT_STATE.md
+  docs/
+    Nomobug_Capstone_Proposal_CP1_Updated.docx
   scripts/
     fetch_calendar_events.py
     test_open_meteo_history.py
   data/
     samples/
-      calendar_events_selected_calendars.csv
-      open_meteo_history_sample.csv
+      local CSV exports only, ignored by Git
   tools/
     build_nomobug_proposal.py
   archive/
@@ -111,8 +113,10 @@ python scripts/test_open_meteo_history.py 3.0738 101.5183 2026-06-01 2026-06-24
 This creates:
 
 ```text
-open_meteo_history_sample.csv
+data/samples/open_meteo_history_sample.csv
 ```
+
+Generated CSV outputs are ignored by Git. Do not commit raw company exports, calendar extracts, customer names, phone numbers, emails, or full addresses.
 
 ## Data Source Direction
 
@@ -172,3 +176,7 @@ archive/old-react-express-prototype/
 
 It is kept only as a reference. The current build direction is BigQuery + Superset + Python ETL.
 The archive is intentionally ignored by Git so the GitHub repository stays focused on the current capstone plan.
+
+## Privacy Rule for GitHub
+
+This repository should contain planning documents, scripts, and safe templates only. Raw company data, Google credentials, calendar tokens, generated CSV exports, and rendered QA files must stay local and are ignored by Git.

@@ -1,0 +1,116 @@
+# Nomobug Capstone Project State
+
+Last updated: 2026-07-05
+
+## Current Phase
+
+This project is in Capstone Project 1 (CP1). CP1 is the planning and proposal phase. The actual build will start in CP2.
+
+## Current Direction
+
+The project is a weather-aware pest control analytics and decision-support dashboard for Nomobug Pest Control Services. It is not a CRM.
+
+The goal is to help management understand:
+
+- service and revenue trends
+- marketing and funnel quality
+- warranty and repeat-problem patterns
+- treatment difficulty by area, pest type, and team
+- recurrence windows and spatial hotspots
+- weather-associated risk indicators
+- upsell package effectiveness and package fit
+- data quality and refresh status
+- recommendation history and action outcomes
+
+## Confirmed Stack
+
+| Layer | Choice |
+|---|---|
+| Raw source | Google Sheets, CSV/Excel exports, Google Calendar |
+| ETL and analytics | Python, Pandas, scikit-learn where appropriate |
+| Warehouse | BigQuery |
+| Visualization | Apache Superset |
+| Weather history | Open-Meteo Historical Weather API |
+| Weather forecast | Open-Meteo forecast first, with data.gov.my/MET as official warning support |
+| Flood indicator | Public InfoBanjir/JPS where extraction is reliable, otherwise optional/manual |
+| Local AI future work | Ollama |
+| Packaging | Docker for local reproducibility, not as the main database |
+
+## CP2 Build Order
+
+1. Profile Google Sheets, CSV exports, and calendar data.
+2. Define canonical columns and data quality rules.
+3. Build Python ingestion and cleaning scripts.
+4. Load staging, cleaned, and mart tables into BigQuery.
+5. Add area/postcode coordinate lookup.
+6. Enrich service rows with historical weather windows.
+7. Build analytics marts for dashboards.
+8. Build Superset dashboards.
+9. Add recommendation log.
+10. Add optional local Ollama explanation layer.
+
+## Analytics Methods
+
+Keep the project analytics-first, not heavy machine learning.
+
+- DBSCAN for spatial repeat-problem hotspot detection.
+- KDE as a heatmap visualization layer.
+- Time-lag analysis for rainfall/weather windows.
+- Logistic regression only if the data is sufficient.
+- Recurrence window analysis for days until repeat claim or complimentary service.
+- Rule-based treatment difficulty index.
+- Descriptive package effectiveness and package-fit analysis for upsell.
+
+The warranty dataset is expected to be around 200+ records, so complex ML should be avoided unless it clearly improves the result.
+
+## Important Wording Rules
+
+Use:
+
+- weather-associated risk
+- risk indicator
+- higher observed risk
+- review indicator
+- requires closer monitoring
+
+Avoid:
+
+- weather caused pest activity
+- technician caused failure
+- this area will definitely fail
+
+## GitHub Privacy Rules
+
+Do not commit:
+
+- raw customer exports
+- calendar extracts with names, phones, emails, or addresses
+- Google credentials
+- OAuth tokens
+- generated CSV outputs
+- rendered proposal QA images/PDFs
+
+Commit:
+
+- proposal documents
+- safe planning markdown
+- scripts
+- templates
+- anonymised or synthetic sample data only
+
+## Current Important Files
+
+- `README.md`: workspace overview
+- `PROJECT_BRIEF.md`: project concept and architecture summary
+- `PROJECT_STATE.md`: compact handoff/context guide
+- `docs/Nomobug_Capstone_Proposal_CP1_Updated.docx`: current CP1 proposal
+- `scripts/fetch_calendar_events.py`: Google Calendar extraction/parser script
+- `scripts/test_open_meteo_history.py`: Open-Meteo historical API test script
+
+## Next Recommended Work
+
+1. Final read-through of the CP1 proposal before submission.
+2. Create a data source mapping sheet from actual Google Sheets tabs.
+3. Confirm which exact Google Calendar fields are reliable.
+4. Build safe synthetic samples for GitHub.
+5. Prepare CP2 starter tasks: BigQuery project setup, Superset local Docker setup, and Python ETL skeleton.

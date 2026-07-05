@@ -12,3 +12,12 @@ coverage/
 verification/
 *.log
 archive/
+data/samples/*.csv
+data/generated/
+data/rendered_proposal/
+googlesheetscredentials.json
+credentials*.json
+*credentials*.json
+token.json
+token*.json
+*.bak
