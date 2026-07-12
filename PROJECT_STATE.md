@@ -84,6 +84,17 @@ Latest data-engineering direction:
 - Use flexible data contracts rather than strict schema rejection because the company data is messy.
 - Include pipeline logs: `etl_run_log`, `source_contract_status`, `data_quality_log`, `record_match_log`, `weather_enrichment_log`, `dbt_test_results`, and `mart_refresh_status`.
 
+## Latest Logbook Status
+
+The current logbook file is `docs/Logbook_Template.docx`.
+
+Latest checks:
+
+- Logbook updated through Week 10.
+- Week 1-4 date ranges corrected to May 2026.
+- Week 5-10 entries added as a natural progression from CRM exploration to analytics, data understanding, calendar parsing, weather research, architecture selection, proposal strengthening, and Airflow/dbt data-engineering scope.
+- Word export check passed after the latest update.
+
 ## Important Wording Rules
 
 Use:
@@ -125,6 +136,7 @@ Commit:
 - `PROJECT_BRIEF.md`: project concept and architecture summary
 - `PROJECT_STATE.md`: compact handoff/context guide
 - `docs/Nomobug_Capstone_Proposal_CP1_Updated.docx`: current CP1 proposal
+- `docs/Logbook_Template.docx`: current CP1 logbook updated through Week 10
 - `scripts/fetch_calendar_events.py`: Google Calendar extraction/parser script
 - `scripts/test_open_meteo_history.py`: Open-Meteo historical API test script
 
