@@ -2,7 +2,7 @@
 
 This workspace is now focused on the current Nomobug capstone direction:
 
-**Weather-aware pest control analytics and decision support using Python ETL, BigQuery, Apache Superset, Google Sheets, Google Calendar, and weather data.**
+**Weather-aware pest control analytics and decision support using Python extract/load scripts, Apache Airflow, BigQuery, dbt Core, Apache Superset, Google Sheets, Google Calendar, and weather data.**
 
 This is not the old CRM prototype. The old React/Express/PostgreSQL prototype has been moved into `archive/old-react-express-prototype` so it does not mix with the current CP1/CP2 plan.
 
@@ -17,6 +17,8 @@ CP1 focuses on:
 - architecture planning
 - source-to-table mapping
 - cleaning and exclusion rules
+- flexible data contracts
+- Airflow/dbt/BigQuery ELT design
 - analytics method selection
 - dashboard design
 - evaluation planning
@@ -29,10 +31,19 @@ Implementation starts in **Capstone Project 2 (CP2)**.
 Google Sheets / CSV / Google Calendar / Weather APIs
         |
         v
-Python ETL and Analytics Scripts
+Python Extract/Load Scripts
         |
         v
-BigQuery Analytics Warehouse
+Apache Airflow Orchestration
+        |
+        v
+BigQuery Bronze Raw Tables
+        |
+        v
+dbt Core Transformations and Tests
+        |
+        v
+BigQuery Silver Clean Tables / Gold Analytics Marts
         |
         v
 Apache Superset Dashboards
@@ -174,7 +185,7 @@ The previous React/Express/PostgreSQL prototype is stored in:
 archive/old-react-express-prototype/
 ```
 
-It is kept only as a reference. The current build direction is BigQuery + Superset + Python ETL.
+It is kept only as a reference. The current build direction is Airflow + Python extract/load + BigQuery + dbt Core + Superset.
 The archive is intentionally ignored by Git so the GitHub repository stays focused on the current capstone plan.
 
 ## Privacy Rule for GitHub

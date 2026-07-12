@@ -4,13 +4,13 @@
 
 **Weather-Aware Pest Control Decision-Support Dashboard**
 
-Using BigQuery, spatial hotspot detection, treatment difficulty analytics, and prescriptive intelligence for Nomobug Pest Control Services.
+Using Airflow-orchestrated ELT, BigQuery, dbt Core, spatial hotspot detection, treatment difficulty analytics, and prescriptive intelligence for Nomobug Pest Control Services.
 
 ## CP1 and CP2 Boundary
 
 This project is currently in **Capstone Project 1 (CP1)**. CP1 focuses on the proposal, problem analysis, literature review, methodology, architecture design, work plan, expected outcomes, and evaluation plan.
 
-The actual system implementation will be carried out in **Capstone Project 2 (CP2)**. CP2 will involve building the ETL pipeline, BigQuery warehouse, Superset dashboards, analytics scripts, and evaluation with company users.
+The actual system implementation will be carried out in **Capstone Project 2 (CP2)**. CP2 will involve building the Airflow-orchestrated ELT pipeline, BigQuery warehouse, dbt transformations and tests, Superset dashboards, analytics scripts, and evaluation with company users.
 
 ## Project Purpose
 
@@ -26,10 +26,19 @@ The proposed project will turn this scattered data into a web-based analytics an
 Google Sheets / CSV / Google Calendar
         |
         v
-Python ETL and Analytics Pipeline
+Python Extract/Load Pipeline
         |
         v
-BigQuery Cloud Data Warehouse
+Apache Airflow Orchestration
+        |
+        v
+BigQuery Bronze Raw Tables
+        |
+        v
+dbt Core Transformations and Tests
+        |
+        v
+BigQuery Silver Clean Tables and Gold Marts
         |
         v
 Apache Superset Dashboards
@@ -55,8 +64,10 @@ Recommendation log and dashboard explanations
 | Layer | Technology | Purpose |
 |---|---|---|
 | Raw data source | Google Sheets, CSV/Excel, Google Calendar | Company records and scheduling data |
-| ETL and analytics | Python, Pandas, scikit-learn | Cleaning, transformation, weather enrichment, DBSCAN, scoring |
-| Data warehouse | BigQuery | Store raw staging tables, cleaned core tables, and dashboard marts |
+| Extract/load | Python, Pandas, BigQuery client | Extract Google Sheets, Calendar, weather APIs, and load Bronze tables |
+| Orchestration | Apache Airflow | Schedule, monitor, retry, and log pipeline tasks |
+| Data warehouse | BigQuery | Store Bronze raw, Silver cleaned, and Gold dashboard mart tables |
+| Transformation and tests | dbt Core | SQL transformations, tests, documentation, and lineage |
 | Dashboard | Apache Superset | Browser-based BI dashboards and filters |
 | Deployment support | Docker | Reproducible local services such as Superset, Python worker, and future Ollama |
 | Future AI | Ollama | Local AI-generated explanations and recommendations without paid API cost |
@@ -66,13 +77,13 @@ Recommendation log and dashboard explanations
 The data warehouse will use three layers:
 
 1. **Staging tables**
-   Raw imported data from Google Sheets, CSV/Excel, Google Calendar, and weather sources.
+   Raw imported data from Google Sheets, CSV/Excel, Google Calendar, and weather sources. In the updated architecture this is the **Bronze** layer.
 
 2. **Cleaned core tables**
-   Standardised customer, service, warranty, refund, payment, upsell, area, pest, and calendar records.
+   Standardised customer, service, warranty, refund, payment, upsell, area, pest, and calendar records. In the updated architecture this is the **Silver** layer.
 
 3. **Analytics marts**
-   Dashboard-ready tables for area risk, treatment difficulty, recurrence windows, hotspot detection, upsell package fit, data quality, refresh status, and recommendations.
+   Dashboard-ready tables for area risk, treatment difficulty, recurrence windows, hotspot detection, upsell package fit, data quality, refresh status, and recommendations. In the updated architecture this is the **Gold** layer.
 
 ## Key Data Relationships
 
@@ -90,6 +101,8 @@ The data warehouse will use three layers:
 ## Data Cleaning and Quality Rules
 
 The project will not silently delete messy records. Raw records will be preserved in staging tables, then cleaned and flagged.
+
+The project will use **flexible data contracts** rather than strict schema rejection. Each source will define required business fields, accepted column aliases, expected data types, and validation rules. If a column cannot be confidently mapped, the source or row is flagged in the Data Quality Report instead of being silently dropped.
 
 Examples of cleaning:
 
@@ -163,12 +176,13 @@ This helps the company understand whether dashboard insights are based on strong
 
 ## Scheduled Refresh
 
-The proposed system will use near-real-time scheduled refresh, not streaming real-time processing.
+The proposed system will use near-real-time scheduled refresh, not streaming real-time processing. Apache Airflow will be used in CP2 to orchestrate the main extraction, loading, dbt transformation, data test, weather enrichment, and refresh logging tasks.
 
 Possible refresh options:
 
-- scheduled Python ETL job
-- BigQuery scheduled query
+- Airflow DAG
+- scheduled Python extract/load task
+- dbt model/test run
 - manual refresh during prototype testing
 
 This is enough because the main business questions are based on day/week/month trends, not second-by-second operations.
@@ -212,8 +226,10 @@ This prepares the project for future local AI using Ollama. The analytics engine
 
 ## Expected CP2 Deliverables
 
-- Python ETL pipeline
-- BigQuery staging, cleaned, and mart tables
+- Python extract/load pipeline
+- Apache Airflow orchestration
+- dbt transformations, tests, documentation, and lineage
+- BigQuery Bronze, Silver, and Gold tables
 - Superset dashboards
 - data quality dashboard
 - weather enrichment output
@@ -226,4 +242,4 @@ This prepares the project for future local AI using Ollama. The analytics engine
 
 ## One-Sentence Description
 
-This project proposes a weather-aware pest control decision-support dashboard that uses company operational data, BigQuery, Python analytics, Superset visualisation, and future local AI recommendations to help Nomobug improve service planning, recurrence monitoring, treatment difficulty analysis, and upsell strategy.
+This project proposes a weather-aware pest control decision-support dashboard that uses company operational data, Airflow-orchestrated ELT, BigQuery, dbt Core, Python analytics, Superset visualisation, and future local AI recommendations to help Nomobug improve service planning, recurrence monitoring, treatment difficulty analysis, and upsell strategy.

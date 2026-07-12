@@ -1,6 +1,6 @@
 # Nomobug Capstone Project State
 
-Last updated: 2026-07-05
+Last updated: 2026-07-12
 
 ## Current Phase
 
@@ -27,8 +27,10 @@ The goal is to help management understand:
 | Layer | Choice |
 |---|---|
 | Raw source | Google Sheets, CSV/Excel exports, Google Calendar |
-| ETL and analytics | Python, Pandas, scikit-learn where appropriate |
-| Warehouse | BigQuery |
+| Extract/load | Python, Pandas, BigQuery client |
+| Orchestration | Apache Airflow |
+| Transformation and tests | dbt Core |
+| Warehouse | BigQuery with Bronze/Silver/Gold layers |
 | Visualization | Apache Superset |
 | Weather history | Open-Meteo Historical Weather API |
 | Weather forecast | Open-Meteo forecast first, with data.gov.my/MET as official warning support |
@@ -39,15 +41,14 @@ The goal is to help management understand:
 ## CP2 Build Order
 
 1. Profile Google Sheets, CSV exports, and calendar data.
-2. Define canonical columns and data quality rules.
-3. Build Python ingestion and cleaning scripts.
-4. Load staging, cleaned, and mart tables into BigQuery.
-5. Add area/postcode coordinate lookup.
-6. Enrich service rows with historical weather windows.
-7. Build analytics marts for dashboards.
-8. Build Superset dashboards.
-9. Add recommendation log.
-10. Add optional local Ollama explanation layer.
+2. Define flexible data contracts, column aliases, and data quality rules.
+3. Build Python extraction/loading scripts into BigQuery Bronze raw tables.
+4. Build dbt models and tests for Silver cleaned tables and Gold dashboard marts.
+5. Add area/postcode coordinate lookup and historical weather enrichment.
+6. Create Airflow DAGs to orchestrate extraction, loading, dbt, testing, enrichment, and refresh logs.
+7. Build Superset dashboards from Gold marts only.
+8. Add pipeline logging, data quality dashboard, and recommendation log.
+9. Add optional local Ollama explanation layer.
 
 ## Analytics Methods
 
@@ -69,11 +70,19 @@ The current proposal file is `docs/Nomobug_Capstone_Proposal_CP1_Updated.docx`.
 
 Latest checks:
 
-- 37 total reference entries.
+- 42 total reference entries after adding Airflow/dbt technical references.
 - 27 literature matrix rows.
 - Around 24 academic/research-like sources, with tool/API documentation kept as technical support references.
 - Literature review expanded with 2020+ sources on pest decision-support systems, DSS adoption, spatial clustering, dashboard design, data quality, rainfall modelling, and AI-assisted pest monitoring.
 - Word export/render check passed after the latest reference expansion.
+
+Latest data-engineering direction:
+
+- Keep the existing proposal title.
+- Strengthen the methodology around an Airflow-orchestrated ELT pipeline.
+- Use Python for extraction/loading, BigQuery for the warehouse, dbt Core for SQL transformations/tests/lineage, and Superset for Gold-mart dashboards.
+- Use flexible data contracts rather than strict schema rejection because the company data is messy.
+- Include pipeline logs: `etl_run_log`, `source_contract_status`, `data_quality_log`, `record_match_log`, `weather_enrichment_log`, `dbt_test_results`, and `mart_refresh_status`.
 
 ## Important Wording Rules
 
@@ -126,4 +135,4 @@ Commit:
 3. Create a data source mapping sheet from actual Google Sheets tabs.
 4. Confirm which exact Google Calendar fields are reliable.
 5. Build safe synthetic samples for GitHub.
-6. Prepare CP2 starter tasks: BigQuery project setup, Superset local Docker setup, and Python ETL skeleton.
+6. Prepare CP2 starter tasks: BigQuery project setup, dbt Core project skeleton, Airflow Docker setup, Superset local Docker setup, and Python extract/load skeleton.
