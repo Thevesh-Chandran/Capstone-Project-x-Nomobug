@@ -1,6 +1,6 @@
 # Nomobug Capstone Project State
 
-Last updated: 2026-07-12
+Last updated: 2026-07-14
 
 ## Current Phase
 
@@ -70,11 +70,16 @@ The current proposal file is `docs/Nomobug_Capstone_Proposal_CP1_Updated.docx`.
 
 Latest checks:
 
+- Added a project technical stack flow figure into Chapter 3.
+- Added a CP2 Gantt chart subsection into Chapter 4.
+- Created editable CP1/CP2 Gantt workbook at `docs/Nomobug_CP1_CP2_Gantt_Chart.xlsx`.
+- Created architecture image at `assets/nomobug_project_tech_stack_flow.png`.
+- Canva generation was attempted but blocked by Canva quota, so the final visual was generated locally.
 - 42 total reference entries after adding Airflow/dbt technical references.
 - 27 literature matrix rows.
 - Around 24 academic/research-like sources, with tool/API documentation kept as technical support references.
 - Literature review expanded with 2020+ sources on pest decision-support systems, DSS adoption, spatial clustering, dashboard design, data quality, rainfall modelling, and AI-assisted pest monitoring.
-- Word export/render check passed after the latest reference expansion.
+- Word export/render check passed after the latest Gantt and architecture update.
 
 Latest data-engineering direction:
 
@@ -91,6 +96,7 @@ The current logbook file is `docs/Logbook_Template.docx`.
 Latest checks:
 
 - Logbook updated through Week 10.
+- Week 10 updated with the CP1/CP2 Gantt workbook and project technical stack flow diagram preparation.
 - Week 1-4 date ranges corrected to May 2026.
 - Week 5-10 entries added as a natural progression from CRM exploration to analytics, data understanding, calendar parsing, weather research, architecture selection, proposal strengthening, and Airflow/dbt data-engineering scope.
 - Word export check passed after the latest update.
@@ -137,14 +143,17 @@ Commit:
 - `PROJECT_STATE.md`: compact handoff/context guide
 - `docs/Nomobug_Capstone_Proposal_CP1_Updated.docx`: current CP1 proposal
 - `docs/Logbook_Template.docx`: current CP1 logbook updated through Week 10
+- `docs/Nomobug_CP1_CP2_Gantt_Chart.xlsx`: editable CP1 and CP2 Gantt workbook
+- `assets/nomobug_project_tech_stack_flow.png`: project technical stack flow image used in the report
 - `scripts/fetch_calendar_events.py`: Google Calendar extraction/parser script
 - `scripts/test_open_meteo_history.py`: Open-Meteo historical API test script
 
 ## Next Recommended Work
 
 1. Final read-through of the CP1 proposal before submission.
-2. If supervisor requests more depth, add short paragraphs for selected literature matrix papers rather than adding more random references.
-3. Create a data source mapping sheet from actual Google Sheets tabs.
-4. Confirm which exact Google Calendar fields are reliable.
-5. Build safe synthetic samples for GitHub.
-6. Prepare CP2 starter tasks: BigQuery project setup, dbt Core project skeleton, Airflow Docker setup, Superset local Docker setup, and Python extract/load skeleton.
+2. Send supervisor the updated proposal plus the project technical stack flow image.
+3. If supervisor requests more depth, add short paragraphs for selected literature matrix papers rather than adding more random references.
+4. Create a data source mapping sheet from actual Google Sheets tabs.
+5. Confirm which exact Google Calendar fields are reliable.
+6. Build safe synthetic samples for GitHub.
+7. Prepare CP2 starter tasks: BigQuery project setup, dbt Core project skeleton, Airflow Docker setup, Superset local Docker setup, and Python extract/load skeleton.
