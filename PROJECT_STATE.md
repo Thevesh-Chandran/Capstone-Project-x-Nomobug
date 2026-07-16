@@ -1,6 +1,6 @@
 # Nomobug Capstone Project State
 
-Last updated: 2026-07-14
+Last updated: 2026-07-16
 
 ## Current Phase
 
@@ -75,11 +75,12 @@ Latest checks:
 - Created editable CP1/CP2 Gantt workbook at `docs/Nomobug_CP1_CP2_Gantt_Chart.xlsx`.
 - Created architecture image at `assets/nomobug_project_tech_stack_flow.png`.
 - Canva generation was attempted but blocked by Canva quota, so the final visual was generated locally.
+- Standardized the proposal formatting to Times New Roman, 12 pt body text, 1.5 line spacing, justified body paragraphs, and APA-style references.
 - 42 total reference entries after adding Airflow/dbt technical references.
 - 27 literature matrix rows.
 - Around 24 academic/research-like sources, with tool/API documentation kept as technical support references.
 - Literature review expanded with 2020+ sources on pest decision-support systems, DSS adoption, spatial clustering, dashboard design, data quality, rainfall modelling, and AI-assisted pest monitoring.
-- Word export/render check passed after the latest Gantt and architecture update.
+- Word export/render check passed after the latest formatting update.
 
 Latest data-engineering direction:
 
