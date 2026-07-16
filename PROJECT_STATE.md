@@ -76,6 +76,9 @@ Latest checks:
 - Created architecture image at `assets/nomobug_project_tech_stack_flow.png`.
 - Canva generation was attempted but blocked by Canva quota, so the final visual was generated locally.
 - Standardized the proposal formatting to Times New Roman, 12 pt body text, 1.5 line spacing, justified body paragraphs, and APA-style references.
+- Revised the proposal so CP1 warehouse/data-source sections read as planned logical designs rather than final implemented schemas.
+- Replaced confusing appendices with clearer planning appendices for data sources, dashboard outputs, and proposed logical warehouse layers.
+- Added more organic in-text citations in Chapter 1 and strengthened citation support for BI, dashboards, data quality, weather-associated risk, and DSS significance.
 - 42 total reference entries after adding Airflow/dbt technical references.
 - 27 literature matrix rows.
 - Around 24 academic/research-like sources, with tool/API documentation kept as technical support references.

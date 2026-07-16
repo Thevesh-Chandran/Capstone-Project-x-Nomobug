@@ -15,6 +15,7 @@ archive/
 data/samples/*.csv
 data/generated/
 data/rendered_proposal/
+data/rendered_*/
 googlesheetscredentials.json
 credentials*.json
 *credentials*.json
