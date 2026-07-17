@@ -4,13 +4,13 @@
 
 **Weather-Aware Pest Control Decision-Support Dashboard**
 
-Using Airflow-orchestrated ELT, BigQuery, dbt Core, spatial hotspot detection, treatment difficulty analytics, and prescriptive intelligence for Nomobug Pest Control Services.
+Using a possible ELT/data engineering workflow, spatial hotspot detection, treatment difficulty analytics, and prescriptive intelligence for Nomobug Pest Control Services.
 
 ## CP1 and CP2 Boundary
 
 This project is currently in **Capstone Project 1 (CP1)**. CP1 focuses on the proposal, problem analysis, literature review, methodology, architecture design, work plan, expected outcomes, and evaluation plan.
 
-The actual system implementation will be carried out in **Capstone Project 2 (CP2)**. CP2 will involve building the Airflow-orchestrated ELT pipeline, BigQuery warehouse, dbt transformations and tests, Superset dashboards, analytics scripts, and evaluation with company users.
+The actual system implementation will be carried out in **Capstone Project 2 (CP2)**. CP2 will involve building the data extraction pipeline, analytics storage layer, transformation and testing logic, dashboards, analytics scripts, and evaluation with company users. Tools such as Airflow, BigQuery, dbt Core, Superset, Docker, and Ollama are possible platform choices, not fixed decisions at CP1 stage.
 
 ## Project Purpose
 
@@ -29,19 +29,23 @@ Google Sheets / CSV / Google Calendar
 Python Extract/Load Pipeline
         |
         v
-Apache Airflow Orchestration
+Possible Orchestration
+Airflow or scheduled Python jobs
         |
         v
-BigQuery Bronze Raw Tables
+Possible Analytics Storage
+BigQuery or another warehouse/database
         |
         v
-dbt Core Transformations and Tests
+Possible Transformations and Tests
+dbt Core or SQL/Python scripts
         |
         v
-BigQuery Silver Clean Tables and Gold Marts
+Cleaned Tables and Dashboard Marts
         |
         v
-Apache Superset Dashboards
+Possible BI Dashboards
+Superset or another BI tool
         |
         v
 Management Decision Support
@@ -50,40 +54,40 @@ Management Decision Support
 Future extension:
 
 ```text
-BigQuery analytics outputs
+Analytics outputs
         |
         v
-Local Ollama AI service
+Possible local AI explanation service
         |
         v
 Recommendation log and dashboard explanations
 ```
 
-## Main Technology Stack
+## Possible Platform Stack
 
 | Layer | Technology | Purpose |
 |---|---|---|
 | Raw data source | Google Sheets, CSV/Excel, Google Calendar | Company records and scheduling data |
-| Extract/load | Python, Pandas, BigQuery client | Extract Google Sheets, Calendar, weather APIs, and load Bronze tables |
-| Orchestration | Apache Airflow | Schedule, monitor, retry, and log pipeline tasks |
-| Data warehouse | BigQuery | Store Bronze raw, Silver cleaned, and Gold dashboard mart tables |
-| Transformation and tests | dbt Core | SQL transformations, tests, documentation, and lineage |
-| Dashboard | Apache Superset | Browser-based BI dashboards and filters |
-| Deployment support | Docker | Reproducible local services such as Superset, Python worker, and future Ollama |
-| Future AI | Ollama | Local AI-generated explanations and recommendations without paid API cost |
+| Extract/load | Python and Pandas | Extract Google Sheets, Calendar, weather APIs, and load raw staging tables |
+| Orchestration | Possible Apache Airflow or scheduled Python jobs | Schedule, monitor, retry, and log pipeline tasks if needed |
+| Analytics storage | Possible BigQuery or another analytics warehouse/database | Store raw, cleaned, and dashboard mart tables |
+| Transformation and tests | Possible dbt Core or SQL/Python scripts | SQL transformations, tests, documentation, and lineage |
+| Dashboard | Possible Apache Superset or another BI tool | Browser-based BI dashboards and filters |
+| Deployment support | Possible Docker setup | Reproducible local services if selected during CP2 |
+| Future AI | Possible local AI model such as Ollama | Local AI-generated explanations and recommendations without paid external API cost |
 
-## BigQuery Storage Design
+## Proposed Analytics Storage Design
 
-The data warehouse will use three layers:
+The analytics storage design will use three logical layers. BigQuery is one possible platform, but the final storage choice will be confirmed in CP2 after feasibility testing.
 
 1. **Staging tables**
-   Raw imported data from Google Sheets, CSV/Excel, Google Calendar, and weather sources. In the updated architecture this is the **Bronze** layer.
+   Raw imported data from Google Sheets, CSV/Excel, Google Calendar, and weather sources.
 
 2. **Cleaned core tables**
-   Standardised customer, service, warranty, refund, payment, upsell, area, pest, and calendar records. In the updated architecture this is the **Silver** layer.
+   Standardised customer, service, warranty, refund, payment, upsell, area, pest, and calendar records.
 
 3. **Analytics marts**
-   Dashboard-ready tables for area risk, treatment difficulty, recurrence windows, hotspot detection, upsell package fit, data quality, refresh status, and recommendations. In the updated architecture this is the **Gold** layer.
+   Dashboard-ready tables for area risk, treatment difficulty, recurrence windows, hotspot detection, upsell package fit, data quality, refresh status, and recommendations.
 
 ## Key Data Relationships
 
@@ -176,13 +180,13 @@ This helps the company understand whether dashboard insights are based on strong
 
 ## Scheduled Refresh
 
-The proposed system will use near-real-time scheduled refresh, not streaming real-time processing. Apache Airflow will be used in CP2 to orchestrate the main extraction, loading, dbt transformation, data test, weather enrichment, and refresh logging tasks.
+The proposed system will use near-real-time scheduled refresh, not streaming real-time processing. In CP2, the refresh workflow may be handled using Apache Airflow, scheduled Python jobs, warehouse scheduled queries, or another suitable scheduler depending on setup complexity and supervisor/company feedback.
 
 Possible refresh options:
 
-- Airflow DAG
+- Airflow DAG if selected
 - scheduled Python extract/load task
-- dbt model/test run
+- transformation/model test run
 - manual refresh during prototype testing
 
 This is enough because the main business questions are based on day/week/month trends, not second-by-second operations.
@@ -222,15 +226,15 @@ The Recommendation Log will store:
 - management action taken
 - later outcome
 
-This prepares the project for future local AI using Ollama. The analytics engine will compute the score, and Ollama can later explain the recommendation in plain language.
+This prepares the project for future local AI support. The analytics engine will compute the score, and a local model such as Ollama can later explain the recommendation in plain language.
 
 ## Expected CP2 Deliverables
 
 - Python extract/load pipeline
-- Apache Airflow orchestration
-- dbt transformations, tests, documentation, and lineage
-- BigQuery Bronze, Silver, and Gold tables
-- Superset dashboards
+- possible orchestration workflow
+- transformations, tests, documentation, and lineage
+- raw, cleaned, and dashboard-ready analytics tables
+- BI dashboards
 - data quality dashboard
 - weather enrichment output
 - treatment difficulty index
@@ -242,4 +246,4 @@ This prepares the project for future local AI using Ollama. The analytics engine
 
 ## One-Sentence Description
 
-This project proposes a weather-aware pest control decision-support dashboard that uses company operational data, Airflow-orchestrated ELT, BigQuery, dbt Core, Python analytics, Superset visualisation, and future local AI recommendations to help Nomobug improve service planning, recurrence monitoring, treatment difficulty analysis, and upsell strategy.
+This project proposes a weather-aware pest control decision-support dashboard that uses company operational data, Python-based data processing, a possible analytics warehouse, BI visualisation, and future local AI recommendations to help Nomobug improve service planning, recurrence monitoring, treatment difficulty analysis, and upsell strategy.
