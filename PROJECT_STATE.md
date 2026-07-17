@@ -102,11 +102,13 @@ The current logbook file is `docs/Logbook_Template.docx`.
 
 Latest checks:
 
-- Logbook updated through Week 10.
+- Logbook updated through Week 11.
+- Week 11 added to reflect supervisor feedback that CP1 methodology should not lock the project into BigQuery/Airflow/dbt/Superset/Docker/Ollama too early.
+- Week 11 explains the revised "possible platform" approach and why final CP2 tools will be confirmed after data profiling and feasibility testing.
 - Week 10 updated with the CP1/CP2 Gantt workbook and project technical stack flow diagram preparation.
 - Week 1-4 date ranges corrected to May 2026.
 - Week 5-10 entries added as a natural progression from CRM exploration to analytics, data understanding, calendar parsing, weather research, architecture selection, proposal strengthening, and data-engineering scope.
-- Word export check passed after the latest update.
+- Word export/render check passed after the latest update.
 
 ## Important Wording Rules
 
