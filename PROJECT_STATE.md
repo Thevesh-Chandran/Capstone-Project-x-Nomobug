@@ -10,9 +10,12 @@ This project is in Capstone Project 1 (CP1). CP1 is the planning and proposal ph
 
 The project is a weather-aware pest control analytics and decision-support dashboard for Nomobug Pest Control Services. It is not a CRM.
 
+The main problem framing should begin with the wider pest-control market and customer-service issue: customers may still experience pest activity after treatment, and SMEs need better evidence to understand recurrence, warranty support, treatment difficulty, refund risk, and service planning. Nomobug's fragmented internal data is the source used to investigate and manage that wider problem, not the only problem by itself.
+
 The goal is to help management understand:
 
 - service and revenue trends
+- repeated pest problems after service
 - marketing and funnel quality
 - warranty and repeat-problem patterns
 - treatment difficulty by area, pest type, and team

@@ -14,11 +14,13 @@ The actual system implementation will be carried out in **Capstone Project 2 (CP
 
 ## Project Purpose
 
+Pest control companies operate in a market where customers may still experience pest activity after treatment, request warranty support, need complimentary follow-up visits, or lose confidence when the same pest issue appears again. For SMEs, these repeated problems can increase service costs, refund risk, technician workload, scheduling pressure, and customer dissatisfaction.
+
 Nomobug currently stores operational data in Google Sheets and Google Calendar. The data includes leads, sales, services, warranty claims, refunds, payment records, upsell records, technician assignments, and service scheduling.
 
-The problem is that these records are spread across separate files and are mainly used for recording, not decision-making. Management has to manually compare different sources to understand warranty patterns, repeat problems, treatment difficulty, refund causes, weather-associated risk, and upsell performance.
+The problem is that these records are spread across separate files and are mainly used for recording, not decision-making. Management has to manually compare different sources to understand whether repeated pest issues are linked with area, premise type, pest type, service timing, warranty claims, refund causes, weather-associated risk, technician/team review indicators, or upsell performance.
 
-The proposed project will turn this scattered data into a web-based analytics and decision-support dashboard.
+The proposed project will turn this scattered data into a web-based analytics and decision-support dashboard that focuses on service outcomes, treatment difficulty, recurrence monitoring, and better planning.
 
 ## Proposed Architecture
 
@@ -246,4 +248,4 @@ This prepares the project for future local AI support. The analytics engine will
 
 ## One-Sentence Description
 
-This project proposes a weather-aware pest control decision-support dashboard that uses company operational data, Python-based data processing, a possible analytics warehouse, BI visualisation, and future local AI recommendations to help Nomobug improve service planning, recurrence monitoring, treatment difficulty analysis, and upsell strategy.
+This project proposes a weather-aware pest control decision-support dashboard that uses company operational data, Python-based data processing, a possible analytics warehouse, BI visualisation, and future local AI recommendations to help Nomobug understand repeated pest problems after service, improve service planning, monitor recurrence, analyse treatment difficulty, and strengthen upsell strategy.
