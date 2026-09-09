@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-label="Nomobug Analytics">
+<rect width="1200" height="360" rx="22" fill="#132536"/>
+<g fill="none" stroke="#86c9ad" opacity=".28"><circle cx="1080" cy="130" r="100"/><circle cx="1080" cy="130" r="170"/><circle cx="1080" cy="130" r="240"/><path d="M860 290 990 190 1090 220 1170 100" stroke-width="4"/></g>
+<g font-family="Segoe UI,Arial,sans-serif"><text x="60" y="65" font-size="15" letter-spacing="3" fill="#86c9ad">THEVESH CHANDRAN / PROJECT PORTFOLIO</text>
+<text x="58" y="151" font-size="48" font-weight="700" fill="white">Nomobug Analytics</text>
+<text x="60" y="200" font-size="21" fill="#c1d5e1">Weather-aware analytics for pest-control operations.</text>
+<path d="M60 242H800" stroke="#456176"/>
+<text x="60" y="295" font-size="18" letter-spacing="2" fill="#86c9ad">DATA ENGINEERING  /  PYTHON  /  CAPSTONE</text></g></svg>

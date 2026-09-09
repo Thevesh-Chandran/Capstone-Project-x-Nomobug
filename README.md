@@ -1,31 +1,55 @@
-# Nomobug Analytics
+<p align="center"><img src="assets/hero.svg" alt="Nomobug Analytics" width="960"></p>
 
-Repository for the Nomobug weather-aware pest-control analytics and decision-support system. The system is intended to combine operational, service-outcome, scheduling, location, and weather data for management analysis.
+<h1 align="center">Nomobug Analytics</h1>
 
-This is an analytics and data-engineering repository, not a CRM application.
+<p align="center">Weather-aware analytics for pest-control operations.</p>
 
-## Repository Status
+<p align="center"><a href="#overview">Overview</a> · <a href="#explore">Explore</a> · <a href="#getting-started">Getting started</a></p>
 
-CP2 implementation is at the source-understanding and pipeline-design stage. The repository currently contains extraction prototypes, architecture material, and implementation notes. A production data pipeline, analytical models, and dashboards have not been added yet.
+<p align="center"><img src="https://img.shields.io/badge/DATA%20ENGINEERING-86c9ad" alt="DATA ENGINEERING">
+<img src="https://img.shields.io/badge/PYTHON-86c9ad" alt="PYTHON">
+<img src="https://img.shields.io/badge/CAPSTONE-86c9ad" alt="CAPSTONE"></p>
 
-## Repository Contents
+## Overview
 
-```text
-assets/                Architecture diagrams
-data/                  Data-workspace policy and safe placeholders
-scripts/               Source-extraction prototypes
-CP2_START_HERE.md      Implementation notes and planned build order
+An ongoing Sunway University capstone project exploring how operational, service-outcome, scheduling, location and weather data can support pest-control management decisions.
+
+The intended system will help investigate recurring service problems, weather-associated patterns and geographic hotspots through analysis and dashboards.
+
+## Explore
+
+| Public repository content | Purpose |
+|---|---|
+| [Calendar extraction prototype](scripts/fetch_calendar_events.py) | Read selected events and parse booking details |
+| [Weather retrieval prototype](scripts/test_open_meteo_history.py) | Explore historical Open-Meteo weather data |
+| [Implementation notes](CP2_START_HERE.md) | Initial CP2 planning and build order |
+| [Data workspace](data/) | Data-handling guidance and placeholders |
+
+## Current progress
+
+The local CP2 project has reached live-source integration: an initial prospects API-to-Neon PostgreSQL load and unchanged-snapshot rerun were verified with 32,580 rows. A BigQuery loader is prepared; live migration remains pending.
+
+**This public repository contains the earlier extraction prototypes and planning material.** The newer local pipeline is not included here. Transformations, predictive modelling, clustering and hosted dashboards remain in development or planned.
+
+## Planned architecture
+
+```mermaid
+flowchart LR
+    A[Google Sheets and Calendar] --> C[Python extraction and profiling]
+    B[Open-Meteo weather] --> C
+    C --> D[BigQuery warehouse]
+    D --> E[dbt transformations]
+    E --> F[Analysis and machine learning]
+    E --> G[Apache Superset dashboards]
+    F --> G
 ```
 
-## Source Prototypes
+The current plan uses Python/Pandas, BigQuery, dbt Core, scikit-learn, GitHub Actions and Preset-hosted Apache Superset. Neon PostgreSQL remains a manual fallback. The diagram describes the planned system, not a completed deployment.
 
-- `scripts/fetch_calendar_events.py` reads selected Google Calendar events and parses semi-structured booking details.
-- `scripts/test_open_meteo_history.py` tests historical weather retrieval from Open-Meteo.
+## Getting started
 
-These scripts are exploratory and require further validation, testing, configuration, and privacy controls before production use.
+Start with the [implementation notes](CP2_START_HERE.md) and inspect the source prototypes. They require source-specific configuration, credentials and further validation; there is no complete public one-command application to launch yet.
 
-## Data and Secrets
+## Data handling
 
-The repository must not contain raw company exports, customer or employee personal data, full Calendar extracts, credentials, OAuth tokens, API keys, or generated outputs containing identifying information.
-
-Use anonymised or synthetic samples for committed tests. Keep real source data and credentials in approved local storage outside version control.
+Raw company exports, customer or employee data, credentials and identifying generated outputs stay outside version control. Use anonymised or synthetic samples for shared tests and examples.
