@@ -1,65 +1,68 @@
-# Residential 4x/6x/12x warranty coverage feasibility
+# Residential 4x/6x/12x warranty coverage model evaluation
 
 ## Dataset contract
 
-The dataset contains one row per mature interval beginning at each recorded base
-service. For services before the final service, the interval ends the day before
-the next service. The final interval ends 30 days after the final service. Every
-recorded Calendar warranty signal in an interval is counted, so repeated claims
-are retained.
+The dataset contains one row per mature coverage interval beginning at each
+recorded base service. Pre-final intervals end the day before the next service;
+the final interval ends 30 days after the final service. Multiple recorded
+warranty signals are retained. Commercial, residential 1x and residential 3x
+packages are excluded.
 
-Commercial clients and residential 1x/3x packages are excluded. The label is an
-operational Calendar signal and does not prove biological recurrence or treatment
-failure.
+There are 364 intervals across 146 packages and 50 positive intervals. Eleven
+packages have multiple recorded claims. Prediction-safe history now records the
+number of earlier claims and services and time since the previous claim/service.
 
-## Coverage
+## Validation design
 
-| Package | Development intervals | 2026 intervals | Recorded claims |
+Two complementary checks are used:
+
+1. Temporal evaluation trains on 2024–2025 and reports on 2026.
+2. Five-fold stratified grouped validation keeps every interval from a package
+   in one fold, preventing the same package from appearing on both sides.
+
+The 2026 confidence intervals use 1,000 package-level bootstrap samples.
+
+## Selected experimental challenger
+
+The history-only L2 logistic model is selected. It has the best grouped average
+precision and does not depend on environmental variables that fail to generalize.
+
+| Validation | ROC AUC | Average precision | Brier score |
 |---|---:|---:|---:|
-| 4x | 145 | 78 | 46 |
-| 6x | 66 | 39 | 6 |
-| 12x | 7 | 29 | 2 |
+| Package-grouped 5-fold mean | 0.6522 | 0.2907 | 0.2254 |
+| 2026 temporal evaluation | 0.6857 | 0.3215 | 0.2028 |
 
-There are 364 mature intervals across 146 distinct packages. Eleven packages
-have more than one recorded claim. The 6x and especially 12x samples are too
-small for dependable package-specific models.
+The 2026 uncertainty is wide:
 
-## Initial 2026 benchmark
+- ROC AUC 95% package-bootstrap interval: 0.516–0.817.
+- Average precision interval: 0.148–0.564.
+- Brier interval: 0.154–0.258.
 
-The development period has 218 intervals and 30 positive intervals. The 2026
-period has 146 intervals and 20 positives, a 13.7% positive rate.
+This remains experimental and must not drive automated customer decisions.
 
-| Feature group | ROC AUC | Average precision | Brier score |
+## Environmental stability
+
+| Feature contract with prior history | Grouped mean ROC AUC | Grouped mean AP | Grouped mean Brier |
 |---|---:|---:|---:|
-| Base, without weather | 0.6607 | 0.2473 | 0.2133 |
-| Base plus prior weather | 0.6440 | 0.2582 | 0.2227 |
-| Base plus HOTOSM waterways | **0.6863** | **0.2786** | **0.2050** |
-| Base plus weather and HOTOSM | 0.6603 | 0.2421 | 0.2174 |
+| History only | **0.6522** | **0.2907** | 0.2254 |
+| History plus prior weather | 0.6517 | 0.2677 | **0.2246** |
+| History plus HOTOSM waterways | 0.5424 | 0.2132 | 0.2446 |
+| History plus weather and HOTOSM | 0.5284 | 0.1932 | 0.2491 |
 
-Prior weather slightly raises average precision but lowers ROC AUC and worsens
-the Brier score. HOTOSM waterways improve all three 2026 metrics when added
-without weather. With only 50 positive development/reporting intervals combined,
-this remains exploratory challenger evidence and does not justify operational
-scoring or a causal waterway explanation.
+The earlier apparent HOTOSM improvement disappears after adding prior history
+and separating packages. Weather also fails to improve grouped average precision.
+Both remain descriptive context rather than selected model features.
 
-## Rainfall and geographic scale
+## Package-specific support
 
-Geohash sensitivity was calculated at broad, area, and local scales. Only 7 of
-104 area-period groups meet the minimum of 30 intervals, 5 positives, and 5
-negatives. No local approximately 5 km group is large enough for a performance
-metric, and the weather source is coarser at approximately 9–11 km.
+| Package | 2026 rows | Positives | ROC AUC | Average precision | Supported |
+|---|---:|---:|---:|---:|---:|
+| 4x | 78 | 15 | 0.6720 | 0.3753 | Yes, experimental |
+| 6x | 39 | 3 | 0.4259 | 0.0939 | No |
+| 12x | 29 | 2 | 0.4444 | 0.0972 | No |
 
-Among supported groups, rainfall/target correlations are small and inconsistent.
-The broad-area correlation changes from -0.111 in development to +0.045 in 2026.
-There is therefore no stable evidence that more rainfall predicts more recorded
-warranty claims in this sample.
+Only the 4x segment meets the minimum reporting rule. The combined model may be
+shown as capstone feasibility evidence, while 6x and 12x remain descriptive.
 
-Flooding, drains, standing water and mapped-water proximity remain reasonable
-hypotheses for future data collection. They cannot currently be presented as
-causal explanations.
-
-Reproduce with:
-
-```powershell
-python scripts/evaluate_warranty_coverage_episodes.py
-```
+The target is a recorded Calendar warranty signal, not confirmed biological
+recurrence or proof of treatment failure.

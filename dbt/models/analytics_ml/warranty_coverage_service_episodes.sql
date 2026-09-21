@@ -62,6 +62,19 @@ with observation as (
         o.observed_through
     from service_anchors a
     cross join observation o
+), prior_history as (
+    select
+        i.calendar_event_row as service_anchor_event_row,
+        countif(h.warranty_claim_candidate) as prior_package_warranty_claims,
+        countif(not h.warranty_claim_candidate) as prior_package_service_events,
+        date_diff(i.coverage_interval_start,
+            max(if(h.warranty_claim_candidate, h.event_date_local, null)), day)
+            as days_since_prior_warranty_claim
+    from intervals i
+    left join {{ ref('calendar_service_event_facts') }} h
+      on h.sales_record_id = i.sales_record_id
+     and h.event_date_local < i.coverage_interval_start
+    group by i.calendar_event_row, i.coverage_interval_start
 ), labelled as (
     select
         i.sales_record_id,
@@ -81,6 +94,13 @@ with observation as (
         i.first_recorded_session,
         i.last_recorded_session,
         i.session_anchor_count,
+        coalesce(ph.prior_package_warranty_claims, 0)
+            as prior_package_warranty_claims,
+        coalesce(ph.prior_package_service_events, 0)
+            as prior_package_service_events,
+        ph.days_since_prior_warranty_claim,
+        date_diff(i.event_date_local, i.previous_service_date, day)
+            as days_since_previous_service,
         coalesce(nullif(trim(i.pest_type_raw), ''), 'UNKNOWN') as pest_category,
         coalesce(nullif(trim(i.package_type_raw), ''), 'UNKNOWN')
             as package_category,
@@ -118,6 +138,8 @@ with observation as (
      and w.warranty_claim_candidate
      and w.event_date_local between i.coverage_interval_start
                               and i.coverage_interval_end
+    left join prior_history ph
+      on ph.service_anchor_event_row = i.calendar_event_row
     left join {{ source('quality', 'hotosm_waterway_context_by_location') }} hot
       on hot.latitude = round(i.latitude, 5)
      and hot.longitude = round(i.longitude, 5)

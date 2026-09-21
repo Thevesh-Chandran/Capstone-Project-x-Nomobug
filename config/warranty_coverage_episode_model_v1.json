@@ -1,0 +1,77 @@
+{
+  "model_version": "warranty_coverage_residential_4x_6x_12x_interval_v1",
+  "status": "validated_experimental_not_operational",
+  "eligible_population": "residential_4x_6x_12x_service_intervals",
+  "target": "any_recorded_calendar_warranty_signal_in_mature_coverage_interval",
+  "model_variant": "logistic_l2_balanced",
+  "selected_feature_set": "base_plus_prior_history",
+  "features": [
+    "service_number",
+    "package_sessions_recorded",
+    "sale_total_rm",
+    "location_uncertainty_radius_m",
+    "prior_package_warranty_claims",
+    "prior_package_service_events",
+    "days_since_prior_warranty_claim",
+    "days_since_previous_service",
+    "pest_category",
+    "package_category",
+    "calendar_pest_text_category",
+    "calendar_service_method_category"
+  ],
+  "ordered_feature_sha256": "2f3b619af5184f1430d2f334dc84b6405f671ac7a8eabedc20877f420a039b52",
+  "package_grouped_5fold": {
+    "mean_roc_auc": 0.6522,
+    "roc_auc_sd": 0.0859,
+    "mean_average_precision": 0.2907,
+    "average_precision_sd": 0.1185,
+    "mean_brier_score": 0.2254,
+    "positive_intervals": 50
+  },
+  "temporal_2026": {
+    "rows": 146,
+    "positive_rows": 20,
+    "roc_auc": 0.6857,
+    "roc_auc_95pct_package_bootstrap": [
+      0.5164,
+      0.8165
+    ],
+    "average_precision": 0.3215,
+    "average_precision_95pct_package_bootstrap": [
+      0.1479,
+      0.5641
+    ],
+    "brier_score": 0.2028,
+    "brier_95pct_package_bootstrap": [
+      0.1544,
+      0.258
+    ]
+  },
+  "supported_package_segment": {
+    "package_sessions": 4,
+    "rows": 78,
+    "positive_rows": 15,
+    "roc_auc": 0.672,
+    "average_precision": 0.3753
+  },
+  "unsupported_package_segments": [
+    {
+      "package_sessions": 6,
+      "rows": 39,
+      "positive_rows": 3
+    },
+    {
+      "package_sessions": 12,
+      "rows": 29,
+      "positive_rows": 2
+    }
+  ],
+  "environment_decision": "weather_and_hotosm_waterways_not_selected_after_package_grouped_validation",
+  "limitations": [
+    "Calendar warranty signal is not confirmed biological recurrence.",
+    "Only 50 positive intervals exist across all periods.",
+    "Confidence intervals are wide.",
+    "Only the 4x 2026 segment meets the minimum reporting support rule.",
+    "Repeated intervals from one package are dependent; grouped validation separates packages."
+  ]
+}

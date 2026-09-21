@@ -37,10 +37,11 @@ must not be added to the selected 3x contract. Small gains in the already-inspec
 | HOTOSM waterways | 0.6863 | 0.2786 | 0.2050 |
 | Weather and HOTOSM | 0.6603 | 0.2421 | 0.2174 |
 
-Waterways improve all three metrics when added alone to the repeated-coverage
-benchmark. This is promising challenger evidence, but the 2026 set contains only
-146 intervals and 20 positives. It is too small to freeze or operationalize the
-model, and the result does not establish causation.
+Waterways initially improve the simple temporal benchmark, but that gain does
+not survive the stronger test. After prediction-safe prior history is added and
+packages are separated across grouped folds, history-only mean ROC AUC is 0.6522
+and average precision is 0.2907, while history plus HOTOSM falls to 0.5424 and
+0.2132. HOTOSM therefore remains descriptive context and is not selected.
 
 ## Flood-event source decision
 
