@@ -98,6 +98,16 @@ with observation as (
         i.prior_14d_precipitation_mm,
         i.prior_7d_relative_humidity_mean_pct,
         i.prior_7d_soil_moisture_0_to_7cm_mean,
+        hot.hotosm_nearest_waterway_m,
+        hot.hotosm_water_features_500m,
+        hot.hotosm_water_features_1km,
+        hot.hotosm_water_features_2km,
+        hot.hotosm_nearest_drainage_m,
+        hot.hotosm_nearest_flowing_water_m,
+        hot.hotosm_nearest_standing_water_m,
+        hot.hotosm_drainage_features_2km,
+        hot.hotosm_flowing_water_features_2km,
+        hot.hotosm_standing_water_features_2km,
         countif(w.warranty_claim_candidate) as warranty_claim_count_in_interval,
         countif(w.warranty_claim_candidate) > 0 as any_warranty_claim_in_interval,
         count(distinct if(w.warranty_claim_candidate,
@@ -108,6 +118,9 @@ with observation as (
      and w.warranty_claim_candidate
      and w.event_date_local between i.coverage_interval_start
                               and i.coverage_interval_end
+    left join {{ source('quality', 'hotosm_waterway_context_by_location') }} hot
+      on hot.latitude = round(i.latitude, 5)
+     and hot.longitude = round(i.longitude, 5)
     where i.coverage_interval_end is not null
       and i.coverage_interval_end <= i.observed_through
       and i.coverage_interval_end >= i.coverage_interval_start

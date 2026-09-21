@@ -9,6 +9,11 @@ select case
         then 'claim_days_exceed_claim_events'
     when any_warranty_claim_in_interval != (warranty_claim_count_in_interval > 0)
         then 'binary_count_mismatch'
+    when hotosm_nearest_waterway_m < 0
+      or hotosm_water_features_500m < 0
+      or hotosm_water_features_1km < hotosm_water_features_500m
+      or hotosm_water_features_2km < hotosm_water_features_1km
+        then 'invalid_hotosm_waterway_context'
     else 'overlapping_intervals'
 end as failure
 from {{ ref('warranty_coverage_service_episodes') }} a
@@ -19,6 +24,10 @@ where package_sessions_recorded not in (4, 6, 12)
    or exposure_days != date_diff(coverage_interval_end, coverage_interval_start, day) + 1
    or warranty_claim_count_in_interval < warranty_claim_days_in_interval
    or any_warranty_claim_in_interval != (warranty_claim_count_in_interval > 0)
+   or hotosm_nearest_waterway_m < 0
+   or hotosm_water_features_500m < 0
+   or hotosm_water_features_1km < hotosm_water_features_500m
+   or hotosm_water_features_2km < hotosm_water_features_1km
    or exists (
        select 1
        from {{ ref('warranty_coverage_service_episodes') }} b

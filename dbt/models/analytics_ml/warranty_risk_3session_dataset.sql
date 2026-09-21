@@ -380,6 +380,17 @@ with observation as (
         env.nearest_mapped_forest_m is not null as mapped_forest_within_2km,
         env.places_result_capped as environmental_places_result_capped,
         env.location_id is not null as environmental_context_available,
+        hot.hotosm_nearest_waterway_m,
+        hot.hotosm_water_features_500m,
+        hot.hotosm_water_features_1km,
+        hot.hotosm_water_features_2km,
+        hot.hotosm_nearest_drainage_m,
+        hot.hotosm_nearest_flowing_water_m,
+        hot.hotosm_nearest_standing_water_m,
+        hot.hotosm_drainage_features_2km,
+        hot.hotosm_flowing_water_features_2km,
+        hot.hotosm_standing_water_features_2km,
+        hot.location_id is not null as hotosm_waterway_context_available,
         exists(
             select 1 from unnest(coalesce(w.warranty_dates, [])) warranty_date
             where warranty_date > c.prediction_anchor_date
@@ -418,6 +429,9 @@ with observation as (
     left join {{ source('quality', 'environmental_context_by_location') }} env
       on env.latitude = round(c.latitude, 5)
      and env.longitude = round(c.longitude, 5)
+    left join {{ source('quality', 'hotosm_waterway_context_by_location') }} hot
+      on hot.latitude = round(c.latitude, 5)
+     and hot.longitude = round(c.longitude, 5)
     cross join observation o
     where p.include_in_sale_count
       and p.package_sessions_recorded = 3

@@ -33,10 +33,14 @@ period has 146 intervals and 20 positives, a 13.7% positive rate.
 |---|---:|---:|---:|
 | Base, without weather | 0.6607 | 0.2473 | 0.2133 |
 | Base plus prior weather | 0.6440 | 0.2582 | 0.2227 |
+| Base plus HOTOSM waterways | **0.6863** | **0.2786** | **0.2050** |
+| Base plus weather and HOTOSM | 0.6603 | 0.2421 | 0.2174 |
 
 Prior weather slightly raises average precision but lowers ROC AUC and worsens
-the Brier score. With only 50 positive development/reporting intervals combined,
-this is exploratory evidence and does not justify operational scoring.
+the Brier score. HOTOSM waterways improve all three 2026 metrics when added
+without weather. With only 50 positive development/reporting intervals combined,
+this remains exploratory challenger evidence and does not justify operational
+scoring or a causal waterway explanation.
 
 ## Rainfall and geographic scale
 

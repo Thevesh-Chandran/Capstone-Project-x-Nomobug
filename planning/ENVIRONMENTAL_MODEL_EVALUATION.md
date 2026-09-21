@@ -1,50 +1,59 @@
-# Environmental factors in the residential 3x warranty-risk experiment
+# Environmental factors in the warranty-risk experiments
 
-## Decision
+## HOTOSM waterways source
 
-Do not promote the current static environmental feature group into
-`warranty_risk_residential_3x_30d_v3`. Keep it for descriptive spatial analysis
-and future testing. It did not improve pre-2026 validation performance.
+The project now uses the 9 September 2026 HOTOSM Malaysia waterways snapshot,
+sourced from OpenStreetMap and distributed through HDX under ODbL. The exact
+source ZIP is pinned by SHA-256
+`544664dd486c2b2b8471c8ba2092f879dfa6282406943cf3a211cbdd0853c513`.
+The bounded service-region load contains 56,582 water features.
 
-## Factors and coverage
+Derived fields distinguish drainage (drains, ditches and canals), flowing water
+(rivers and streams), and standing water. They include nearest distance and
+feature counts within 500 m, 1 km and 2 km. All 1,119 cached service locations
+have a mapped waterway within 2 km, compared with 951 locations in the earlier
+Geoapify result. This is improved mapped coverage, not evidence that a location
+flooded. OpenStreetMap completeness varies with volunteer mapping activity.
 
-The challenger adds elevation, 500-metre relief, and mapped water and forest
-proximity/counts. Among 1,335 eligible rows, elevation and relief cover all rows,
-water distance covers 1,117, and forest distance covers 242. Missing values are
-imputed inside each training fold.
+## Residential 3x model
 
-| Feature contract | Pre-2026 mean ROC AUC | Pre-2026 mean AP | Mean Brier |
+| Feature contract | Pre-2026 mean ROC AUC | Mean AP | Mean Brier |
 |---|---:|---:|---:|
-| v3 base | 0.5187 | 0.2535 | 0.2143 |
-| v3 plus static environment | 0.5162 | 0.2496 | 0.2194 |
+| v3 base | 0.5198 | 0.2540 | 0.2145 |
+| Legacy static environment | 0.5165 | 0.2496 | 0.2194 |
+| HOTOSM waterways | 0.5090 | 0.2409 | 0.2239 |
+| All static environment | 0.5112 | 0.2404 | 0.2264 |
 
-On the already-inspected 401-row 2026 diagnostic, the static group changes ROC
-AUC from 0.5469 to 0.5530 and average precision from 0.2932 to 0.2998. That small
-post-selection gain does not override the weaker development evidence.
+HOTOSM waterways worsen all three pre-2026 mean metrics for the 3x target. They
+must not be added to the selected 3x contract. Small gains in the already-inspected
+2026 diagnostic do not override the development result.
 
-## Rainfall and spatial scale
+## Residential 4x/6x/12x repeated-coverage model
 
-Testing rainfall by area is sensible, but scale must match the source. Current
-weather is approximately a 0.1-degree grid, roughly 9–11 km locally. A 1 km or
-2 km rainfall radius would repeat the same grid estimate and imply precision the
-source does not contain. Spatial clustering may still use smaller radii for
-service-location patterns, but it must not be presented as local rainfall.
+| Feature contract | 2026 ROC AUC | Average precision | Brier |
+|---|---:|---:|---:|
+| Base | 0.6607 | 0.2473 | 0.2133 |
+| Prior weather | 0.6440 | 0.2582 | 0.2227 |
+| HOTOSM waterways | 0.6863 | 0.2786 | 0.2050 |
+| Weather and HOTOSM | 0.6603 | 0.2421 | 0.2174 |
 
-For a later dashboard, precompute a small set of validated geographic scenarios,
-such as weather-grid cell and broader 10 km/20 km neighbourhoods. For each scale
-show the eligible denominator, positive count, recurrence-proxy rate, uncertainty,
-and model metrics only when both outcome classes have adequate samples. Changing
-a radius should select a stored evaluation result; it should not retrain a model
-inside the dashboard.
+Waterways improve all three metrics when added alone to the repeated-coverage
+benchmark. This is promising challenger evidence, but the 2026 set contains only
+146 intervals and 20 positives. It is too small to freeze or operationalize the
+model, and the result does not establish causation.
 
-Flooding, drains, standing water, building condition and nearby water are valid
-hypotheses. The current mapped-water variable is incomplete and the project has
-no verified flood or drainage exposure source, so these factors cannot yet be
-used as causal explanations. The target is also a recorded warranty signal, not
-confirmed biological recurrence.
+## Flood-event source decision
 
-Reproduce the static challenger with:
+ReliefWeb is suitable for broad event-date and named-area context after an
+approved API `appname` is obtained. Its disaster records do not provide consistent
+property-level flood footprints, so they must not be used to label a service
+property as flooded. Any future ReliefWeb feature must be framed as reported
+regional flood context.
+
+Reproduce the waterway load and comparisons with:
 
 ```powershell
+python scripts/load_hotosm_waterways.py
 python scripts/evaluate_warranty_environmental_factors.py
+python scripts/evaluate_warranty_coverage_episodes.py
 ```

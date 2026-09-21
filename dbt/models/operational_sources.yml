@@ -48,3 +48,6 @@ sources:
       - name: environmental_context_by_location
         identifier: environmental_context_by_location_v1
         description: "Static terrain and mapped nearby water/wetland/waterway/forest context at rounded ML-anchor coordinates; mapped-feature absence is not proof of real-world absence or flood history."
+      - name: hotosm_waterway_context_by_location
+        identifier: hotosm_waterway_context_by_location_v1
+        description: "Distances and counts from the pinned 2026-09-09 HOTOSM Malaysia waterways snapshot (OpenStreetMap contributors, ODbL); mapped waterways are exposure context, not flood observations."

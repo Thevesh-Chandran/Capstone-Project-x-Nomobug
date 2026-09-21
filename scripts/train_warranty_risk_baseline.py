@@ -147,10 +147,17 @@ ENVIRONMENTAL_NUMERIC_FEATURES = [
     "elevation_m", "local_relief_500m_m", "nearest_mapped_water_m",
     "mapped_water_features_2km", "nearest_mapped_forest_m",
     "mapped_forest_features_2km",
+    "hotosm_nearest_waterway_m", "hotosm_water_features_500m",
+    "hotosm_water_features_1km", "hotosm_water_features_2km",
+    "hotosm_nearest_drainage_m", "hotosm_nearest_flowing_water_m",
+    "hotosm_nearest_standing_water_m", "hotosm_drainage_features_2km",
+    "hotosm_flowing_water_features_2km",
+    "hotosm_standing_water_features_2km",
 ]
 ENVIRONMENTAL_BOOLEAN_FEATURES = [
     "mapped_water_within_2km", "mapped_forest_within_2km",
     "environmental_places_result_capped", "environmental_context_available",
+    "hotosm_waterway_context_available",
 ]
 OPERATIONAL_FEATURES = (
     OPERATIONAL_NUMERIC_FEATURES

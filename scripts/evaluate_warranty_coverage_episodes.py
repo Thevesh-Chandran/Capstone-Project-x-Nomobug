@@ -31,6 +31,13 @@ WEATHER_NUMERIC = [
     "prior_14d_precipitation_mm", "prior_7d_relative_humidity_mean_pct",
     "prior_7d_soil_moisture_0_to_7cm_mean",
 ]
+WATERWAY_NUMERIC = [
+    "hotosm_nearest_waterway_m", "hotosm_water_features_500m",
+    "hotosm_water_features_1km", "hotosm_water_features_2km",
+    "hotosm_nearest_drainage_m", "hotosm_nearest_flowing_water_m",
+    "hotosm_nearest_standing_water_m", "hotosm_drainage_features_2km",
+    "hotosm_flowing_water_features_2km", "hotosm_standing_water_features_2km",
+]
 CATEGORICAL = [
     "pest_category", "package_category", "calendar_pest_text_category",
     "calendar_service_method_category",
@@ -67,7 +74,7 @@ def main() -> None:
         "evaluation_split", "area_cell", TARGET,
         "warranty_claim_count_in_interval", "exposure_days",
         "complete_prior_14d_weather", *BASE_NUMERIC, *WEATHER_NUMERIC,
-        *CATEGORICAL,
+        *WATERWAY_NUMERIC, *CATEGORICAL,
     ]
     sql = f"select {', '.join(dict.fromkeys(columns))} from `{SOURCE}`"
     client = bigquery.Client(project=PROJECT, location=LOCATION)
@@ -87,6 +94,9 @@ def main() -> None:
     for name, numeric in (
         ("base_without_weather", BASE_NUMERIC),
         ("base_plus_prior_weather", BASE_NUMERIC + WEATHER_NUMERIC),
+        ("base_plus_hotosm_waterways", BASE_NUMERIC + WATERWAY_NUMERIC),
+        ("base_plus_weather_and_hotosm", BASE_NUMERIC + WEATHER_NUMERIC
+         + WATERWAY_NUMERIC),
     ):
         fitted = model(numeric).fit(train[numeric + CATEGORICAL], train[TARGET])
         probability = fitted.predict_proba(test[numeric + CATEGORICAL])[:, 1]

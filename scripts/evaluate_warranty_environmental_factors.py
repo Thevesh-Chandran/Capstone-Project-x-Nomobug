@@ -38,6 +38,16 @@ ENVIRONMENTAL_FEATURES = (
     list(ENVIRONMENTAL_NUMERIC_FEATURES) + list(ENVIRONMENTAL_BOOLEAN_FEATURES)
 )
 CHALLENGER_FEATURES = BASE_FEATURES + ENVIRONMENTAL_FEATURES
+HOTOSM_FEATURES = [feature for feature in ENVIRONMENTAL_FEATURES
+                   if feature.startswith("hotosm_")]
+LEGACY_ENVIRONMENTAL_FEATURES = [feature for feature in ENVIRONMENTAL_FEATURES
+                                 if not feature.startswith("hotosm_")]
+VARIANTS = (
+    ("v3_base", []),
+    ("v3_plus_legacy_static_environment", LEGACY_ENVIRONMENTAL_FEATURES),
+    ("v3_plus_hotosm_waterways", HOTOSM_FEATURES),
+    ("v3_plus_all_static_environment", ENVIRONMENTAL_FEATURES),
+)
 
 SQL = f"""
 select prediction_anchor_date, {TARGET}, complete_prior_14d_weather,
@@ -47,23 +57,24 @@ where {TARGET} is not null
 """
 
 
-def build_model(include_environment: bool):
-    numeric = list(RISK_CORE_NO_TEAM_NUMERIC_FEATURES)
-    boolean = list(RISK_CORE_NO_TEAM_BOOLEAN_FEATURES)
-    if include_environment:
-        numeric += ENVIRONMENTAL_NUMERIC_FEATURES
-        boolean += ENVIRONMENTAL_BOOLEAN_FEATURES
+def build_model(extra_features: list[str]):
+    numeric = list(RISK_CORE_NO_TEAM_NUMERIC_FEATURES) + [
+        feature for feature in ENVIRONMENTAL_NUMERIC_FEATURES
+        if feature in extra_features]
+    boolean = list(RISK_CORE_NO_TEAM_BOOLEAN_FEATURES) + [
+        feature for feature in ENVIRONMENTAL_BOOLEAN_FEATURES
+        if feature in extra_features]
     return logistic_pipeline(
         numeric, boolean, list(RISK_CORE_NO_TEAM_CATEGORICAL_FEATURES))
 
 
 def evaluate_fold(frame: pd.DataFrame, test_start, test_end,
-                  include_environment: bool) -> dict:
-    features = CHALLENGER_FEATURES if include_environment else BASE_FEATURES
+                  extra_features: list[str]) -> dict:
+    features = BASE_FEATURES + extra_features
     train = frame[frame["prediction_anchor_date"] < test_start]
     test = frame[(frame["prediction_anchor_date"] >= test_start)
                  & (frame["prediction_anchor_date"] < test_end)]
-    model = build_model(include_environment).fit(
+    model = build_model(extra_features).fit(
         train[features], train[TARGET].astype(bool))
     probability = model.predict_proba(test[features])[:, 1]
     return {
@@ -98,17 +109,17 @@ def main() -> None:
         "relief_rows": int(frame["local_relief_500m_m"].notna().sum()),
         "water_distance_rows": int(frame["nearest_mapped_water_m"].notna().sum()),
         "forest_distance_rows": int(frame["nearest_mapped_forest_m"].notna().sum()),
+        "hotosm_waterway_rows": int(frame["hotosm_nearest_waterway_m"].notna().sum()),
     }
     print("Coverage:", coverage)
 
     rows = []
-    for model_name, include_environment in (
-            ("v3_base", False), ("v3_plus_static_environment", True)):
+    for model_name, extra_features in VARIANTS:
         for fold_name, test_start, test_end in DEVELOPMENT_FOLDS:
             rows.append({
                 "model": model_name,
                 "fold": fold_name,
-                **evaluate_fold(frame, test_start, test_end, include_environment),
+                **evaluate_fold(frame, test_start, test_end, extra_features),
             })
     metrics = pd.DataFrame(rows)
     print("\nPre-2026 walk-forward folds:")
@@ -122,10 +133,9 @@ def main() -> None:
     reporting = frame[(frame["prediction_anchor_date"] >= REPORTING_START)
                       & (frame["prediction_anchor_date"] < REPORTING_END)]
     diagnostic_rows = []
-    for model_name, include_environment in (
-            ("v3_base", False), ("v3_plus_static_environment", True)):
-        features = CHALLENGER_FEATURES if include_environment else BASE_FEATURES
-        model = build_model(include_environment).fit(
+    for model_name, extra_features in VARIANTS:
+        features = BASE_FEATURES + extra_features
+        model = build_model(extra_features).fit(
             training[features], training[TARGET].astype(bool))
         probability = model.predict_proba(reporting[features])[:, 1]
         diagnostic_rows.append({

@@ -24,6 +24,13 @@ select case
         then 'invalid_forest_distance'
     when mapped_water_features_2km < 0 or mapped_forest_features_2km < 0
         then 'invalid_environment_feature_count'
+    when not hotosm_waterway_context_available
+        then 'missing_hotosm_waterway_context'
+    when hotosm_nearest_waterway_m < 0
+      or hotosm_water_features_500m < 0
+      or hotosm_water_features_1km < hotosm_water_features_500m
+      or hotosm_water_features_2km < hotosm_water_features_1km
+        then 'invalid_hotosm_waterway_context'
     when prior_team_warranty_rate_smoothed not between 0 and 1
       or prior_area_warranty_rate_smoothed not between 0 and 1
       or prior_pest_premise_warranty_rate_smoothed not between 0 and 1
@@ -50,6 +57,11 @@ where outcome_window_end_date > observed_through
    or nearest_mapped_water_m < 0 or nearest_mapped_water_m > 2000
    or nearest_mapped_forest_m < 0 or nearest_mapped_forest_m > 2000
    or mapped_water_features_2km < 0 or mapped_forest_features_2km < 0
+   or not hotosm_waterway_context_available
+   or hotosm_nearest_waterway_m < 0
+   or hotosm_water_features_500m < 0
+   or hotosm_water_features_1km < hotosm_water_features_500m
+   or hotosm_water_features_2km < hotosm_water_features_1km
    or prior_team_warranty_rate_smoothed not between 0 and 1
    or prior_area_warranty_rate_smoothed not between 0 and 1
    or prior_pest_premise_warranty_rate_smoothed not between 0 and 1

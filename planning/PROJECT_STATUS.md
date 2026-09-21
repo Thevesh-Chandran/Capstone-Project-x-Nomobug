@@ -16,6 +16,9 @@ The residential 4x/6x/12x repeated-coverage dataset is now implemented with 364
 mature service intervals across 146 packages. It retains multiple claims and
 shows only exploratory model value; see
 [`WARRANTY_COVERAGE_MODEL_EVALUATION.md`](WARRANTY_COVERAGE_MODEL_EVALUATION.md).
+The pinned 9 September 2026 HOTOSM Malaysia waterways snapshot now supplies
+reproducible drainage, flowing-water and standing-water proximity features. It
+improves the repeated-coverage challenger but not the residential 3x model.
 
 ## What the levels mean
 
