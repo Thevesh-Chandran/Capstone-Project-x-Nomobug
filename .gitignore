@@ -24,6 +24,7 @@ verification/
 .codex-qa/
 .codex-tmp/
 /tmp/
+/outputs/
 /secrets/
 
 # Local-only CP1 documents and authoring utilities
