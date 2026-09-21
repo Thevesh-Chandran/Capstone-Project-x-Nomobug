@@ -1,7 +1,8 @@
 {{ config(schema='analytics_ml', tags=['analytics_ml'], materialized='table') }}
 -- Leakage-safe experiment cohort, not a production risk score.
 -- Prediction time is immediately after the recorded 3/3 Calendar event.
--- Selected outcome is a later recorded Calendar warranty signal within 60 days.
+-- Selected outcome is a later recorded Calendar warranty signal within 30 days.
+-- Only warranty-eligible residential 3x packages are included.
 -- It does not prove completed treatments or biological pest recurrence.
 with observation as (
     select least(max(event_date_local), current_date('Asia/Kuala_Lumpur'))
@@ -215,7 +216,7 @@ with observation as (
         p.closed_date,
         c.calendar_event_row as prediction_anchor_event_row,
         c.prediction_anchor_date,
-        date_add(c.prediction_anchor_date, interval 60 day) as outcome_window_end_date,
+        date_add(c.prediction_anchor_date, interval 30 day) as outcome_window_end_date,
         o.observed_through,
         extract(year from c.prediction_anchor_date) as anchor_year,
         extract(month from c.prediction_anchor_date) as anchor_month,
@@ -263,6 +264,7 @@ with observation as (
         coalesce(nullif(trim(p.package_type_raw), ''), 'UNKNOWN') as package_category,
         coalesce(nullif(trim(p.contract_type_raw), ''), 'UNKNOWN') as contract_category,
         p.premise_type,
+        p.package_sessions_recorded,
         p.trbs_status,
         p.billing_arrangement,
         p.sales_pic,
@@ -419,10 +421,12 @@ with observation as (
     cross join observation o
     where p.include_in_sale_count
       and p.package_sessions_recorded = 3
+      and p.warranty_policy_eligible
+      and p.premise_type = 'RESIDENTIAL'
       and p.closed_date is not null
       and c.prediction_anchor_date >= p.closed_date
       and c.completion_anchor_count = 1
-      and date_add(c.prediction_anchor_date, interval 60 day) <= o.observed_through
+      and date_add(c.prediction_anchor_date, interval 30 day) <= o.observed_through
 )
 select
     *,
@@ -430,7 +434,8 @@ select
         when prediction_anchor_date < date '2026-01-01' then 'train_2024_2025'
         else 'holdout_2026'
     end as evaluation_split,
-    'recorded_calendar_warranty_signal_within_60d_after_3_of_3' as target_definition,
+    'eligible_residential_3x_recorded_calendar_warranty_signal_within_30d_after_3_of_3'
+        as target_definition,
     'after_recorded_3_of_3_event' as prediction_time_definition,
     'scheduled_or_recorded_calendar_signal_not_completed_treatment_or_pest_recurrence_proof'
         as label_evidence

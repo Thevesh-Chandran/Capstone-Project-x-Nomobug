@@ -4,7 +4,7 @@
 
 - one included SALES package with exactly three recorded sessions;
 - one unambiguous, matched Calendar `3/3` anchor on or after the sale date;
-- a fully observed 60-day outcome window;
+- a fully observed 30-day outcome window for eligible residential 3x packages;
 - target = a later recorded Calendar warranty-claim signal within that window.
 
 Prediction time is immediately after the recorded `3/3` event. Features are

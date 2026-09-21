@@ -1,7 +1,8 @@
 """Walk-forward validation, error analysis, and model freeze evidence.
 
-The selected outcome is a recorded Calendar warranty signal within 60 days
-after a unique 3-of-3 event. It is not proof of biological recurrence or fault.
+The selected outcome is a recorded Calendar warranty signal within 30 days
+after a unique residential 3-of-3 event. It is not proof of biological
+recurrence or fault.
 """
 
 from datetime import date, datetime, timezone
@@ -32,7 +33,7 @@ from tune_warranty_risk_model import build_model
 
 
 SOURCE = f"{PROJECT}.analytics_ml.warranty_risk_3session_dataset"
-TARGET = "warranty_signal_within_60d"
+TARGET = "warranty_signal_within_30d"
 SEGMENT_COLUMNS = [
     "pest_category", "premise_type", "package_category", "area_cell",
     "property_history_band", "rain_band",
@@ -46,15 +47,15 @@ FOLDS = [
 
 SQL = f"""
 select sales_record_id, prediction_anchor_date, area_cell,
-       warranty_signal_within_60d, complete_prior_14d_weather,
+       warranty_signal_within_30d, complete_prior_14d_weather,
        {', '.join(RISK_CORE_NO_TEAM_FEATURES)}
 from `{SOURCE}`
-where warranty_signal_within_60d is not null
+where warranty_signal_within_30d is not null
 """
 
 
 def fit_model() -> object:
-    return build_model("rf_regularized", list(RISK_CORE_NO_TEAM_FEATURES))
+    return build_model("logistic_l2", list(RISK_CORE_NO_TEAM_FEATURES))
 
 
 def add_segments(frame: pd.DataFrame) -> pd.DataFrame:
@@ -155,7 +156,7 @@ def main() -> None:
         ["TRUE_POSITIVE", "FALSE_POSITIVE", "FALSE_NEGATIVE"],
         default="TRUE_NEGATIVE")
     final_predictions["run_utc"] = run_utc
-    final_predictions["selected_horizon_days"] = 60
+    final_predictions["selected_horizon_days"] = 30
     final_predictions["frozen_threshold"] = final_threshold
 
     segment_rows = []
@@ -196,32 +197,28 @@ def main() -> None:
     group by horizon_days
     order by horizon_days
     """
-    horizon_rows = [dict(row) for row in client.query(horizon_query).result()]
-    reliable = [row for row in horizon_rows if row["roc_auc"] >= 0.55]
-    best_ap = max(row["average_precision"] for row in reliable)
-    selected = min(
-        (row for row in reliable
-         if row["average_precision"] >= best_ap - 0.01),
-        key=lambda row: row["horizon_days"])
+    # The 30-day horizon is fixed by the confirmed residential 3x warranty
+    # policy. Historical cross-horizon metrics no longer select this value.
+    selected = {"horizon_days": 30}
     selection_summary = pd.DataFrame([{
         "run_utc": run_utc,
         "selected_horizon_days": int(selected["horizon_days"]),
         "selected_feature_set": "risk_core_without_team_v1",
         "frozen_threshold": final_threshold,
         "selection_rule": (
-            "shortest_horizon_with_roc_auc_at_least_0_55_and_average_precision_"
-            "within_0_01_of_best_reliable_horizon"),
+            "fixed_by_confirmed_residential_3x_warranty_policy"),
         "label_definition": (
-            "recorded_calendar_warranty_signal_within_60d_after_3_of_3"),
+            "eligible_residential_3x_recorded_calendar_warranty_signal_"
+            "within_30d_after_3_of_3"),
         "release_status": "VALIDATED_EXPERIMENTAL_NOT_CAUSAL",
     }])
-    if int(selected["horizon_days"]) != 60:
-        raise SystemExit("Horizon selection no longer resolves to 60 days")
+    if int(selected["horizon_days"]) != 30:
+        raise SystemExit("Horizon selection no longer resolves to 30 days")
 
     outputs = {
         "warranty_risk_walk_forward_metrics": pd.DataFrame(fold_rows),
-        "warranty_risk_error_analysis_60d": final_predictions,
-        "warranty_risk_segment_metrics_60d": pd.DataFrame(segment_rows),
+        "warranty_risk_error_analysis_30d_v3": final_predictions,
+        "warranty_risk_segment_metrics_30d_v3": pd.DataFrame(segment_rows),
         "warranty_risk_model_selection_summary": selection_summary,
     }
     for table, data in outputs.items():

@@ -1,4 +1,4 @@
-"""Tune and calibrate the prediction-safe 60-day warranty-risk model.
+"""Tune and calibrate the prediction-safe residential 3x 30-day model.
 
 All model/feature/threshold choices use pre-2026 walk-forward predictions.
 The mature 2026 cohort is used only for reporting the frozen result.
@@ -35,7 +35,7 @@ from train_warranty_risk_baseline import (
 
 
 SOURCE = f"{PROJECT}.analytics_ml.warranty_risk_3session_dataset"
-TARGET = "warranty_signal_within_60d"
+TARGET = "warranty_signal_within_30d"
 DEVELOPMENT_FOLDS = [
     ("2025_q2", date(2025, 4, 1), date(2025, 7, 1)),
     ("2025_q3", date(2025, 7, 1), date(2025, 10, 1)),
@@ -50,10 +50,10 @@ SEGMENT_COLUMNS = [
 
 SQL = f"""
 select sales_record_id, prediction_anchor_date, area_cell,
-       warranty_signal_within_60d, complete_prior_14d_weather,
+       warranty_signal_within_30d, complete_prior_14d_weather,
        {', '.join(RISK_CORE_NO_TEAM_FEATURES)}
 from `{SOURCE}`
-where warranty_signal_within_60d is not null
+where warranty_signal_within_30d is not null
 """
 
 
@@ -337,7 +337,8 @@ def main() -> None:
         })
     reporting_comparison = pd.DataFrame(reporting_comparison_rows)
     selection = pd.DataFrame([{
-        "run_utc": run_utc, "model_version": "warranty_risk_60d_v2",
+        "run_utc": run_utc,
+        "model_version": "warranty_risk_residential_3x_30d_v3",
         "selected_model": selected_model,
         "selected_feature_set": selected_feature_set,
         "selected_feature_count": len(selected_features),
@@ -364,7 +365,8 @@ def main() -> None:
         "status": "VALIDATED_EXPERIMENTAL_NOT_CAUSAL",
     }])
     selected_feature_table = pd.DataFrame({
-        "run_utc": run_utc, "model_version": "warranty_risk_60d_v2",
+        "run_utc": run_utc,
+        "model_version": "warranty_risk_residential_3x_30d_v3",
         "feature_order": range(1, len(selected_features) + 1),
         "feature_name": selected_features,
     })
@@ -376,15 +378,15 @@ def main() -> None:
         "warranty_risk_tuning_summary": summary,
         "warranty_risk_stable_subset_fold_metrics": reduced_metrics,
         "warranty_risk_feature_stability": stability,
-        "warranty_risk_selected_features_v2": selected_feature_table,
-        "warranty_risk_oof_predictions_v2": selected_oof,
-        "warranty_risk_reporting_predictions_v2": reporting[[
+        "warranty_risk_selected_features_v3": selected_feature_table,
+        "warranty_risk_oof_predictions_v3": selected_oof,
+        "warranty_risk_reporting_predictions_v3": reporting[[
             "sales_record_id", "prediction_anchor_date", *SEGMENT_COLUMNS,
             "actual_signal", "raw_probability", "calibrated_probability",
             "risk_percentile", "risk_level", "run_utc"]],
-        "warranty_risk_reporting_evaluation_v2": evaluation,
-        "warranty_risk_reporting_feature_comparison_v2": reporting_comparison,
-        "warranty_risk_model_selection_v2": selection,
+        "warranty_risk_reporting_evaluation_v3": evaluation,
+        "warranty_risk_reporting_feature_comparison_v3": reporting_comparison,
+        "warranty_risk_model_selection_v3": selection,
     }
     for table, data in outputs.items():
         client.load_table_from_dataframe(

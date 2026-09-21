@@ -12,11 +12,12 @@ import train_warranty_risk_baseline as model  # noqa: E402
 
 def test_current_warranty_risk_model_contract_matches_code():
     contract = json.loads((
-        ROOT / "config" / "warranty_risk_model_v2.json").read_text(encoding="utf-8"))
+        ROOT / "config" / "warranty_risk_model_v3.json").read_text(encoding="utf-8"))
     encoded = json.dumps(
         model.RISK_CORE_NO_TEAM_FEATURES, separators=(",", ":")).encode()
-    assert contract["selected_horizon_days"] == 60
-    assert contract["model_variant"] == "rf_regularized"
+    assert contract["selected_horizon_days"] == 30
+    assert contract["eligible_population"] == "residential_3x_packages_only"
+    assert contract["model_variant"] == "logistic_l2"
     assert contract["priority_review_percentile_cutoff"] == 0.5
     assert contract["high_risk_tier_supported"] is False
     assert contract["feature_count"] == len(model.RISK_CORE_NO_TEAM_FEATURES)
@@ -37,3 +38,10 @@ def test_v1_contract_is_explicitly_superseded():
         ROOT / "config" / "warranty_risk_model_v1.json").read_text(encoding="utf-8"))
     assert contract["status"] == "superseded_due_to_event_day_weather_leakage"
     assert contract["superseded_by"] == "warranty_risk_60d_v2"
+
+
+def test_v2_contract_is_explicitly_superseded_by_confirmed_policy_model():
+    contract = json.loads((
+        ROOT / "config" / "warranty_risk_model_v2.json").read_text(encoding="utf-8"))
+    assert contract["status"] == "superseded_due_to_warranty_policy_scope_and_horizon"
+    assert contract["superseded_by"] == "warranty_risk_residential_3x_30d_v3"

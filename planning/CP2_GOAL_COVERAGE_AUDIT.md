@@ -67,15 +67,14 @@ owner-confirmed operating rules take precedence.
    reporting is possible; predictive fit must wait for a defensible label.
    Prospect/B2B funnel reporting is likewise descriptive until the link, booking
    and outcome semantics are reconciled.
-6. **Predictive model:** the selected v2 target is a recorded Calendar warranty
-   signal within 60 days after a unique three-session completion anchor. Model
-   choice uses three pre-2026 walk-forward folds; the selected balanced random
-   forest averages ROC AUC 0.554 and average precision 0.385 across those folds.
-   The 405-row 2026 reporting cohort has ROC AUC 0.622 and average precision
-   0.434, but it was inspected during earlier development and is not a pristine
-   final holdout. The top-half priority-review band has 48.3% precision and
-   65.3% recall; the top-20% tier is unsupported and disabled. Retain this as a
-   feasibility result, not production scoring or evidence of causation.
+6. **Predictive model:** the selected v3 target is a recorded Calendar warranty
+   signal within 30 days after the third service for eligible residential 3x
+   packages. Commercial clients and residential 1x packages are excluded. The
+   selected logistic model averages ROC AUC 0.519 and average precision 0.254
+   across three pre-2026 folds. The 401-row complete-weather 2026 diagnostic has
+   ROC AUC 0.547 and average precision 0.293 against 26.2% prevalence. This weak
+   result supports experimental review ranking only; the high-risk tier remains
+   disabled.
 7. **Recommendation log:** no management-action log has been published yet.
    Future rules must store the reason, evidence, confidence/review label, action
    and later outcome instead of embedding unexplained text in a chart.

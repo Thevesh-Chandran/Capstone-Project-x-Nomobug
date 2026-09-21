@@ -157,12 +157,11 @@ property weather or a causal driver.
 Use only aggregate evaluation outputs, never package-level reporting scores.
 Show the selected model, ROC AUC, average precision, Brier score, reporting
 population and positive count. Display the status prominently as `experimental
-priority-review ranking — not causal or production ready`. The current v2 model
-is a 60-day random-forest ranking benchmark selected on three pre-2026
-walk-forward folds. Its 2026 reporting cohort is not a pristine final holdout
-because that period was inspected during earlier development.
+priority-review ranking — not causal or production ready`. The current v3 model is a 30-day logistic ranking benchmark for eligible
+residential 3x packages, selected on three pre-2026 walk-forward folds. Its 2026
+reporting cohort is not a pristine final holdout and discrimination is weak.
 
-The target is a recorded Calendar warranty signal within 60 days after a unique
+The target is a recorded Calendar warranty signal within 30 days after a unique
 3/3 event. Prediction time is immediately after 3/3. The model may support
 aggregate feasibility reporting only; it is not a score for scheduling,
 customer treatment, employee assessment or automated action. The high-risk tier

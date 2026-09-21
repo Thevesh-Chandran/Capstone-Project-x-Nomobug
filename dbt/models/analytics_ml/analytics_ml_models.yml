@@ -2,13 +2,13 @@ version: 2
 
 models:
   - name: warranty_risk_3session_dataset
-    description: "Mature, leakage-safe 3-session experiment cohort. The selected target is a recorded Calendar warranty signal within 60 days after a unique 3/3 anchor, not proven pest recurrence."
+    description: "Mature, leakage-safe experiment cohort restricted to warranty-eligible residential 3x packages. The target is a recorded Calendar warranty signal within 30 days after a unique 3/3 anchor, not proven pest recurrence."
     columns:
       - name: sales_record_id
         data_tests: [not_null, unique]
       - name: prediction_anchor_date
         data_tests: [not_null]
-      - name: warranty_signal_within_60d
+      - name: warranty_signal_within_30d
         data_tests: [not_null]
       - name: evaluation_split
         data_tests:
@@ -19,7 +19,7 @@ models:
         data_tests:
           - accepted_values:
               arguments:
-                values: [recorded_calendar_warranty_signal_within_60d_after_3_of_3]
+                values: [eligible_residential_3x_recorded_calendar_warranty_signal_within_30d_after_3_of_3]
       - name: prediction_time_definition
         data_tests:
           - accepted_values:

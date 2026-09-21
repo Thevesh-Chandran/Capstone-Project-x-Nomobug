@@ -1,6 +1,6 @@
 {
   "model_version": "warranty_risk_60d_v2",
-  "status": "validated_experimental_not_causal",
+  "status": "superseded_due_to_warranty_policy_scope_and_horizon",
   "selected_horizon_days": 60,
   "prediction_time": "immediately_after_recorded_3_of_3_calendar_event",
   "label_definition": "recorded_calendar_warranty_signal_within_60d_after_3_of_3",
@@ -48,5 +48,6 @@
     "Only three independent development folds exist, so automatic feature removal is disabled.",
     "Commercial premises have insufficient positive examples for dependable alerts.",
     "Risk bands are relative to the current scoring batch and are not absolute probabilities of recurrence."
-  ]
+  ],
+  "superseded_by": "warranty_risk_residential_3x_30d_v3"
 }

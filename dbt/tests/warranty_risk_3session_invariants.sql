@@ -2,6 +2,8 @@ select case
     when outcome_window_end_date > observed_through then 'immature_outcome_window'
     when prediction_anchor_date < closed_date then 'anchor_before_sale'
     when completion_anchor_count != 1 then 'non_unique_completion_anchor'
+    when premise_type != 'RESIDENTIAL' then 'non_residential_model_row'
+    when package_sessions_recorded != 3 then 'non_3x_model_row'
     when warranty_signal_within_14d and not warranty_signal_within_30d
         then '14d_target_not_nested_in_30d'
     when warranty_signal_within_30d and warranty_signal_within_60d is false
@@ -36,6 +38,8 @@ from {{ ref('warranty_risk_3session_dataset') }}
 where outcome_window_end_date > observed_through
    or prediction_anchor_date < closed_date
    or completion_anchor_count != 1
+   or premise_type != 'RESIDENTIAL'
+   or package_sessions_recorded != 3
    or (warranty_signal_within_14d and not warranty_signal_within_30d)
    or (warranty_signal_within_30d and warranty_signal_within_60d is false)
    or (warranty_signal_within_60d and warranty_signal_within_90d is false)

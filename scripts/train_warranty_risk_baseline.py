@@ -1,8 +1,9 @@
 """Compare leakage-safe horizons and baselines for 3-session warranty risk.
 
-The selected v2 outcome is a recorded Calendar warranty signal within 60 days
-after a unique 3/3 event. It is not proof of treatment completion or biological
-pest recurrence. Final v2 selection is performed by tune_warranty_risk_model.py.
+The selected v3 outcome is a recorded Calendar warranty signal within 30 days
+after a unique residential 3/3 event. It is not proof of treatment completion
+or biological pest recurrence. Final selection is performed by
+tune_warranty_risk_model.py.
 """
 
 from datetime import datetime, timezone

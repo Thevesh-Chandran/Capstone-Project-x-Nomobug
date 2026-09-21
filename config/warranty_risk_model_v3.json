@@ -1,0 +1,71 @@
+{
+  "model_version": "warranty_risk_residential_3x_30d_v3",
+  "status": "validated_experimental_not_causal",
+  "selected_horizon_days": 30,
+  "eligible_population": "residential_3x_packages_only",
+  "prediction_time": "immediately_after_recorded_3_of_3_calendar_event",
+  "label_definition": "eligible_residential_3x_recorded_calendar_warranty_signal_within_30d_after_3_of_3",
+  "model_family": "logistic_regression",
+  "model_variant": "logistic_l2",
+  "model_parameters": {
+    "penalty": "l2",
+    "max_iter": 2000,
+    "categorical_min_frequency": 10
+  },
+  "feature_set": "prediction_safe_risk_core_without_team_v2",
+  "feature_source_constant": "scripts.train_warranty_risk_baseline.RISK_CORE_NO_TEAM_FEATURES",
+  "feature_count": 56,
+  "ordered_feature_sha256": "aa8c74698103addf1f12b52084c4fbf6b6734049a1e978e3b3838c1b87131576",
+  "excluded_populations": [
+    "commercial_all_packages",
+    "residential_1x",
+    "residential_4x_6x_12x_pending_separate_completion_anchor_and_claim_window_contract"
+  ],
+  "excluded_feature_groups": [
+    "event_day_weather_not_known_at_prediction_time",
+    "team_identity_and_team_historical_performance",
+    "salesperson_and_acquisition_channel",
+    "billing_and_payment_history",
+    "static_environmental_context"
+  ],
+  "selection_method": "three_pre_2026_walk_forward_quarterly_folds",
+  "calibration_method": "platt_on_pooled_pre_2026_walk_forward_predictions",
+  "feature_pruning_decision": "retain_full_safe_feature_set_because_only_three_development_folds_exist",
+  "minimum_development_folds_for_automatic_feature_removal": 4,
+  "operational_risk_banding": "priority_review_top_50pct_within_scoring_batch;_high_risk_disabled_until_supported",
+  "priority_review_percentile_cutoff": 0.5,
+  "high_risk_tier_supported": false,
+  "cohort": {
+    "rows": 1335,
+    "train_2024_2025_rows": 907,
+    "train_positives": 205,
+    "holdout_2026_rows": 428,
+    "holdout_positives": 112
+  },
+  "reporting_metrics_2026_complete_weather_rows": {
+    "rows": 401,
+    "positive_rows": 105,
+    "positive_rate": 0.2618,
+    "roc_auc": 0.5469,
+    "average_precision": 0.2932,
+    "calibrated_brier_score": 0.1954,
+    "priority_review_rows": 201,
+    "priority_review_precision": 0.2886,
+    "priority_review_recall": 0.5524
+  },
+  "environmental_challenger": {
+    "pre_2026_mean_average_precision_base": 0.2535,
+    "pre_2026_mean_average_precision_plus_static_environment": 0.2496,
+    "2026_average_precision_base": 0.2932,
+    "2026_average_precision_plus_static_environment": 0.2998,
+    "decision": "do_not_promote_static_environmental_features"
+  },
+  "limitations": [
+    "The target records Calendar warranty activity rather than confirmed biological pest recurrence.",
+    "The 2026 reporting period was inspected during development and is not a pristine final test set.",
+    "The model has weak discrimination and is suitable only for experimental review prioritisation.",
+    "Only three independent development folds exist.",
+    "Risk bands are relative to the scoring batch and are not absolute recurrence probabilities.",
+    "Weather is approximately 0.1-degree grid data, so kilometre-scale rainfall attribution would imply false precision."
+  ]
+}

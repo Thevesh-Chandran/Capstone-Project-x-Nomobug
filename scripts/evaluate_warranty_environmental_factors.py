@@ -1,7 +1,7 @@
 """Evaluate static environmental context as a grouped model challenger.
 
-This script is read-only. It compares the frozen v2 regularised-random-forest
-feature contract with the same model plus elevation, relief, mapped-water and
+This script is read-only. It compares the selected v3 logistic model feature
+contract with the same model plus elevation, relief, mapped-water and
 mapped-forest context. Model
 selection evidence comes from pre-2026 walk-forward folds. The 2026 comparison
 is diagnostic because that period has already been inspected during development.
@@ -11,8 +11,6 @@ from datetime import datetime, timezone
 
 import pandas as pd
 from google.cloud import bigquery
-from sklearn.ensemble import RandomForestClassifier
-
 from train_warranty_risk_baseline import (
     ENVIRONMENTAL_BOOLEAN_FEATURES,
     ENVIRONMENTAL_NUMERIC_FEATURES,
@@ -23,7 +21,7 @@ from train_warranty_risk_baseline import (
     RISK_CORE_NO_TEAM_CATEGORICAL_FEATURES,
     RISK_CORE_NO_TEAM_FEATURES,
     RISK_CORE_NO_TEAM_NUMERIC_FEATURES,
-    tree_pipeline,
+    logistic_pipeline,
 )
 from tune_warranty_risk_model import (
     DEVELOPMENT_FOLDS,
@@ -55,19 +53,8 @@ def build_model(include_environment: bool):
     if include_environment:
         numeric += ENVIRONMENTAL_NUMERIC_FEATURES
         boolean += ENVIRONMENTAL_BOOLEAN_FEATURES
-    return tree_pipeline(
-        RandomForestClassifier(
-            n_estimators=500,
-            max_depth=6,
-            min_samples_leaf=20,
-            class_weight="balanced_subsample",
-            random_state=42,
-            n_jobs=-1,
-        ),
-        numeric,
-        boolean,
-        list(RISK_CORE_NO_TEAM_CATEGORICAL_FEATURES),
-    )
+    return logistic_pipeline(
+        numeric, boolean, list(RISK_CORE_NO_TEAM_CATEGORICAL_FEATURES))
 
 
 def evaluate_fold(frame: pd.DataFrame, test_start, test_end,
@@ -116,7 +103,7 @@ def main() -> None:
 
     rows = []
     for model_name, include_environment in (
-            ("v2_base", False), ("v2_plus_static_environment", True)):
+            ("v3_base", False), ("v3_plus_static_environment", True)):
         for fold_name, test_start, test_end in DEVELOPMENT_FOLDS:
             rows.append({
                 "model": model_name,
@@ -136,7 +123,7 @@ def main() -> None:
                       & (frame["prediction_anchor_date"] < REPORTING_END)]
     diagnostic_rows = []
     for model_name, include_environment in (
-            ("v2_base", False), ("v2_plus_static_environment", True)):
+            ("v3_base", False), ("v3_plus_static_environment", True)):
         features = CHALLENGER_FEATURES if include_environment else BASE_FEATURES
         model = build_model(include_environment).fit(
             training[features], training[TARGET].astype(bool))

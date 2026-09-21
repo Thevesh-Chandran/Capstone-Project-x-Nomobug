@@ -4,10 +4,7 @@ This is the current progress entry point. Older plans/profiles are historical,
 not proof that a pipeline is built. Latest reconciliation includes the successful
 Prospects and complete eight-tab operational Bronze/Silver batch.
 
-Latest verification on 21 September 2026: the local suite passes 144 tests. The
-selected predictive experiment is `warranty_risk_60d_v2`; older 30-day model
-results below are historical feasibility evidence and no longer describe the
-selected model. The repaired Git repository now follows the current remote main
+Latest verification on 21 September 2026: the confirmed warranty policy is now encoded and the selected experiment is `warranty_risk_residential_3x_30d_v3`. It covers eligible residential 3x packages and predicts a recorded Calendar warranty signal within 30 days after the third service. Earlier 60-day models are superseded. The repaired Git repository now follows the current remote main
 history on branch `codex/cp2-v2`; the pre-repair working tree and damaged Git
 metadata are preserved in a separate recovery folder.
 
@@ -282,37 +279,11 @@ the current pinned snapshot and does not join enquiries to sales.
   materialized as BigQuery views with `0 processed`. The local test suite still
   passes 99 tests. After the custom quota was increased, the combined live
   reconciliation passed within the 100 MiB query guard (6,031,566 bytes).
-- The selected predictive experiment is now `warranty_risk_60d_v2`. Its target
-  is a recorded Calendar warranty signal within 60 days after a unique matched
-  `3/3` event. Eligibility is limited to three-session packages with a mature
-  60-day window and an anchor on or after the recorded sale date. The target is
-  operational recording evidence, not proof of treatment failure or biological
-  recurrence.
-- Model and feature selection use three pre-2026 walk-forward folds. The selected
-  regularised random forest has mean ROC AUC 0.5538 and mean average precision
-  0.3845; fold ROC AUC ranges from approximately 0.510 to 0.583, so stability
-  remains weak.
-  The mature 2026 reporting cohort contains 405 rows and 150 positives. ROC AUC
-  is 0.6215, average precision 0.4343 and calibrated Brier score 0.2258. The
-  top-half priority-review band contains 203 rows, with 48.3% precision and
-  65.3% recall. The top-20% band has only 43.2% precision and 23.3% recall, so the
-  high-risk tier is disabled. The 2026 period was inspected during earlier
-  experiments and is not a pristine final holdout. This model is useful as a
-  capstone feasibility result only and must not drive customer, employee or
-  scheduling decisions.
-- The selected 56-feature contract includes prediction-time-safe operational and
-  prior-weather variables while excluding event-day weather, team identity,
-  salesperson/acquisition, payment behaviour and static environmental context.
-  Static elevation, relief, mapped-water and mapped-forest features are assessed
-  only as a grouped challenger because geographic coverage is uneven and adding
-  variables can overfit the small development sample.
-- The grouped static-environment challenger was evaluated on 21 September. Mean
-  pre-2026 walk-forward ROC AUC changes from 0.5538 to 0.5521, while mean average
-  precision improves from 0.3845 to 0.3983. The already-inspected 2026 reporting
-  cohort shows similarly small changes. Forest distance is available for only
-  253/1,354 mature rows and there are only three development folds. Static
-  environment is therefore a promising challenger, not part of frozen v2; see
-  `planning/ENVIRONMENTAL_MODEL_EVALUATION.md`.
+- The selected predictive experiment is now `warranty_risk_residential_3x_30d_v3`. It excludes all commercial clients and residential 1x packages, and uses a mature 30-day window after the residential 3x completion anchor.
+- The selected L2 logistic model averages ROC AUC 0.519 and average precision 0.254 across three pre-2026 walk-forward folds. On the already-inspected 2026 complete-weather cohort it has ROC AUC 0.547 and average precision 0.293 (26.2% prevalence). This is weak discrimination, so the model remains an experimental review-ranking aid.
+
+- The selected 56-feature contract includes prediction-time-safe operational and prior-weather variables while excluding event-day weather, team identity, salesperson/acquisition, payment behaviour and static environmental context.
+- Static environmental features did not improve pre-2026 evidence: mean average precision changed from 0.2535 to 0.2496. The small 2026 diagnostic gain is insufficient for promotion; see `planning/ENVIRONMENTAL_MODEL_EVALUATION.md`.
 - DBSCAN now operates on 108 distinct service properties containing 215
   recorded warranty signals, rather than directly on repeated event rows. With
   a minimum of three distinct properties, the 1 km view has 4 clusters/13
@@ -326,9 +297,7 @@ the current pinned snapshot and does not join enquiries to sales.
   or allocated automatically.
 - The source and model audit covers the critical financial, matching and
   warranty joins; it does not certify every one of the 205 source columns.
-- Repository integrity needs repair separately: `git fsck --connectivity-only
-  --no-reflogs` reports missing objects, and `git diff --check` cannot complete.
-  No Git history or index repair was attempted during the data audit.
+- Repository metadata was repaired from a fresh clone. The pre-repair working tree and damaged metadata remain preserved in the documented recovery folder.
 
 ## Remaining work in batches — no one-field-at-a-time handoff
 

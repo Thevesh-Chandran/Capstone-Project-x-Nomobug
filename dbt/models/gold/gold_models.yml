@@ -11,6 +11,21 @@ models:
           - accepted_values:
               arguments:
                 values: [entry_timestamp, early_sequence_inferred, adjacent_timestamps_inferred, unresolved]
+      - name: premise_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [RESIDENTIAL, COMMERCIAL, VEHICLE, UNKNOWN]
+      - name: warranty_policy_category
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [ELIGIBLE_RESIDENTIAL_PACKAGE, INELIGIBLE_COMMERCIAL, INELIGIBLE_RESIDENTIAL_1X, REVIEW_UNDEFINED_POLICY]
+      - name: warranty_policy_rule
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [POST_FINAL_SERVICE_30D, FIRST_SERVICE_THROUGH_30D_AFTER_FINAL_UNLIMITED_CLAIMS, NO_WARRANTY, REVIEW_UNDEFINED_POLICY]
   - name: payment_record_facts
     columns:
       - name: payment_record_id

@@ -71,7 +71,48 @@ select
     nullif(trim(pest_type_raw), '') as pest_type_raw,
     nullif(trim(package_type_raw), '') as package_type_raw,
     nullif(trim(contract_type_raw), '') as contract_type_raw,
-    coalesce(nullif(upper(trim(premise_type_raw)), ''), 'UNKNOWN') as premise_type,
+    case
+        when regexp_contains(upper(trim(premise_type_raw)), r'^COMM')
+            then 'COMMERCIAL'
+        when regexp_contains(upper(trim(premise_type_raw)), r'^RES')
+            then 'RESIDENTIAL'
+        when upper(trim(premise_type_raw)) in ('CAR', 'VAN', 'VEHICLE')
+            then 'VEHICLE'
+        else 'UNKNOWN'
+    end as premise_type,
+    case
+        when regexp_contains(upper(trim(premise_type_raw)), r'^RES')
+             and safe_cast(nullif(trim(total_sessions_raw), '') as int64)
+                 in (3, 4, 6, 12)
+            then true
+        else false
+    end as warranty_policy_eligible,
+    case
+        when regexp_contains(upper(trim(premise_type_raw)), r'^COMM')
+            then 'INELIGIBLE_COMMERCIAL'
+        when regexp_contains(upper(trim(premise_type_raw)), r'^RES')
+             and safe_cast(nullif(trim(total_sessions_raw), '') as int64) = 1
+            then 'INELIGIBLE_RESIDENTIAL_1X'
+        when regexp_contains(upper(trim(premise_type_raw)), r'^RES')
+             and safe_cast(nullif(trim(total_sessions_raw), '') as int64)
+                 in (3, 4, 6, 12)
+            then 'ELIGIBLE_RESIDENTIAL_PACKAGE'
+        else 'REVIEW_UNDEFINED_POLICY'
+    end as warranty_policy_category,
+    case
+        when regexp_contains(upper(trim(premise_type_raw)), r'^RES')
+             and safe_cast(nullif(trim(total_sessions_raw), '') as int64) = 3
+            then 'POST_FINAL_SERVICE_30D'
+        when regexp_contains(upper(trim(premise_type_raw)), r'^RES')
+             and safe_cast(nullif(trim(total_sessions_raw), '') as int64)
+                 in (4, 6, 12)
+            then 'FIRST_SERVICE_THROUGH_30D_AFTER_FINAL_UNLIMITED_CLAIMS'
+        when regexp_contains(upper(trim(premise_type_raw)), r'^COMM')
+          or (regexp_contains(upper(trim(premise_type_raw)), r'^RES')
+              and safe_cast(nullif(trim(total_sessions_raw), '') as int64) = 1)
+            then 'NO_WARRANTY'
+        else 'REVIEW_UNDEFINED_POLICY'
+    end as warranty_policy_rule,
     coalesce(nullif(upper(trim(trbs_raw)), ''), 'UNKNOWN') as trbs_status,
     coalesce(nullif(upper(trim(billing_arrangement_raw)), ''), 'UNKNOWN')
         as billing_arrangement,

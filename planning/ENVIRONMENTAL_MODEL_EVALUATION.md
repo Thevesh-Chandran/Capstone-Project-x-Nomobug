@@ -1,59 +1,50 @@
-# Environmental factors in the warranty-risk experiment
+# Environmental factors in the residential 3x warranty-risk experiment
 
 ## Decision
 
-Do not automatically add the current static environmental feature group to
-`warranty_risk_60d_v2`. Retain it as a promising challenger and for descriptive
-spatial analysis. It improves average precision modestly but does not improve
-mean ROC AUC, has uneven coverage, and has only three development folds.
+Do not promote the current static environmental feature group into
+`warranty_risk_residential_3x_30d_v3`. Keep it for descriptive spatial analysis
+and future testing. It did not improve pre-2026 validation performance.
 
-## Factors evaluated
+## Factors and coverage
 
-- elevation;
-- local terrain relief within 500 metres;
-- distance to and count of mapped water features within 2 kilometres;
-- distance to and count of mapped forest features within 2 kilometres;
-- availability/capping indicators for the environmental lookup.
+The challenger adds elevation, 500-metre relief, and mapped water and forest
+proximity/counts. Among 1,335 eligible rows, elevation and relief cover all rows,
+water distance covers 1,117, and forest distance covers 242. Missing values are
+imputed inside each training fold.
 
-The comparison uses the same regularised random forest, 60-day target, mature rows,
-prediction-safe base features and three pre-2026 walk-forward folds as v2. The
-script is read-only and reproducible with:
+| Feature contract | Pre-2026 mean ROC AUC | Pre-2026 mean AP | Mean Brier |
+|---|---:|---:|---:|
+| v3 base | 0.5187 | 0.2535 | 0.2143 |
+| v3 plus static environment | 0.5162 | 0.2496 | 0.2194 |
+
+On the already-inspected 401-row 2026 diagnostic, the static group changes ROC
+AUC from 0.5469 to 0.5530 and average precision from 0.2932 to 0.2998. That small
+post-selection gain does not override the weaker development evidence.
+
+## Rainfall and spatial scale
+
+Testing rainfall by area is sensible, but scale must match the source. Current
+weather is approximately a 0.1-degree grid, roughly 9–11 km locally. A 1 km or
+2 km rainfall radius would repeat the same grid estimate and imply precision the
+source does not contain. Spatial clustering may still use smaller radii for
+service-location patterns, but it must not be presented as local rainfall.
+
+For a later dashboard, precompute a small set of validated geographic scenarios,
+such as weather-grid cell and broader 10 km/20 km neighbourhoods. For each scale
+show the eligible denominator, positive count, recurrence-proxy rate, uncertainty,
+and model metrics only when both outcome classes have adequate samples. Changing
+a radius should select a stored evaluation result; it should not retrain a model
+inside the dashboard.
+
+Flooding, drains, standing water, building condition and nearby water are valid
+hypotheses. The current mapped-water variable is incomplete and the project has
+no verified flood or drainage exposure source, so these factors cannot yet be
+used as causal explanations. The target is also a recorded warranty signal, not
+confirmed biological recurrence.
+
+Reproduce the static challenger with:
 
 ```powershell
 python scripts/evaluate_warranty_environmental_factors.py
 ```
-
-## Coverage
-
-The mature 60-day cohort contains 1,354 rows. Elevation and relief are available
-for all 1,354 rows, mapped-water distance for 1,136, and mapped-forest distance
-for only 253. Missing values are imputed inside each training fold; they are not
-filled from future outcomes.
-
-## Results — pre-2026 selection evidence
-
-| Feature contract | Mean ROC AUC | Mean average precision | Mean Brier score |
-|---|---:|---:|---:|
-| v2 base | 0.5538 | 0.3845 | 0.2303 |
-| v2 plus static environment | 0.5521 | 0.3983 | 0.2301 |
-
-The environmental group raises mean average precision by 0.0138 and improves it
-in all three folds. Mean ROC AUC falls by 0.0017 and the Brier change is
-negligible. This is encouraging challenger evidence, but it is too small and too
-limited in independent periods to justify expanding the frozen v2 contract.
-
-## 2026 diagnostic
-
-On the already-inspected 405-row 2026 reporting cohort, static environment changes
-ROC AUC from 0.6215 to 0.6218 and average precision from 0.4343 to 0.4378. This
-period is not a pristine holdout and cannot independently approve the feature
-group.
-
-## Interpretation
-
-These results do not show that environmental context is irrelevant to pest
-activity. The available variables are coarse mapped surroundings, forest
-coverage is sparse, and the target is a recorded Calendar warranty signal rather
-than measured pest recurrence. The factors remain appropriate for maps,
-descriptive comparisons and later testing with stronger property-condition,
-drainage/flood and confirmed recurrence data.
