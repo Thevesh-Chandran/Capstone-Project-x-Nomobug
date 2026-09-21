@@ -32,3 +32,16 @@ population accuracy. After review, results must be reported separately by
 detection reason and review stratum, with uncertainty intervals. Any systematic
 false-positive or false-negative pattern must be corrected in the Calendar label
 logic before model retraining.
+
+## Analyze the completed review
+
+After every row has a review label, run:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\analyze_warranty_label_review.py outputs\cp2-v2\CP2_Warranty_Label_Review.xlsx
+```
+
+The command writes `CP2_Warranty_Label_Review_analysis.json` beside the workbook.
+It reports system-positive precision, the hard-negative positive rate, Wilson 95%
+intervals, stratum-level results, unclear rows, and error-reason counts. Until all
+rows are labeled, it exits with status 2 and lists the remaining review IDs.
