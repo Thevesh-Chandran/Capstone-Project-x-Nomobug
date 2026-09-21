@@ -1,0 +1,52 @@
+version: 2
+models:
+  - name: b2b_follow_up
+    columns:
+      - name: b2b_record_id
+        data_tests: [not_null, unique]
+  - name: sales
+    columns:
+      - name: sales_row_id
+        data_tests: [not_null, unique]
+  - name: payments
+    columns:
+      - name: payment_record_id
+        data_tests: [not_null, unique]
+      - name: reference_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [missing, unrecognized, repeated_reference_review, combined, single]
+  - name: payment_sales_links
+    columns:
+      - name: payment_record_id
+        data_tests: [not_null]
+      - name: sales_record_id
+        data_tests: [not_null]
+  - name: calendar_event_locations
+    description: "Sanitized verified coordinates for 2023-2026 service-like Calendar events; event location is independent of the linked SALES property."
+    columns:
+      - name: calendar_event_row
+        data_tests: [not_null, unique]
+      - name: precision_tier
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [precise_candidate, street_candidate, postcode_area_candidate, area_analysis_candidate, text_agreement_candidate, proximity_candidate, peer_address_candidate, google_hinted_area_candidate, manual_verified, area_reference_verified]
+  - name: calendar_event_weather
+    description: "Event-day and lagged ECMWF IFS reanalysis features; association evidence only."
+    columns:
+      - name: calendar_event_row
+        data_tests: [not_null, unique]
+      - name: weather_coverage_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [available, missing_from_partial_cache, event_after_weather_snapshot]
+  - name: regional_weather_features_by_date
+    description: "Daily service-region mean weather fallback with leakage-safe trailing features; not property-level weather."
+    columns:
+      - name: weather_date
+        data_tests: [not_null, unique]
+      - name: contributing_grid_cells
+        data_tests: [not_null]

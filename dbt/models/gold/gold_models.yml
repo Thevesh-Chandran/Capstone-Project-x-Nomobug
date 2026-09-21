@@ -1,0 +1,239 @@
+version: 2
+models:
+  - name: sales_package_facts
+    columns:
+      - name: sales_row_id
+        data_tests: [not_null, unique]
+      - name: sales_record_id
+        data_tests: [not_null, unique]
+      - name: closed_date_year_source
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [entry_timestamp, early_sequence_inferred, adjacent_timestamps_inferred, unresolved]
+  - name: payment_record_facts
+    columns:
+      - name: payment_record_id
+        data_tests: [not_null, unique]
+      - name: payment_date_cell_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [serial, text, blank]
+  - name: calendar_service_event_facts
+    columns:
+      - name: calendar_event_row
+        data_tests: [not_null, unique]
+      - name: match_status
+        data_tests: [not_null]
+      - name: warranty_claim_candidate
+        data_tests: [not_null]
+  - name: sales_monthly_recorded
+    description: "Monthly SALES package rows and recorded package face value, not earned revenue. Null month retains undated rows."
+  - name: payments_monthly_recorded
+    description: "Monthly PAYMENTS entries and recorded entry amounts, not confirmed cash. Null month retains undated rows."
+  - name: prospect_reply_monthly_recorded
+    description: "Monthly 2026 first-reply enquiry rows; not unique customers or a sale conversion rate."
+  - name: recorded_activity_quality
+    description: "Issue counts by source with separate denominators; issues overlap and must not be summed."
+    columns:
+      - name: source_name
+        data_tests: [not_null]
+      - name: issue_code
+        data_tests: [not_null]
+      - name: affected_rows
+        data_tests: [not_null]
+      - name: source_rows
+        data_tests: [not_null]
+  - name: refund_record_facts
+    description: "One REFUND sheet entry; recorded status is not bank-transfer proof. No bank or contact fields."
+    columns:
+      - name: refund_record_id
+        data_tests: [not_null, unique]
+      - name: sale_link_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [exact_sale_id, unmatched_source_id]
+      - name: recorded_refund_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [recorded_complete, not_recorded, other_status_needs_review]
+  - name: warranty_claim_record_facts
+    description: "One WARRANTY CLAIM sheet entry, not a count of Calendar warranty treatments."
+    columns:
+      - name: warranty_claim_record_id
+        data_tests: [not_null, unique]
+      - name: sale_link_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [exact_sale_id, unmatched_source_id]
+      - name: source_refund_indicator
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [recorded_yes, recorded_no, date_text_recorded, other_needs_review]
+  - name: spatial_repeat_signal_events
+    description: "Heatmap-ready warranty-claim proxies (explicit warranty labels or post-package sequences such as 4/3 and 5/3) with 1/2/5 km DBSCAN sensitivity; not confirmed pest spread."
+    columns:
+      - name: calendar_event_row
+        data_tests: [not_null, unique]
+      - name: repeat_signal_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [warranty]
+  - name: spatial_repeat_signal_properties
+    description: "One row per distinct geocoded service property with recorded warranty signals; prevents repeated callbacks at one address from manufacturing a neighbourhood cluster."
+    columns:
+      - name: address_hash
+        data_tests: [not_null, unique]
+      - name: recorded_warranty_signal_rows
+        data_tests: [not_null]
+  - name: spatial_repeat_signal_property_clusters
+    description: "Property-grain 1/2/5 km DBSCAN sensitivity assignments with minimum three properties."
+    columns:
+      - name: address_hash
+        data_tests: [not_null, unique]
+  - name: spatial_service_area_metrics
+    description: "Area-level repeat-signal share with scheduled-service volume denominator; geohash cells are analytical bins, not pest radii."
+    columns:
+      - name: area_cell
+        data_tests: [not_null, unique]
+      - name: denominator_evidence
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [scheduled_event_denominator_not_completed_treatment_count]
+  - name: dashboard_service_monthly
+    description: "Monthly dashboard summary of scheduled service entries, warranty-claim signals and location/weather coverage; not unique customers or completed treatments."
+    columns:
+      - name: service_month
+        data_tests: [not_null, unique]
+      - name: denominator_evidence
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [scheduled_calendar_event_denominator_not_unique_customer_or_completed_treatment_count]
+  - name: dashboard_warranty_package_metrics
+    description: "One row per matched SALES package with Calendar warranty-claim signal counts; Customer IDs are package IDs, not unique people."
+    columns:
+      - name: sales_record_id
+        data_tests: [not_null, unique]
+      - name: denominator_evidence
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [matched_sales_package_denominator_not_unique_person_or_completed_treatment_count]
+  - name: dashboard_recurrence_windows
+    description: "Package/property-aware Calendar intervals with proposal recurrence buckets; planned package sequences are not labelled recurrence without a return signal."
+    columns:
+      - name: calendar_event_row
+        data_tests: [not_null, unique]
+      - name: recurrence_bucket
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [no_previous_event, no_confirmed_return_signal, property_needs_review, 0_7_days, 8_14_days, 15_30_days, 31_60_days, 61_plus_days, invalid_interval_review]
+  - name: dashboard_scheduling_capacity
+    description: "Daily and Calendar workload counts for 2026 scheduled/recorded events; not completed treatment hours."
+    columns:
+      - name: service_date
+        data_tests: [not_null]
+      - name: denominator_evidence
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [scheduled_calendar_workload_not_completed_treatment_or_capacity_hours]
+  - name: dashboard_refund_monthly
+    description: "Monthly REFUND source-record summary with unresolved date/amount counts; not cash-settlement proof."
+    columns:
+      - name: denominator_evidence
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [refund_source_record_denominator_not_cash_settlement_proof]
+  - name: dashboard_package_fit_matrix
+    description: "Descriptive package/pest/contract evidence; payment links are not rejected-offer labels and amounts are not allocated across combined payments."
+    columns:
+      - name: denominator_evidence
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [descriptive_package_fit_not_rejected_offer_prediction_or_cash_allocation]
+  - name: dashboard_treatment_difficulty
+    description: "Separate warranty/additional-visit/refund-context indicators. Composite score remains null pending validation."
+    columns:
+      - name: score_evidence
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [separate_components_composite_pending_validation]
+  - name: dashboard_payment_link_monthly
+    description: "PAYMENT LINK recorded WON outcomes. The unused completion-status column is in PAYMENTS; cross-source conversion is still pending reconciliation."
+    columns:
+      - name: denominator_evidence
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [payment_link_source_record_denominator_not_unique_customer_or_conversion_proof]
+  - name: dashboard_spatial_area
+    description: "Looker map source aggregated to geohash-5 areas with at least five scheduled service entries; no property/event coordinates."
+    columns:
+      - name: area_cell
+        data_tests: [not_null, unique]
+      - name: map_grain_evidence
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [geohash_precision_5_several_km_analytical_area_not_pest_radius_or_property]
+  - name: dashboard_recurrence_monthly
+    description: "Monthly recorded warranty-signal intervals only; not planned visits, unique customers or confirmed reinfestations."
+    columns:
+      - name: service_month
+        data_tests: [not_null]
+      - name: recorded_warranty_signal_rows
+        data_tests: [not_null]
+  - name: dashboard_ml_evaluation
+    description: "Latest aggregate held-out experiment metrics. Individual scores are not released to Looker."
+    columns:
+      - name: run_utc
+        data_tests: [not_null]
+      - name: model_name
+        data_tests: [not_null]
+      - name: metric_name
+        data_tests: [not_null]
+      - name: experiment_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [evaluated_weather_inclusive_not_causal_or_production_ready]
+  - name: dashboard_spatial_cluster_summary
+    description: "DBSCAN 1/2/5 km sensitivity at aggregate cluster grain; not a pest-spread radius or event-coordinate release."
+    columns:
+      - name: radius_km
+        data_tests: [not_null]
+      - name: cluster_id
+        data_tests: [not_null]
+      - name: cluster_evidence
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [dbscan_minimum_3_distinct_service_properties_sensitivity_not_pest_spread_radius]
+  - name: dashboard_weather_monthly
+    description: "Monthly descriptive weather association with complete-window coverage; not causal evidence."
+    columns:
+      - name: service_month
+        data_tests: [not_null]
+      - name: event_group
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [recorded_warranty_signal, other_scheduled_service_entry]
+      - name: weather_evidence
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [open_meteo_reanalysis_association_not_property_measurement_or_causal_effect]

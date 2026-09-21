@@ -1,0 +1,81 @@
+domain,canonical_field,business_definition,proposed_type,expected_source,data_classification,status,confirmation_question
+lineage,source_system,System from which the row originated,string,All sources,Non-personal,confirmed_required,Use controlled source names from source_inventory.csv
+lineage,source_object,Original Sheet tab or Calendar name,string,All sources,Business metadata,confirmed_required,Retain for traceability and scope filtering
+lineage,source_row_number,Original populated-range Sheet row number,string,Google Sheets,Business metadata,confirmed_required,Use with source object as the raw Sheet record identifier
+lineage,source_record_id,Stable source identifier or generated source-object plus row identifier,string,All sources,Business metadata,confirmed_required,Calendar uses event_id while Sheets use source object plus row number
+lineage,extracted_at,Timestamp when the source was read,timestamp,All sources,Business metadata,confirmed_required,Store in Asia/Kuala_Lumpur and UTC if practical
+prospect,prospect_interaction_id,Generated identifier for one recorded prospect conversation or follow-up,string,Prospects 2026 and B2B FOLLOW UP,Business metadata,business_definition_confirmed,Generate from source object and source row number
+prospect,phone_normalized,Normalised phone used for controlled matching but not as a unique prospect key,string,Prospects 2026; B2B FOLLOW UP; SALES; PAYMENT LINK,Personal,business_definition_confirmed,Define Malaysian country-code multi-number and invalid-number rules
+prospect,lead_platform,Source platform such as advertisement or website,string,Prospects 2026,Business metadata,observed_field_pending_categories,Normalise PLATFORM Ads Website values
+prospect,prospect_customer_type,Residential or business classification,string,Prospects 2026,Business metadata,observed_field_pending_categories,Normalise RESIDENTIAL BUSINESS values
+prospect,prospect_status,Open or closed prospect status,string,Prospects 2026,Business metadata,observed_field_pending_categories,Confirm whether closed means won lost or simply no longer active
+prospect,prospect_pic,Person responsible for the prospect interaction,string,Prospects 2026,Employee-related,observed_field_pending_categories,Confirm reporting permission and name normalisation
+prospect,first_reply_date,Date staff first replied to the prospect; manually entered in ENGAGE,date,Prospects 2026 ENGAGE,Business metadata,business_definition_confirmed_2026_09_03,Date parsing and year resolution pending; not incoming-message date and cannot alone measure response time
+prospect,scheduled_follow_up_date,Automatically populated scheduled follow-up date; not evidence of completed contact,date,Prospects 2026 1st F/UP through 5th F/UP,Business metadata,business_definition_confirmed_2026_09_03,Five columns observed; sixth unconfirmed; retain each original column until transformation is agreed
+quality,prospect_row_class,Provisional presence-based classification distinguishing phone or first reply from follow-up-only candidates and other values,string,Prospects 2026 extraction,Business metadata,provisional_rule_v1,All rows retained; neither template candidates nor repeated rows are automatically removed; not a unique-customer count
+prospect,b2b_business_name,Name of the prospective business,string,B2B FOLLOW UP,Personal,business_definition_confirmed,Use only in protected matching layers
+prospect,b2b_status,Current B2B opportunity or follow-up status,string,B2B FOLLOW UP,Business metadata,observed_field_pending_categories,Define open booked inspection quoted won and lost categories
+prospect,b2b_inspection_appointment_date,Date booked for the business inspection or site visit,date,B2B FOLLOW UP and Google Calendar,Business metadata,business_definition_confirmed,Use Appointment Date as planned date and Calendar event start as operational appointment date when matched
+prospect,b2b_inspection_booked_flag,Whether the B2B prospect progressed to a booked inspection,boolean,Derived from B2B FOLLOW UP,Business metadata,business_rule_pending,Define using Appointment Date Lead to Appointment and Status
+customer,customer_id,Company-assigned identifier used to link SALES PAYMENTS WARRANTY REFUND and recurring billing,string,SESSION & PAYMENT workbook,Personal,business_definition_confirmed,Measure completeness uniqueness and cross-tab match rates
+customer,customer_name_raw,Customer name exactly as recorded,string,Sheets and Calendar,Personal,observed_field,Retain only in protected raw and matching layers
+sales,sale_id,Generated identifier for one closed sale or service agreement,string,SALES,Business metadata,business_definition_confirmed,Use source row identifier unless a stable sale reference is identified
+sales,closed_date,Date the sale was closed,date,SALES,Business metadata,business_definition_confirmed,Use Closed Date for sales reporting
+sales,first_contact_date,Date first contact was recorded,date,SALES,Business metadata,observed_field,Assess completeness before funnel analysis
+sales,customer_type,Residential or commercial classification,string,SALES,Business metadata,business_definition_confirmed,SALES is authoritative and Commercial Clients is auto-derived
+sales,pest_type,Normalised pest category sold,string,SALES,Business metadata,observed_field_pending_categories,Profile TYPE OF PEST values and agree canonical groups
+sales,package_type,Normalised service package sold,string,SALES,Business metadata,business_definition_confirmed,Define GPC TRBS session-count and subscription labels
+sales,total_sale_amount_rm,Total contracted sale amount in Malaysian ringgit,decimal,SALES,Sensitive business,business_definition_confirmed,Confirm whether amounts include tax discounts or later adjustments
+sales,deposit_paid_rm,Deposit recorded against the sale in Malaysian ringgit,decimal,SALES,Sensitive business,business_definition_confirmed,Reconcile to PAYMENTS rather than assuming this is transaction-level data
+sales,balance_paid_rm,Balance recorded as paid in Malaysian ringgit,decimal,SALES,Sensitive business,business_definition_confirmed,Reconcile to PAYMENTS rather than assuming this is transaction-level data
+sales,outstanding_balance_rm,Outstanding amount recorded against the sale in Malaysian ringgit,decimal,SALES,Sensitive business,business_definition_confirmed,Check whether this is formula-derived and current
+sales,deposit_invoice_id,Invoice reference associated with the deposit,string,SALES,Sensitive business,observed_field,Map from the first INVOICE ID column
+sales,balance_invoice_id,Invoice reference associated with the balance,string,SALES,Sensitive business,observed_field,Map from the second INVOICE ID column
+sales,billing_cadence_raw,Payment arrangement such as clear deposit quarterly or monthly,string,SALES and Recurring Payments,Sensitive business,business_definition_confirmed,Confirm how yearly-paying B2B customers are represented
+service,service_event_id,Calendar event identifier for one scheduled operational service or appointment,string,Google Calendar,Business metadata,business_definition_confirmed,Use event_id and recurring instance start where required
+service,service_start,Accurate operational service or inspection start timestamp,timestamp,Google Calendar,Business metadata,authoritative_source_confirmed,Calendar is authoritative because SALES service-date columns are not maintained
+service,service_end,Operational service or inspection end timestamp,timestamp,Google Calendar,Business metadata,authoritative_source_confirmed,Define treatment for missing ends and all-day events
+service,service_status,Calendar event status such as confirmed or cancelled,string,Google Calendar,Business metadata,observed_field,Exclude or separately report cancelled events
+service,event_category,Derived service inspection warranty complimentary replacement or other category,string,Google Calendar,Business metadata,business_rule_pending,Agree title and description parsing patterns
+service,team_name,Team associated with the operational Calendar event,string,Google Calendar,Employee-related,observed_field,Calendar name supplies team context unless event text overrides it
+service,technician_name,Technician assigned to the operational service,string,Google Calendar and WARRANTY CLAIM,Employee-related,business_definition_confirmed,Normalise names and confirm permitted reporting level
+location,address_raw,Full source address retained only in protected raw data,string,SALES and Google Calendar,Personal,observed_field,Remove from dashboard-ready tables after location matching
+location,area_name,Normalised general service area,string,SALES and Google Calendar,Business metadata,pending_derivation,Define an approved area list
+location,postcode,Postal code used for area matching,string,SALES and Google Calendar,Quasi-identifier,pending_derivation,Measure extraction completeness and reliability
+location,latitude,Latitude used for weather and spatial matching,decimal,Derived or source,Quasi-identifier,pending_policy,Decide exact coordinates versus postcode or area centroid
+location,longitude,Longitude used for weather and spatial matching,decimal,Derived or source,Quasi-identifier,pending_policy,Decide exact coordinates versus postcode or area centroid
+payment,payment_transaction_id,Generated identifier for one recorded receipt of customer money,string,PAYMENTS,Sensitive business,business_definition_confirmed,Test Customer ID plus Date plus Amount for collisions and retain source row identifier
+payment,payment_date,Date money was recorded as received,date or timestamp,PAYMENTS,Sensitive business,business_definition_confirmed,Confirm whether pending rows should count as received
+payment,payment_amount_rm,Amount received in Malaysian ringgit,decimal,PAYMENTS,Sensitive business,business_definition_confirmed,Define reversal correction and duplicate-entry treatment
+payment,payment_method,Method used for the payment,string,PAYMENTS,Sensitive business,observed_field_pending_categories,Normalise payment-method values
+payment,payment_status,Completed or pending payment status,string,PAYMENTS,Sensitive business,observed_field_pending_categories,Only completed payments should count as realised cash unless business rules say otherwise
+payment_link,payment_link_record_id,Generated identifier for one prospect sent payment or invoice information,string,PAYMENT LINK,Business metadata,business_definition_confirmed,Use source row identifier
+payment_link,payment_link_date,Date payment or invoice information was sent,date,PAYMENT LINK,Business metadata,business_definition_confirmed,Confirm date semantics against business process
+payment_link,payment_link_status,Outcome where WON means paid or successfully closed and PENDING remains open,string,PAYMENT LINK,Business metadata,business_definition_confirmed,Profile actual WON PENDING and other values
+payment_link,payment_link_success_flag,Whether the payment-link opportunity became successful,boolean,Derived from PAYMENT LINK,Business metadata,business_rule_confirmed,Set true for WON after cleaning status values
+warranty,claim_id,Generated identifier for one warranty claim,string,WARRANTY CLAIM,Business metadata,business_definition_confirmed,Use source row identifier because no stable claim number is present
+warranty,claim_recorded_date,Date the warranty claim was recorded,date,WARRANTY CLAIM,Business metadata,observed_field_pending_semantics,Confirm whether Date is complaint date entry date or appointment date
+warranty,warranty_service_start,Accurate operational timestamp for the warranty or complimentary visit,timestamp,Google Calendar,Business metadata,authoritative_source_confirmed,Match claim to Calendar and do not rely on Sheet service dates for operational timing
+warranty,warranty_reason_category,Reason or pest category for the warranty claim,string,WARRANTY CLAIM and derived context,Sensitive business,business_rule_pending,Confirm whether all claims concern cockroach recurrence after three services or whether other cases exist
+warranty,complimentary_service_flag,Whether a no-charge follow-up service was provided,boolean,WARRANTY CLAIM and Google Calendar,Sensitive business,business_rule_pending,Define from matched Calendar category and available Sheet fields
+warranty,service_sequence_number,Original first-to-seventh service position associated with a technician,integer,WARRANTY CLAIM,Business metadata,transformation_confirmed,Unpivot the repeated technician columns into service-sequence rows
+warranty,claim_technician_name,Technician recorded for a service in the warranty history,string,WARRANTY CLAIM,Employee-related,transformation_confirmed,Unpivot and normalise technician names before analysis
+refund,refund_id,Generated identifier for one refund case,string,REFUND,Business metadata,business_definition_confirmed,Use source row identifier because no refund reference is visible
+refund,refund_date,Date associated with the refund case,date,REFUND,Business metadata,observed_field_pending_semantics,Confirm whether Date is request approval or completion date
+refund,refund_reason_raw,Reason recorded when the pest could not be eradicated after complimentary services,string,REFUND,Sensitive business,business_definition_confirmed,Create safe categories while retaining raw text only in protected data
+refund,refund_amount_rm,Amount refunded in Malaysian ringgit,decimal,REFUND,Sensitive business,business_definition_confirmed,Define partial-refund and adjustment handling
+refund,refund_status,Completed or pending refund status,string,REFUND,Sensitive business,observed_field_pending_categories,Define which status counts in completed-refund KPIs
+recurring,recurring_customer_id,Customer identifier for one recurring B2B agreement,string,Recurring Payments,Personal,business_definition_confirmed,Link back to the authoritative SALES record
+recurring,recurring_cadence,Monthly quarterly or yearly billing cadence,string,SALES and Recurring Payments,Sensitive business,business_definition_confirmed,Confirm exact yearly source value because the observed header names only clear deposit quarterly and monthly
+recurring,scheduled_payment_number,Sequence number of a monthly or quarterly scheduled payment,integer,Recurring Payments,Business metadata,transformation_confirmed,Unpivot repeated monthly and quarterly payment columns
+recurring,scheduled_payment_value_raw,Raw recorded value for one scheduled recurring payment,string,Recurring Payments,Sensitive business,observed_field_pending_semantics,Determine whether values are dates amounts statuses or mixed
+calendar,event_id,Google Calendar event identifier,string,Google Calendar,Business metadata,observed_field,Test stability for edits recurring instances and moved events
+calendar,calendar_id,Identifier of the source Calendar,string,Google Calendar,Business metadata,observed_field,All six confirmed Nomobug Calendars remain in scope
+calendar,event_start,Calendar event start including timezone,timestamp,Google Calendar,Business metadata,authoritative_source_confirmed,Normalise to Asia/Kuala_Lumpur while retaining original timezone
+calendar,event_end,Calendar event end including timezone,timestamp,Google Calendar,Business metadata,observed_field,Define all-day and missing-end handling
+calendar,event_summary_raw,Original Calendar event title retained in protected data,string,Google Calendar,Personal,observed_field,Use parsed safe fields in analytical tables
+calendar,event_description_raw,Original Calendar description retained in protected data,string,Google Calendar,Personal,observed_field,Use only for controlled customer and service matching
+weather,weather_date,Local date of the weather observation,date,Open-Meteo,Non-personal,proposed_unconfirmed,Decide daily versus service-time hourly grain after location matching is tested
+weather,rainfall_mm,Rainfall amount in millimetres,decimal,Open-Meteo,Non-personal,proposed_unconfirmed,Choose precipitation variables and lag windows
+weather,relative_humidity_pct,Relative humidity percentage,decimal,Open-Meteo,Non-personal,proposed_unconfirmed,Choose daily aggregation or service-time value
+weather,temperature_c,Temperature in degrees Celsius,decimal,Open-Meteo,Non-personal,proposed_unconfirmed,Choose mean minimum maximum or service-time value

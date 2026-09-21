@@ -1,0 +1,15 @@
+name: nomobug
+version: '1.0.0'
+config-version: 2
+profile: nomobug
+model-paths: [models]
+test-paths: [tests]
+target-path: target
+models:
+  nomobug:
+    +materialized: view
+
+seeds:
+  nomobug:
+    +schema: gold
+    +tags: ['gold']

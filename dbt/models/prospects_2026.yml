@@ -1,0 +1,19 @@
+version: 2
+models:
+  - name: prospects_2026
+    description: "All rows from one verified Bronze snapshot with conservative cleaning and review flags. Repeated enquiries and placeholders retained. Not a sales fact table."
+    columns:
+      - name: snapshot_row_id
+        data_tests: [not_null, unique]
+      - name: source_sheet_row
+        data_tests: [not_null, unique]
+      - name: row_class
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [prospect_candidate, followup_only_placeholder, numbered_only_placeholder, other_values_needs_review]
+      - name: first_reply_date
+        description: "First staff reply, not inbound message date. Year 2026 confirmed by owner; invalid values remain null and flagged."
+      - name: remark_is_exact_won
+        description: "Exact trimmed WON remark only. Must reconcile Sales/Payments before interpreting actual successful sales."

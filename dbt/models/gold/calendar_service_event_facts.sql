@@ -1,0 +1,51 @@
+{{ config(schema='gold', tags=['gold'], materialized='table') }}
+-- One row per confirmed service-like Calendar entry. Scheduled does not mean completed.
+select
+    e.calendar_event_row,
+    e.calendar_name,
+    e.event_id,
+    e.event_date_local,
+    e.event_start_ts,
+    e.event_end_ts,
+    e.is_all_day,
+    safe_cast(e.created_raw as timestamp) as event_created_ts,
+    safe_cast(e.updated_raw as timestamp) as event_updated_ts,
+    e.recurring_event_id,
+    e.calendar_pest_text_category,
+    e.calendar_service_method_category,
+    e.event_category,
+    e.session_current,
+    e.session_total,
+    e.sequence_over_package,
+    e.warranty_claim_candidate,
+    e.warranty_claim_reason,
+    e.extra_visit_candidate,
+    m.matched_sales_record_id as sales_record_id,
+    m.match_status,
+    m.sales_match_count,
+    l.latitude,
+    l.longitude,
+    l.address_hash,
+    l.service_geography,
+    l.precision_tier as location_precision_tier,
+    l.location_uncertainty_radius_m,
+    coalesce(l.heatmap_eligible, false) as heatmap_eligible,
+    coalesce(l.weather_eligible, false) as weather_eligible,
+    w.weather_coverage_status,
+    w.event_day_weather_available,
+    w.complete_prior_14d_weather,
+    w.event_day_temperature_mean_c,
+    w.event_day_precipitation_mm,
+    w.event_day_relative_humidity_mean_pct,
+    w.event_day_soil_moisture_0_to_7cm_mean,
+    w.prior_3d_precipitation_mm,
+    w.prior_7d_precipitation_mm,
+    w.prior_14d_precipitation_mm,
+    w.prior_7d_relative_humidity_mean_pct,
+    w.prior_7d_soil_moisture_0_to_7cm_mean,
+    'scheduled_or_recorded_not_completion_proof' as completion_evidence
+from {{ ref('calendar_events') }} e
+join {{ ref('calendar_event_matches') }} m using (calendar_event_row)
+left join {{ ref('calendar_event_locations') }} l using (calendar_event_row)
+left join {{ ref('calendar_event_weather') }} w using (calendar_event_row)
+where e.service_candidate

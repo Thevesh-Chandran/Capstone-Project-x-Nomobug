@@ -1,0 +1,10 @@
+version: 2
+sources:
+  - name: bronze
+    database: profound-keel-500007-s4
+    schema: bronze
+    tables:
+      - name: prospects_2026_snapshot
+        # One verified immutable snapshot, NOT a wildcard across snapshot history.
+        identifier: "prospects_2026_{{ var('prospects_snapshot_id') }}"
+        description: "One immutable snapshot explicitly selected by the verified refresh runner."
