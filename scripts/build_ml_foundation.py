@@ -39,7 +39,8 @@ def main() -> None:
                  if release_only else
                  ("looker_release_invariants dashboard_spatial_cluster_summary dashboard_ml_evaluation"
                  if contract_only else ("+tag:spatial+" if spatial_only else
-                 ("warranty_risk_3session_invariants" if test_only else "+tag:analytics_ml"))
+                 ("warranty_risk_3session_invariants warranty_coverage_service_episode_invariants"
+                  if test_only else "+tag:analytics_ml"))
                  ))
     command = [
         str(dbt), "test" if (test_only or contract_only) else

@@ -1,6 +1,29 @@
 version: 2
 
 models:
+  - name: warranty_coverage_service_episodes
+    description: "Mature service intervals for warranty-eligible residential 4x, 6x and 12x packages. Retains multiple recorded warranty signals during coverage."
+    columns:
+      - name: sales_record_id
+        data_tests: [not_null]
+      - name: service_anchor_event_row
+        data_tests: [not_null, unique]
+      - name: coverage_interval_start
+        data_tests: [not_null]
+      - name: coverage_interval_end
+        data_tests: [not_null]
+      - name: warranty_claim_count_in_interval
+        data_tests: [not_null]
+      - name: evaluation_split
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [train_2024_2025, holdout_2026]
+      - name: target_definition
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [residential_4x_6x_12x_service_interval_claim_count]
   - name: warranty_risk_3session_dataset
     description: "Mature, leakage-safe experiment cohort restricted to warranty-eligible residential 3x packages. The target is a recorded Calendar warranty signal within 30 days after a unique 3/3 anchor, not proven pest recurrence."
     columns:

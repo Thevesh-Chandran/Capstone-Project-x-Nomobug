@@ -12,6 +12,11 @@ The CP1-to-CP2 requirements comparison is recorded in
 [`CP2_GOAL_COVERAGE_AUDIT.md`](CP2_GOAL_COVERAGE_AUDIT.md). It distinguishes
 implemented evidence from planned work and superseded proposal options.
 
+The residential 4x/6x/12x repeated-coverage dataset is now implemented with 364
+mature service intervals across 146 packages. It retains multiple claims and
+shows only exploratory model value; see
+[`WARRANTY_COVERAGE_MODEL_EVALUATION.md`](WARRANTY_COVERAGE_MODEL_EVALUATION.md).
+
 ## What the levels mean
 
 ### Dashboard calculation correction — 15 September 2026
