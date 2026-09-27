@@ -4,6 +4,19 @@ This is the current progress entry point. Older plans/profiles are historical,
 not proof that a pipeline is built. Latest reconciliation includes the successful
 Prospects and complete eight-tab operational Bronze/Silver batch.
 
+Latest callback evidence work on 27 September 2026: all 5,598 frozen targets
+reconcile with source records. The claim-date audit separates request/record
+dates from visit dates and isolates seven unresolved within-window conflicts
+in a private title/date-searchable queue. Ten structured description predictors
+were tested across eight candidate contracts on identical eligible cohorts.
+At 374 reviews, the refitted baseline captures 94 callbacks versus 91 with new
+fields; no reliable ranking gain is established. Retain v4 as experimental.
+All 250 tests pass; three artifacts replay all 1,869 diagnostic probabilities.
+See [the evidence reconciliation](CP2_CALLBACK_EVIDENCE_RECONCILIATION.md),
+[the proposed recording guide](CP2_CALLBACK_RECORDING_GUIDE.md) and
+[`warranty_callback_description_experiment_v1.json`](../config/warranty_callback_description_experiment_v1.json).
+No operational sources, confirmed labels or governing model contract changed.
+
 Latest training-period comparison on 27 September 2026: earlier-2026 training
 was tested on the same 392 July–14 August services with 35 callbacks. At a fixed
 79-service review capacity, frozen v4 and 2026-only ExtraTrees each capture 21

@@ -13,6 +13,13 @@ prediction models are too weak or uncertain for operational decisions.
 Freeze the development-selected model and evaluate future mature records
 before adopting its probabilities or alert threshold.
 
+The subsequent [claim-date and description-feature experiment](CP2_CALLBACK_EVIDENCE_RECONCILIATION.md)
+reconciles all 5,598 targets, isolates seven date conflicts and tests ten recovered
+Problem-field variables. It establishes no useful gain at equal review capacity
+(94 callbacks for a refitted baseline versus 91 with descriptions at 374 reviews).
+The [recording guide](CP2_CALLBACK_RECORDING_GUIDE.md) and blank template define
+the structured request, visit, treatment and availability evidence needed next.
+
 ## Target and variable meaning
 
 Each row is a recorded paid base service. Prediction occurs immediately
