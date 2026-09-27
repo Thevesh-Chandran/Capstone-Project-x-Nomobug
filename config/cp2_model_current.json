@@ -1,0 +1,42 @@
+{
+  "version": "cp2_callback_v5",
+  "status": "current_experimental_candidate_not_deployed",
+  "primary_model": "ExtraTrees depth 10, min leaf 5, 300 trees",
+  "primary_selection": "et10_leaf5",
+  "primary_bundle_model": "challenger_all_history",
+  "target": "recorded_corrective_calendar_callback_within_30d",
+  "target_type": "binary",
+  "output": "risk_probability",
+  "bundle_relative_path": "outputs/cp2-v2/prospective_callback_v2",
+  "bundle_sha256": "6ace4314b4a5e170ea1bd6feee40dadbdd14eb3c986db9223d888b3c3ee302e0",
+  "training_services": 5695,
+  "training_2026_services": 2075,
+  "training_callbacks": 521,
+  "latest_training_service": "2026-08-27",
+  "latest_training_outcome": "2026-09-26",
+  "new_retrospective_test": {
+    "services": 100,
+    "callback_positive_service_windows": 5,
+    "period": [
+      "2026-08-15",
+      "2026-08-27"
+    ],
+    "primary_auc": 0.8905263157894737,
+    "reference_auc": 0.8126315789473684,
+    "primary_average_precision": 0.30508104921898027,
+    "review_services": 20,
+    "primary_positive_windows_captured": 4,
+    "reference_positive_windows_captured": 3,
+    "threshold_accuracy": 0.94,
+    "always_no_callback_accuracy": 0.95,
+    "limits": "Only five positives; paired AUC/AP intervals include zero. Not online historical predictions."
+  },
+  "prospective_cohort": [
+    "2026-09-28",
+    "2026-10-27"
+  ],
+  "earliest_final_evaluation": "2026-11-27",
+  "live_feature_feed": "not_connected",
+  "report": "planning/CP2_CORRECTED_MODEL_CANDIDATES_V5.md",
+  "historical_v4": "retained_for_reproduction_superseded_as_current_candidate"
+}

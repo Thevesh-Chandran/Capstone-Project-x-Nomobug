@@ -15,11 +15,13 @@ import numpy as np
 import pandas as pd
 try:
     from scripts import benchmark_warranty_models as b
-    from scripts.compare_callback_blind_spots import add_targeted_features,fit_pipeline,masks,segment_metrics,paired_intervals
+    from scripts.compare_callback_blind_spots import add_targeted_features,fit_pipeline,masks,segment_metrics
+    from scripts.callback_evaluation import paired_intervals
     from scripts.compare_flood_models import configure_contracts
 except ModuleNotFoundError:
     import benchmark_warranty_models as b
-    from compare_callback_blind_spots import add_targeted_features,fit_pipeline,masks,segment_metrics,paired_intervals
+    from compare_callback_blind_spots import add_targeted_features,fit_pipeline,masks,segment_metrics
+    from callback_evaluation import paired_intervals
     from compare_flood_models import configure_contracts
 
 LOCAL=ZoneInfo('Asia/Kuala_Lumpur')
@@ -44,11 +46,30 @@ def timestamp(value):
     return parsed.astimezone(timezone.utc)
 
 
-def prepare_scoring_frame(raw):
+def prepare_scoring_frame(raw,preparation=None):
     raw=raw.copy()
     raw['outcome_end_date']=pd.to_datetime(raw.anchor_date)+pd.Timedelta(days=30)
     # Outcomes may be absent: never synthesize a false/no-callback label.
-    return add_targeted_features(b.prepare_frame(raw,require_outcomes=False))
+    frame=add_targeted_features(b.prepare_frame(raw,require_outcomes=False))
+    if preparation=='candidate_v5':
+        try:
+            from scripts.compare_callback_candidates_v2 import add_contract_policy_feature
+        except ModuleNotFoundError:
+            from compare_callback_candidates_v2 import add_contract_policy_feature
+        frame=add_contract_policy_feature(frame)
+    return frame
+
+
+def artifact_probability(artifact,frame):
+    if 'members' in artifact:
+        try:
+            from scripts.compare_callback_candidates_v2 import predict_raw
+        except ModuleNotFoundError:
+            from compare_callback_candidates_v2 import predict_raw
+        raw=predict_raw(artifact['members'],frame)
+    else:
+        raw=artifact['pipeline'].predict_proba(frame[artifact['features']])[:,1]
+    return b.apply_calibrator(artifact['calibrator'],raw)
 
 
 def validate_prediction_times(frame,manifest,now):
@@ -153,17 +174,18 @@ def load_bundle(output):
 
 def verify(output):
     configure_contracts(False);manifest,models=load_bundle(output)
-    if digest(INPUT)!=manifest['input_file_sha256'] or digest(output/manifest['training_replay_file'])!=manifest['training_replay_sha256']:
+    replay_input=b.ROOT/manifest['training_input_relative_path'] if 'training_input_relative_path' in manifest else INPUT
+    if digest(replay_input)!=manifest['input_file_sha256'] or digest(output/manifest['training_replay_file'])!=manifest['training_replay_sha256']:
         raise ValueError('Replay inputs changed')
-    raw=b.load_dataset_input(INPUT).drop(columns=[b.TARGET])
-    frame=prepare_scoring_frame(raw)
+    raw=b.load_dataset_input(replay_input).drop(columns=[b.TARGET])
+    frame=prepare_scoring_frame(raw,manifest.get('preparation'))
     if b.TARGET in frame:
         raise ValueError('Outcome entered prospective predictors')
     expected=pd.read_csv(output/manifest['training_replay_file'],dtype={'sales_record_id':str})
     keys=frame[KEYS].copy();keys.anchor_date=keys.anchor_date.dt.strftime('%Y-%m-%d')
     differences={}
     for name,artifact in models.items():
-        p=b.apply_calibrator(artifact['calibrator'],artifact['pipeline'].predict_proba(frame[artifact['features']])[:,1])
+        p=artifact_probability(artifact,frame)
         joined=keys.assign(replayed=p).merge(expected[KEYS+[name]],on=KEYS,how='outer',validate='one_to_one',indicator=True)
         if not joined['_merge'].eq('both').all() or not np.allclose(joined.replayed,joined[name],rtol=0,atol=1e-12):
             raise ValueError('Bundle predictor-only replay failed')
@@ -173,11 +195,11 @@ def verify(output):
 
 def score(output,input_path,log_dir):
     configure_contracts(False);manifest,models=load_bundle(output)
-    frame=prepare_scoring_frame(b.load_dataset_input(input_path))
+    frame=prepare_scoring_frame(b.load_dataset_input(input_path),manifest.get('preparation'))
     now=datetime.now(timezone.utc)
     validate_prediction_times(frame,manifest,now)
     for name,artifact in models.items():
-        frame[name]=b.apply_calibrator(artifact['calibrator'],artifact['pipeline'].predict_proba(frame[artifact['features']])[:,1])
+        frame[name]=artifact_probability(artifact,frame)
     feature_columns=sorted({c for info in manifest['models'].values() for c in info['features']})
     rows=json.loads(frame[KEYS+['address_hash','prediction_at','feature_snapshot_at','service_start_at','service_end_at']+feature_columns+list(models)].to_json(orient='records',date_format='iso'))
     pending=[]

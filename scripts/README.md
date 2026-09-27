@@ -1,5 +1,25 @@
 # Scripts — choose the active path
 
+## Current model workflow
+
+Start with [the model guide](../planning/CP2_START_HERE.md) before running an experiment. Commands use `.venv/Scripts/python.exe` from the repository root. Existing frozen results are private local artifacts; a rerun is not a new independent test.
+
+| Script | Use |
+|---|---|
+| `cp2_model.py status` | Read the current corrected v5 model pointer, training coverage and evaluation limits |
+| `cp2_model.py verify` | Replay the current corrected future bundle and check its hashes |
+| `cp2_model.py predict --input-json <private predictors> --output-csv outputs/<private scores>.csv` | Generate risk scores without manufacturing observed outcomes; this does not register prospective evidence |
+| `cp2_model.py log-prospective --input-json <private predictors>` | Log the current frozen comparison with strict timing gates; the live feature feed is not connected |
+| `cp2_model.py evaluate-prospective --input-json <private Calendar labels>` | Evaluate the mature frozen cohort once, with complete coverage, no earlier than 27 November |
+| `compare_callback_candidates_v2.py` | Reproduce the corrected v5 fixed candidate selection and artifact generation |
+| `refresh_callback_validation.py` | Derive a separate corrected candidate input from refreshed source evidence |
+| `evaluate_callback_holdout.py` | Evaluate the frozen selected models on the reserved newer-date cohort; refuses result overwrite |
+| `reconcile_callback_evidence.py` and `trace_claim_service_dates.py` | Preserve source-label/date audit evidence |
+
+Use `--help` for accepted inputs and [the corrected v5 report](../planning/CP2_CORRECTED_MODEL_CANDIDATES_V5.md) for timing, coverage and immutability requirements. The governed configs are mapped in [config/README.md](../config/README.md).
+
+Historical `benchmark_warranty_models.py`, `compare_callback_blind_spots.py`, `freeze_callback_prospective.py` and `write_warranty_benchmark_report.py` remain for reproduction; use the current entry point above to follow the corrected v2 future bundle. The v4 report generator writes its report into `planning/archive/model_evaluations/` and does not replace the current v5 pointer. [Archived reports](../planning/archive/README.md) explain the older experiments.
+
 ## Active BigQuery workflow
 
 Run from the repository root with `.venv` active. BigQuery is the primary warehouse; upload scripts retain explicit project, region, approval and size gates.
@@ -69,3 +89,10 @@ Use the notebooks when learning or inspecting each step. Keep these Python scrip
 ## Output policy
 
 Raw company data and generated profiles belong only in Git-ignored `data/` locations. Credentials belong in the ignored `secrets/` directory or private `.env`. Do not upload those files to GitHub.
+
+
+## Current corrected v5 model
+
+Use `python scripts/cp2_model.py status` or `verify` first. `predict --input-json <predictors> --output-csv outputs/<scores>.csv` generates private risk scores; `log-prospective` and `evaluate-prospective` retain controlled future-test requirements.
+
+Reproduction stages are `load_calendar_bronze.py --private-snapshot-json outputs/<new-source>.json` (read-only), `refresh_callback_validation.py`, `compare_callback_candidates_v2.py`, `evaluate_callback_holdout.py` (one final result), and `freeze_corrected_callback.py` (fixed all-mature refit). Read [the full protocol](../planning/CP2_CORRECTED_MODEL_CANDIDATES_V5.md) before rebuilding. Existing v1 artifacts stay frozen; production source pins are unchanged.

@@ -1,46 +1,30 @@
-# Nomobug Analytics
+# Nomobug CP2: recorded callback risk
 
-Repository for the Nomobug weather-aware pest-control analytics and decision-support system. The system is intended to combine operational, service-outcome, scheduling, location, and weather data for management analysis.
+Start with [the model guide](planning/CP2_START_HERE.md). It explains the prediction, current evidence and which files to use. [Project status](planning/PROJECT_STATUS.md) holds the detailed implementation history.
 
-This is an analytics and data-engineering repository, not a CRM application.
+The main experimental model ranks paid services by the risk of a recorded corrective Calendar callback within the following 30 days. It produces a numerical risk score for a binary outcome. Warranty entitlement is calculated separately from the owner's policy.
 
-## Repository Status
+The current experimental candidate is **corrected v5 ExtraTrees, depth 10**. On 100 newer services it found four of five callback-positive windows within 20 reviews, versus three for the corrected reference. Five positives are too few to establish a dependable improvement. [Current model evidence](planning/CP2_CORRECTED_MODEL_CANDIDATES_V5.md) explains the selection, corrections and limits.
 
-CP2 has verified BigQuery Bronze snapshots for Prospects, eight operational Sheets tabs and six Calendars. Silver matching and an initial three-view Gold fact layer pass dbt checks. Financial and warranty KPIs, weather enrichment, predictive ML, DBSCAN, automation and the dashboard remain to be completed. Neon is a manual fallback. See [current status](planning/PROJECT_STATUS.md).
+The future-test refit trains on all 5,695 mature services, including 2,075 from 2026. Use `scripts/cp2_model.py status` or `verify` for the current model. The live feature feed is not connected and no future accuracy has been measured. First-service detection remains weak; dashboard work is deferred.
 
-## Planned Stack
+## Find the right files
 
-Python/pandas, BigQuery, dbt Core (`dbt-bigquery`), scikit-learn, Cloud Run Jobs with Cloud Scheduler, Looker Studio and GitHub Actions for CI/deployment. Neon PostgreSQL remains a manual fallback. Docker supports reproducible execution. Live Google Sheets, Google Calendar and Open-Meteo APIs are the source interfaces; CSV exports are optional backups.
+| Folder | Use |
+|---|---|
+| [planning/](planning/README.md) | Current model guide, policy, evidence and next steps |
+| [planning/archive/](planning/archive/README.md) | Completed evaluations and historical setup notes |
+| [config/](config/README.md) | Model contracts, experiment provenance and source dictionaries |
+| [scripts/](scripts/README.md) | Repeatable extraction, warehouse, analysis and model commands |
+| dbt/ | Tested warehouse transformations and source lineage |
+| tests/ | Synthetic regression checks |
+| templates/ | Blank structured recording templates |
+| notebooks/ | Introductory profiling notebooks |
+| outputs/ and tmp/ | Private generated model artifacts, source snapshots and working files; ignored by Git |
+| data/, docs/ and secrets/ | Private local data, preserved CP1 documents and credentials; ignored by Git |
 
-The build targets RM0 usage within verified free allowances. Billing-linked BigQuery has residual charge risk; the RM10 budget alert and query byte cap are active controls. Cloud Run and Looker Studio are selected but not yet deployed.
+Run commands from the repository root using `.venv/Scripts/python.exe`. BigQuery is the primary warehouse; `scripts/neon/` is a preserved manual fallback and `scripts/prototypes/` contains older exploration. See [the script inventory](scripts/README.md) before running a command.
 
-## Repository Contents
+## Data handling
 
-```text
-planning/              Scope, schedule, migration checklist and writing reference
-config/                Source maps, dictionary drafts and quality findings
-scripts/               Active BigQuery workflow and shared source tooling
-  neon/                Preserved manual fallback scripts
-  prototypes/          Older exploration scripts; not the active pipeline
-notebooks/             Beginner-friendly pandas profiling notebooks
-tests/                 Offline synthetic regression tests
-data/                  Local data workspace (private contents ignored)
-docs/                  Preserved CP1 documents and proposal (local only)
-secrets/               Private credentials (ignored)
-```
-
-## Source Tooling
-
-- The three numbered notebooks provide the main step-by-step pandas workflow for local Jupyter or VS Code.
-- `scripts/inventory_google_sources.py` discovers approved Google Sheets and Calendar metadata.
-- The three `profile_*_all_*` scripts create local raw snapshots and data-quality profiles.
-- `scripts/prototypes/fetch_calendar_events.py` is retained as the Calendar parsing prototype.
-- `scripts/prototypes/test_open_meteo_history.py` is retained as the historical-weather prototype.
-
-See `scripts/README.md` for the active script inventory. Historical prototypes remain separate from the tested first-source pipeline; broader production validation is pending.
-
-## Data and Secrets
-
-The repository must not contain raw company exports, customer or employee personal data, full Calendar extracts, credentials, OAuth tokens, API keys, or generated outputs containing identifying information.
-
-Use anonymised or synthetic samples for committed tests. Keep real source data and credentials in approved local storage outside version control.
+Keep raw exports, customer details, Calendar descriptions, credentials and generated private predictions outside version control. Use synthetic or anonymized test data. Frozen experiment inputs and saved models are retained for reproducibility; their local outputs are not duplicate source records to merge into a dataset.

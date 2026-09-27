@@ -20,5 +20,5 @@ The initial profile targets the existing Singapore silver dataset.
 The 100 MiB per-query setting limits query bytes, not total cloud spending.
 
 The runner builds the full current dbt project, including the independent
-mapping test, then prints the aggregate checkpoint. See planning/PROSPECTS_REFRESH.md
+mapping test, then prints the aggregate checkpoint. See planning/archive/implementation/PROSPECTS_REFRESH.md
 for failure semantics and remaining production-hardening work.

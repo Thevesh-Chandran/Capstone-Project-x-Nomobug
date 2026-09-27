@@ -88,7 +88,7 @@ owner-confirmed operating rules take precedence.
     separate GDACS regional flood reports now enrich the experimental callback
     dataset. Their 35 comparisons did not improve development selection; only
     37 anchors have reliable GFM observations and none contains detected flooding.
-    See [the flood evaluation](CP2_FLOOD_MODEL_EVALUATION.md). No live warning
+    See [the flood evaluation](archive/model_evaluations/CP2_FLOOD_MODEL_EVALUATION.md). No live warning
     feed or confirmed property flood indicator is implemented. Rainfall fields
     remain distinct from flood observations.
 

@@ -44,7 +44,10 @@ def _credentials() -> Credentials:
     ])
     if not credentials.valid:
         if credentials.expired and credentials.refresh_token:
-            credentials.refresh(Request())
+            try:
+                credentials.refresh(Request())
+            except GoogleAuthError:
+                raise SystemExit("Google Calendar sign-in needs renewal: python scripts/renew_google_access.py") from None
         else:
             raise SystemExit("Google Calendar sign-in needs renewal: python scripts/renew_google_access.py")
     return credentials
@@ -160,7 +163,15 @@ def main() -> None:
     parser.add_argument("--upload", action="store_true")
     parser.add_argument("--start-date", type=date.fromisoformat, default=DEFAULT_START)
     parser.add_argument("--end-date", type=date.fromisoformat, default=date.today())
+    parser.add_argument("--private-snapshot-json", type=Path,
+        help="Save read-only source evidence inside the project's ignored outputs folder.")
     args = parser.parse_args()
+    if args.private_snapshot_json:
+        private_path = args.private_snapshot_json.resolve()
+        if not private_path.is_relative_to((ROOT / "outputs").resolve()):
+            raise SystemExit("Private Calendar snapshots must stay inside ignored project outputs.")
+        if private_path.exists():
+            raise SystemExit("Private Calendar snapshot already exists; choose a new filename.")
     load_dotenv(ROOT / ".env")
     if args.end_date < args.start_date:
         raise SystemExit("End date must be on or after start date.")
@@ -175,6 +186,11 @@ def main() -> None:
     targets = _targets(metadata_path)
     records = _fetch(targets, args.start_date, args.end_date)
     snapshot = _snapshot(records, targets, args.start_date, args.end_date)
+    if args.private_snapshot_json:
+        private_path.parent.mkdir(parents=True, exist_ok=True)
+        with private_path.open("x", encoding="utf-8") as handle:
+            json.dump({"metadata": snapshot["metadata"], "records": records}, handle,
+                ensure_ascii=False)
     print(f"Calendar window: {args.start_date} through {args.end_date} ({LOCAL_TZ_NAME})")
     print(f"Approved calendars: {len(targets)} | event rows: {len(records)}")
     print(f"Distinct event IDs within calendar: {len({(r['calendar_id'], r['event_id']) for r in records})}")

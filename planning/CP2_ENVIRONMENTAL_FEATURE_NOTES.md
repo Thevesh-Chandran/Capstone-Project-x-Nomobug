@@ -24,9 +24,9 @@ should preserve retrieval timestamps and use data actually available at scoring
 time. [Open-Meteo documentation](https://open-meteo.com/en/docs/historical-weather-api).
 
 The flood sources are evaluated separately from rainfall and from each other.
-See [the flood comparison](CP2_FLOOD_MODEL_EVALUATION.md) for extraction coverage,
+See [the flood comparison](archive/model_evaluations/CP2_FLOOD_MODEL_EVALUATION.md) for extraction coverage,
 matched-cohort results and the observation-coverage control, and
-[the source review](CP2_FLOOD_SOURCE_REVIEW.md) for their spatial and timing limits.
+[the source review](archive/model_evaluations/CP2_FLOOD_SOURCE_REVIEW.md) for their spatial and timing limits.
 
 The new weather model requires complete, unique daily rows and nonmissing inputs
 for the relevant window. Incomplete windows yield null feature values rather
@@ -97,4 +97,4 @@ Rainfall, waterway proximity, standing-water land cover and disaster reports
 must remain distinct variables. Nearby observed GFM context and GDACS regional
 reports have now been added to the separate flood experiment. Neither is a
 confirmed property flood indicator; their performance and coverage are recorded
-in [the flood evaluation](CP2_FLOOD_MODEL_EVALUATION.md).
+in [the flood evaluation](archive/model_evaluations/CP2_FLOOD_MODEL_EVALUATION.md).

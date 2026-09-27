@@ -59,6 +59,7 @@ def main():
     receipt.parent.mkdir(parents=True, exist_ok=True)
     receipt.write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
     lines = [
+        '> Historical v4 evidence, superseded by [the corrected v5 model](../../CP2_CORRECTED_MODEL_CANDIDATES_V5.md). Retained for reproduction; this is not the current model recommendation.', '',
         '# CP2 model improvement — 27 September 2026', '',
         'The reviewed labels, prediction timing and evaluation were repaired before',
         'model comparison. These are retrospective experiments, not operational',
@@ -217,7 +218,7 @@ def main():
         '  Compact/history and weather-only candidates provide no-OSM sensitivity.',
         '- Spatial buffers can be smaller than geocoding uncertainty; approximate',
         '  locations cannot establish exact house-level water or land-cover exposure.',
-        '  See [environmental source notes](CP2_ENVIRONMENTAL_FEATURE_NOTES.md).',
+        '  See [environmental source notes](../../CP2_ENVIRONMENTAL_FEATURE_NOTES.md).',
         '- Maximum seven-day temperature means the maximum cached daily mean,',
         '  not the maximum instantaneous temperature.',
         '- Labels describe recorded Calendar claim visits, not verified biological',
@@ -253,7 +254,9 @@ def main():
         '[Open-Meteo historical weather](https://open-meteo.com/en/docs/historical-weather-api),',
         '[HOTOSM Malaysia waterways](https://data.humdata.org/dataset/hotosm_mys_waterways).',
     ]
-    (ROOT/'planning/CP2_MODEL_IMPROVEMENT.md').write_text('\n'.join(lines)+'\n', encoding='utf-8')
+    report_path = ROOT / 'planning/archive/model_evaluations/CP2_MODEL_IMPROVEMENT.md'
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text('\n'.join(lines)+'\n', encoding='utf-8')
     config = {
         'model_version': 'warranty_fixed_30d_reviewed_v4',
         'status': 'diagnostic_only_not_operational',

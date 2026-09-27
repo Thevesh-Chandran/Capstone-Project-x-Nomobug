@@ -1,0 +1,64 @@
+{
+  "version": "prospective_callback_v2_corrected",
+  "preparation": "candidate_v5",
+  "status": "frozen_not_operational_no_future_performance",
+  "frozen_at_utc": "2026-09-27T13:47:01.074277+00:00",
+  "cohort_start": "2026-09-28",
+  "cohort_end": "2026-10-27",
+  "earliest_final_evaluation_date": "2026-11-27",
+  "target": "recorded_corrective_calendar_callback_within_30d",
+  "date_authority": "Calendar",
+  "review_fraction": 0.2,
+  "input_file_sha256": "eb5f0a85c207ab802b3ba99b2cb58b012980e93dc608d7fd9f1c6bbdb5ffdd24",
+  "training_rows": 5695,
+  "training_positive_rows": 521,
+  "training_2026_rows": 2075,
+  "latest_training_anchor": "2026-08-27",
+  "latest_training_outcome_end": "2026-09-26",
+  "development_selection_sha256": "5f52d041f95391f3e9ca768485b442f79917aa14d7481e22e92d4265caf77fab",
+  "feature_preparation_hashes": {
+    "scripts\\benchmark_warranty_models.py": "b2fc7f588c4cd98059203b6058376e21ce8af2e0cbe55c47d4628228182bd06d",
+    "scripts\\compare_callback_blind_spots.py": "c12f7bbc80912ad4299d06d120733ca889a309b9ef178f8f9287af3370ddd90d",
+    "scripts\\compare_callback_candidates_v2.py": "82efb921332b70366fbe9ff6f2179191a49a0d966184f94ff20d3cb9a8b8acc4"
+  },
+  "upstream_contract_hashes": {
+    "dbt\\macros\\calendar_history_available.sql": "17d255b0521a48d8bb1349405a9b1d887ca376eea513427805f346411a141889",
+    "dbt\\macros\\calendar_snapshot_observation_sql.sql": "868d2d03fdfc1663c8e936758950156d987529be500f5b4cd133391c7f650d42",
+    "dbt\\macros\\warranty_anchor_dataset_sql.sql": "6cf7d0679ba17120410ac8adf8546fd188c03d4487345b849081fb5642b86628",
+    "dbt/macros/warranty_anchor_dataset_sql.sql": "50f1ed4bae6a037542f2e3ff3ed5b93239af48e066ad8aa63f69f74c69809a86"
+  },
+  "models": {
+    "reference_all_history": {
+      "file": "reference_all_history.joblib",
+      "sha256": "d5c2fbe943a102785d06f98df83a79bfe3f7b8e6115302984487e2c23136daa8",
+      "selection_name": "reference_et6",
+      "threshold": 0.16999999999999998,
+      "source_development_artifact_sha256": "5360a0badf01ac7cd209b797f24f5017c7090b205ee02707d69b19e3ac43930f"
+    },
+    "challenger_all_history": {
+      "file": "challenger_all_history.joblib",
+      "sha256": "b47d7dcc826ae2856c55899c3b6f4311bdb6489e08b63fb566b5fb8c9019e65f",
+      "selection_name": "et10_leaf5",
+      "threshold": 0.19,
+      "source_development_artifact_sha256": "ad01a607d147bf72e6c3029d4db98820d4eed79e06b54d6e0a371ea4dc832eaa"
+    },
+    "priority_all_history": {
+      "file": "priority_all_history.joblib",
+      "sha256": "06fd8af2b4db57b67b05682b8f1115f72a9c6325618712f9724f78815a562c98",
+      "selection_name": "policy_et6",
+      "threshold": 0.16,
+      "source_development_artifact_sha256": "46819953c3cbec3da6d28cea1bf78ad41f1ba203e751718d194cfb45590376ba"
+    }
+  },
+  "limits": [
+    "Training includes the later retrospective holdout only after its evaluation; no future accuracy is measured.",
+    "Calibrators and thresholds stay from the fixed purged development predictions.",
+    "Live predictor extraction and full prospective outcome capture remain required.",
+    "Predictors must exclude future-created history and use complete-day coverage.",
+    "Timestamp declarations do not independently establish every upstream feature availability."
+  ],
+  "training_replay_sha256": "423f0b419b280c0e993605e88f985faec6632961656c4acfa6b80d4ecbc195e6",
+  "manifest_correction": {
+    "detail": "Recorded the equivalent optimized production history join before any prospective predictions; training input, models and cohort unchanged."
+  }
+}

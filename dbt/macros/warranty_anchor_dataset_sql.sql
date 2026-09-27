@@ -2,8 +2,7 @@
 -- Fixed, prediction-safe outcome windows. No future appointment date is a feature.
 -- The same property/package is kept together during downstream validation.
 with observation as (
-    select least(max(event_date_local), current_date('Asia/Kuala_Lumpur')) as observed_through
-    from {{ ref('calendar_service_event_facts') }}
+    {{ calendar_snapshot_observation_sql() }}
 ), uncertain_packages as (
     select distinct m.matched_sales_record_id as sales_record_id
     from {{ ref('calendar_events') }} e
@@ -50,6 +49,30 @@ with observation as (
     from candidates c cross join observation o
     where anchor_order = 1 and anchor_count = 1
       and date_add(event_date_local, interval 30 day) <= o.observed_through
+), history_links as (
+    -- Separate equality joins avoid a broad OR join across the full history.
+    -- A visit linked by multiple identifiers contributes only once.
+    select a.calendar_event_row as anchor_row, h.calendar_event_row as history_row
+    from anchors a
+    join {{ ref('calendar_service_event_facts') }} h
+      on h.sales_record_id = a.sales_record_id
+     and h.event_date_local < a.event_date_local
+     and {{ calendar_history_available('h', 'a') }}
+    union distinct
+    select a.calendar_event_row as anchor_row, h.calendar_event_row as history_row
+    from anchors a
+    join {{ ref('calendar_service_event_facts') }} h
+      on a.address_hash is not null and h.address_hash = a.address_hash
+     and h.event_date_local < a.event_date_local
+     and {{ calendar_history_available('h', 'a') }}
+    union distinct
+    select a.calendar_event_row as anchor_row, h.calendar_event_row as history_row
+    from anchors a
+    join {{ ref('calendar_service_event_facts') }} h
+      on st_geohash(h.service_geography, 4) = st_geohash(a.service_geography, 4)
+     and h.event_date_local >= date_sub(a.event_date_local, interval 90 day)
+     and h.event_date_local < a.event_date_local
+     and {{ calendar_history_available('h', 'a') }}
 ), histories as (
     select a.calendar_event_row,
         countif(h.sales_record_id = a.sales_record_id and h.warranty_claim_candidate)
@@ -79,12 +102,9 @@ with observation as (
             and h.event_date_local >= date_sub(a.event_date_local, interval 90 day))
             as prior_area_services_90d
     from anchors a
+    left join history_links l on l.anchor_row = a.calendar_event_row
     left join {{ ref('calendar_service_event_facts') }} h
-      on h.event_date_local < a.event_date_local
-     and (h.sales_record_id = a.sales_record_id
-          or (a.address_hash is not null and h.address_hash = a.address_hash)
-          or (h.event_date_local >= date_sub(a.event_date_local, interval 90 day)
-              and st_geohash(h.service_geography, 4) = st_geohash(a.service_geography, 4)))
+      on h.calendar_event_row = l.history_row
     group by a.calendar_event_row, a.event_date_local
 ), outcomes as (
     select a.calendar_event_row,

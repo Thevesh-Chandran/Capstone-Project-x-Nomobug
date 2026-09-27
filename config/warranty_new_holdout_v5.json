@@ -1,0 +1,403 @@
+{
+  "evaluated_at_utc": "2026-09-27T13:45:56.893403+00:00",
+  "status": "retrospective_future_services_not_online_prediction",
+  "input_file_sha256": "d7a7615afae5d778e376271cdc51929ac4d849feeef2c30c9f70851bc51857de",
+  "development_selections_sha256": "5f52d041f95391f3e9ca768485b442f79917aa14d7481e22e92d4265caf77fab",
+  "models_sha256": {
+    "reference": "04550d88e6b466cef07526a2f141addce0b6376585f95e2e712446ea3fd8d927",
+    "selected_ap": "bcc6a2cb287e4b120a11fb7810e7af944e5faee735cb4b12f287059ca35f85f6",
+    "selected_priority": "d3d6301f1fd198b065bae2936ac7fb4223f42be248f3916c372c0a4896ec8d6b"
+  },
+  "rows": 100,
+  "positive_rows": 5,
+  "start": "2026-08-15",
+  "end": "2026-08-27",
+  "results": {
+    "reference": {
+      "selection": "reference_et6",
+      "training_rows": 5333,
+      "training_positive_rows": 492,
+      "training_max_outcome_end_date": "2026-08-14",
+      "metrics": {
+        "rows": 100,
+        "positives": 5,
+        "prevalence": 0.05,
+        "roc_auc": 0.8126315789473684,
+        "average_precision": 0.27232922732362824,
+        "brier_score": 0.043225501488438,
+        "accuracy": 0.92,
+        "balanced_accuracy": 0.6736842105263158,
+        "precision": 0.2857142857142857,
+        "recall": 0.4,
+        "f1": 0.3333333333333333,
+        "alert_rows": 7,
+        "threshold": 0.16999999999999998,
+        "majority_class_accuracy": 0.95,
+        "ap_lift_over_prevalence": 5.446584546472565
+      },
+      "priority_top20pct": {
+        "target_fraction": 0.2,
+        "target_rows": 20,
+        "selected_rows_including_ties": 20,
+        "realized_fraction": 0.2,
+        "score_cutoff": 0.04427976066939781,
+        "cutoff_tied_rows": 1,
+        "precision": 0.15,
+        "recall": 0.6,
+        "precision_lift_over_prevalence": 2.9999999999999996,
+        "selection": "within_batch_top_fraction_including_cutoff_ties"
+      },
+      "segments": {
+        "all": {
+          "rows": 100,
+          "positive_rows": 5,
+          "budget_alerts": 20,
+          "budget_TP": 3,
+          "budget_FN": 2,
+          "budget_FP": 17,
+          "budget_recall": 0.6,
+          "budget_precision": 0.15,
+          "threshold_TP": 2,
+          "threshold_FN": 3,
+          "threshold_FP": 5
+        },
+        "first_service": {
+          "rows": 32,
+          "positive_rows": 0,
+          "budget_alerts": 3,
+          "budget_TP": 0,
+          "budget_FN": 0,
+          "budget_FP": 3,
+          "budget_recall": null,
+          "budget_precision": 0.0,
+          "threshold_TP": 0,
+          "threshold_FN": 0,
+          "threshold_FP": 0
+        },
+        "mixed_pest": {
+          "rows": 41,
+          "positive_rows": 2,
+          "budget_alerts": 6,
+          "budget_TP": 1,
+          "budget_FN": 1,
+          "budget_FP": 5,
+          "budget_recall": 0.5,
+          "budget_precision": 0.16666666666666666,
+          "threshold_TP": 0,
+          "threshold_FN": 2,
+          "threshold_FP": 0
+        },
+        "target_union": {
+          "rows": 61,
+          "positive_rows": 2,
+          "budget_alerts": 9,
+          "budget_TP": 1,
+          "budget_FN": 1,
+          "budget_FP": 8,
+          "budget_recall": 0.5,
+          "budget_precision": 0.1111111111111111,
+          "threshold_TP": 0,
+          "threshold_FN": 2,
+          "threshold_FP": 0
+        },
+        "other_pests": {
+          "rows": 52,
+          "positive_rows": 2,
+          "budget_alerts": 9,
+          "budget_TP": 1,
+          "budget_FN": 1,
+          "budget_FP": 8,
+          "budget_recall": 0.5,
+          "budget_precision": 0.1111111111111111,
+          "threshold_TP": 0,
+          "threshold_FN": 2,
+          "threshold_FP": 0
+        }
+      }
+    },
+    "selected_ap": {
+      "selection": "et10_leaf5",
+      "training_rows": 5333,
+      "training_positive_rows": 492,
+      "training_max_outcome_end_date": "2026-08-14",
+      "metrics": {
+        "rows": 100,
+        "positives": 5,
+        "prevalence": 0.05,
+        "roc_auc": 0.8905263157894737,
+        "average_precision": 0.30508104921898027,
+        "brier_score": 0.04105936926992149,
+        "accuracy": 0.94,
+        "balanced_accuracy": 0.6842105263157895,
+        "precision": 0.4,
+        "recall": 0.4,
+        "f1": 0.4,
+        "alert_rows": 5,
+        "threshold": 0.19,
+        "majority_class_accuracy": 0.95,
+        "ap_lift_over_prevalence": 6.101620984379605
+      },
+      "priority_top20pct": {
+        "target_fraction": 0.2,
+        "target_rows": 20,
+        "selected_rows_including_ties": 20,
+        "realized_fraction": 0.2,
+        "score_cutoff": 0.060293341873942,
+        "cutoff_tied_rows": 1,
+        "precision": 0.2,
+        "recall": 0.8,
+        "precision_lift_over_prevalence": 4.0,
+        "selection": "within_batch_top_fraction_including_cutoff_ties"
+      },
+      "segments": {
+        "all": {
+          "rows": 100,
+          "positive_rows": 5,
+          "budget_alerts": 20,
+          "budget_TP": 4,
+          "budget_FN": 1,
+          "budget_FP": 16,
+          "budget_recall": 0.8,
+          "budget_precision": 0.2,
+          "threshold_TP": 2,
+          "threshold_FN": 3,
+          "threshold_FP": 3
+        },
+        "first_service": {
+          "rows": 32,
+          "positive_rows": 0,
+          "budget_alerts": 0,
+          "budget_TP": 0,
+          "budget_FN": 0,
+          "budget_FP": 0,
+          "budget_recall": null,
+          "budget_precision": null,
+          "threshold_TP": 0,
+          "threshold_FN": 0,
+          "threshold_FP": 0
+        },
+        "mixed_pest": {
+          "rows": 41,
+          "positive_rows": 2,
+          "budget_alerts": 5,
+          "budget_TP": 1,
+          "budget_FN": 1,
+          "budget_FP": 4,
+          "budget_recall": 0.5,
+          "budget_precision": 0.2,
+          "threshold_TP": 0,
+          "threshold_FN": 2,
+          "threshold_FP": 0
+        },
+        "target_union": {
+          "rows": 61,
+          "positive_rows": 2,
+          "budget_alerts": 5,
+          "budget_TP": 1,
+          "budget_FN": 1,
+          "budget_FP": 4,
+          "budget_recall": 0.5,
+          "budget_precision": 0.2,
+          "threshold_TP": 0,
+          "threshold_FN": 2,
+          "threshold_FP": 0
+        },
+        "other_pests": {
+          "rows": 52,
+          "positive_rows": 2,
+          "budget_alerts": 7,
+          "budget_TP": 1,
+          "budget_FN": 1,
+          "budget_FP": 6,
+          "budget_recall": 0.5,
+          "budget_precision": 0.14285714285714285,
+          "threshold_TP": 0,
+          "threshold_FN": 2,
+          "threshold_FP": 0
+        }
+      }
+    },
+    "selected_priority": {
+      "selection": "policy_et6",
+      "training_rows": 5333,
+      "training_positive_rows": 492,
+      "training_max_outcome_end_date": "2026-08-14",
+      "metrics": {
+        "rows": 100,
+        "positives": 5,
+        "prevalence": 0.05,
+        "roc_auc": 0.8863157894736842,
+        "average_precision": 0.3948251748251749,
+        "brier_score": 0.04178430952904844,
+        "accuracy": 0.93,
+        "balanced_accuracy": 0.6789473684210526,
+        "precision": 0.3333333333333333,
+        "recall": 0.4,
+        "f1": 0.36363636363636365,
+        "alert_rows": 6,
+        "threshold": 0.16,
+        "majority_class_accuracy": 0.95,
+        "ap_lift_over_prevalence": 7.896503496503497
+      },
+      "priority_top20pct": {
+        "target_fraction": 0.2,
+        "target_rows": 20,
+        "selected_rows_including_ties": 20,
+        "realized_fraction": 0.2,
+        "score_cutoff": 0.049688929659176595,
+        "cutoff_tied_rows": 1,
+        "precision": 0.15,
+        "recall": 0.6,
+        "precision_lift_over_prevalence": 2.9999999999999996,
+        "selection": "within_batch_top_fraction_including_cutoff_ties"
+      },
+      "segments": {
+        "all": {
+          "rows": 100,
+          "positive_rows": 5,
+          "budget_alerts": 20,
+          "budget_TP": 3,
+          "budget_FN": 2,
+          "budget_FP": 17,
+          "budget_recall": 0.6,
+          "budget_precision": 0.15,
+          "threshold_TP": 2,
+          "threshold_FN": 3,
+          "threshold_FP": 4
+        },
+        "first_service": {
+          "rows": 32,
+          "positive_rows": 0,
+          "budget_alerts": 0,
+          "budget_TP": 0,
+          "budget_FN": 0,
+          "budget_FP": 0,
+          "budget_recall": null,
+          "budget_precision": null,
+          "threshold_TP": 0,
+          "threshold_FN": 0,
+          "threshold_FP": 0
+        },
+        "mixed_pest": {
+          "rows": 41,
+          "positive_rows": 2,
+          "budget_alerts": 6,
+          "budget_TP": 1,
+          "budget_FN": 1,
+          "budget_FP": 5,
+          "budget_recall": 0.5,
+          "budget_precision": 0.16666666666666666,
+          "threshold_TP": 0,
+          "threshold_FN": 2,
+          "threshold_FP": 1
+        },
+        "target_union": {
+          "rows": 61,
+          "positive_rows": 2,
+          "budget_alerts": 6,
+          "budget_TP": 1,
+          "budget_FN": 1,
+          "budget_FP": 5,
+          "budget_recall": 0.5,
+          "budget_precision": 0.16666666666666666,
+          "threshold_TP": 0,
+          "threshold_FN": 2,
+          "threshold_FP": 1
+        },
+        "other_pests": {
+          "rows": 52,
+          "positive_rows": 2,
+          "budget_alerts": 9,
+          "budget_TP": 1,
+          "budget_FN": 1,
+          "budget_FP": 8,
+          "budget_recall": 0.5,
+          "budget_precision": 0.1111111111111111,
+          "threshold_TP": 0,
+          "threshold_FN": 2,
+          "threshold_FP": 1
+        }
+      }
+    }
+  },
+  "paired_intervals": {
+    "selected_ap": {
+      "direction": "candidate_minus_baseline",
+      "groups": 94,
+      "requested_repeats": 300,
+      "valid_repeats": {
+        "roc_auc": 299,
+        "average_precision": 299,
+        "all_budget_recall": 299,
+        "first_service_budget_recall": 0,
+        "mixed_pest_budget_recall": 258,
+        "target_union_budget_recall": 258
+      },
+      "confidence_95pct": {
+        "roc_auc": [
+          -0.008421052631578945,
+          0.2306151396728904
+        ],
+        "average_precision": [
+          -0.1867723058215534,
+          0.2379275748761043
+        ],
+        "all_budget_recall": [
+          0.0,
+          0.9100000000000023
+        ],
+        "first_service_budget_recall": null,
+        "mixed_pest_budget_recall": [
+          0.0,
+          0.5
+        ],
+        "target_union_budget_recall": [
+          0.0,
+          0.5
+        ]
+      }
+    },
+    "selected_priority": {
+      "direction": "candidate_minus_baseline",
+      "groups": 94,
+      "requested_repeats": 300,
+      "valid_repeats": {
+        "roc_auc": 299,
+        "average_precision": 299,
+        "all_budget_recall": 299,
+        "first_service_budget_recall": 0,
+        "mixed_pest_budget_recall": 258,
+        "target_union_budget_recall": 258
+      },
+      "confidence_95pct": {
+        "roc_auc": [
+          -0.011854015799868311,
+          0.1968098529734474
+        ],
+        "average_precision": [
+          -0.02951754385964919,
+          0.2915183346065699
+        ],
+        "all_budget_recall": [
+          0.0,
+          1.0
+        ],
+        "first_service_budget_recall": null,
+        "mixed_pest_budget_recall": [
+          0.0,
+          1.0
+        ],
+        "target_union_budget_recall": [
+          0.0,
+          1.0
+        ]
+      }
+    }
+  },
+  "limitations": [
+    "Models selected before reading this holdout; no subsequent tuning on its results.",
+    "Returning customers can appear in prior training; this measures future operational services.",
+    "Historical feature revisions cannot all be reconstructed; creation-time gates remove provable future history.",
+    "Small callback counts limit confidence; this is distinct from the prospective live cohort."
+  ]
+}

@@ -1,13 +1,20 @@
-# CP2 planning files
+# CP2 model files
 
-Start with **bigquery_migration.md** for the current checkpoint: BigQuery is primary, but live setup/load verification is still pending. Neon remains an explicitly selected fallback.
+Read [CP2_START_HERE.md](CP2_START_HERE.md) first. It gives the current target, model roles, performance interpretation and next steps.
 
-| File | Purpose |
+| Current file | Purpose |
 |---|---|
-| `bigquery_migration.md` | Current migration steps, safety gates and fallback policy |
-| `cp2_scope.md` | Required sources, business questions and deliverables |
-| `CP2_SEP_NOV_IMPLEMENTATION_PLAN.md` | Deadlines and daily targets; read its migration amendment first |
-| `CP2_START_HERE.md` | Broader implementation background; older checkpoint text is historical |
-| `WRITING_VOICE_GUIDE.md` | Report-writing reference, not a setup requirement |
+| [CP2_START_HERE.md](CP2_START_HERE.md) | Short model guide and file map |
+| [CP2_CORRECTED_MODEL_CANDIDATES_V5.md](CP2_CORRECTED_MODEL_CANDIDATES_V5.md) | Current corrected v5 model, newer evaluation and limits |
+| [WARRANTY_POLICY_RULES.md](WARRANTY_POLICY_RULES.md) | Owner-confirmed contractual eligibility rules |
+| [CP2_CALLBACK_RECORDING_GUIDE.md](CP2_CALLBACK_RECORDING_GUIDE.md) | Structured recording needed to improve labels and features |
+| [CP2_ENVIRONMENTAL_FEATURE_NOTES.md](CP2_ENVIRONMENTAL_FEATURE_NOTES.md) | Weather, waterways, land-cover and flood-source interpretation |
+| [CP2_GOAL_COVERAGE_AUDIT.md](CP2_GOAL_COVERAGE_AUDIT.md) | Capstone requirements versus implemented evidence |
+| [PROJECT_STATUS.md](PROJECT_STATUS.md) | Detailed checkpoints and implementation history |
+| [cp2_scope.md](cp2_scope.md) | Business scope and required deliverables |
 
-All commands are run from the repository root. The older plan in `config/archive/` is preserved history, not active instructions. CP1 documents and the proposal remain unchanged under `docs/`.
+[The current v5 report](CP2_CORRECTED_MODEL_CANDIDATES_V5.md) also defines the corrected future-test bundle and its 28 September–27 October cohort. Use the single model entry point in [the script index](../scripts/README.md).
+
+[The archive](archive/README.md) preserves superseded v4 models, the earlier blind-spot experiment, the frozen v1 protocol, completed comparisons, source audits and historical setup plans. [The deferred dashboard specification](deferred/LOOKER_STUDIO_BUILD_SPEC.md) is separate from current model work. `WRITING_VOICE_GUIDE.md` is a report-writing reference.
+
+`warranty_review_decisions.csv` remains here because the label-seed builder reads this stable path. Model configs also remain at stable paths under [config/](../config/README.md) for tests and replay. Private source data, model binaries and customer-level outputs belong in ignored local folders.

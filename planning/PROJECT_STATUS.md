@@ -1,8 +1,10 @@
 # Nomobug CP2 — current status and batch checklist
 
-This is the current progress entry point. Older plans/profiles are historical,
-not proof that a pipeline is built. Latest reconciliation includes the successful
-Prospects and complete eight-tab operational Bronze/Silver batch.
+Use [the model guide](CP2_START_HERE.md) and [corrected v5 report](CP2_CORRECTED_MODEL_CANDIDATES_V5.md) for the current model. This file retains detailed implementation checkpoints; earlier recommendations and source-refresh failures below are historical.
+
+The current primary is ExtraTrees depth 10. On 100 newer services it captured four of five positive service windows in 20 reviews, versus three for the corrected reference; AUC was 0.891 versus 0.813. Only five positives prevent a reliable improvement claim. The frozen future refit uses all 5,695 mature services, including 2,075 from 2026. No future accuracy has been measured and the live feature feed remains unconnected.
+
+## Historical checkpoints
 
 Latest blind-spot experiment on 27 September 2026: 27 stage/pest/history/rainfall
 features and focused positive training emphasis were tested across 16 earlier-data
@@ -12,7 +14,7 @@ ExtraTrees control, including 10/20 mixed-pest positives versus zero. First-serv
 capture remains 0/11. Overall AP is slightly lower and uncertainty includes no
 overall gain; freeze the focused candidate as an experimental challenger while
 retaining governing v4. All 260 tests pass; five artifacts replay all 1,975 scores.
-See [the blind-spot evaluation](CP2_BLIND_SPOT_EVALUATION.md) and
+See [the blind-spot evaluation](archive/model_evaluations/CP2_BLIND_SPOT_EVALUATION.md) and
 [`warranty_blind_spot_experiment_v1.json`](../config/warranty_blind_spot_experiment_v1.json).
 
 Latest callback evidence work on 27 September 2026: all 5,598 frozen targets
@@ -25,7 +27,7 @@ were tested across eight candidate contracts on identical eligible cohorts.
 At 374 reviews, the refitted baseline captures 94 callbacks versus 91 with new
 fields; no reliable ranking gain is established. Retain v4 as experimental.
 All 250 tests pass; three artifacts replay all 1,869 diagnostic probabilities.
-See [the evidence reconciliation](CP2_CALLBACK_EVIDENCE_RECONCILIATION.md),
+See [the evidence reconciliation](archive/model_evaluations/CP2_CALLBACK_EVIDENCE_RECONCILIATION.md),
 [the proposed recording guide](CP2_CALLBACK_RECORDING_GUIDE.md) and
 [`warranty_callback_description_experiment_v1.json`](../config/warranty_callback_description_experiment_v1.json).
 No operational sources, confirmed labels or governing model contract changed.
@@ -36,7 +38,7 @@ was tested on the same 392 July–14 August services with 35 callbacks. At a fix
 callbacks; updated all-history captures 22. Neither regime establishes improved
 ranking over frozen v4, and paired intervals are wide. Thirty development-only
 candidate contracts were tested; the current recommendation remains unchanged.
-See [the 2026 training evaluation](CP2_2026_TRAINING_EVALUATION.md) and
+See [the 2026 training evaluation](archive/model_evaluations/CP2_2026_TRAINING_EVALUATION.md) and
 [`warranty_2026_training_experiment_v1.json`](../config/warranty_2026_training_experiment_v1.json).
 All 231 local tests passed and five saved artifacts reproduced all 392 later-period
 probabilities in fresh processes. This is an exploratory comparison on previously
@@ -50,7 +52,7 @@ did not improve pre-2026 selection: baseline AP 0.2380 versus best GFM candidate
 ExtraTrees with weather/history and normalized pest context. GFM provides only
 37 reliably observed anchors and no detected flood exposure; GDACS has no
 matched report in the development evaluation quarters or 2026 diagnostic period.
-See [the flood evaluation](CP2_FLOOD_MODEL_EVALUATION.md) and
+See [the flood evaluation](archive/model_evaluations/CP2_FLOOD_MODEL_EVALUATION.md) and
 [`warranty_flood_experiment_v1.json`](../config/warranty_flood_experiment_v1.json).
 Verification passed 27/27 scoped warehouse nodes and 228 local tests; all five
 saved comparison models reproduced their 1,975 diagnostic probabilities in
@@ -61,7 +63,7 @@ applied with event provenance, with two unresolved records kept unknown.
 Prediction timing and validation were repaired before comparing fixed 30-day
 targets, model families, antecedent weather and historical land cover. The latest
 contract is `warranty_fixed_30d_reviewed_v4`, marked diagnostic only. See
-[`CP2_MODEL_IMPROVEMENT.md`](CP2_MODEL_IMPROVEMENT.md) for the final comparisons,
+[`CP2_MODEL_IMPROVEMENT.md`](archive/model_evaluations/CP2_MODEL_IMPROVEMENT.md) for the final comparisons,
 target definitions, baseline performance and recommendation. Recorded corrective
 callback planning is a separate experimental goal from contractual eligibility;
 commercial clients still have no contractual warranty. Previously selected v3
@@ -86,7 +88,7 @@ implemented evidence from planned work and superseded proposal options.
 The earlier residential 4x/6x/12x repeated-coverage evaluation used 364
 mature service intervals across 146 packages. It retains multiple claims and
 shows only exploratory model value; see
-[`WARRANTY_COVERAGE_MODEL_EVALUATION.md`](WARRANTY_COVERAGE_MODEL_EVALUATION.md).
+[`WARRANTY_COVERAGE_MODEL_EVALUATION.md`](archive/model_evaluations/WARRANTY_COVERAGE_MODEL_EVALUATION.md).
 The pinned 9 September 2026 HOTOSM Malaysia waterways snapshot now supplies
 reproducible drainage, flowing-water and standing-water proximity features. Its
 initial temporal gain did not survive package-grouped validation. The current
@@ -314,7 +316,7 @@ the current pinned snapshot and does not join enquiries to sales.
   recognition and coordinates still require validation; do not equate this
   format check with failed geocoding or inaccessible customers.
 - Location validation gates and privacy/cost hold are recorded in
-  `planning/LOCATION_VALIDATION.md`. The local multi-line prototype found 30
+  `planning/archive/implementation/LOCATION_VALIDATION.md`. The local multi-line prototype found 30
   address-like continuation lines with a five-digit token, raising candidate
   address-block coverage to 2,041/2,776 events; 735 lack a token in the
   cautious block. This does not validate postcodes or coordinates. No
@@ -364,7 +366,7 @@ the current pinned snapshot and does not join enquiries to sales.
 - The selected L2 logistic model averages ROC AUC 0.519 and average precision 0.254 across three pre-2026 walk-forward folds. On the already-inspected 2026 complete-weather cohort it has ROC AUC 0.547 and average precision 0.293 (26.2% prevalence). This is weak discrimination, so the model remains an experimental review-ranking aid.
 
 - The selected 56-feature contract includes prediction-time-safe operational and prior-weather variables while excluding event-day weather, team identity, salesperson/acquisition, payment behaviour and static environmental context.
-- Static environmental features did not improve pre-2026 evidence: mean average precision changed from 0.2535 to 0.2496. The small 2026 diagnostic gain is insufficient for promotion; see `planning/ENVIRONMENTAL_MODEL_EVALUATION.md`.
+- Static environmental features did not improve pre-2026 evidence: mean average precision changed from 0.2535 to 0.2496. The small 2026 diagnostic gain is insufficient for promotion; see `planning/archive/model_evaluations/ENVIRONMENTAL_MODEL_EVALUATION.md`.
 - DBSCAN now operates on 108 distinct service properties containing 215
   recorded warranty signals, rather than directly on repeated event rows. With
   a minimum of three distinct properties, the 1 km view has 4 clusters/13
@@ -423,7 +425,7 @@ Looker checkpoint (15 September 2026): five privacy-safe release views now cover
 aggregate recurrence, geohash-area mapping, DBSCAN sensitivity clusters, monthly
 weather associations and held-out ML evaluation. Exact event coordinates and
 individual prediction rows are excluded. The focused Looker build completed 21
-dbt steps successfully; `planning/LOOKER_STUDIO_BUILD_SPEC.md` records the page,
+dbt steps successfully; `planning/deferred/LOOKER_STUDIO_BUILD_SPEC.md` records the page,
 field, denominator and privacy contract. The Looker Studio report itself, viewer
 access and rendered usability checks are still pending.
 The signed-in Looker Studio account setup is open at its final email-preference
@@ -461,4 +463,11 @@ No command is required for this checklist checkpoint. Read the status page first
 
 ## 27 September: all-mature-data prospective setup
 
-Both frozen experimental models now use all 5,598 mature services (1,975 from 2026). Predictor-only scoring preserves pending outcomes. All 269 tests pass; no prospective accuracy is available and the live feature feed is not connected. The 28 September–27 October cohort cannot be finally evaluated before 27 November. A read-only Calendar refresh failed because Google sign-in expired or was revoked; newer source availability remains unknown. See [the protocol](CP2_PROSPECTIVE_MODEL_TEST.md). Governing v4 remains unchanged.
+Both frozen experimental models now use all 5,598 mature services (1,975 from 2026). Predictor-only scoring preserves pending outcomes. All 269 tests pass; no prospective accuracy is available and the live feature feed is not connected. The 28 September–27 October cohort cannot be finally evaluated before 27 November. A read-only Calendar refresh failed because Google sign-in expired or was revoked; newer source availability remains unknown. See [the protocol](archive/model_evaluations/CP2_PROSPECTIVE_MODEL_TEST.md). Governing v4 remains unchanged.
+
+
+## Current checkpoint: corrected v5
+
+Use [the corrected v5 report](CP2_CORRECTED_MODEL_CANDIDATES_V5.md) and [the current model pointer](../config/cp2_model_current.json). The earlier reference recommendation and frozen v1 setup above are historical. The renewed read-only Calendar refresh succeeded. History availability, complete-day outcome maturity and paired score alignment are repaired, and fourteen fixed candidates were tested.
+
+The primary ExtraTrees depth 10 was selected from development evidence before the newer outcomes were accessed. On 100 newer services it caught four of five positive service windows in 20 reviews; the corrected reference caught three. Five positives are insufficient to establish a dependable improvement. The final future refit trains on 5,695 mature services, including 2,075 from 2026. Live extraction remains unconnected and no future accuracy is measured.
