@@ -257,21 +257,26 @@ def validation_group_coverage(frame: pd.DataFrame) -> dict:
             "limitation": "unobserved_properties_cannot_link_other_unidentified_packages"}
 
 
-def prepare_frame(frame: pd.DataFrame) -> pd.DataFrame:
+def prepare_frame(frame: pd.DataFrame, *, require_outcomes: bool = True) -> pd.DataFrame:
     """Validate identifiers/dates and derive features without reading outcomes."""
     source_categorical = [column for column in CATEGORICAL if column not in DERIVED_CATEGORICAL]
-    missing = sorted(set(KEYS + BASE_NUMERIC + source_categorical
+    required_keys=KEYS if require_outcomes else [key for key in KEYS if key!=TARGET]
+    missing = sorted(set(required_keys + BASE_NUMERIC + source_categorical
                          + WEATHER_NUMERIC + ENVIRONMENT_NUMERIC
                          + LANDCOVER_NUMERIC
                          + optional_flood_source_numeric()) - set(frame))
     if missing:
         raise ValueError(f"Dataset is missing contracted columns: {missing}")
     frame = frame.copy()
-    if frame[KEYS].drop(columns="address_hash").isna().any().any():
+    if frame[required_keys].drop(columns="address_hash").isna().any().any():
         raise ValueError("Null target, population, sale identifier, or outcome dates")
-    if not frame[TARGET].isin([True, False, 0, 1]).all():
-        raise ValueError("Target must contain resolved binary labels")
-    frame[TARGET] = frame[TARGET].astype(bool)
+    if require_outcomes:
+        if not frame[TARGET].isin([True, False, 0, 1]).all():
+            raise ValueError("Target must contain resolved binary labels")
+        frame[TARGET] = frame[TARGET].astype(bool)
+    else:
+        # Scoring never invents a negative outcome for a service awaiting follow-up.
+        frame = frame.drop(columns=[TARGET], errors='ignore')
     for column in ("anchor_date", "outcome_end_date"):
         frame[column] = pd.to_datetime(frame[column], errors="raise")
     # Warehouse row order is undefined. Stable order is essential for seeded

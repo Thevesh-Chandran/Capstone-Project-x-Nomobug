@@ -407,3 +407,8 @@ Each model contract records its own exact input fingerprint and source.
 Sources: [ESA WorldCover data access](https://esa-worldcover.org/en/data-access),
 [Open-Meteo historical weather](https://open-meteo.com/en/docs/historical-weather-api),
 [HOTOSM Malaysia waterways](https://data.humdata.org/dataset/hotosm_mys_waterways).
+
+
+## 27 September: all-mature-data prospective setup
+
+Both frozen experimental models now use all 5,598 mature services (1,975 from 2026). Predictor-only scoring preserves pending outcomes. All 269 tests pass; no prospective accuracy is available and the live feature feed is not connected. The 28 September–27 October cohort cannot be finally evaluated before 27 November. A read-only Calendar refresh failed because Google sign-in expired or was revoked; newer source availability remains unknown. See [the protocol](CP2_PROSPECTIVE_MODEL_TEST.md). Governing v4 remains unchanged.

@@ -457,3 +457,8 @@ Selected stack: Python/pandas, BigQuery, dbt, scikit-learn + DBSCAN, Cloud Run J
 + Scheduler, Docker, Looker Studio; GitHub Actions CI; Neon manual fallback.
 
 No command is required for this checklist checkpoint. Read the status page first.
+
+
+## 27 September: all-mature-data prospective setup
+
+Both frozen experimental models now use all 5,598 mature services (1,975 from 2026). Predictor-only scoring preserves pending outcomes. All 269 tests pass; no prospective accuracy is available and the live feature feed is not connected. The 28 September–27 October cohort cannot be finally evaluated before 27 November. A read-only Calendar refresh failed because Google sign-in expired or was revoked; newer source availability remains unknown. See [the protocol](CP2_PROSPECTIVE_MODEL_TEST.md). Governing v4 remains unchanged.
