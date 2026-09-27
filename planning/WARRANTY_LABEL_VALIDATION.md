@@ -17,9 +17,10 @@ The deterministic 80-event sample contains:
 - 8 complimentary-event hard negatives;
 - 8 other matched-event hard negatives.
 
-The workbook excludes raw names, phone numbers, email addresses and addresses.
-Reviewers locate the original Calendar entry by event ID and date when more
-context is needed.
+The workbook includes original Calendar titles, which may contain customer
+details, and must be kept private. Click the linked event title in Review column G
+to open the original entry while signed into an account with access to that team
+calendar. The event date and team calendar provide fallback navigation.
 
 ## Required human fields
 

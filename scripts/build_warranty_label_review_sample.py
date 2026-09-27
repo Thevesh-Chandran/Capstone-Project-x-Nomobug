@@ -1,6 +1,7 @@
 """Create a privacy-reduced, stratified warranty-label review sample."""
 
 import json
+import base64
 from pathlib import Path
 
 from google.cloud import bigquery
@@ -26,6 +27,8 @@ with service_bounds as (
     select
         e.calendar_event_row,
         e.event_id,
+        raw.summary as event_title,
+        raw.calendar_id,
         e.calendar_name,
         e.event_date_local,
         extract(year from e.event_date_local) as event_year,
@@ -124,6 +127,10 @@ def main() -> None:
     rows = [dict(row) for row in client.query(SQL).result(timeout=300)]
     for index, row in enumerate(rows, start=1):
         row["review_id"] = f"WR-{index:03d}"
+        encoded = base64.urlsafe_b64encode(
+            f"{row['event_id']} {row['calendar_id']}".encode("utf-8")
+        ).decode("ascii").rstrip("=")
+        row["calendar_event_link"] = "https://calendar.google.com/calendar/event?eid=" + encoded
         for key, value in list(row.items()):
             if hasattr(value, "isoformat"):
                 row[key] = value.isoformat()
