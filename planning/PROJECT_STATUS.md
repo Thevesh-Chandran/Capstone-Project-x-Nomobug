@@ -4,7 +4,21 @@ This is the current progress entry point. Older plans/profiles are historical,
 not proof that a pipeline is built. Latest reconciliation includes the successful
 Prospects and complete eight-tab operational Bronze/Silver batch.
 
-Latest verification on 27 September 2026: the 80 owner-reviewed labels are
+Latest addition on 27 September 2026: observed nearby GFM context and separate
+GDACS regional flood reports now enrich all 5,598 mature callback anchors with
+12 experimental numeric variables. The 32 candidate and three locked comparisons
+did not improve pre-2026 selection: baseline AP 0.2380 versus best GFM candidate
+0.2288 and locked GDACS 0.2340. The current v4 callback recommendation remains
+ExtraTrees with weather/history and normalized pest context. GFM provides only
+37 reliably observed anchors and no detected flood exposure; GDACS has no
+matched report in the development evaluation quarters or 2026 diagnostic period.
+See [the flood evaluation](CP2_FLOOD_MODEL_EVALUATION.md) and
+[`warranty_flood_experiment_v1.json`](../config/warranty_flood_experiment_v1.json).
+Verification passed 27/27 scoped warehouse nodes and 228 local tests; all five
+saved comparison models reproduced their 1,975 diagnostic probabilities in
+fresh processes. Flood data remains experimental; dashboard work is deferred.
+
+Earlier reviewed-model verification on 27 September 2026: the 80 owner-reviewed labels are
 applied with event provenance, with two unresolved records kept unknown.
 Prediction timing and validation were repaired before comparing fixed 30-day
 targets, model families, antecedent weather and historical land cover. The latest

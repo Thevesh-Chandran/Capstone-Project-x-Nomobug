@@ -1,0 +1,66 @@
+version: 2
+
+sources:
+  - name: flood_quality
+    database: profound-keel-500007-s4
+    schema: quality
+    tables:
+      - name: gfm_flood_context_by_anchor
+        description: "Copernicus Global Flood Monitoring observations within a 1km service-location buffer, restricted to observations and product availability before the anchor date in Asia/Kuala_Lumpur. Nearby observed flood extent is contextual evidence, not confirmation that a customer property flooded. Missing or invalid observations are not zero flooding."
+        columns:
+          - name: flood_anchor_id
+            data_tests: [not_null, unique]
+          - name: population
+            data_tests: [not_null]
+          - name: sales_record_id
+            data_tests: [not_null]
+          - name: anchor_date
+            data_tests: [not_null]
+          - name: gfm_status
+            data_tests: [not_null]
+          - name: gfm_source_catalogue_sha256
+            data_tests: [not_null]
+          - name: gfm_fetched_at
+            data_tests: [not_null]
+      - name: gdacs_reported_flood_context_by_anchor
+        description: "GDACS regional reported flood events whose current affected-area geometry contains the service location. Conservative latest-known modification/insertion timestamps, with a 24-hour delay for naive timestamps, must precede anchor midnight in Asia/Kuala_Lumpur. This gates current affected-region geometry using an exploratory historical availability proxy; the API does not prove that the same geometry was published at that historical time. Counts deduplicate episodes by event ID. These are regional reports, not observed inundation or confirmation of flooding at a customer property. Unavailable historical coverage remains null rather than dry."
+        columns:
+          - name: flood_anchor_id
+            data_tests: [not_null, unique]
+          - name: population
+            data_tests: [not_null]
+          - name: sales_record_id
+            data_tests: [not_null]
+          - name: anchor_date
+            data_tests: [not_null]
+          - name: gdacs_status
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: ['reported_region_match', 'no_matching_recorded_report', 'unknown_missing_location', 'unknown_outside_query_period']
+          - name: gdacs_source_sha256
+            data_tests: [not_null]
+          - name: gdacs_fetched_at
+            data_tests: [not_null]
+
+models:
+  - name: warranty_callback_flood_dataset
+    description: "Unchanged mature callback anchors enriched with historical observed GFM flood context and separate exploratory GDACS regional flood reports. GDACS uses current affected-region geometry with conservative latest-known modification/insertion timestamps plus a 24-hour delay for naive timestamps as a historical availability proxy, and counts deduplicate episodes by event ID. The target remains a recorded corrective return within 30 days, irrespective of contractual warranty entitlement. Flood observations describe the surrounding 1km buffer and GDACS reports describe affected regional polygons, not an individual property."
+    columns:
+      - name: anchor_event_row
+        data_tests: [not_null, unique]
+      - name: flood_anchor_id
+        data_tests: [not_null, unique]
+      - name: gfm_status
+        data_tests: [not_null]
+      - name: gdacs_status
+        data_tests: [not_null]
+      - name: gfm_prior_30d_observed_days
+        description: "Number of distinct local observation days with valid pixels; zero also indicates unavailable observation coverage and must be interpreted with status and validity fields."
+      - name: gfm_prior_30d_max_flood_fraction_1km
+        description: "Maximum observed fraction of valid pixels marked flooded among preceding 30-day observations. Null if no valid observation exists."
+      - name: gfm_prior_30d_max_valid_fraction_1km
+        description: "Maximum fraction of buffer pixels valid for flood observation among preceding 30-day observations. Null if no valid observation exists."
+      - name: gdacs_prior_30d_reported_events
+        description: "Distinct reported regional flood event IDs after deduplicating episodes, whose current affected-area geometry contains the service point and polygon date is in the preceding 30 local days. Latest-known modification/insertion timestamps with a conservative delay gate inclusion as an exploratory availability proxy. Null when historical catalogue coverage is unavailable; zero means no matching report in the available catalogue, not confirmed absence of a flood."

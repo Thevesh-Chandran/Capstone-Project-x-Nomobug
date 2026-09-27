@@ -84,9 +84,13 @@ owner-confirmed operating rules take precedence.
 9. **Evaluation:** automated tests are evidence of pipeline correctness, not
    evidence of dashboard usefulness. Manual spreadsheet reconciliation, user
    tasks/feedback and a privacy-safe release check remain required.
-10. **Flood/current-warning context:** the proposal listed flood or warning
-    indicators as optional weather context, but no approved flood-warning source
-    is loaded. Rainfall fields must not be presented as flood observations.
+10. **Flood/current-warning context:** observed nearby Copernicus GFM context and
+    separate GDACS regional flood reports now enrich the experimental callback
+    dataset. Their 35 comparisons did not improve development selection; only
+    37 anchors have reliable GFM observations and none contains detected flooding.
+    See [the flood evaluation](CP2_FLOOD_MODEL_EVALUATION.md). No live warning
+    feed or confirmed property flood indicator is implemented. Rainfall fields
+    remain distinct from flood observations.
 
 ## Proposal choices superseded by the current scope
 

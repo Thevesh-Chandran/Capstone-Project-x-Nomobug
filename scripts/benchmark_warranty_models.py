@@ -103,6 +103,22 @@ LANDCOVER_NUMERIC = [
     for buffer in (250, 1000)
     for category in ("builtup", "tree", "grass", "crop", "water", "wetland")
 ]
+FLOOD_NUMERIC = [
+    "gfm_prior_7d_max_flood_fraction_1km",
+    "gfm_prior_14d_max_flood_fraction_1km",
+    "gfm_prior_30d_max_flood_fraction_1km",
+    "gfm_prior_30d_observed_days",
+    "gfm_prior_30d_flood_detected_days",
+    "gfm_days_since_detected_flood_capped_30d",
+    "gfm_days_since_valid_observation",
+    "gfm_prior_30d_max_valid_fraction_1km",
+]
+FLOOD_CONTEXT_ENABLED = False
+REPORTED_FLOOD_NUMERIC = [
+    "gdacs_prior_7d_reported_events", "gdacs_prior_14d_reported_events",
+    "gdacs_prior_30d_reported_events", "gdacs_days_since_reported_event_capped_30d",
+]
+REPORTED_FLOOD_CONTEXT_ENABLED = False
 COMPACT_NUMERIC = [
     "service_number", "package_sessions_recorded", "days_since_previous_service",
     "prior_package_warranty_claims", "prior_property_warranty_claims",
@@ -166,6 +182,57 @@ def configure_pest_context(enabled: bool) -> None:
             column for column in PEST_CONTEXT_NUMERIC if column not in numeric]
 
 
+def configure_flood_context(enabled: bool) -> None:
+    """Require observed satellite context only for an explicit ablation run."""
+    global FLOOD_CONTEXT_ENABLED
+    FLOOD_CONTEXT_ENABLED = enabled
+    if enabled:
+        for feature_set, numeric in list(FEATURE_SETS.items()):
+            # Copy contracts: base/compact lists may otherwise alias constants.
+            FEATURE_SETS[feature_set] = numeric + [
+                column for column in FLOOD_NUMERIC if column not in numeric]
+
+
+def configure_reported_flood_context(enabled: bool) -> None:
+    global REPORTED_FLOOD_CONTEXT_ENABLED
+    REPORTED_FLOOD_CONTEXT_ENABLED = enabled
+    if enabled:
+        for feature_set, numeric in list(FEATURE_SETS.items()):
+            FEATURE_SETS[feature_set] = numeric + [
+                column for column in REPORTED_FLOOD_NUMERIC if column not in numeric]
+
+
+def optional_flood_source_numeric() -> list[str]:
+    return ((FLOOD_NUMERIC if FLOOD_CONTEXT_ENABLED else [])
+            + (REPORTED_FLOOD_NUMERIC if REPORTED_FLOOD_CONTEXT_ENABLED else []))
+
+
+def feature_preparation_options() -> dict:
+    options = {
+        "premise_context": "premise_type" in CATEGORICAL,
+        "normalize_pest_context": "normalized_pest_category" in CATEGORICAL,
+    }
+    # Preserve previously frozen two-option contracts for historical models.
+    if FLOOD_CONTEXT_ENABLED:
+        options["flood_context"] = True
+    if REPORTED_FLOOD_CONTEXT_ENABLED:
+        options["reported_flood_context"] = True
+    return options
+
+
+def flood_context_coverage(frame: pd.DataFrame) -> dict:
+    return {
+        "rows": len(frame),
+        "rows_with_prior_30d_valid_observation": int(
+            frame["gfm_prior_30d_observed_days"].gt(0).sum()),
+        "rows_with_prior_30d_detected_flood": int(
+            frame["gfm_prior_30d_flood_detected_days"].gt(0).sum()),
+        "rows_with_prior_30d_flood_fraction": int(
+            frame["gfm_prior_30d_max_flood_fraction_1km"].notna().sum()),
+        "interpretation": "observed_nearby_flood_context_not_confirmed_property_flooding",
+    }
+
+
 def filter_populations(frame: pd.DataFrame, populations: list[str] | None) -> pd.DataFrame:
     if not populations:
         return frame
@@ -195,7 +262,8 @@ def prepare_frame(frame: pd.DataFrame) -> pd.DataFrame:
     source_categorical = [column for column in CATEGORICAL if column not in DERIVED_CATEGORICAL]
     missing = sorted(set(KEYS + BASE_NUMERIC + source_categorical
                          + WEATHER_NUMERIC + ENVIRONMENT_NUMERIC
-                         + LANDCOVER_NUMERIC) - set(frame))
+                         + LANDCOVER_NUMERIC
+                         + optional_flood_source_numeric()) - set(frame))
     if missing:
         raise ValueError(f"Dataset is missing contracted columns: {missing}")
     frame = frame.copy()
@@ -215,9 +283,29 @@ def prepare_frame(frame: pd.DataFrame) -> pd.DataFrame:
     if frame.duplicated(["population", "sales_record_id", "anchor_date"]).any():
         raise ValueError("Duplicate population/sale/anchor prediction rows")
     frame["validation_group"] = connected_validation_groups(frame)
-    for column in BASE_NUMERIC + WEATHER_NUMERIC + ENVIRONMENT_NUMERIC + LANDCOVER_NUMERIC:
+    for column in (BASE_NUMERIC + WEATHER_NUMERIC + ENVIRONMENT_NUMERIC
+                   + LANDCOVER_NUMERIC + optional_flood_source_numeric()):
         frame[column] = pd.to_numeric(frame[column], errors="coerce").astype(float)
         frame[column] = frame[column].replace([np.inf, -np.inf], np.nan)
+    if FLOOD_CONTEXT_ENABLED:
+        for column in FLOOD_NUMERIC:
+            if frame[column].dropna().lt(0).any():
+                raise ValueError(f"Negative observed flood feature: {column}")
+            if "fraction" in column and frame[column].dropna().gt(1).any():
+                raise ValueError(f"Observed flood fraction outside [0,1]: {column}")
+        observed = frame["gfm_prior_30d_observed_days"]
+        detected = frame["gfm_prior_30d_flood_detected_days"]
+        if ((detected > observed) | (observed > 30)).any():
+            raise ValueError("Flood detected/observed day counts violate 30-day window")
+    if REPORTED_FLOOD_CONTEXT_ENABLED:
+        for column in REPORTED_FLOOD_NUMERIC:
+            if frame[column].dropna().lt(0).any():
+                raise ValueError(f"Negative reported regional flood feature: {column}")
+        if (frame["gdacs_prior_7d_reported_events"] > frame["gdacs_prior_14d_reported_events"]).any() or (
+                frame["gdacs_prior_14d_reported_events"] > frame["gdacs_prior_30d_reported_events"]).any():
+            raise ValueError("Reported regional flood event counts violate nested windows")
+        if frame["gdacs_days_since_reported_event_capped_30d"].gt(30).any():
+            raise ValueError("Reported regional flood recency exceeds capped window")
     pest_context = frame["pest_category"].map(normalize_pest_context)
     frame["normalized_pest_category"] = pest_context.map(lambda value: value[0])
     for column in PEST_CONTEXT_NUMERIC:
@@ -486,10 +574,7 @@ def benchmark_population(frame: pd.DataFrame, output: Path,
         "rows": len(frame), "positive_rows": int(frame[TARGET].sum()),
         "selected_model": model_name, "selected_feature_set": feature_set,
         "selected_features": FEATURE_SETS[feature_set] + CATEGORICAL,
-        "feature_preparation_options": {
-            "premise_context": "premise_type" in CATEGORICAL,
-            "normalize_pest_context": "normalized_pest_category" in CATEGORICAL,
-        },
+        "feature_preparation_options": feature_preparation_options(),
         "selected_is_prevalence_baseline": model_name == "dummy_prior",
         "selection": winner.to_dict(), "skipped_folds": skipped,
         "validation_group_coverage": validation_group_coverage(frame),
@@ -507,8 +592,15 @@ def benchmark_population(frame: pd.DataFrame, output: Path,
         "landcover_1000m_rows": int(frame[[column for column in LANDCOVER_NUMERIC
                                            if column.endswith("_1000m")]].notna().all(axis=1).sum()),
     }
+    if FLOOD_CONTEXT_ENABLED:
+        result["flood_context_coverage"] = flood_context_coverage(frame)
     train, diagnostic, audit = purged_split(frame, REPORTING_START)
     result["diagnostic_split_audit"] = audit
+    if FLOOD_CONTEXT_ENABLED:
+        result["flood_context_coverage_by_period"] = {
+            "purged_pre2026_training": flood_context_coverage(train),
+            "diagnostic_2026": flood_context_coverage(diagnostic),
+        }
     if train[TARGET].nunique() < 2 or diagnostic[TARGET].nunique() < 2:
         result["diagnostic_status"] = "insufficient_classes_after_property_purge"
         return result
@@ -560,7 +652,8 @@ def read_frame(source: str) -> pd.DataFrame:
     from google.cloud import bigquery
     source_categorical = [column for column in CATEGORICAL if column not in DERIVED_CATEGORICAL]
     columns = (KEYS + BASE_NUMERIC + source_categorical + WEATHER_NUMERIC
-               + ENVIRONMENT_NUMERIC + LANDCOVER_NUMERIC)
+               + ENVIRONMENT_NUMERIC + LANDCOVER_NUMERIC
+               + optional_flood_source_numeric())
     sql = f"select {', '.join(columns)} from `{source}`"
     client = bigquery.Client(project=PROJECT, location=LOCATION)
     dry = client.query(sql, job_config=bigquery.QueryJobConfig(
@@ -617,6 +710,10 @@ def main() -> None:
                         help="Include premise_type category for a separate callback experiment")
     parser.add_argument("--normalize-pest-context", action="store_true",
                         help="Add deterministic known pest aliases and multi-pest indicators")
+    parser.add_argument("--flood-context", action="store_true",
+                        help="Include strictly prior observed satellite flood context")
+    parser.add_argument("--reported-flood-context", action="store_true",
+                        help="Include conservative prior reported regional GDACS context")
     parser.add_argument("--feature-set", action="append", choices=list(FEATURE_SETS),
                         help="Restrict feature contracts for a bounded challenger")
     parser.add_argument("--model", action="append", choices=model_specs(),
@@ -627,6 +724,8 @@ def main() -> None:
     args = parser.parse_args()
     configure_premise_context(args.premise_context)
     configure_pest_context(args.normalize_pest_context)
+    configure_flood_context(args.flood_context)
+    configure_reported_flood_context(args.reported_flood_context)
     if args.feature_set:
         for feature_set in list(FEATURE_SETS):
             if feature_set not in args.feature_set:
@@ -654,10 +753,7 @@ def main() -> None:
         "requested_populations": args.population,
         "premise_context_enabled": args.premise_context,
         "pest_normalization_enabled": args.normalize_pest_context,
-        "feature_preparation_options": {
-            "premise_context": args.premise_context,
-            "normalize_pest_context": args.normalize_pest_context,
-        },
+        "feature_preparation_options": feature_preparation_options(),
         "pest_alias_contract": PEST_ALIASES if args.normalize_pest_context else None,
         "requested_models": args.model,
         "requested_feature_sets": args.feature_set,
@@ -673,6 +769,12 @@ def main() -> None:
         "target_comparison_caveat": "Compare AP lift/support as populations have different prevalence",
         "populations": results,
     }
+    if args.flood_context:
+        report["flood_context_enabled"] = True
+        report["flood_feature_contract"] = list(FLOOD_NUMERIC)
+    if args.reported_flood_context:
+        report["reported_flood_context_enabled"] = True
+        report["reported_flood_feature_contract"] = list(REPORTED_FLOOD_NUMERIC)
     args.output_dir.mkdir(parents=True, exist_ok=True)
     (args.output_dir / "benchmark_results.json").write_text(
         json.dumps(report, indent=2, allow_nan=False), encoding="utf-8")

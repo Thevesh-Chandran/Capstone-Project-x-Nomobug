@@ -13,6 +13,8 @@ a recorded claim/corrective visit; contractual warranty entitlement is separate.
 | ESA WorldCover 2021 v200 | Tree, grass, cropland, built-up, permanent-water and wetland/mangrove pixel fractions in approximate circular 250 m and 1 km buffers | The map describes 2021 and was released in October 2022, before the 2023+ service dates. It can miss later development, vegetation changes and drainage work. |
 | HOTOSM Malaysia waterways, 9 September 2026 | Mapped drainage/flowing/standing-water proximity and counts within 500 m, 1 km and 2 km | This 2026 OpenStreetMap snapshot is applied retrospectively to earlier services. It is not an archived map known to have been available at a 2025 prediction anchor. |
 | Geoapify environmental places and elevation | Mapped water/forest proximity and counts; elevation and local relief | Places are current OpenStreetMap-derived context without per-feature historical validity in this pipeline. Terrain is treated as broadly static; neither source confirms past floods or drainage condition. |
+| Copernicus GFM | Satellite-observed nearby flood fractions and observation coverage in an approximate 1 km buffer, prior 7/14/30 days | Acquisition and recorded creation/processing must precede the Malaysian service-date midnight. Unreliable pixels and source failures remain unknown. Current metadata is an availability proxy, not a preserved historical feed. |
+| GDACS reported floods | Matching reported regional events in prior 7/14/30 days and capped report recency | Current affected-region geometry is gated by its latest known update plus 24 hours for naive availability timestamps. This conservative exploratory proxy cannot reconstruct first historical publication or confirm property flooding. |
 
 The weather cache covers 18 December 2022 through 14 September 2026, using 52
 requested 0.1-degree grid locations. This corresponds to broad weather exposure,
@@ -20,6 +22,11 @@ approximately 9–11 km, rather than property rainfall. IFS updates and historic
 reconstruction can change the source across time. A future operational test
 should preserve retrieval timestamps and use data actually available at scoring
 time. [Open-Meteo documentation](https://open-meteo.com/en/docs/historical-weather-api).
+
+The flood sources are evaluated separately from rainfall and from each other.
+See [the flood comparison](CP2_FLOOD_MODEL_EVALUATION.md) for extraction coverage,
+matched-cohort results and the observation-coverage control, and
+[the source review](CP2_FLOOD_SOURCE_REVIEW.md) for their spatial and timing limits.
 
 The new weather model requires complete, unique daily rows and nonmissing inputs
 for the relevant window. Incomplete windows yield null feature values rather
@@ -87,4 +94,7 @@ A report about a flooded district does not confirm that a particular service
 property flooded. Any regional flood feature must respect publication time
 (report available before the anchor), spatial coverage and reporting gaps.
 Rainfall, waterway proximity, standing-water land cover and disaster reports
-must remain distinct variables. No property flood indicator has been added.
+must remain distinct variables. Nearby observed GFM context and GDACS regional
+reports have now been added to the separate flood experiment. Neither is a
+confirmed property flood indicator; their performance and coverage are recorded
+in [the flood evaluation](CP2_FLOOD_MODEL_EVALUATION.md).

@@ -367,6 +367,12 @@ Calibration and review workload:
 
 ## Verification and replay
 
+The subsequent flood-data experiment is documented separately in
+[CP2_FLOOD_MODEL_EVALUATION.md](CP2_FLOOD_MODEL_EVALUATION.md). It preserves this
+target and cohort, compares observed nearby flooding with an observation-only
+control, and tests reported regional floods in a separate locked comparison.
+The metrics below are the completed pre-flood evaluation receipt.
+
 Live bounded dataset build: 53/53 passed. Local suite: 181 passed.
 Saved selected model artifacts also reload and predict in a fresh Python process.
 Composite input fingerprint: `e8ddefc5ba728366fa74bebc3ffcad576ad1d26fd8237fd766e2d7d17aa62163`.
