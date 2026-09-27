@@ -13,6 +13,13 @@ prediction models are too weak or uncertain for operational decisions.
 Freeze the development-selected model and evaluate future mature records
 before adopting its probabilities or alert threshold.
 
+The [subsequent blind-spot experiment](CP2_BLIND_SPOT_EVALUATION.md) produces
+a focused RandomForest challenger: 108/179 callbacks versus 100 at the same
+395-review capacity, including 10/20 mixed-pest positives versus zero. First-service
+capture remains zero, overall AP is slightly lower, and overall uncertainty
+includes no gain. Retain v4 as the reference and freeze this challenger for
+prospective evaluation; no operational contract has been replaced.
+
 The subsequent [claim-date and description-feature experiment](CP2_CALLBACK_EVIDENCE_RECONCILIATION.md)
 reconciles all 5,598 targets, isolates seven date conflicts and tests ten recovered
 Problem-field variables. It establishes no useful gain at equal review capacity

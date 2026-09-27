@@ -4,6 +4,17 @@ This is the current progress entry point. Older plans/profiles are historical,
 not proof that a pipeline is built. Latest reconciliation includes the successful
 Prospects and complete eight-tab operational Bronze/Silver batch.
 
+Latest blind-spot experiment on 27 September 2026: 27 stage/pest/history/rainfall
+features and focused positive training emphasis were tested across 16 earlier-data
+candidate contracts. The development-selected focused RandomForest captures
+108/179 callbacks at the same 395-service review capacity versus 100 for the
+ExtraTrees control, including 10/20 mixed-pest positives versus zero. First-service
+capture remains 0/11. Overall AP is slightly lower and uncertainty includes no
+overall gain; freeze the focused candidate as an experimental challenger while
+retaining governing v4. All 260 tests pass; five artifacts replay all 1,975 scores.
+See [the blind-spot evaluation](CP2_BLIND_SPOT_EVALUATION.md) and
+[`warranty_blind_spot_experiment_v1.json`](../config/warranty_blind_spot_experiment_v1.json).
+
 Latest callback evidence work on 27 September 2026: all 5,598 frozen targets
 reconcile with source records. The claim-date audit separates request/record
 dates from visit dates and isolates seven within-window conflicts. The owner
