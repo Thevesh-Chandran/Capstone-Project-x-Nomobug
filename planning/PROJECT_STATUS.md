@@ -4,7 +4,19 @@ This is the current progress entry point. Older plans/profiles are historical,
 not proof that a pipeline is built. Latest reconciliation includes the successful
 Prospects and complete eight-tab operational Bronze/Silver batch.
 
-Latest addition on 27 September 2026: observed nearby GFM context and separate
+Latest training-period comparison on 27 September 2026: earlier-2026 training
+was tested on the same 392 July–14 August services with 35 callbacks. At a fixed
+79-service review capacity, frozen v4 and 2026-only ExtraTrees each capture 21
+callbacks; updated all-history captures 22. Neither regime establishes improved
+ranking over frozen v4, and paired intervals are wide. Thirty development-only
+candidate contracts were tested; the current recommendation remains unchanged.
+See [the 2026 training evaluation](CP2_2026_TRAINING_EVALUATION.md) and
+[`warranty_2026_training_experiment_v1.json`](../config/warranty_2026_training_experiment_v1.json).
+All 231 local tests passed and five saved artifacts reproduced all 392 later-period
+probabilities in fresh processes. This is an exploratory comparison on previously
+inspected 2026 records, not a new independent test.
+
+Earlier flood addition on 27 September 2026: observed nearby GFM context and separate
 GDACS regional flood reports now enrich all 5,598 mature callback anchors with
 12 experimental numeric variables. The 32 candidate and three locked comparisons
 did not improve pre-2026 selection: baseline AP 0.2380 versus best GFM candidate

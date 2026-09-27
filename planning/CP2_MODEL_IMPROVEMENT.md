@@ -367,6 +367,11 @@ Calibration and review workload:
 
 ## Verification and replay
 
+The subsequent [2026 training-period comparison](CP2_2026_TRAINING_EVALUATION.md)
+tests earlier-2026-only and updated all-history fits on identical later services.
+Neither establishes a gain over the frozen callback recommendation. Its subset
+metrics should not be mixed with the original full-2026 metrics below.
+
 The subsequent flood-data experiment is documented separately in
 [CP2_FLOOD_MODEL_EVALUATION.md](CP2_FLOOD_MODEL_EVALUATION.md). It preserves this
 target and cohort, compares observed nearby flooding with an observation-only
