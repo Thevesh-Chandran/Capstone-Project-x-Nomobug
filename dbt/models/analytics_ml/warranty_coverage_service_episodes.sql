@@ -12,6 +12,12 @@ with observation as (
     where premise_type = 'RESIDENTIAL'
       and package_sessions_recorded in (4, 6, 12)
       and warranty_policy_eligible
+      and not exists (
+          select 1 from {{ ref('calendar_events') }} reviewed_event
+          join {{ ref('calendar_event_matches') }} reviewed_match using (calendar_event_row)
+          where reviewed_event.warranty_label_uncertain
+            and reviewed_match.matched_sales_record_id = sales_package_facts.sales_record_id
+      )
 ), service_candidates as (
     select
         f.*,
@@ -78,6 +84,7 @@ with observation as (
 ), labelled as (
     select
         i.sales_record_id,
+        i.address_hash,
         i.calendar_event_row as service_anchor_event_row,
         i.session_current as service_number,
         i.package_sessions_recorded,

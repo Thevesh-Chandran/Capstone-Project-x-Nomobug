@@ -1,6 +1,7 @@
 {
   "model_version": "warranty_risk_residential_3x_30d_v3",
-  "status": "validated_experimental_not_causal",
+  "status": "historical_evaluation_before_label_review_and_purged_validation",
+  "superseded_by": "warranty_fixed_30d_reviewed_v4",
   "selected_horizon_days": 30,
   "eligible_population": "residential_3x_packages_only",
   "prediction_time": "immediately_after_recorded_3_of_3_calendar_event",

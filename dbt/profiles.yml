@@ -12,4 +12,4 @@ nomobug:
       job_execution_timeout_seconds: 120
       job_retries: 0
       priority: interactive
-      maximum_bytes_billed: 104857600
+      maximum_bytes_billed: "{{ env_var('NOMOBUG_BQ_MAX_BYTES_BILLED', '104857600') | int }}"

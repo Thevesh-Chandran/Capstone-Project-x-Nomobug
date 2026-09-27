@@ -32,6 +32,7 @@ from train_warranty_risk_baseline import (
     logistic_pipeline,
     tree_pipeline,
 )
+from warranty_validation_splits import purged_forward_split
 
 
 SOURCE = f"{PROJECT}.analytics_ml.warranty_risk_3session_dataset"
@@ -49,7 +50,7 @@ SEGMENT_COLUMNS = [
 ]
 
 SQL = f"""
-select sales_record_id, prediction_anchor_date, area_cell,
+select sales_record_id, address_hash, prediction_anchor_date, area_cell,
        warranty_signal_within_30d, complete_prior_14d_weather,
        {', '.join(RISK_CORE_NO_TEAM_FEATURES)}
 from `{SOURCE}`
@@ -111,9 +112,7 @@ def walk_forward(frame: pd.DataFrame, model_name: str,
                  features: list[str], include_importance: bool = False):
     metric_rows, prediction_frames, importance_rows = [], [], []
     for fold_name, test_start, test_end in DEVELOPMENT_FOLDS:
-        train = frame[frame["prediction_anchor_date"] < test_start]
-        test = frame[(frame["prediction_anchor_date"] >= test_start)
-                     & (frame["prediction_anchor_date"] < test_end)]
+        train, test = purged_forward_split(frame, test_start, test_end)
         model = build_model(model_name, features).fit(
             train[features], train[TARGET].astype(bool))
         probability = model.predict_proba(test[features])[:, 1]
@@ -268,9 +267,7 @@ def main() -> None:
     monitor_threshold, high_threshold = choose_thresholds(
         selected_oof["actual_signal"].astype(bool), oof_calibrated)
 
-    training = frame[frame["prediction_anchor_date"] < REPORTING_START]
-    reporting = frame[(frame["prediction_anchor_date"] >= REPORTING_START)
-                      & (frame["prediction_anchor_date"] < REPORTING_END)].copy()
+    training, reporting = purged_forward_split(frame, REPORTING_START, REPORTING_END)
     final_model = build_model(selected_model, selected_features).fit(
         training[selected_features], training[TARGET].astype(bool))
     raw_probability = final_model.predict_proba(reporting[selected_features])[:, 1]

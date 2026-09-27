@@ -31,6 +31,48 @@ def coordinate_pairs(value):
             yield from coordinate_pairs(item)
 
 
+def context_query(digest: str) -> str:
+    return f"""
+    create or replace table `{CONTEXT_TABLE}` as
+    with locations as (
+        select location_id, latitude, longitude,
+            st_geogpoint(longitude, latitude) as point
+        from `{PROJECT}.quality.environmental_context_by_location_v1`
+    )
+    select
+        l.location_id, l.latitude, l.longitude,
+        min(st_distance(l.point, w.geography)) as hotosm_nearest_waterway_m,
+        count(distinct if(st_dwithin(l.point, w.geography, 500),
+            w.feature_id, null)) as hotosm_water_features_500m,
+        count(distinct if(st_dwithin(l.point, w.geography, 1000),
+            w.feature_id, null)) as hotosm_water_features_1km,
+        count(distinct if(st_dwithin(l.point, w.geography, 2000),
+            w.feature_id, null)) as hotosm_water_features_2km,
+        min(if(w.water_feature_group = 'DRAINAGE',
+            st_distance(l.point, w.geography), null)) as hotosm_nearest_drainage_m,
+        min(if(w.water_feature_group = 'FLOWING_WATER',
+            st_distance(l.point, w.geography), null)) as hotosm_nearest_flowing_water_m,
+        min(if(w.water_feature_group = 'STANDING_WATER',
+            st_distance(l.point, w.geography), null)) as hotosm_nearest_standing_water_m,
+        count(distinct if(w.water_feature_group = 'DRAINAGE'
+            and st_dwithin(l.point, w.geography, 2000), w.feature_id, null))
+            as hotosm_drainage_features_2km,
+        count(distinct if(w.water_feature_group = 'FLOWING_WATER'
+            and st_dwithin(l.point, w.geography, 2000), w.feature_id, null))
+            as hotosm_flowing_water_features_2km,
+        count(distinct if(w.water_feature_group = 'STANDING_WATER'
+            and st_dwithin(l.point, w.geography, 2000), w.feature_id, null))
+            as hotosm_standing_water_features_2km,
+        date '{SNAPSHOT_DATE}' as source_snapshot_date,
+        '{digest}' as source_sha256,
+        'OpenStreetMap contributors via HOTOSM/HDX; ODbL' as attribution
+    from locations l
+    left join `{FEATURE_TABLE}` w
+      on st_dwithin(l.point, w.geography, 10000)
+    group by l.location_id, l.latitude, l.longitude
+    """
+
+
 def main() -> None:
     ZIP_PATH.parent.mkdir(exist_ok=True)
     if not ZIP_PATH.exists():
@@ -42,7 +84,7 @@ def main() -> None:
         raise SystemExit(f"Unexpected HOTOSM snapshot hash: {digest}")
 
     # This bounding box covers all current service coordinates plus roughly
-    # 5–7 km. Exact 10 km proximity is applied later with BigQuery geography.
+    # 5â€“7 km. Exact 10 km proximity is applied later with BigQuery geography.
     bounds = (100.35, 1.43, 104.01, 5.71)
     selected = 0
     with zipfile.ZipFile(ZIP_PATH) as archive:
@@ -107,45 +149,7 @@ def main() -> None:
     """
     client.query(feature_sql).result(timeout=600)
 
-    context_sql = f"""
-    create or replace table `{CONTEXT_TABLE}` as
-    with locations as (
-        select location_id, latitude, longitude,
-            st_geogpoint(longitude, latitude) as point
-        from `{PROJECT}.quality.environmental_context_by_location_v1`
-    )
-    select
-        l.location_id, l.latitude, l.longitude,
-        min(st_distance(l.point, w.geography)) as hotosm_nearest_waterway_m,
-        count(distinct if(st_dwithin(l.point, w.geography, 500),
-            w.feature_id, null)) as hotosm_water_features_500m,
-        count(distinct if(st_dwithin(l.point, w.geography, 1000),
-            w.feature_id, null)) as hotosm_water_features_1km,
-        count(distinct if(st_dwithin(l.point, w.geography, 2000),
-            w.feature_id, null)) as hotosm_water_features_2km,
-        min(if(w.water_feature_group = 'DRAINAGE',
-            st_distance(l.point, w.geography), null)) as hotosm_nearest_drainage_m,
-        min(if(w.water_feature_group = 'FLOWING_WATER',
-            st_distance(l.point, w.geography), null)) as hotosm_nearest_flowing_water_m,
-        min(if(w.water_feature_group = 'STANDING_WATER',
-            st_distance(l.point, w.geography), null)) as hotosm_nearest_standing_water_m,
-        count(distinct if(w.water_feature_group = 'DRAINAGE'
-            and st_dwithin(l.point, w.geography, 2000), w.feature_id, null))
-            as hotosm_drainage_features_2km,
-        count(distinct if(w.water_feature_group = 'FLOWING_WATER'
-            and st_dwithin(l.point, w.geography, 2000), w.feature_id, null))
-            as hotosm_flowing_water_features_2km,
-        count(distinct if(w.water_feature_group = 'STANDING_WATER'
-            and st_dwithin(l.point, w.geography, 2000), w.feature_id, null))
-            as hotosm_standing_water_features_2km,
-        date '{SNAPSHOT_DATE}' as source_snapshot_date,
-        '{digest}' as source_sha256,
-        'OpenStreetMap contributors via HOTOSM/HDX; ODbL' as attribution
-    from locations l
-    left join `{FEATURE_TABLE}` w
-      on st_dwithin(l.point, w.geography, 10000)
-    group by l.location_id, l.latitude, l.longitude
-    """
+    context_sql = context_query(digest)
     client.query(context_sql).result(timeout=600)
     print(f"HOTOSM LOAD PASS: {selected} regional features; hash {digest}")
     print(f"WROTE {CONTEXT_TABLE}: {client.get_table(CONTEXT_TABLE).num_rows} locations")

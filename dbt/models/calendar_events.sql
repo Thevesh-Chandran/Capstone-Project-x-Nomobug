@@ -7,28 +7,28 @@ with raw_events as (
     from {{ source('calendar_bronze', 'events') }}
 ), classified as (
     select *,
-        case
-            when upper(status) = 'CANCELLED' then 'cancelled'
-            -- Administrative reminders can mention warranty terms without
-            -- representing a customer visit. Keep them out of service,
-            -- geospatial, weather, and ML grains while retaining the raw row.
-            when regexp_contains(
-                summary_upper,
-                r'\b(?:CHECK|REVIEW|CALCULATE)\b.*\bCONVERSION\s+RATE\b'
-            ) then 'administrative'
-            -- A sequence beyond the purchased package (for example 4/3 or
-            -- 5/3) is how the team records a warranty/claim visit within the
-            -- package's warranty window. Keep this ahead of the generic
-            -- complimentary/extra wording so it is counted as a warranty
-            -- claim even when the title says "complimentary".
-            when session_current > session_total then 'warranty'
-            when regexp_contains(summary_upper, r'WARRANTY|CLAIM|CALLBACK') then 'warranty'
-            when regexp_contains(summary_upper, r'EXTRA|COMPLIMENTARY|FOLLOW[- ]?UP') then 'complimentary'
-            when regexp_contains(summary_upper, r'CONSULTATION|INSPECTION') then 'consultation'
-            when regexp_contains(summary_upper, r'\b\d{1,2}\s*/\s*\d{1,2}\b') then 'service'
-            else 'other'
-        end as event_category
+        {{ calendar_event_category('summary_upper', 'status', 'session_current', 'session_total') }}
+            as rule_event_category,
+        {{ calendar_event_category('summary_upper', 'status', 'session_current', 'session_total', false) }}
+            as non_claim_event_category
     from raw_events
+), reviewed as (
+    select c.*,
+        r.review_id as warranty_label_review_id,
+        r.review_label as warranty_label_review_status,
+        r.reviewed_at as warranty_label_reviewed_at,
+        case
+            -- Cancellation/admin rules still control operational eligibility.
+            when c.rule_event_category in ('cancelled', 'administrative') then c.rule_event_category
+            when r.review_label = 'Confirmed warranty claim' then 'warranty'
+            when r.review_label = 'Not a warranty claim' then c.non_claim_event_category
+            when r.review_label = 'Unclear' then 'label_unresolved'
+            else c.rule_event_category
+        end as event_category
+    from classified c
+    left join {{ ref('calendar_warranty_review_overrides') }} r
+      on r.calendar_event_row = c.calendar_event_row
+     and r.event_id = c.event_id
 )
 select
     calendar_event_row,
@@ -68,18 +68,27 @@ select
     session_total,
     session_current > session_total as sequence_over_package,
     event_category,
-    status = 'confirmed' and (
-        coalesce(session_current > session_total, false)
-        or coalesce(regexp_contains(summary_upper, r'WARRANTY|CLAIM|CALLBACK'), false)
-    ) as warranty_claim_candidate,
+    warranty_label_review_id,
+    coalesce(warranty_label_review_status, 'Not reviewed') as warranty_label_review_status,
+    warranty_label_reviewed_at,
+    coalesce(warranty_label_review_status = 'Unclear', false) as warranty_label_uncertain,
+    if(warranty_label_review_id is null, 'calendar_title_rule', 'manual_review_2026_09_27')
+        as warranty_label_provenance,
+    -- Unresolved reviews deliberately produce NULL, never a negative label.
     case
-        when status = 'confirmed' and session_current > session_total then 'post_package_sequence'
-        when status = 'confirmed' and regexp_contains(summary_upper, r'WARRANTY|CLAIM|CALLBACK') then 'explicit_warranty_label'
+        when warranty_label_review_status = 'Unclear' then cast(null as bool)
+        else status = 'confirmed' and event_category = 'warranty'
+    end as warranty_claim_candidate,
+    case
+        when status = 'confirmed' and event_category = 'warranty'
+             and warranty_label_review_status = 'Confirmed warranty claim' then 'manual_review_confirmed_claim'
+        when status = 'confirmed' and event_category = 'warranty'
+             and session_current > session_total then 'post_package_sequence'
+        when status = 'confirmed' and event_category = 'warranty' then 'explicit_warranty_label'
         else null
     end as warranty_claim_reason,
     status = 'confirmed' and event_category in ('service', 'warranty', 'extra_visit_candidate', 'complimentary') as service_candidate,
-    status = 'confirmed' and (
-        event_category in ('warranty', 'extra_visit_candidate', 'complimentary')
-        or regexp_contains(summary_upper, r'EXTRA|COMPLIMENTARY|WARRANTY|CLAIM|CALLBACK')
-    ) as extra_visit_candidate
-from classified
+    status = 'confirmed'
+        and event_category in ('warranty', 'extra_visit_candidate', 'complimentary')
+        as extra_visit_candidate
+from reviewed

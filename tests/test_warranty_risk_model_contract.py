@@ -15,6 +15,7 @@ def test_current_warranty_risk_model_contract_matches_code():
         ROOT / "config" / "warranty_risk_model_v3.json").read_text(encoding="utf-8"))
     encoded = json.dumps(
         model.RISK_CORE_NO_TEAM_FEATURES, separators=(",", ":")).encode()
+    assert contract['superseded_by'] == 'warranty_fixed_30d_reviewed_v4'
     assert contract["selected_horizon_days"] == 30
     assert contract["eligible_population"] == "residential_3x_packages_only"
     assert contract["model_variant"] == "logistic_l2"

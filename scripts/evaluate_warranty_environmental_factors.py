@@ -30,6 +30,7 @@ from tune_warranty_risk_model import (
     TARGET,
     probability_metrics,
 )
+from warranty_validation_splits import purged_forward_split
 
 
 SOURCE = f"{PROJECT}.analytics_ml.warranty_risk_3session_dataset"
@@ -50,7 +51,7 @@ VARIANTS = (
 )
 
 SQL = f"""
-select prediction_anchor_date, {TARGET}, complete_prior_14d_weather,
+select sales_record_id, address_hash, prediction_anchor_date, {TARGET}, complete_prior_14d_weather,
        {', '.join(CHALLENGER_FEATURES)}
 from `{SOURCE}`
 where {TARGET} is not null
@@ -71,9 +72,7 @@ def build_model(extra_features: list[str]):
 def evaluate_fold(frame: pd.DataFrame, test_start, test_end,
                   extra_features: list[str]) -> dict:
     features = BASE_FEATURES + extra_features
-    train = frame[frame["prediction_anchor_date"] < test_start]
-    test = frame[(frame["prediction_anchor_date"] >= test_start)
-                 & (frame["prediction_anchor_date"] < test_end)]
+    train, test = purged_forward_split(frame, test_start, test_end)
     model = build_model(extra_features).fit(
         train[features], train[TARGET].astype(bool))
     probability = model.predict_proba(test[features])[:, 1]

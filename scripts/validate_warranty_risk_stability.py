@@ -30,6 +30,7 @@ from train_warranty_risk_baseline import (
     best_f1_threshold,
 )
 from tune_warranty_risk_model import build_model
+from warranty_validation_splits import purged_forward_split
 
 
 SOURCE = f"{PROJECT}.analytics_ml.warranty_risk_3session_dataset"
@@ -46,7 +47,7 @@ FOLDS = [
 ]
 
 SQL = f"""
-select sales_record_id, prediction_anchor_date, area_cell,
+select sales_record_id, address_hash, prediction_anchor_date, area_cell,
        warranty_signal_within_30d, complete_prior_14d_weather,
        {', '.join(RISK_CORE_NO_TEAM_FEATURES)}
 from `{SOURCE}`
@@ -119,9 +120,7 @@ def main() -> None:
     final_predictions = None
     final_threshold = None
     for fold_name, test_start, test_end in FOLDS:
-        train = frame[frame["prediction_anchor_date"] < test_start].copy()
-        test = frame[(frame["prediction_anchor_date"] >= test_start)
-                     & (frame["prediction_anchor_date"] < test_end)].copy()
+        train, test = purged_forward_split(frame, test_start, test_end)
         if min(len(train), len(test)) == 0 or train[TARGET].nunique() != 2 \
                 or test[TARGET].nunique() != 2:
             raise SystemExit(f"Invalid walk-forward fold: {fold_name}")

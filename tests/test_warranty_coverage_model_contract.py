@@ -16,7 +16,8 @@ def test_repeated_coverage_contract_matches_selected_history_features():
     ).read_text(encoding="utf-8"))
     features = model.BASE_NUMERIC + model.HISTORY_NUMERIC + model.CATEGORICAL
     encoded = json.dumps(features, separators=(",", ":")).encode()
-    assert contract["status"] == "validated_experimental_not_operational"
+    assert contract["status"] == "historical_variable_interval_evaluation"
+    assert contract['superseded_by'] == 'warranty_fixed_30d_reviewed_v4'
     assert contract["selected_feature_set"] == "base_plus_prior_history"
     assert contract["features"] == features
     assert contract["ordered_feature_sha256"] == hashlib.sha256(encoded).hexdigest()

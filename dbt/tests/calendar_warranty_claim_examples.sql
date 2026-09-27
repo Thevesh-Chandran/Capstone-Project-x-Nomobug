@@ -1,9 +1,11 @@
 {{ config(tags=['calendar', 'gold']) }}
--- A sequence beyond the purchased package (for example 4/3 or 5/3) is a
--- warranty/claim visit, even when the title uses "complimentary".
+-- Sequence overrun denotes warranty unless an audited exception, administrative
+-- reminder or consultation proves the entry represents a different activity.
 select calendar_event_row
 from {{ ref('calendar_events') }}
-where status = 'confirmed' and sequence_over_package and (
+where status = 'confirmed' and sequence_over_package
+  and warranty_label_review_status = 'Not reviewed'
+  and event_category not in ('consultation', 'administrative') and (
     event_category != 'warranty'
     or not warranty_claim_candidate
 )

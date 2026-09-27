@@ -4,7 +4,26 @@ This is the current progress entry point. Older plans/profiles are historical,
 not proof that a pipeline is built. Latest reconciliation includes the successful
 Prospects and complete eight-tab operational Bronze/Silver batch.
 
-Latest verification on 21 September 2026: the confirmed warranty policy is now encoded and the selected experiment is `warranty_risk_residential_3x_30d_v3`. It covers eligible residential 3x packages and predicts a recorded Calendar warranty signal within 30 days after the third service. Earlier 60-day models are superseded. The repaired Git repository now follows the current remote main
+Latest verification on 27 September 2026: the 80 owner-reviewed labels are
+applied with event provenance, with two unresolved records kept unknown.
+Prediction timing and validation were repaired before comparing fixed 30-day
+targets, model families, antecedent weather and historical land cover. The latest
+contract is `warranty_fixed_30d_reviewed_v4`, marked diagnostic only. See
+[`CP2_MODEL_IMPROVEMENT.md`](CP2_MODEL_IMPROVEMENT.md) for the final comparisons,
+target definitions, baseline performance and recommendation. Recorded corrective
+callback planning is a separate experimental goal from contractual eligibility;
+commercial clients still have no contractual warranty. Previously selected v3
+and variable-interval coverage metrics are historical and superseded.
+
+The 271 corrected candidate/feature comparisons selected ExtraTrees for the
+callback experiment: diagnostic AUC 0.774, with 55.9% of callbacks captured in
+the highest-scored 20% of visits (25.3% precision). The 3x and multi-service
+warranty models have AUC 0.541 and 0.631 respectively; multi-service has only
+nine positive diagnostic rows. All results remain experimental. The live
+bounded dbt build passed 53/53, local tests passed 181, and saved models
+reproduced all diagnostic probabilities after loading in a fresh process.
+
+The repaired Git repository now follows the current remote main
 history on branch `codex/cp2-v2`; the pre-repair working tree and damaged Git
 metadata are preserved in a separate recovery folder.
 
@@ -12,14 +31,15 @@ The CP1-to-CP2 requirements comparison is recorded in
 [`CP2_GOAL_COVERAGE_AUDIT.md`](CP2_GOAL_COVERAGE_AUDIT.md). It distinguishes
 implemented evidence from planned work and superseded proposal options.
 
-The residential 4x/6x/12x repeated-coverage dataset is now implemented with 364
+The earlier residential 4x/6x/12x repeated-coverage evaluation used 364
 mature service intervals across 146 packages. It retains multiple claims and
 shows only exploratory model value; see
 [`WARRANTY_COVERAGE_MODEL_EVALUATION.md`](WARRANTY_COVERAGE_MODEL_EVALUATION.md).
 The pinned 9 September 2026 HOTOSM Malaysia waterways snapshot now supplies
 reproducible drainage, flowing-water and standing-water proximity features. Its
-initial temporal gain does not survive package-grouped validation, so waterways
-remain descriptive and are excluded from both selected model contracts.
+initial temporal gain did not survive package-grouped validation. The current
+fixed-horizon experiment re-evaluates waterways alongside other features; the
+earlier exclusion applies to the historical model contracts only.
 
 ## What the levels mean
 

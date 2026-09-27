@@ -17,6 +17,15 @@ from sklearn.pipeline import Pipeline
 from sklearn.model_selection import StratifiedGroupKFold
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
+try:
+    from warranty_validation_splits import (
+        assert_package_property_disjoint, connected_validation_groups,
+    )
+except ModuleNotFoundError:
+    from scripts.warranty_validation_splits import (
+        assert_package_property_disjoint, connected_validation_groups,
+    )
+
 PROJECT = "profound-keel-500007-s4"
 LOCATION = "asia-southeast1"
 SOURCE = f"{PROJECT}.analytics_ml.warranty_coverage_service_episodes"
@@ -75,15 +84,15 @@ def metrics(y: pd.Series, probability: np.ndarray) -> dict:
 
 def package_bootstrap(frame: pd.DataFrame, probability: np.ndarray,
                       repeats: int = 1000) -> dict:
-    working = frame[["sales_record_id", TARGET]].copy()
+    working = frame[['validation_group', TARGET]].copy()
     working["probability"] = probability
-    package_ids = working["sales_record_id"].unique()
+    package_ids = working['validation_group'].unique()
     grouped = {
         package_id: (
             group[TARGET].to_numpy(dtype=bool),
             group["probability"].to_numpy(dtype=float),
         )
-        for package_id, group in working.groupby("sales_record_id")
+        for package_id, group in working.groupby('validation_group')
     }
     rng = np.random.default_rng(42)
     rows = []
@@ -102,12 +111,14 @@ def package_bootstrap(frame: pd.DataFrame, probability: np.ndarray,
         result[f"{metric}_ci_low"] = float(np.quantile(values, 0.025))
         result[f"{metric}_ci_high"] = float(np.quantile(values, 0.975))
     result["bootstrap_repeats"] = len(rows)
+    result['bootstrap_connected_components'] = len(package_ids)
     return result
 
 
 def main() -> None:
     columns = [
-        "sales_record_id", "service_anchor_event_row", "service_date",
+        "sales_record_id", "address_hash", "service_anchor_event_row", "service_date",
+        "coverage_interval_end",
         "evaluation_split", "area_cell", TARGET,
         "warranty_claim_count_in_interval", "exposure_days",
         "complete_prior_14d_weather", *BASE_NUMERIC, *WEATHER_NUMERIC,
@@ -123,8 +134,13 @@ def main() -> None:
         sql, job_config=bigquery.QueryJobConfig(maximum_bytes_billed=MAX_BYTES)
     ).result(timeout=300))
     frame[TARGET] = frame[TARGET].astype(bool)
-    train = frame[frame["evaluation_split"] == "train_2024_2025"].copy()
+    frame['service_date'] = pd.to_datetime(frame['service_date'])
+    frame['coverage_interval_end'] = pd.to_datetime(frame['coverage_interval_end'])
+    frame['validation_group'] = connected_validation_groups(frame)
+    train = frame[frame['coverage_interval_end'] < pd.Timestamp('2026-01-01')].copy()
     test = frame[frame["evaluation_split"] == "holdout_2026"].copy()
+    train = train[~train['validation_group'].isin(test['validation_group'])].copy()
+    assert_package_property_disjoint(train, test)
 
     run_utc = datetime.now(timezone.utc)
     result_rows = []
@@ -172,11 +188,14 @@ def main() -> None:
 
     grouped_rows = []
     splitter = StratifiedGroupKFold(n_splits=5, shuffle=True, random_state=42)
+    # Development selection never sees the already-inspected 2026 period.
+    development = frame[frame['coverage_interval_end'] < pd.Timestamp('2026-01-01')].copy()
     for name, numeric in variants:
         for fold, (train_index, test_index) in enumerate(splitter.split(
-                frame, frame[TARGET], groups=frame["sales_record_id"]), start=1):
-            fold_train = frame.iloc[train_index]
-            fold_test = frame.iloc[test_index]
+                development, development[TARGET], groups=development['validation_group']), start=1):
+            fold_train = development.iloc[train_index]
+            fold_test = development.iloc[test_index]
+            assert_package_property_disjoint(fold_train, fold_test)
             fitted = model(numeric).fit(
                 fold_train[numeric + CATEGORICAL], fold_train[TARGET])
             probability = fitted.predict_proba(

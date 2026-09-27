@@ -82,8 +82,12 @@ with observation as (
             as session_3_team,
         count(distinct if(session_current between 1 and 3, calendar_name, null))
             as distinct_teams_first_three_sessions
-    from {{ ref('calendar_service_event_facts') }}
+    from {{ ref('calendar_service_event_facts') }} sequence_event
     where sales_record_id is not null and not warranty_claim_candidate
+      and event_date_local <= (
+          select min(c.prediction_anchor_date) from completion_candidates c
+          where c.sales_record_id = sequence_event.sales_record_id
+      )
     group by sales_record_id
 ), package_history as (
     select c.calendar_event_row,
@@ -161,7 +165,9 @@ with observation as (
     from completion_candidates c
     left join {{ ref('calendar_service_event_facts') }} e
       on e.calendar_name = c.assigned_team_calendar
-     and e.event_date_local = c.prediction_anchor_date
+     and e.event_date_local between date_sub(c.prediction_anchor_date, interval 7 day)
+                                and c.prediction_anchor_date
+     and e.event_created_ts <= c.event_start_ts
     group by c.calendar_event_row
 ), payment_entries as (
     select sale_id as sales_record_id, f.payment_date, f.amount_rm
@@ -213,6 +219,7 @@ with observation as (
 ), eligible as (
     select
         p.sales_record_id,
+        c.address_hash,
         p.closed_date,
         c.calendar_event_row as prediction_anchor_event_row,
         c.prediction_anchor_date,
@@ -441,6 +448,12 @@ with observation as (
       and c.prediction_anchor_date >= p.closed_date
       and c.completion_anchor_count = 1
       and date_add(c.prediction_anchor_date, interval 30 day) <= o.observed_through
+      and not exists (
+          select 1 from {{ ref('calendar_events') }} reviewed_event
+          join {{ ref('calendar_event_matches') }} reviewed_match using (calendar_event_row)
+          where reviewed_event.warranty_label_uncertain
+            and reviewed_match.matched_sales_record_id = p.sales_record_id
+      )
 )
 select
     *,

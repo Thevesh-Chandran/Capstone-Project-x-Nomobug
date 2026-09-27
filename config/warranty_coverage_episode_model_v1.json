@@ -1,6 +1,7 @@
 {
   "model_version": "warranty_coverage_residential_4x_6x_12x_interval_v1",
-  "status": "validated_experimental_not_operational",
+  "status": "historical_variable_interval_evaluation",
+  "superseded_by": "warranty_fixed_30d_reviewed_v4",
   "eligible_population": "residential_4x_6x_12x_service_intervals",
   "target": "any_recorded_calendar_warranty_signal_in_mature_coverage_interval",
   "model_variant": "logistic_l2_balanced",
