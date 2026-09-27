@@ -35,9 +35,19 @@ service date. The other two nearby candidates are ordinary service entries.
 These do not prove rescheduling, treatment completion, or linkage to that claim.
 One case lacks both supported identity keys. The search is not exhaustive.
 
-The seven cases are saved in a private CSV with Calendar title/date and a
+**Owner resolution, 27 September 2026:** Calendar dates govern these seven
+cases because sheet dates can be inaccurate. All seven date conflicts are
+closed; existing Calendar-based 30-day outcomes remain unchanged. This resolves
+date authority, not treatment completion or fulfillment of a particular claim.
+The decision is scoped to these exact snapshot/case fingerprints in
+`config/callback_date_authority_review_v1.json`; it does not automatically close
+future discrepancies or validate claim-request dates.
+
+The seven closed cases are saved in a private CSV with Calendar title/date and a
 claim-sheet service date, so they can be checked without searching by event ID:
-`outputs/cp2-v2/callback_evidence_reconciliation/private_seven_date_cases.csv`.
+`outputs/cp2-v2/callback_evidence_reconciliation/private_seven_date_cases_resolved.csv`.
+The original review CSV remains a historical copy; it was open/locked by Excel
+when the owner resolution was recorded.
 The full 130-anchor reconciliation is in `private_claim_visit_review.csv` in
 the same directory. Confirmed 4/3 warranty visits and reviewed upsells were retained.
 
@@ -120,7 +130,8 @@ structured visit reason; and identify treatment/access/severity evidence that
 would be useful if captured at prediction time. The guide preserves commercial
 no-warranty policy and existing residential/package-upgrade rules.
 
-Resolve the seven date conflicts from source evidence before changing labels.
+The seven date conflicts are owner-resolved using Calendar dates; no further
+manual checking is required for their date authority and no labels were changed.
 Use structured records for newly arriving services and preserve their historical
 versions. Evaluate a frozen candidate after new 30-day outcomes mature. The
 recovered description fields are available for further development work, but

@@ -6,8 +6,10 @@ Prospects and complete eight-tab operational Bronze/Silver batch.
 
 Latest callback evidence work on 27 September 2026: all 5,598 frozen targets
 reconcile with source records. The claim-date audit separates request/record
-dates from visit dates and isolates seven unresolved within-window conflicts
-in a private title/date-searchable queue. Ten structured description predictors
+dates from visit dates and isolates seven within-window conflicts. The owner
+resolved all seven on 27 September: Calendar dates are authoritative because
+sheet dates can be inaccurate. Their existing outcomes remain unchanged; the
+private title/date-searchable file now records closure. Ten structured description predictors
 were tested across eight candidate contracts on identical eligible cohorts.
 At 374 reviews, the refitted baseline captures 94 callbacks versus 91 with new
 fields; no reliable ranking gain is established. Retain v4 as experimental.

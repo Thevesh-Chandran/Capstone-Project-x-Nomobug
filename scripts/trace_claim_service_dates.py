@@ -1,9 +1,20 @@
 """Read-only exact identity/date trace for unresolved claim-service cases."""
 import json,re
 import argparse
+import hashlib
 from pathlib import Path
 from google.cloud import bigquery
 from scripts.reconcile_callback_evidence import parse_service_dates,dates_within
+
+
+def case_resolution(anchor_event_row,service_date,snapshot,policy):
+    fingerprint=hashlib.sha256(f'{snapshot}|{anchor_event_row}|{service_date}'.encode()).hexdigest()
+    resolved=(policy.get('status')=='owner_resolved' and policy.get('date_authority')=='Calendar'
+              and policy.get('snapshot_table')==snapshot and fingerprint in policy.get('case_fingerprints',[]))
+    return {'review_status':'owner_resolved_calendar_authoritative' if resolved else 'pending_review',
+            'requires_review':not resolved,'date_authority':'Calendar' if resolved else 'unresolved',
+            'review_action':'Closed by owner: retain Calendar dates and existing outcomes; ignore conflicting sheet service date.'
+                            if resolved else 'Check claim sheet service date against actual booking/reschedule; no label change inferred.'}
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
@@ -21,6 +32,8 @@ def main():
       for d in dates_within(a['anchor_date'],ds):
        lookups.append(bigquery.StructQueryParameter(None,bigquery.ScalarQueryParameter('anchor_event_row','INT64',int(a['anchor_event_row'])),bigquery.ScalarQueryParameter('service_date','DATE',d)))
     raw=re.search(r'profound-keel-500007-s4\.bronze\.calendar_events_[0-9a-f]{64}',r['queries']['anchors']['sql']).group()
+    policy_path=Path('config/callback_date_authority_review_v1.json')
+    policy=json.loads(policy_path.read_text()) if policy_path.exists() else {}
     q=f'''with lookups as (select * from unnest(@lookups)),
     normalized as (select *,regexp_replace(regexp_extract(regexp_replace(description,r'<[^>]+>',''),r'(?i)(?:Phone|Telefon|No[.]? Tel):\\s*([^\\n<]+)'),r'[^0-9]','') phone_key,
      regexp_replace(upper(trim(regexp_extract(regexp_replace(description,r'<[^>]+>',''),r'(?i)(?:Nama|Name):\\s*([^\\n<]+)'))),r'[^A-Z0-9]','') name_key,
@@ -64,9 +77,15 @@ def main():
           'claim_record_dates':[c['recorded_claim_date'] for c in linked_claims],
           'claim_sheet_service_date':ds,'nearby_calendar_dates':[x['event_date'] for x in matches],
           'nearby_categories':[x['event_category'] for x in matches],
-          'review_action':'Check claim sheet service date against actual booking/reschedule; no label change inferred.'})
-    pd.DataFrame(private).to_csv(root/'private_seven_date_cases.csv',index=False,encoding='utf-8-sig')
+          **case_resolution(key,ds,raw,policy)})
+    case_file='private_seven_date_cases_resolved.csv' if policy else 'private_seven_date_cases.csv'
+    pd.DataFrame(private).to_csv(root/case_file,index=False,encoding='utf-8-sig')
     aggregate={'cases':len(lookups),'cases_with_identity_key':sum(s['has_phone'] or s['has_name'] for s in summary),
+      'owner_resolved_cases':sum(not row['requires_review'] for row in private),
+      'pending_review_cases':sum(row['requires_review'] for row in private),
+      'resolution_policy':'config/callback_date_authority_review_v1.json' if policy else None,
+      'labels_changed':0,
+      'private_case_file':case_file,
       'cases_with_nearby_identity_candidate':sum(s['same_identity_nearby_events']>0 for s in summary),
       'cases_with_exact_date_match':sum(s['exact_date_events']>0 for s in summary),
       'cases_with_later_warranty_candidate':sum(any((x['date_offset'] or 0)>0 and bool(x['warranty_claim_candidate']) for x in rows

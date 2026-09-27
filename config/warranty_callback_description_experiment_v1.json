@@ -72,6 +72,11 @@
   "seven_case_trace": {
     "cases": 7,
     "cases_with_identity_key": 6,
+    "owner_resolved_cases": 7,
+    "pending_review_cases": 0,
+    "resolution_policy": "config/callback_date_authority_review_v1.json",
+    "labels_changed": 0,
+    "private_case_file": "private_seven_date_cases_resolved.csv",
     "cases_with_nearby_identity_candidate": 4,
     "cases_with_exact_date_match": 0,
     "cases_with_later_warranty_candidate": 2,
@@ -3470,5 +3475,24 @@
     "saved_models_replayed": 3,
     "replay_rows_per_model": 1869,
     "max_probability_difference_bound": 1e-12
+  },
+  "owner_date_authority_resolution": {
+    "review_date": "2026-09-27",
+    "status": "owner_resolved",
+    "date_authority": "Calendar",
+    "scope": "Only the seven reviewed sheet-service-date conflicts in the frozen Calendar snapshot",
+    "owner_instruction": "sometimes the sheets dsent have accurate datea so just follow the caladner one for the 7 cases",
+    "resolution": "Ignore conflicting sheet service dates for these cases; retain Calendar-based 30-day outcomes",
+    "snapshot_table": "profound-keel-500007-s4.bronze.calendar_events_78147d417f3d97d3c1d9ef0be59638fd7850e4195108e1fc7b879483c7f35b66",
+    "case_fingerprints": [
+      "0a54ac5d9a5e029e9d723258ff670be6f9bf09ae655b92c35e69d8d4ed8f9874",
+      "2cf2dbfbafa018aa429d166f0c47c944b0c6d4fe24741c5dbac308c50c92502a",
+      "3a6e7778f59fc45eaaef08ed35b59e568f666af177f385abc242808f48dee949",
+      "90edd78b7cc745a2d3403d80bec2c4f609aeba6f5db1e4c7e50ef75775fec744",
+      "c960358021fff99c54a1932e79996cd6bf8d621266a9763935dd590942ce06d2",
+      "d514f3842091a16cf4bc6c47572f7262697df6f899dd183d0d531bf3df87d905",
+      "d59c742c7f25af4eb3f9d94289b07fea9255e3f585187af781dfa140d84edc7b"
+    ],
+    "labels_changed": 0
   }
 }
