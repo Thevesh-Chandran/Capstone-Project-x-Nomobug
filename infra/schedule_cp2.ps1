@@ -30,17 +30,23 @@ $common = @('--project',$Project,'--location',$Region,'--schedule','0 6 * * *',
     '--time-zone','Asia/Kuala_Lumpur','--uri',$Uri,'--http-method','POST',
     '--oauth-service-account-email',$Identity,'--oauth-token-scope','https://www.googleapis.com/auth/cloud-platform',
     '--max-retry-attempts','0','--max-retry-duration','0s','--attempt-deadline','30s',
-    '--message-body','{}','--headers','Content-Type=application/json','--quiet')
+    '--message-body','{}','--quiet')
 & gcloud scheduler jobs describe $Scheduler --project $Project --location $Region --quiet --format='value(name)' 2>$null | Out-Null
 if ($LASTEXITCODE -eq 0) {
-    & gcloud scheduler jobs update http $Scheduler @common
+    & gcloud scheduler jobs update http $Scheduler @common `
+        --update-headers 'Content-Type=application/json'
 } else {
-    & gcloud scheduler jobs create http $Scheduler @common
+    & gcloud scheduler jobs create http $Scheduler @common `
+        --headers 'Content-Type=application/json'
 }
 if ($LASTEXITCODE -ne 0) { throw 'Scheduler create/update failed' }
 if ($Activate) {
-    & gcloud scheduler jobs resume $Scheduler --project $Project --location $Region --quiet
-    if ($LASTEXITCODE -ne 0) { throw 'Scheduler resume failed' }
+    for ($attempt = 1; $attempt -le 3; $attempt++) {
+        & gcloud scheduler jobs resume $Scheduler --project $Project --location $Region --quiet
+        if ($LASTEXITCODE -eq 0) { break }
+        if ($attempt -eq 3) { throw 'Scheduler resume failed after three attempts' }
+        Start-Sleep -Seconds 3
+    }
     Write-Output 'Daily 06:00 MYT schedule active.'
 } else {
     & gcloud scheduler jobs pause $Scheduler --project $Project --location $Region --quiet

@@ -12,7 +12,7 @@ Development selection used purged walk-forward 2025 folds. The selected depth-10
 
 The reporting path reads approved Sheets and six Calendars with read-only OAuth, saves immutable Bronze snapshots, builds candidate Silver/Gold datasets with dbt, independently reconciles source rows and monthly business KPIs, and promotes stable reporting views only after validation. An audit table records runs and their last successful release; failures retain the previous published view definitions. Gold views supply the restricted management dashboard. A separate local two-minute collector logs predictions within five minutes of a scheduled Calendar service end, using the frozen bundle; the daily reporting batch does not replace that timing-sensitive experiment. [Reporting runbook](../infra/README.md) and [prospective operations](CP2_LIVE_PIPELINE_OPERATIONS.md).
 
-The 28 September fresh release `20260928081442aba7ea` is published. All 180 dbt nodes passed, the independent KPI check returned `pass_with_business_caveats`, and 41 stable view pointers were promoted. The published release is source-backed, but a Calendar entry remains a scheduled/recorded visit, SALES value remains package face value, PAYMENTS remain sheet entries, formal claims remain separate from callback signals, and source dates or amounts can be missing or inferred. The reviewed 1x plus Upsell 2x episode and `4/3` warranty examples are covered by the business checks; neither a Calendar title nor a package flag alone decides contractual entitlement.
+The 28 September fresh release `20260928081442aba7ea` is published. All 180 dbt nodes passed, the independent KPI check returned `pass_with_business_caveats`, and 41 stable view pointers were promoted. The first cloud execution then failed on a scoped BigQuery `quality` write permission, leaving those Gold pointers intact. After a dataset-level grant, manual Cloud Run execution `cp2-reporting-daily-7jfzx` completed successfully in 8m17s and published release `20260928134056afeb07`. Its audit row is `PUBLISHED` and the checked Gold dashboard view points to the new candidate dataset. The published release is source-backed, but a Calendar entry remains a scheduled/recorded visit, SALES value remains package face value, PAYMENTS remain sheet entries, formal claims remain separate from callback signals, and source dates or amounts can be missing or inferred. The reviewed 1x plus Upsell 2x episode and `4/3` warranty examples are covered by the business checks; neither a Calendar title nor a package flag alone decides contractual entitlement.
 
 The dashboard is a management artifact, not a customer risk list. It should show denominators, freshness, weather/location coverage, DBSCAN radius sensitivity, and aggregate held-out model evidence. Weather, waterways, land cover and flood context were evaluated as observational predictors; geographic clustering and rainfall associations are not causal effects. Individual experimental probabilities must not be shared in the report.
 
@@ -23,9 +23,9 @@ The dashboard is a management artifact, not a customer risk list. It should show
 | Fresh source → candidate build → independent reconciliation → publish | Passed on 28 September; release ID above |
 | Python/dbt CI and container smoke | GitHub CI passed for the deploy revision; local full Python suite passed 376 tests; Linux image build and CLI smoke passed |
 | Frozen model replay | Previously passed for all 5,695 current-bundle scores; rerun during final acceptance |
-| Manual cloud job | Await the first deployed execution and BigQuery `audit.release_runs` evidence |
-| 06:00 MYT scheduled cloud job | Activate only after a successful manual run; verify its first completed execution and audit row |
-| Deliberate cloud failure and recovery | Pending; verify unchanged Gold pointers, inspect failure, rerun successfully |
+| Manual cloud job | Passed: execution `cp2-reporting-daily-7jfzx` completed; audit release `20260928134056afeb07` is `PUBLISHED` |
+| 06:00 MYT scheduled cloud job | Trigger configured and enabled for `0 6 * * *` Asia/Kuala_Lumpur; verify the first actual 06:00 execution and audit row |
+| Deliberate cloud failure and recovery | The first deployed execution failed on a missing scoped quality write grant; the previous Gold pointers remained intact. The corrected manual run published successfully. A separate deliberate failure injection is still pending if required for acceptance. |
 | Dashboard totals, filters, privacy, viewer access and narrow-screen rendering | Owner is finishing the dashboard; pending final checks |
 | Prospective collection | Local collector installed; report logged predictions and missed windows from its immutable operational records at submission |
 | Project cost below RM 30/month operator ceiling | Check actual project Billing Reports spend before each deployment and while schedule runs; budget alerts do not cap charges |
@@ -34,8 +34,7 @@ As of the 28 September 13:33 UTC collector tick, **zero prospective predictions*
 
 ## Remaining before 31 October
 
-1. Verify the manual Cloud Run execution, create and activate the 06:00 MYT Scheduler trigger, and observe an actual completed scheduled release.
-2. Exercise failure and recovery without changing the model or treating a failed source read as a successful release; verify the prior Gold pointers remain intact.
+1. Observe a completed Cloud Scheduler-triggered execution and the first actual 06:00 MYT release; verify both have matching audit rows.
+2. If acceptance specifically requires a deliberate fault injection beyond the observed real IAM failure, run one safely without changing the model, and verify unchanged Gold pointers and a successful retry.
 3. Recheck current source-to-Gold reconciliation and owner examples after the final release. Confirm dashboard totals, filters, privacy, viewer permissions, and narrow-screen use with the owner.
 4. Run the final Python/dbt suites, frozen replay and container smoke against the submission revision. Record the actual prospective log and missed-window counts, latest cost observation, and any unresolved blockers.
-
