@@ -41,11 +41,18 @@ if ($LASTEXITCODE -eq 0) {
 }
 if ($LASTEXITCODE -ne 0) { throw 'Scheduler create/update failed' }
 if ($Activate) {
-    for ($attempt = 1; $attempt -le 3; $attempt++) {
-        & gcloud scheduler jobs resume $Scheduler --project $Project --location $Region --quiet
-        if ($LASTEXITCODE -eq 0) { break }
-        if ($attempt -eq 3) { throw 'Scheduler resume failed after three attempts' }
-        Start-Sleep -Seconds 3
+    $state = (& gcloud scheduler jobs describe $Scheduler --project $Project `
+        --location $Region --format='value(state)').Trim()
+    if ($LASTEXITCODE -ne 0) { throw 'Scheduler state check failed' }
+    if ($state -eq 'PAUSED') {
+        for ($attempt = 1; $attempt -le 3; $attempt++) {
+            & gcloud scheduler jobs resume $Scheduler --project $Project --location $Region --quiet
+            if ($LASTEXITCODE -eq 0) { break }
+            if ($attempt -eq 3) { throw 'Scheduler resume failed after three attempts' }
+            Start-Sleep -Seconds 3
+        }
+    } elseif ($state -ne 'ENABLED') {
+        throw "Unexpected Scheduler state: $state"
     }
     Write-Output 'Daily 06:00 MYT schedule active.'
 } else {
