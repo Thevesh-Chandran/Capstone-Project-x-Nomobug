@@ -5,10 +5,14 @@ performance. Historical replay is separate from real prospective recording.
 """
 from __future__ import annotations
 import argparse
+from contextlib import contextmanager
 from datetime import datetime,timedelta,timezone
 import hashlib
 import json
+import os
 from pathlib import Path
+import re
+import tempfile
 from zoneinfo import ZoneInfo
 import joblib
 import numpy as np
@@ -28,6 +32,7 @@ LOCAL=ZoneInfo('Asia/Kuala_Lumpur')
 DEFAULT_OUTPUT=b.ROOT/'outputs/cp2-v2/prospective_callback_v1'
 INPUT=b.ROOT/'outputs/cp2-v2/model_callback_normalized_pest/dataset_input.json'
 KEYS=['population','sales_record_id','anchor_date']
+SOURCE_NAME='Google Calendar + Google Sheets'
 
 
 def digest(path):
@@ -44,6 +49,73 @@ def timestamp(value):
     if parsed.tzinfo is None:
         raise ValueError('Timezone-bearing timestamp required')
     return parsed.astimezone(timezone.utc)
+
+
+def private_path(path):
+    path=Path(path).resolve()
+    if not path.is_relative_to((b.ROOT/'outputs').resolve()):
+        raise ValueError('Customer-level prospective evidence must stay in ignored project outputs')
+    return path
+
+
+@contextmanager
+def append_lock(directory):
+    """OS-held lock releases after a process crash; a leftover file is harmless."""
+    directory.mkdir(parents=True,exist_ok=True)
+    with (directory/'.append.lock').open('a+b') as handle:
+        if handle.tell()==0:
+            handle.write(b'0');handle.flush()
+        handle.seek(0)
+        if os.name=='nt':
+            import msvcrt
+            lock=lambda:msvcrt.locking(handle.fileno(),msvcrt.LK_NBLCK,1)
+            unlock=lambda:msvcrt.locking(handle.fileno(),msvcrt.LK_UNLCK,1)
+        else:
+            import fcntl
+            lock=lambda:fcntl.flock(handle.fileno(),fcntl.LOCK_EX|fcntl.LOCK_NB)
+            unlock=lambda:fcntl.flock(handle.fileno(),fcntl.LOCK_UN)
+        try:lock()
+        except OSError as error:
+            raise ValueError('Prospective evidence writer is busy; retry the same input') from error
+        try:yield
+        finally:unlock()
+
+
+def atomic_create_json(path,payload):
+    """Publish a fully flushed file without exposing partial JSON or overwriting."""
+    path.parent.mkdir(parents=True,exist_ok=True)
+    descriptor,name=tempfile.mkstemp(prefix='.pending-',suffix='.tmp',dir=path.parent)
+    temporary=Path(name)
+    try:
+        with os.fdopen(descriptor,'w',encoding='utf-8') as handle:
+            json.dump(payload,handle,indent=2,allow_nan=False)
+            handle.flush();os.fsync(handle.fileno())
+        # Atomic hard-link creation fails if another process already committed.
+        os.link(temporary,path)
+    finally:temporary.unlink(missing_ok=True)
+
+
+def validate_source_receipt(receipt,input_path,now,*,outcomes=False):
+    if not isinstance(receipt,dict) or receipt.get('source')!=SOURCE_NAME:
+        raise ValueError('Source receipt for Google Calendar + Google Sheets required')
+    for field in ['snapshot_sha256','feature_input_sha256']:
+        if not re.fullmatch('[0-9a-f]{64}',str(receipt.get(field,''))):
+            raise ValueError('Source receipt requires valid SHA256 fingerprints')
+    if digest(input_path)!=receipt['feature_input_sha256']:
+        raise ValueError('Source receipt and exact predictor/label input differ')
+    extracted=timestamp(receipt['extracted_at_utc'])
+    if extracted>timestamp(now):raise ValueError('Source extraction cannot be in the future')
+    minimum=timestamp(receipt.get('source_extraction_min_at_utc',extracted))
+    maximum=timestamp(receipt.get('source_extraction_max_at_utc',extracted))
+    if minimum>maximum or maximum!=extracted:
+        raise ValueError('Source extraction receipt ordering differs')
+    if not outcomes:
+        generated=timestamp(receipt['prediction_generated_at_utc'])
+        if not extracted<=generated<=timestamp(now):
+            raise ValueError('Source extraction must finish before prediction generation')
+        if not isinstance(receipt.get('run_id'),str) or not receipt['run_id'].strip():
+            raise ValueError('Source receipt requires a pipeline run identifier')
+    return extracted
 
 
 def prepare_scoring_frame(raw,preparation=None):
@@ -88,7 +160,8 @@ def validate_prediction_times(frame,manifest,now):
             raise ValueError('Prediction/snapshot timing violates prospective availability')
         if (now-prediction).total_seconds()>300:
             raise ValueError('Historical backfill cannot be presented as prospective scoring')
-        if not service_start<=service_end<=prediction or (prediction-service_end).total_seconds()>300:
+        if (not service_start<=service_end<=prediction or (prediction-service_end).total_seconds()>300
+                or (now-service_end).total_seconds()>300):
             raise ValueError('Score must be recorded within five minutes after Calendar service end')
         if service_start.astimezone(LOCAL).date()!=row['anchor_date'].date():
             raise ValueError('Calendar service start must match the local anchor date')
@@ -193,33 +266,103 @@ def verify(output):
     return {'rows':len(frame),'max_probability_difference':differences,'outcome_required_for_scoring':False}
 
 
-def score(output,input_path,log_dir):
+def score(output,input_path,log_dir,*,source_receipt=None):
+    log_dir=private_path(log_dir)
     configure_contracts(False);manifest,models=load_bundle(output)
     frame=prepare_scoring_frame(b.load_dataset_input(input_path),manifest.get('preparation'))
     now=datetime.now(timezone.utc)
-    validate_prediction_times(frame,manifest,now)
+    extracted=validate_source_receipt(source_receipt,input_path,now)
+    generated=timestamp(source_receipt['prediction_generated_at_utc'])
+    for row in frame.to_dict('records'):
+        if timestamp(row['prediction_at'])!=generated or not extracted<=timestamp(row['feature_snapshot_at'])<=generated:
+            raise ValueError('Logged prediction and feature snapshot must match source receipt timing')
+        if generated.astimezone(LOCAL).date()>row['anchor_date'].date():
+            raise ValueError('Prediction must precede the first local day of the callback outcome window')
     for name,artifact in models.items():
         frame[name]=artifact_probability(artifact,frame)
-    feature_columns=sorted({c for info in manifest['models'].values() for c in info['features']})
+        if not np.isfinite(frame[name]).all() or not frame[name].between(0,1).all():
+            raise ValueError('Scoring produced an invalid probability')
+    feature_columns=sorted({c for info in manifest['models'].values() for c in info['features']}
+      | {'service_number','pest_distinct_known_types','normalized_pest_category'})
     rows=json.loads(frame[KEYS+['address_hash','prediction_at','feature_snapshot_at','service_start_at','service_end_at']+feature_columns+list(models)].to_json(orient='records',date_format='iso'))
-    pending=[]
-    for row in rows:
-        key='|'.join(str(row[k]) for k in KEYS)
-        path=log_dir/(hashlib.sha256(key.encode()).hexdigest()+'.json')
-        if path.exists():
-            raise ValueError('Prediction already logged; immutable records cannot be overwritten')
-        record={'logged_at_utc':now.isoformat(),'bundle_sha256':digest(output/'bundle.json'),
-          'row':row,'label_status':'awaiting_calendar_30d_outcome'}
-        record['record_sha256']=record_digest(record)
-        pending.append((path,record))
-    log_dir.mkdir(parents=True,exist_ok=True)
-    for path,record in pending:
-        with path.open('x',encoding='utf-8') as handle:
-            json.dump(record,handle,indent=2,allow_nan=False)
-    return {'logged_rows':len(pending),'models':list(models),'performance':'not_available_until_mature_outcomes'}
+    pending=[];existing_count=0
+    with append_lock(log_dir):
+        # Inference/lock acquisition can cross the five-minute or midnight
+        # boundary. Timestamp the actual commit phase and validate it again.
+        now=datetime.now(timezone.utc)
+        for row in rows:
+            key='|'.join(str(row[k]) for k in KEYS)
+            path=log_dir/(hashlib.sha256(key.encode()).hexdigest()+'.json')
+            record={'schema_version':2,'logged_at_utc':now.isoformat(),'bundle_sha256':digest(output/'bundle.json'),
+              'source_receipt':source_receipt,'row':row,'label_status':'awaiting_calendar_30d_outcome'}
+            record['record_sha256']=record_digest(record)
+            if path.exists():
+                prior=json.loads(path.read_text(encoding='utf-8'))
+                if prior.get('record_sha256')!=record_digest(prior):
+                    raise ValueError('Existing prospective record integrity failure')
+                # Idempotent retries preserve the FIRST timestamp and evidence.
+                fields=['schema_version','bundle_sha256','source_receipt','row','label_status']
+                if any(prior.get(field)!=record.get(field) for field in fields):
+                    raise ValueError('Prediction already logged with different immutable evidence')
+                earlier=pd.DataFrame([row]);earlier.anchor_date=pd.to_datetime(earlier.anchor_date)
+                validate_prediction_times(earlier,manifest,prior['logged_at_utc'])
+                existing_count+=1
+                continue
+            one=pd.DataFrame([row]);one.anchor_date=pd.to_datetime(one.anchor_date)
+            validate_prediction_times(one,manifest,now)
+            if now.astimezone(LOCAL).date()>one.anchor_date.iloc[0].date():
+                raise ValueError('Prediction commit must precede the first local outcome day')
+            pending.append((path,record))
+        # Validate the entire batch before committing any new row. If a process
+        # dies between atomic commits, rerunning the EXACT input safely resumes.
+        for path,record in pending:atomic_create_json(path,record)
+    return {'logged_rows':len(pending),'already_logged_rows':existing_count,'models':list(models),
+      'performance':'not_available_until_mature_outcomes'}
+
+
+def prepare_labels(output,input_path,source_receipt,labels_path):
+    """Create final labels from a fresh, complete source-derived mature dataset."""
+    labels_path=private_path(labels_path)
+    manifest,_=load_bundle(output);now=datetime.now(timezone.utc)
+    if now.astimezone(LOCAL).date()<pd.Timestamp(manifest['earliest_final_evaluation_date']).date():
+        raise ValueError('Prospective cohort and inclusive 30-day outcomes have not matured')
+    extracted=validate_source_receipt(source_receipt,input_path,now,outcomes=True)
+    last_outcome=pd.Timestamp(manifest['cohort_end'])+pd.Timedelta(days=30)
+    coverage=pd.Timestamp(source_receipt['complete_outcomes_through'])
+    if (source_receipt.get('complete_calendar_inventory') is not True
+            or pd.Timestamp(source_receipt['calendar_coverage_start'])>pd.Timestamp(manifest['cohort_start'])
+            or coverage<last_outcome
+            or coverage.date()>extracted.astimezone(LOCAL).date()-timedelta(days=1)):
+        raise ValueError('Full Calendar inventory and completed-day outcome coverage required')
+    raw=b.load_dataset_input(input_path)
+    required=KEYS+[b.TARGET]
+    if not set(required).issubset(raw):raise ValueError('Source-derived dataset lacks outcome keys')
+    raw=raw.copy();raw.anchor_date=pd.to_datetime(raw.anchor_date).dt.normalize()
+    raw=raw[raw.anchor_date.between(pd.Timestamp(manifest['cohort_start']),pd.Timestamp(manifest['cohort_end']))]
+    if raw[required].isna().any().any() or raw.duplicated(KEYS).any():
+        raise ValueError('Unresolved or duplicate Calendar cohort outcomes')
+    if not all(type(value) in [bool,np.bool_] for value in raw[b.TARGET]):
+        raise ValueError('Outcome labels must be resolved true/false; unknown is not negative')
+    if 'outcome_end_date' in raw and not pd.to_datetime(raw.outcome_end_date).eq(raw.anchor_date+pd.Timedelta(days=30)).all():
+        raise ValueError('Source-derived outcome horizon differs from the frozen 30-day target')
+    if raw.empty:raise ValueError('No complete prospective cohort anchors in source dataset')
+    truth=raw[required].copy();truth.sales_record_id=truth.sales_record_id.astype(str)
+    truth.anchor_date=truth.anchor_date.dt.strftime('%Y-%m-%d')
+    labels={'schema_version':2,'date_authority':'Calendar','cohort_complete':True,
+      'cohort_start':manifest['cohort_start'],'cohort_end':manifest['cohort_end'],
+      'calendar_coverage_through':coverage.strftime('%Y-%m-%d'),'expected_cohort_anchors':len(truth),
+      'source_receipt':source_receipt,'prepared_at_utc':now.isoformat(),
+      'records':json.loads(truth.to_json(orient='records'))}
+    labels['record_sha256']=record_digest(labels)
+    with append_lock(labels_path.parent):
+        if labels_path.exists():raise ValueError('Prepared prospective labels already exist')
+        atomic_create_json(labels_path,labels)
+    return {'labels_path':str(labels_path),'complete_cohort_anchors':len(truth),
+      'positive_anchors':int(raw[b.TARGET].sum()),'source_input_sha256':digest(input_path)}
 
 
 def evaluate(output,labels_path,log_dir):
+    private_path(output);log_dir=private_path(log_dir)
     manifest,models=load_bundle(output);now=datetime.now(timezone.utc)
     if now.astimezone(LOCAL).date()<pd.Timestamp(manifest['earliest_final_evaluation_date']).date():
         raise ValueError('Prospective cohort and inclusive 30-day outcomes have not matured')
@@ -232,6 +375,24 @@ def evaluate(output,labels_path,log_dir):
     last_outcome=pd.Timestamp(manifest['cohort_end'])+pd.Timedelta(days=30)
     if pd.Timestamp(labels['calendar_coverage_through'])<last_outcome:
         raise ValueError('Calendar coverage is incomplete for the full outcome window')
+    if manifest.get('version','').startswith('prospective_callback_v2'):
+        receipt=labels.get('source_receipt',{})
+        if labels.get('record_sha256')!=record_digest(labels):
+            raise ValueError('Prepared outcome labels changed after source derivation')
+        if (labels.get('schema_version')!=2 or receipt.get('source')!=SOURCE_NAME
+                or receipt.get('complete_calendar_inventory') is not True
+                or labels.get('cohort_start')!=manifest['cohort_start']
+                or labels.get('cohort_end')!=manifest['cohort_end']
+                or pd.Timestamp(receipt.get('calendar_coverage_start','2100-01-01'))>pd.Timestamp(manifest['cohort_start'])
+                or pd.Timestamp(receipt.get('complete_outcomes_through','1900-01-01'))<last_outcome):
+            raise ValueError('Source-derived prospective v2 labels and coverage receipt required')
+        for field in ['snapshot_sha256','feature_input_sha256']:
+            if not re.fullmatch('[0-9a-f]{64}',str(receipt.get(field,''))):
+                raise ValueError('Outcome source fingerprints required')
+        extracted=timestamp(receipt['extracted_at_utc'])
+        if (extracted>now or pd.Timestamp(labels['calendar_coverage_through']).date()>
+                extracted.astimezone(LOCAL).date()-timedelta(days=1)):
+            raise ValueError('Outcome coverage must contain completed days before source extraction')
     records=[]
     for path in sorted(log_dir.glob('*.json')):
         entry=json.loads(path.read_text())
@@ -239,11 +400,24 @@ def evaluate(output,labels_path,log_dir):
             continue
         if entry.get('record_sha256')!=record_digest(entry) or b.TARGET in entry['row']:
             raise ValueError('Prospective prediction record changed or included an outcome')
+        if manifest.get('version','').startswith('prospective_callback_v2'):
+            receipt=entry.get('source_receipt',{})
+            if entry.get('schema_version')!=2 or receipt.get('source')!=SOURCE_NAME:
+                raise ValueError('Source-linked prospective v2 prediction receipt required')
+            extracted=timestamp(receipt['extracted_at_utc'])
+            prediction=timestamp(entry['row']['prediction_at'])
+            if (not extracted<=timestamp(entry['row']['feature_snapshot_at'])<=prediction
+                    or timestamp(receipt['prediction_generated_at_utc'])!=prediction
+                    or prediction.astimezone(LOCAL).date()>pd.Timestamp(entry['row']['anchor_date']).date()
+                    or timestamp(entry['logged_at_utc']).astimezone(LOCAL).date()>pd.Timestamp(entry['row']['anchor_date']).date()):
+                raise ValueError('Prospective source/prediction timing differs')
         one=pd.DataFrame([entry['row']]);one.anchor_date=pd.to_datetime(one.anchor_date)
         validate_prediction_times(one,manifest,entry['logged_at_utc'])
         records.append(entry['row'])
     if not records:
         raise ValueError('No prospectively logged anchors; historical backfill is not an evaluation')
+    if type(labels.get('expected_cohort_anchors')) is not int or len(labels['records'])!=labels['expected_cohort_anchors']:
+        raise ValueError('Calendar outcome records and declared cohort size differ')
     if len(records)!=labels['expected_cohort_anchors']:
         raise ValueError('Prediction logging coverage does not match the complete Calendar cohort')
     if not all(type(row.get(b.TARGET)) is bool for row in labels['records']):
@@ -255,6 +429,7 @@ def evaluate(output,labels_path,log_dir):
     frame=frame.merge(truth[KEYS+[b.TARGET]],on=KEYS,how='outer',validate='one_to_one',indicator=True)
     if not frame['_merge'].eq('both').all():
         raise ValueError('Prospective labels and logged anchors differ')
+    frame=frame.sort_values(KEYS,kind='stable').reset_index(drop=True)
     frame['outcome_end_date']=frame.anchor_date+pd.Timedelta(days=30)
     frame['validation_group']=b.connected_validation_groups(frame)
     results={};predictions={}
@@ -275,22 +450,32 @@ def evaluate(output,labels_path,log_dir):
       'limits':['Complete-source coverage is a declared source contract, not proof of biological recurrence.',
         'Known customers may appear in both historical training and prospective services.',
         'The cohort must not be used to retune thresholds, feature sets or training emphasis.']}
-    result_path.write_text(json.dumps(result,indent=2,allow_nan=False))
+    with append_lock(output):
+        if result_path.exists():raise ValueError('Final prospective evaluation already recorded')
+        atomic_create_json(result_path,result)
     return result
 
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('mode',choices=['freeze','verify','score','evaluate'])
+    p.add_argument('mode',choices=['freeze','verify','score','prepare-labels','evaluate'])
     p.add_argument('--bundle-dir',type=Path,default=DEFAULT_OUTPUT)
     p.add_argument('--input-json',type=Path)
+    p.add_argument('--source-receipt',type=Path)
+    p.add_argument('--output-json',type=Path)
     p.add_argument('--log-dir',type=Path,default=b.ROOT/'outputs/cp2-v2/prospective_callback_logs')
     args=p.parse_args()
     if args.mode=='freeze':result=freeze(args.bundle_dir)
     elif args.mode=='verify':result=verify(args.bundle_dir)
     elif args.mode=='score':
-        if not args.input_json:p.error('score requires --input-json')
-        result=score(args.bundle_dir,args.input_json,args.log_dir)
+        if not args.input_json or not args.source_receipt:p.error('score requires --input-json and --source-receipt')
+        result=score(args.bundle_dir,args.input_json,args.log_dir,
+          source_receipt=json.loads(args.source_receipt.read_text(encoding='utf-8')))
+    elif args.mode=='prepare-labels':
+        if not args.input_json or not args.source_receipt or not args.output_json:
+            p.error('prepare-labels requires --input-json, --source-receipt and --output-json')
+        result=prepare_labels(args.bundle_dir,args.input_json,
+          json.loads(args.source_receipt.read_text(encoding='utf-8')),args.output_json)
     else:
         if not args.input_json:p.error('evaluate requires Calendar outcomes in --input-json')
         result=evaluate(args.bundle_dir,args.input_json,args.log_dir)

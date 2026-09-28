@@ -3,7 +3,8 @@
 Reviewed against the CP1 proposal `Thevesh AL Chandran_24017717_proposal.pdf`,
 the current `planning/cp2_scope.md`, and the deployed dbt/Python structure on
 15 September 2026. The proposal is historical context; the current scope and
-owner-confirmed operating rules take precedence.
+owner-confirmed operating rules take precedence. Current updates were reviewed
+on 28 September 2026; old dated evidence below remains historical context.
 
 ## Objective coverage
 
@@ -11,9 +12,9 @@ owner-confirmed operating rules take precedence.
 |---|---|---|---|
 | Review BI, pest decision-support, service-quality, weather-risk, spatial and explainable methods | Proposal literature review, method notes, project scope and interpretation rules are preserved | In progress as a report activity | Finish the final literature/method discussion and connect each chosen method to measured project evidence |
 | Design a weather-aware architecture integrating Sheets, Calendar, service, claims, refunds, payments, upsell and weather | Live Sheets/Calendar inventory; BigQuery Bronze/Silver/Gold/Quality layers; source authority rules; sanitized geocoding and Open-Meteo enrichment | Implemented for the current prototype | Add the production run log, last-success publication rule and hosted execution |
-| Develop a tested CP2 ELT prototype with contracts and quality checks | Python extraction/loaders, preserved Bronze snapshots, dbt models/tests, matching regression tests, spatial/weather checks and local tests | Implemented locally and in BigQuery | One integrated API-to-Gold command, scheduled execution, failure recovery and refresh evidence |
+| Develop a tested CP2 ELT prototype with contracts and quality checks | Python extraction/loaders, preserved Bronze snapshots, dbt models/tests, matching regression tests, spatial/weather checks and local tests; local API-to-temporary-BigQuery model scoring and failure-preserving run log | Local model path implemented; Gold refresh remains pinned | Governed fresh-source API-to-Gold release, hosted execution and unattended credential recovery |
 | Implement descriptive/diagnostic and selected predictive/prescriptive indicators | Service/package warranty marts, monthly source-record marts, recurrence/scheduling/refund/package-fit/difficulty marts, historical weather-lag features, property-level DBSCAN sensitivity, and a time-held-out weather/team/operational model comparison | Implemented as a non-production feasibility prototype | Add the recommendation decision log; predictive release remains rejected until stronger outcome and treatment-quality evidence exists |
-| Evaluate pipeline, dashboard usability, insight usefulness and output reliability | Row/column preservation, reconciliation and dbt/Python tests; explicit limitation documentation | Partially implemented | Manual KPI reconciliation, Looker usability tasks/feedback, privacy release check, refresh test, and model/cluster evaluation evidence |
+| Evaluate pipeline, dashboard usability, insight usefulness and output reliability | Row/column preservation, reconciliation and dbt/Python tests; 12 independent business KPI row/month checks against real pinned Bronze/Gold sources; live model refresh test | Partially implemented | Reconcile newly pinned Gold after refresh, Looker usability tasks/feedback, privacy release check and complete future model/cluster evaluation evidence |
 
 ## What is already aligned
 
@@ -67,23 +68,28 @@ owner-confirmed operating rules take precedence.
    reporting is possible; predictive fit must wait for a defensible label.
    Prospect/B2B funnel reporting is likewise descriptive until the link, booking
    and outcome semantics are reconciled.
-6. **Predictive model:** the selected v3 target is a recorded Calendar warranty
-   signal within 30 days after the third service for eligible residential 3x
-   packages. Commercial clients and residential 1x packages are excluded. The
-   selected logistic model averages ROC AUC 0.519 and average precision 0.254
-   across three pre-2026 folds. The 401-row complete-weather 2026 diagnostic has
-   ROC AUC 0.547 and average precision 0.293 against 26.2% prevalence. This weak
-   result supports experimental review ranking only; the high-risk tier remains
-   disabled.
+6. **Predictive model:** corrected v5 ExtraTrees predicts recorded corrective
+   Calendar callbacks during days 1–30 after a matched paid service. It is
+   distinct from warranty entitlement; recorded commercial callbacks remain
+   valid outcomes. On a newer 100-service retrospective test, its top 20 risk
+   scores found four of five positive windows, versus three for the corrected
+   reference (AUC 0.891 versus 0.813). The interval includes no gain. A local
+   live feed now scores recent services; the first run produced 205 private
+   scores but zero prospective logs. Complete future outcomes and reliable
+   first-service detection have not been established. [Current guide](CP2_START_HERE.md).
 7. **Recommendation log:** no management-action log has been published yet.
    Future rules must store the reason, evidence, confidence/review label, action
    and later outcome instead of embedding unexplained text in a chart.
-8. **Refresh/deployment:** Cloud Run Jobs + Scheduler, GitHub Actions CI,
-   unattended OAuth handling, a last-success indicator, rollback/retention and
-   Looker Studio are planned but not deployed.
-9. **Evaluation:** automated tests are evidence of pipeline correctness, not
-   evidence of dashboard usefulness. Manual spreadsheet reconciliation, user
-   tasks/feedback and a privacy-safe release check remain required.
+8. **Refresh/deployment:** Local read-only model refresh, two-minute Windows
+   Calendar trigger, SHA-verified private run logs, exact-retry prospective
+   logging and last-success indicator are implemented. Hosted Cloud Run Jobs +
+   Scheduler, GitHub Actions CI, unattended OAuth handling, permanent fresh
+   Gold publication and Looker Studio are not deployed.
+9. **Evaluation:** 12 business KPI checks independently reconcile real pinned
+   Bronze and Gold rows/monthly totals. Fresh Sheets differ from pinned Gold,
+   so those totals are not current. Automated tests and reconciliation do not
+   establish dashboard usefulness; user tasks/feedback, the refreshed Gold
+   acceptance check and a privacy-safe release check remain required.
 10. **Flood/current-warning context:** observed nearby Copernicus GFM context and
     separate GDACS regional flood reports now enrich the experimental callback
     dataset. Their 35 comparisons did not improve development selection; only
@@ -100,19 +106,18 @@ The active scope selects BigQuery, dbt Core, Cloud Run Jobs + Cloud Scheduler,
 GitHub Actions CI, Looker Studio, one defensible predictive experiment and
 DBSCAN. A proposal option is not evidence that the component has been built.
 
-## Safe implementation order from this audit
+## Remaining acceptance order
 
-1. Live-validate the published recurrence-window and scheduling-capacity marts
-   with owner examples and explicit denominators/package-property safeguards.
-2. Validate separate treatment-difficulty components before selecting weights
-   and testing the sensitivity of any composite score.
-3. Validate the refund and descriptive upsell/package marts; keep unsupported
-   predictions flagged as unavailable.
-4. Freeze the predictive target, run the baseline and held-out evaluation, or
-   record an explicit infeasibility decision with evidence.
-5. Add the integrated refresh/run log and failure-preserving publication path.
-6. Wire Looker Studio to approved Gold views, then perform manual KPI checks,
-   privacy review and user testing.
+1. Monitor local future prediction coverage through the frozen cohort. Retain
+   missed windows explicitly and evaluate complete Calendar outcomes only after
+   26 November; no backfilled score counts as future evidence.
+2. Refresh the governed Bronze/Silver/Gold source pins, reconcile the resulting
+   current KPIs, and review recurrence, scheduling, treatment-difficulty,
+   refund and upsell examples at their correct grains with the owner.
+3. Harden hosted execution, unattended read-only sign-in recovery, CI, retention
+   and privacy review. The local runner depends on this PC being awake.
+4. Build and test the deferred Looker Studio dashboard using approved reporting
+   views after the core data and model acceptance checks.
 
 This audit is a coverage checklist, not a claim that the remaining work is
 complete. It prevents the dashboard from implying unique customers, completed

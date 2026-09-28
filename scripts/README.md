@@ -8,8 +8,13 @@ Start with [the model guide](../planning/CP2_START_HERE.md) before running an ex
 |---|---|
 | `cp2_model.py status` | Read the current corrected v5 model pointer, training coverage and evaluation limits |
 | `cp2_model.py verify` | Replay the current corrected future bundle and check its hashes |
+| `cp2_pipeline.py run`, `resume --run-id <id>`, `status` | Live read-only Google→temporary BigQuery→private scoring, stage journal, recovery and last-success integrity |
+| `cp2_pipeline_tick.py` | Calendar-only two-minute trigger for just-ending service predictions |
+| `install_cp2_local_runner.ps1 -Mode Status/Install/Remove` | Local interactive Windows Task Scheduler runner for the frozen future cohort; PC must be awake |
+| `validate_business_kpis.py --output-dir outputs/<private-run>` | Independent pinned-Bronze vs deployed Gold KPI checks and optional fresh Sheets drift report |
 | `cp2_model.py predict --input-json <private predictors> --output-csv outputs/<private scores>.csv` | Generate risk scores without manufacturing observed outcomes; this does not register prospective evidence |
-| `cp2_model.py log-prospective --input-json <private predictors>` | Log the current frozen comparison with strict timing gates; the live feature feed is not connected |
+| `cp2_model.py log-prospective --input-json <private predictors> --source-receipt <private receipt>` | Log the current frozen comparison with strict timing and immutable source evidence |
+| `cp2_model.py prepare-prospective-labels --input-json <mature dataset> --source-receipt <private receipt> --output-json <private labels>` | Prepare complete source-derived cohort labels after 26 November |
 | `cp2_model.py evaluate-prospective --input-json <private Calendar labels>` | Evaluate the mature frozen cohort once, with complete coverage, no earlier than 27 November |
 | `compare_callback_candidates_v2.py` | Reproduce the corrected v5 fixed candidate selection and artifact generation |
 | `refresh_callback_validation.py` | Derive a separate corrected candidate input from refreshed source evidence |

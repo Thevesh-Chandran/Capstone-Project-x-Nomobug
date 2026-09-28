@@ -12,13 +12,14 @@ On 100 newer services with five positive callback windows, reviewing the highest
 
 On the larger, previously inspected 2026 diagnostic, v5 found 103 of 179 positives in 395 reviews; the corrected reference found 97. First-service detection remains weak: zero of eleven at that review budget. See the full report for precision, AP and uncertainty.
 
-The final future-test refit uses **all 5,695 mature services, including 2,075 from 2026**. Its training scores are not accuracy evidence. The live feature feed is not connected yet.
+The final future-test refit uses **all 5,695 mature services, including 2,075 from 2026**. Its training scores are not accuracy evidence. A local read-only Google → temporary BigQuery → model feed is now connected; it is not a hosted service. The latest 28 September live run generated **205 private scores**, with **zero prospective logs** because no eligible service had just ended. Exact sanitized-address reuse of an existing trusted geocode reduced missing coordinates from 103 to **39** of those 205 anchors and raised complete prior-30-day weather coverage from 102 to **166**. This is a feature-coverage gain, not measured accuracy. [Operations and future-test guide](CP2_LIVE_PIPELINE_OPERATIONS.md).
 
 ## Use one command
 
 ```powershell
 .\.venv\Scripts\python.exe scripts\cp2_model.py status
 .\.venv\Scripts\python.exe scripts\cp2_model.py verify
+.\.venv\Scripts\python.exe scripts\cp2_pipeline.py status
 ```
 
 The command also supports `predict`, `log-prospective` and `evaluate-prospective`. [Runnable commands](../scripts/README.md). The primary serialized model is `outputs/cp2-v2/prospective_callback_v2/challenger_all_history.joblib`; predictions and model binaries stay in ignored local outputs.
@@ -31,6 +32,8 @@ The command also supports `predict`, `log-prospective` and `evaluate-prospective
 | [config/](../config/README.md) | Current pointer and reproducible experiment evidence |
 | [scripts/](../scripts/README.md) | Current entry point and extraction/training tools |
 | [Recording guide](CP2_CALLBACK_RECORDING_GUIDE.md) | Better future callback and treatment data |
+| [Live pipeline operations](CP2_LIVE_PIPELINE_OPERATIONS.md) | Local refresh, failure recovery, timed logging, and final outcome test |
+| [Business KPI validation](CP2_BUSINESS_KPI_VALIDATION.md) | Source-backed checks and known KPI freshness gap |
 | [archive/](archive/README.md) | Completed experiments and historical setup |
 | [deferred/](deferred/README.md) | Dashboard material for later |
 

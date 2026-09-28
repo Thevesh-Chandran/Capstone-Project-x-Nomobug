@@ -34,8 +34,9 @@ def predict(bundle,input_path,output):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode',choices=['status','verify','predict','log-prospective','evaluate-prospective'])
+    parser.add_argument('mode',choices=['status','verify','predict','log-prospective','prepare-prospective-labels','evaluate-prospective'])
     parser.add_argument('--input-json',type=Path);parser.add_argument('--output-csv',type=Path)
+    parser.add_argument('--source-receipt',type=Path);parser.add_argument('--output-json',type=Path)
     args=parser.parse_args();registry,bundle=current_bundle()
     if args.mode=='status':result=registry
     elif args.mode=='verify':result=p.verify(bundle)
@@ -44,8 +45,15 @@ def main():
         result=predict(bundle,args.input_json,args.output_csv)
     else:
         if not args.input_json:parser.error('input JSON required')
-        logs=p.b.ROOT/'outputs/cp2-v2/prospective_callback_v2_logs'
-        result=p.score(bundle,args.input_json,logs) if args.mode=='log-prospective' else p.evaluate(bundle,args.input_json,logs)
+        logs=p.b.ROOT/'outputs/cp2-v2/live_pipeline/prospective_logs'
+        if args.mode in ['log-prospective','prepare-prospective-labels']:
+            if not args.source_receipt:parser.error('source receipt JSON required')
+            receipt=json.loads(args.source_receipt.read_text(encoding='utf-8'))
+            if args.mode=='log-prospective':result=p.score(bundle,args.input_json,logs,source_receipt=receipt)
+            else:
+                if not args.output_json:parser.error('prepare-prospective-labels requires --output-json')
+                result=p.prepare_labels(bundle,args.input_json,receipt,args.output_json)
+        else:result=p.evaluate(bundle,args.input_json,logs)
     print(json.dumps(result,indent=2,allow_nan=False))
 
 
