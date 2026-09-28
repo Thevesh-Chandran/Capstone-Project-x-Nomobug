@@ -89,6 +89,7 @@ if ($MatchingBudgets.Count -eq 1) {
 Invoke-Gcloud @('services','enable','run.googleapis.com','cloudscheduler.googleapis.com',
     'secretmanager.googleapis.com','artifactregistry.googleapis.com',
     'iam.googleapis.com','iamcredentials.googleapis.com','sts.googleapis.com',
+    'cloudresourcemanager.googleapis.com',
     '--project', $Project,'--quiet')
 
 foreach ($id in @('cp2-reporting-job','cp2-reporting-scheduler','cp2-reporting-deployer')) {

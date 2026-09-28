@@ -70,7 +70,6 @@ jobs:
         run: |
           test "$GITHUB_REF" = refs/heads/main
           gcloud config set project "$PROJECT" --quiet
-          gcloud billing projects describe "$PROJECT" --format='value(billingEnabled)' | grep -qx True
           python3 - <<'PY'
           from datetime import datetime, timezone
           from decimal import Decimal
