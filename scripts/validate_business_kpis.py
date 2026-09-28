@@ -216,10 +216,13 @@ def calendar_category(summary: str, status: str, review: str | None = None) -> s
 
 
 def expected_calendar(raw: list[dict], reviews: list[dict]) -> list[dict]:
-    overrides = {(int(r["calendar_event_row"]), r["event_id"]): r["review_label"] for r in reviews}
+    overrides = {r["event_identity_hash"]: r["review_label"] for r in reviews}
+    if len(overrides) != len(reviews):
+        raise ValueError("Duplicate Calendar review identity")
     output = []
     for row in raw:
-        label = overrides.get((int(row["calendar_event_row"]), row["event_id"]))
+        identity = hashlib.sha256(f"{row['calendar_id']}|{row['event_id']}".encode()).hexdigest()
+        label = overrides.get(identity)
         category = calendar_category(row["summary"], row["status"], label)
         if row["status"] != "confirmed" or category not in ("service", "warranty", "extra_visit_candidate", "complimentary"):
             continue
@@ -263,8 +266,16 @@ def expected_prospects(raw: list[dict]) -> list[dict]:
 
 
 class Reader:
-    def __init__(self, client: Any, project: str):
+    def __init__(self, client: Any, project: str, *, silver_schema: str = "silver",
+                 gold_schema: str = "gold", serials_table: str | None = None):
         self.client, self.project = client, project
+        for schema in (silver_schema, gold_schema):
+            if not re.fullmatch(r"[a-z][a-z0-9_]*", schema):
+                raise ValueError("Invalid reporting schema")
+        self.silver_schema, self.gold_schema = silver_schema, gold_schema
+        if serials_table is not None and not re.fullmatch(r"payments_date_serials_[0-9a-f]{64}", serials_table):
+            raise ValueError("Invalid payment serial snapshot")
+        self.serials_table = serials_table
         self.jobs: list[dict] = []
         self.lineage: list[dict] = []
 
@@ -283,7 +294,7 @@ class Reader:
         return rows
 
     def source(self, silver_view: str, prefix: str) -> str:
-        view = self.client.get_table(f"{self.project}.silver.{silver_view}")
+        view = self.client.get_table(f"{self.project}.{self.silver_schema}.{silver_view}")
         if view.table_type != "VIEW":
             raise ValueError("Source lineage requires a deployed Silver view")
         matches = set(re.findall(rf"\b{prefix}_[0-9a-f]{{64}}\b", view.view_query or ""))
@@ -313,17 +324,21 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
     }
     import yaml
     sources = yaml.safe_load((ROOT / "dbt/models/operational_sources.yml").read_text(encoding="utf-8"))
-    identifier = next(t["identifier"] for s in sources["sources"] if s["name"] == "operational_bronze"
+    configured = next(t["identifier"] for s in sources["sources"] if s["name"] == "operational_bronze"
                       for t in s["tables"] if t["name"] == "payments_date_serials")
+    default_match = re.search(r"payments_date_serials_[0-9a-f]{64}", configured)
+    if default_match is None:
+        raise ValueError("No default payment serial snapshot")
+    identifier = reader.serials_table or default_match.group()
     source_names["serials"] = reader.snapshot(identifier)
     raw = {}
     selections = {
-        "sales": [3, 4, 7, 13, 14, 26, 28], "payments": [1, 2, 3],
+        "sales": [3, 4, 7, 9, 13, 14, 26, 28], "payments": [1, 2, 3],
         "refund": [1, 2, 7, 10], "claims": [1, 2, 7], "prospects": [2, 8, 12, 13], "b2b": [3, 7],
     }
     for source, positions in selections.items():
         raw[source] = reader.read(source_names[source], ["source_sheet_row"] + [f"source_column_{p:03}" for p in positions])
-    raw["calendar"] = reader.read(source_names["calendar"], ["calendar_event_row", "event_id", "status", "summary", "start_raw"])
+    raw["calendar"] = reader.read(source_names["calendar"], ["calendar_event_row", "calendar_id", "event_id", "status", "summary", "start_raw"])
     raw["serials"] = reader.read(source_names["serials"], ["source_sheet_row", "payment_date_display_raw", "unformatted_value", "unformatted_type"])
     with (ROOT / "dbt/seeds/sale_disposition_overrides.csv").open(encoding="utf-8", newline="") as stream:
         cancellations = {r["sales_record_id"] for r in csv.DictReader(stream)}
@@ -341,7 +356,9 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
         "prospects": ("silver.prospects_2026", "source_sheet_row", ["first_reply_date", "conversation_status", "remark_is_exact_won", "row_class"]),
     }
     for name, (table, key, columns) in specifications.items():
-        actual[name] = reader.read(f"{reader.project}.{table}", [key] + columns)
+        schema, table_name = table.split(".", 1)
+        active_schema = reader.gold_schema if schema == "gold" else reader.silver_schema
+        actual[name] = reader.read(f"{reader.project}.{active_schema}.{table_name}", [key] + columns)
         selected = [r for r in actual[name] if r["row_class"] == "prospect_candidate"] if name == "prospects" else actual[name]
         checks[f"{name}_source_to_reporting_rows"] = compare_rows(expected[name], selected, key,
                                                                   [c for c in columns if c != "row_class"], name)
@@ -368,7 +385,7 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
             prepared.append(common)
         expected[name] = prepared
         fields = [c for c in prepared[0] if c != "source_sheet_row"] if prepared else []
-        actual[name] = reader.read(f"{reader.project}.gold.{table}", ["source_sheet_row"] + fields)
+        actual[name] = reader.read(f"{reader.project}.{reader.gold_schema}.{table}", ["source_sheet_row"] + fields)
         checks[f"{name}_source_to_reporting_rows"] = compare_rows(prepared, actual[name], "source_sheet_row", fields, name)
     refund_monthly = defaultdict(Counter)
     for source_row, row in zip(raw["refund"], expected["refund"]):
@@ -381,7 +398,7 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
         group["date_review_rows"] += int(named_date(source_row["source_column_001"]) is None)
     names = ["refund_source_rows", "linked_refund_rows", "unmatched_refund_rows", "recorded_complete_rows", "amount_review_rows", "date_review_rows"]
     expected["refund_monthly"] = [{"month": key, **{name: count[name] for name in names}} for key, count in refund_monthly.items()]
-    monthly = reader.read(f"{reader.project}.gold.dashboard_refund_monthly", ["refund_month"] + names)
+    monthly = reader.read(f"{reader.project}.{reader.gold_schema}.dashboard_refund_monthly", ["refund_month"] + names)
     actual["refund_monthly"] = [{"month": month(r["refund_month"]), **{name: r[name] for name in names}} for r in monthly]
     checks["refund_monthly_from_bronze"] = compare_rows(expected["refund_monthly"], actual["refund_monthly"], "month", names, "refund")
     for name, table, date_column, names in (
@@ -389,7 +406,7 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
         ("payments", "payments_monthly_recorded", "payment_month", ["payment_rows", "dated_nonfuture_rows", "recorded_payment_entry_amount_rm"]),
     ):
         expected[f"{name}_monthly"] = monetary_months(expected[name], name, today)
-        monthly = reader.read(f"{reader.project}.gold.{table}", [date_column] + names)
+        monthly = reader.read(f"{reader.project}.{reader.gold_schema}.{table}", [date_column] + names)
         actual[f"{name}_monthly"] = [{"month": month(r[date_column]), **{n: r[n] for n in names}} for r in monthly]
         checks[f"{name}_monthly_from_bronze"] = compare_rows(expected[f"{name}_monthly"], actual[f"{name}_monthly"], "month", names, name)
     calendar_monthly = defaultdict(Counter)
@@ -403,7 +420,7 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
             group["generic_complimentary_event_rows"] += int(row["event_category"] == "complimentary")
     names = ["scheduled_service_event_rows", "normal_package_service_event_rows", "warranty_claim_event_rows", "generic_complimentary_event_rows"]
     expected["calendar_monthly"] = [{"month": key, **{name: count[name] for name in names}} for key, count in calendar_monthly.items()]
-    monthly = reader.read(f"{reader.project}.gold.dashboard_service_monthly", ["service_month"] + names)
+    monthly = reader.read(f"{reader.project}.{reader.gold_schema}.dashboard_service_monthly", ["service_month"] + names)
     actual["calendar_monthly"] = [{"month": month(r["service_month"]), **{name: r[name] for name in names}} for r in monthly]
     checks["calendar_monthly_from_bronze"] = compare_rows(expected["calendar_monthly"], actual["calendar_monthly"], "month", names, "calendar")
     prospect_monthly = defaultdict(Counter)
@@ -415,13 +432,45 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
         group["exact_won_remark_rows"] += int(row["remark_is_exact_won"])
     names = ["prospect_candidate_rows", "recorded_closed_rows", "recorded_open_rows", "exact_won_remark_rows"]
     expected["prospects_monthly"] = [{"month": key, **{name: count[name] for name in names}} for key, count in prospect_monthly.items()]
-    monthly = reader.read(f"{reader.project}.gold.prospect_reply_monthly_recorded", ["first_reply_month"] + names)
+    monthly = reader.read(f"{reader.project}.{reader.gold_schema}.prospect_reply_monthly_recorded", ["first_reply_month"] + names)
     actual["prospects_monthly"] = [{"month": month(r["first_reply_month"]), **{name: r[name] for name in names}} for r in monthly]
     checks["prospects_monthly_from_bronze"] = compare_rows(expected["prospects_monthly"], actual["prospects_monthly"], "month", names, "prospects")
     expected["b2b"] = [{"source_sheet_row": r["source_sheet_row"], "phone_present_candidate": bool(str(r["source_column_003"] or "").strip()),
                         "status_label": str(r["source_column_007"] or "").strip().upper() or None} for r in raw["b2b"]]
-    actual["b2b"] = reader.read(f"{reader.project}.silver.b2b_follow_up", ["source_sheet_row", "phone_present_candidate", "status_label"])
+    actual["b2b"] = reader.read(f"{reader.project}.{reader.silver_schema}.b2b_follow_up", ["source_sheet_row", "phone_present_candidate", "status_label"])
     checks["b2b_source_annotations"] = compare_rows(expected["b2b"], actual["b2b"], "source_sheet_row", ["phone_present_candidate", "status_label"], "b2b")
+    # Owner-confirmed cases. These source-row anchors are deliberately checked
+    # for their original values so a Sheet insertion cannot silently move the
+    # decision onto another customer. No name or contact value enters summary.
+    sale_rows = {r["source_sheet_row"]: r for r in raw["sales"]}
+    sale_facts = {r["source_sheet_row"]: r for r in actual["sales"]}
+    first, upsell = sale_rows.get(1852), sale_rows.get(1933)
+    linked_ok = bool(first and upsell and
+        first["source_column_009"] and first["source_column_009"] == upsell["source_column_009"] and
+        first["source_column_014"].strip() == "1" and upsell["source_column_014"].strip() == "2" and
+        upsell["source_column_026"].strip().upper() == "UPSELL 2X" and
+        first["source_column_007"] != upsell["source_column_007"] and
+        sale_facts.get(1852, {}).get("package_sessions_recorded") == 1 and
+        sale_facts.get(1933, {}).get("package_sessions_recorded") == 2)
+    review = next((r for r in reviews if r["review_id"] == "WR-003"), None)
+    matching = [r for r in raw["calendar"] if review and
+        hashlib.sha256(f"{r['calendar_id']}|{r['event_id']}".encode()).hexdigest() == review["event_identity_hash"]]
+    linked_ok = linked_ok and review is not None and len(matching) == 1 and (
+        review["review_label"] == "Not a warranty claim" and
+        calendar_category(matching[0]["summary"], matching[0]["status"], review["review_label"]) != "warranty" and
+        next((r for r in actual["calendar"] if r["calendar_event_row"] == matching[0]["calendar_event_row"]),
+             {}).get("warranty_claim_candidate") is False)
+    checks["owner_linked_1x_upsell_2x"] = {"status": "pass" if linked_ok else "fail",
+        "case": "two_paid_sales_rows_and_reviewed_nonwarranty_visit", "source_rows_checked": 2}
+    overrun_rows = [r for r in raw["calendar"] if r["status"] == "confirmed" and
+        re.search(r"\b4\s*/\s*3\b", r["summary"] or "")]
+    actual_calendar = {r["calendar_event_row"]: r for r in actual["calendar"]}
+    overrun_ok = bool(overrun_rows) and all(
+        actual_calendar.get(r["calendar_event_row"], {}).get("warranty_claim_candidate") is True
+        for r in overrun_rows)
+    checks["owner_fourth_visit_after_three"] = {"status": "pass" if overrun_ok else "fail",
+        "case": "confirmed_4_of_3_calendar_titles_are_warranty_signals",
+        "calendar_rows_checked": len(overrun_rows)}
     examples = []
     selectors = [
         ("sales", "cancelled_package", lambda r: not r["include_in_sale_count"]),
@@ -476,14 +525,16 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
         "sales_inferred_close_year_rows": sum(r["closed_date_year_source"].endswith("inferred") for r in expected["sales"]),
     }
     summary = {
-        "schema_version": 1, "as_of_local_date": today.isoformat(), "validation_type": "read_only_bronze_python_vs_deployed_reporting",
+        "schema_version": 1, "as_of_local_date": today.isoformat(),
+        "validation_type": "read_only_bronze_python_vs_selected_reporting",
+        "silver_schema": reader.silver_schema, "gold_schema": reader.gold_schema,
         "status": "pass_with_business_caveats" if all(c["status"] == "pass" for c in checks.values()) else "needs_revision",
         "checks": checks, "totals": primitive(totals), "real_source_examples": examples, "lineage": reader.lineage,
         "maximum_bytes_billed_per_query": MAXIMUM_BYTES_BILLED,
         "bytes_processed": sum(job["bytes_processed"] or 0 for job in reader.jobs),
         "query_count": len(reader.jobs),
         "caveats": [
-            "Validation uses exact deployed immutable snapshots; it does not claim every Sheet or the Calendar warehouse is refreshed to today.",
+            "Validation uses exact selected immutable snapshots; live sources may change after extraction.",
             "Package face value is not earned revenue; payment entries and COMPLETE refund annotations are not bank-verified settlement.",
             "Service monthly counts include future 2026 appointments, consistently with the scheduled/recorded definition; they are not completed treatments.",
             "Formal Sheet claims and Calendar callback signals are different grains and must not be added as one claim count.",
@@ -544,7 +595,9 @@ def fresh_source_drift(evidence: dict, fresh: dict) -> dict:
 
 
 def validate(output_dir: str | Path, fresh_source_path: str | Path | None = None,
-             *, project: str = PROJECT, location: str = LOCATION) -> dict:
+             *, project: str = PROJECT, location: str = LOCATION,
+             silver_schema: str = "silver", gold_schema: str = "gold",
+             serials_table: str | None = None) -> dict:
     """Public API for a pipeline stage; no Google or warehouse mutation."""
     output = private_output(Path(output_dir))
     fresh = None
@@ -557,7 +610,8 @@ def validate(output_dir: str | Path, fresh_source_path: str | Path | None = None
     try:
         if client.get_dataset(f"{project}.bronze").location.lower() != location.lower():
             raise ValueError("Warehouse region mismatch")
-        summary, evidence = run_validation(Reader(client, project), datetime.now(MYT).date())
+        summary, evidence = run_validation(Reader(client, project, silver_schema=silver_schema,
+            gold_schema=gold_schema, serials_table=serials_table), datetime.now(MYT).date())
     finally:
         client.close()
     if fresh is not None:
@@ -572,10 +626,14 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--project", default=PROJECT)
     parser.add_argument("--location", default=LOCATION)
+    parser.add_argument("--silver-schema", default="silver")
+    parser.add_argument("--gold-schema", default="gold")
+    parser.add_argument("--serials-table")
     parser.add_argument("--fresh-source-json", type=Path, help="Optional private Sheets artifact for source freshness comparison")
     parser.add_argument("--output-dir", type=Path, default=ROOT / "outputs/kpi_validation" / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ"))
     args = parser.parse_args(argv)
-    summary = validate(args.output_dir, args.fresh_source_json, project=args.project, location=args.location)
+    summary = validate(args.output_dir, args.fresh_source_json, project=args.project, location=args.location,
+        silver_schema=args.silver_schema, gold_schema=args.gold_schema, serials_table=args.serials_table)
     print(json.dumps({"status": summary["status"], "checks": {name: result["status"] for name, result in summary["checks"].items()},
                       "query_count": summary["query_count"], "bytes_processed": summary["bytes_processed"], "output_dir": str(args.output_dir.resolve())}, indent=2))
     return 0 if summary["status"] == "pass_with_business_caveats" else 1

@@ -212,7 +212,7 @@ models:
       - name: recorded_warranty_signal_rows
         data_tests: [not_null]
   - name: dashboard_ml_evaluation
-    description: "Latest aggregate held-out experiment metrics. Individual scores are not released to Looker."
+    description: "Frozen corrected v5 late-August retrospective holdout aggregates only. Individual scores are not released to Looker; five positive windows make the comparison uncertain."
     columns:
       - name: run_utc
         data_tests: [not_null]
@@ -224,7 +224,23 @@ models:
         data_tests:
           - accepted_values:
               arguments:
-                values: [evaluated_weather_inclusive_not_causal_or_production_ready]
+                values: [retrospective_later_services_not_online_or_production_ready]
+  - name: dashboard_data_quality
+    description: "Aggregate source issue counts with explicit per-source denominators; issue categories may overlap."
+    columns:
+      - name: source_name
+        data_tests: [not_null]
+      - name: issue_code
+        data_tests: [not_null]
+      - name: source_rows
+        data_tests: [not_null]
+  - name: dashboard_source_freshness
+    description: "Validated immutable Bronze extraction timestamps and release run ID from the reporting manifest; no customer fields."
+    columns:
+      - name: source_name
+        data_tests: [not_null]
+      - name: snapshot_table
+        data_tests: [not_null]
   - name: dashboard_spatial_cluster_summary
     description: "DBSCAN 1/2/5 km sensitivity at aggregate cluster grain; not a pest-spread radius or event-coordinate release."
     columns:

@@ -27,7 +27,7 @@ with raw_events as (
         end as event_category
     from classified c
     left join {{ ref('calendar_warranty_review_overrides') }} r
-      on r.calendar_event_row = c.calendar_event_row
+      on r.event_identity_hash = to_hex(sha256(concat(c.calendar_id, '|', c.event_id)))
      and r.event_id = c.event_id
 )
 select

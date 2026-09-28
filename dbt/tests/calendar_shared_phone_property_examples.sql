@@ -4,7 +4,7 @@
 -- link a 3x House & Car service stream to its six-session compound sale.
 -- Syed's House 2 package visit at event 9738 physically took place at House 1;
 -- the title/SALES link and actual Calendar service address are separate facts.
-with expected as (
+with legacy_expected as (
     select 7266 as calendar_event_row, 'CUST1772' as sales_record_id union all
     select 5061, 'CUST1772' union all
     select 5086, 'CUST1772' union all
@@ -21,6 +21,13 @@ with expected as (
     union all select 1134, 'CUST1686'
     union all select 1461, 'CUST1686'
     union all select 9771, 'CUST1686'
+), expected as (
+    select fresh.calendar_event_row, old_case.sales_record_id
+    from legacy_expected old_case
+    left join {{ source('calendar_baseline_bronze', 'events') }} baseline
+      on baseline.calendar_event_row = old_case.calendar_event_row
+    left join {{ ref('calendar_events') }} fresh
+      on fresh.calendar_id = baseline.calendar_id and fresh.event_id = baseline.event_id
 )
 select e.calendar_event_row, e.sales_record_id, m.matched_sales_record_id
 from expected e

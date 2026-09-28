@@ -8,7 +8,7 @@ where recorded_warranty_signal_rows <= 0
 union all
 select 'ml_status_not_explicit'
 from {{ ref('dashboard_ml_evaluation') }}
-where experiment_status != 'evaluated_weather_inclusive_not_causal_or_production_ready'
+where experiment_status != 'retrospective_later_services_not_online_or_production_ready'
 union all
 select 'dbscan_cluster_below_minimum_size'
 from {{ ref('dashboard_spatial_cluster_summary') }}

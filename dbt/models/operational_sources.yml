@@ -5,25 +5,31 @@ sources:
     schema: bronze
     tables:
       - name: b2b
-        identifier: b2b_follow_up_9108505ec89b8d23513fae1a2aba7e0d63466b7ceb1dc1ea99b451167047231d
+        identifier: "{{ var('b2b_snapshot_table', 'b2b_follow_up_9108505ec89b8d23513fae1a2aba7e0d63466b7ceb1dc1ea99b451167047231d') }}"
       - name: sales
-        identifier: sales_6d1d3d3155b4ca3f57df14237b344cc2be163516d7b22f4f8ab1a305de80c2b8
+        identifier: "{{ var('sales_snapshot_table', 'sales_6d1d3d3155b4ca3f57df14237b344cc2be163516d7b22f4f8ab1a305de80c2b8') }}"
       - name: payments
-        identifier: payments_edbb6850cf6e869051a3d067090e04c87b6c0167d7e2881de47f26d3706c21e4
+        identifier: "{{ var('payments_snapshot_table', 'payments_edbb6850cf6e869051a3d067090e04c87b6c0167d7e2881de47f26d3706c21e4') }}"
       - name: payments_date_serials
         # Verified against date/reference cells in the selected PAYMENTS snapshot.
-        identifier: payments_date_serials_8c2ba4b6334166bd4365b51fd0ff73d3315836a21508d0aaacec8e511a1a0690
+        identifier: "{{ var('payments_date_serials_snapshot_table', 'payments_date_serials_8c2ba4b6334166bd4365b51fd0ff73d3315836a21508d0aaacec8e511a1a0690') }}"
       - name: payment_link
-        identifier: payment_link_f040f2944375cbb9d35e39db828c9aeb8c9e30444d6d9f9bbd14fa880611a976
+        identifier: "{{ var('payment_link_snapshot_table', 'payment_link_f040f2944375cbb9d35e39db828c9aeb8c9e30444d6d9f9bbd14fa880611a976') }}"
       - name: warranty_claim
-        identifier: warranty_claim_c20e5659ea3fff3f6e8c7ea5740c0bf6c0590bc8888e01f5128e240f0c9edf13
+        identifier: "{{ var('warranty_claim_snapshot_table', 'warranty_claim_c20e5659ea3fff3f6e8c7ea5740c0bf6c0590bc8888e01f5128e240f0c9edf13') }}"
       - name: commercial_clients
-        identifier: commercial_clients_60e12ac95a426cddd7fdc03c2de5e92337feb525b559260617147e11d58576fd
+        identifier: "{{ var('commercial_clients_snapshot_table', 'commercial_clients_60e12ac95a426cddd7fdc03c2de5e92337feb525b559260617147e11d58576fd') }}"
       - name: refund
-        identifier: refund_e5b24aae95b0502a1221f9c556ac0cc9d90fe58cf8b5823517fad501f59b6cf8
+        identifier: "{{ var('refund_snapshot_table', 'refund_e5b24aae95b0502a1221f9c556ac0cc9d90fe58cf8b5823517fad501f59b6cf8') }}"
       - name: recurring_payments
-        identifier: recurring_payments_5f68eb4fd2c39e1913717dea880bbde75b0cc29c429adc14009c9c0f0cac03c2
+        identifier: "{{ var('recurring_payments_snapshot_table', 'recurring_payments_5f68eb4fd2c39e1913717dea880bbde75b0cc29c429adc14009c9c0cac03c2') }}"
   - name: calendar_bronze
+    database: profound-keel-500007-s4
+    schema: bronze
+    tables:
+      - name: events
+        identifier: "{{ var('calendar_snapshot_table', 'calendar_events_78147d417f3d97d3c1d9ef0be59638fd7850e4195108e1fc7b879483c7f35b66') }}"
+  - name: calendar_baseline_bronze
     database: profound-keel-500007-s4
     schema: bronze
     tables:
@@ -40,7 +46,7 @@ sources:
         identifier: open_meteo_weather_daily_2026_v1
         description: "Partial 2026 daily ECMWF IFS reanalysis cache by sanitized coordinate; not a property-level observation."
       - name: calendar_event_geocodes_all
-        identifier: calendar_event_geocodes_all_v2
+        identifier: "{{ var('calendar_geocodes_table', 'calendar_event_geocodes_all_v2') }}"
         description: "Sanitized verified coordinates for 2023-2026 Calendar events, including protected manual overrides; no raw address or contact fields."
       - name: open_meteo_weather_daily_all
         identifier: open_meteo_weather_daily_grid_2023_2026_v5

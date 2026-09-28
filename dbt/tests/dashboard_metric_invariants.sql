@@ -1,5 +1,5 @@
 {{ config(tags=['gold', 'dashboard']) }}
-select service_month
+select cast(service_month as string) as record_key
 from {{ ref('dashboard_service_monthly') }}
 where warranty_claim_event_rows > scheduled_service_event_rows
    or generic_complimentary_event_rows > scheduled_service_event_rows

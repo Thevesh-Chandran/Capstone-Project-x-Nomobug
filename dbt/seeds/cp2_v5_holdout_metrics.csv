@@ -1,0 +1,17 @@
+model_role,metric_name,metric_value
+reference,roc_auc,0.8126315789473684
+reference,average_precision,0.27232922732362824
+reference,brier_score,0.043225501488438
+reference,threshold_accuracy,0.92
+reference,always_no_callback_accuracy,0.95
+reference,review20_recall,0.6
+reference,review20_precision,0.15
+reference,review20_positive_windows_found,3
+selected_ap,roc_auc,0.8905263157894737
+selected_ap,average_precision,0.30508104921898027
+selected_ap,brier_score,0.04105936926992149
+selected_ap,threshold_accuracy,0.94
+selected_ap,always_no_callback_accuracy,0.95
+selected_ap,review20_recall,0.8
+selected_ap,review20_precision,0.2
+selected_ap,review20_positive_windows_found,4

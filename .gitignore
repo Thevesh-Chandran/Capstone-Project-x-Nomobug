@@ -14,6 +14,7 @@ __pycache__/
 /dbt/target/
 /dbt/logs/
 /dbt/dbt_packages/
+/dbt/tmp/
 /dbt/.user.yml
 .ipynb_checkpoints/
 .DS_Store

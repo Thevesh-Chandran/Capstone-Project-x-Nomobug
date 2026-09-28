@@ -80,7 +80,16 @@ def prepare_rows(stored, formatted, unformatted):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--upload", action="store_true")
+    parser.add_argument("--source-table", default=SOURCE_TABLE,
+                        help="Verified immutable PAYMENTS Bronze table selected by the release manifest")
+    parser.add_argument("--receipt-json", type=Path,
+                        help="Private machine-readable receipt under outputs/ for release orchestration")
     args = parser.parse_args()
+    source_table = args.source_table
+    if not __import__("re").fullmatch(r"payments_[0-9a-f]{64}", source_table):
+        raise SystemExit("Invalid PAYMENTS snapshot identifier")
+    if args.receipt_json and not args.receipt_json.resolve().is_relative_to((ROOT / "outputs").resolve()):
+        raise SystemExit("Private receipt must stay under outputs")
     if os.getenv("NOMOBUG_BQ_PROJECT") != PROJECT or os.getenv("NOMOBUG_BQ_LOCATION", "").lower() != LOCATION:
         raise SystemExit("Unexpected project/region; no work performed")
     if args.upload and os.getenv("NOMOBUG_BQ_UPLOAD_APPROVED") != "yes":
@@ -100,7 +109,7 @@ def main():
     client = bigquery.Client(project=PROJECT, location=LOCATION)
     try:
         query = (f"SELECT source_sheet_row, source_column_001 AS payment_date_raw, "
-                 f"source_column_002 AS sales_references_raw FROM `{PROJECT}.bronze.{SOURCE_TABLE}` "
+                 f"source_column_002 AS sales_references_raw FROM `{PROJECT}.bronze.{source_table}` "
                  "ORDER BY source_sheet_row")
         stored = [dict(row) for row in client.query(query, location=LOCATION,
             job_config=bigquery.QueryJobConfig(maximum_bytes_billed=104857600)).result(timeout=120)]
@@ -111,7 +120,7 @@ def main():
         records = prepare_rows(stored, formatted, unformatted)
         counts = {kind: sum(row["unformatted_type"] == kind for row in records)
                   for kind in ("serial", "text", "blank")}
-        digest = hashlib.sha256(json.dumps({"source_table": SOURCE_TABLE, "records": records},
+        digest = hashlib.sha256(json.dumps({"source_table": source_table, "records": records},
             ensure_ascii=False, separators=(",", ":")).encode()).hexdigest()
         table_name = "payments_date_serials_" + digest
         print("PAYMENTS date sidecar plan:", len(records), "rows;", counts,
@@ -123,13 +132,13 @@ def main():
         if dataset.location.lower() != LOCATION or dataset.default_table_expiration_ms is not None:
             raise ValueError("Bronze dataset region/expiry mismatch")
         existing = [table.table_id for table in client.list_tables(dataset)]
-        if table_name not in existing and sum(name.startswith("payments_date_serials_") for name in existing) >= 5:
-            raise ValueError("Five date sidecars already stored; retention review required")
+        if table_name not in existing and sum(name.startswith("payments_date_serials_") for name in existing) >= 64:
+            raise ValueError("64 date sidecars already stored; retention review required")
         table_id = f"{PROJECT}.bronze.{table_name}"
         schema = [bigquery.SchemaField("source_sheet_row", "INTEGER", mode="REQUIRED")]
         schema += [bigquery.SchemaField(field, "STRING", mode="REQUIRED") for field in
                    ("payment_date_display_raw", "unformatted_value", "unformatted_type")]
-        metadata = {"snapshot_id": digest, "source_table": SOURCE_TABLE,
+        metadata = {"snapshot_id": digest, "source_table": source_table,
                     "source_row_count": len(records), "extracted_at": datetime.now(timezone.utc).isoformat()}
         try:
             table = client.get_table(table_id)
@@ -149,6 +158,11 @@ def main():
         actual = sorted((dict(row) for row in client.list_rows(table)), key=lambda row: row["source_sheet_row"])
         if actual != records:
             raise ValueError("Stored date sidecar rows/values mismatch")
+        if args.receipt_json:
+            args.receipt_json.parent.mkdir(parents=True, exist_ok=True)
+            args.receipt_json.write_text(json.dumps({"table_name": table_name, "source_table": source_table,
+                "status": status, "rows": len(actual), "snapshot_id": digest,
+                "extracted_at": actual_meta["extracted_at"]}) + "\n", encoding="utf-8")
         print(status, table_id, "| exact row/date values: PASS")
     finally:
         client.close()

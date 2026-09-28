@@ -1,0 +1,12 @@
+# Runtime for the daily reporting release only. The prospective model collector
+# remains a separate local task and retains its full environment.
+dbt-bigquery==1.12.0
+dbt-core==1.12.0
+db-dtypes==1.7.1
+google-api-python-client==2.200.0
+google-auth-oauthlib==1.4.1
+google-cloud-bigquery==3.44.0
+pandas==3.0.5
+python-dotenv==1.2.3
+PyYAML==6.0.3
+tzdata==2026.3

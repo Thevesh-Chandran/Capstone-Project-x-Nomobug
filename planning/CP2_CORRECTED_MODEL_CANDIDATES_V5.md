@@ -109,7 +109,7 @@ Creation timestamps prove when entries existed, but older edited classifications
 
 The separate corrected v2 future bundle now trains on all **5,695 mature services, including 2,075 from 2026**, with 521 positive windows. It refits the fixed models after the later-date evaluation; no hyperparameters, weights, calibrators or thresholds change in response to that result. Its latest training service is 27 August and outcome end 26 September. Model files are under `outputs/cp2-v2/prospective_callback_v2/`; the primary file is `challenger_all_history.joblib`. Three fresh-process predictor-only replays match all 5,695 scores within 3.4e-16, and the public config records artifact hashes. Training replay is reproducibility evidence, not accuracy.
 
-The next prospective service cohort remains 28 September–27 October, with final evaluation no earlier than 27 November and complete coverage required. No live feature extractor or recurring job is connected; there are no future prediction logs yet. Earlier v4 and v1 artifacts remain historical evidence rather than the current model recommendation.
+The next prospective service cohort remains 28 September–27 October, with final evaluation no earlier than 27 November and complete coverage required. A local read-only Sheets/Calendar-to-temporary-BigQuery feature feed and two-minute prospective collector are now connected; its first checked run produced 205 private recent-service scores but no qualifying just-ended service to log. The collector depends on the signed-in computer remaining awake and connected. These operational scores do not add future accuracy evidence. Earlier v4 and v1 artifacts remain historical evidence rather than the current model recommendation.
 
 ## File cleanup
 

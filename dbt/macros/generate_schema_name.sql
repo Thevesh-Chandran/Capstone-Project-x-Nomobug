@@ -1,7 +1,8 @@
 {% macro generate_schema_name(custom_schema_name, node) -%}
+    {%- set release_prefix = var('release_schema_prefix', '') -%}
     {%- if custom_schema_name is none -%}
-        {{ target.schema }}
+        {{ release_prefix ~ target.schema }}
     {%- else -%}
-        {{ custom_schema_name | trim }}
+        {{ release_prefix ~ (custom_schema_name | trim) }}
     {%- endif -%}
 {%- endmacro %}

@@ -4,7 +4,8 @@
 select 'review_event_identity' as check_name, r.calendar_event_row
 from {{ ref('calendar_warranty_review_overrides') }} r
 left join {{ ref('calendar_events') }} e
-  on e.calendar_event_row = r.calendar_event_row and e.event_id = r.event_id
+  on to_hex(sha256(concat(e.calendar_id, '|', e.event_id))) = r.event_identity_hash
+ and e.event_id = r.event_id
 where e.calendar_event_row is null or e.warranty_label_review_id is distinct from r.review_id
 union all
 select 'reviewed_positive', calendar_event_row
