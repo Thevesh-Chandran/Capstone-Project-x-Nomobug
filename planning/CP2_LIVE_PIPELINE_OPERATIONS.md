@@ -1,5 +1,7 @@
 # CP2 local refresh and future evaluation
 
+**28 September update:** A separate fresh reporting release now feeds Gold views; see [the October submission record](CP2_OCTOBER_SUBMISSION.md). The local collector remains the prospective experiment's timing gate. Its 13:33 UTC tick reported zero logged predictions and seven missed service windows, so collection coverage is incomplete and a full-cohort future accuracy claim is not currently available. The older reporting-release note below describes the prior checkpoint.
+
 The current v5 model answers whether a **recorded corrective Calendar callback** occurs during days 1–30 after a matched paid service. Its output is a risk probability, not warranty entitlement or proof that treatment was completed. [Current model and limits](CP2_START_HERE.md).
 
 ## Fresh local run

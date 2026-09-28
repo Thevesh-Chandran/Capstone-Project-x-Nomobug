@@ -12,8 +12,8 @@ from google.cloud import bigquery
 
 PROJECT = "profound-keel-500007-s4"
 REGION = "asia-southeast1"
-WRITABLE = ("bronze", "silver", "gold", "audit")
-READ_ONLY = ("quality", "analytics_ml")
+WRITABLE = ("bronze", "silver", "gold", "audit", "quality")
+READ_ONLY = ("analytics_ml",)
 
 
 def main() -> None:
@@ -33,13 +33,20 @@ def main() -> None:
             matching = [entry for entry in entries
                         if entry.entity_type == "userByEmail" and entry.entity_id == principal]
             if matching and any(entry.role != role for entry in matching):
-                raise ValueError(f"Existing different access for {name}; review manually")
-            if not matching and args.apply:
+                if not (name == "quality" and role == "WRITER" and
+                        all(entry.role == "READER" for entry in matching)):
+                    raise ValueError(f"Existing different access for {name}; review manually")
+            needs_update = not matching or any(entry.role != role for entry in matching)
+            if needs_update and args.apply:
+                entries = [entry for entry in entries if not (
+                    entry.entity_type == "userByEmail" and entry.entity_id == principal
+                )]
                 entries.append(bigquery.AccessEntry(role=role, entity_type="userByEmail",
                                                     entity_id=principal))
                 dataset.access_entries = entries
                 client.update_dataset(dataset, ["access_entries"])
-            print(f"{name}: {role} {'present' if matching else ('granted' if args.apply else 'planned')}")
+            state = "present" if not needs_update else ("granted" if args.apply else "planned")
+            print(f"{name}: {role} {state}")
     finally:
         client.close()
 

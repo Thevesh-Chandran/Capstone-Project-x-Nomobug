@@ -1,5 +1,7 @@
 # Nomobug CP2 — current status and batch checklist
 
+**Current October delivery record:** [CP2_OCTOBER_SUBMISSION.md](CP2_OCTOBER_SUBMISSION.md). The reporting release was refreshed and published on 28 September; the deployment and scheduled-run acceptance checks are in progress. The seven-page management report exists, and the owner is finishing dashboard editing. The older checkpoints below remain historical evidence, including their former statements that hosting, fresh Gold and dashboard work were open.
+
 Use [the model guide](CP2_START_HERE.md) and [corrected v5 report](CP2_CORRECTED_MODEL_CANDIDATES_V5.md) for the current model. This file retains detailed implementation checkpoints; earlier recommendations and source-refresh failures below are historical.
 
 The current primary is ExtraTrees depth 10. On 100 newer services it captured four of five positive service windows in 20 reviews, versus three for the corrected reference; AUC was 0.891 versus 0.813. Only five positives prevent a reliable improvement claim. The frozen future refit uses all 5,695 mature services, including 2,075 from 2026. No future accuracy has been measured.
