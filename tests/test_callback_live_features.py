@@ -9,6 +9,13 @@ from scripts import callback_live_features as live
 
 
 NOW = datetime(2026, 9, 27, 12, 0, tzinfo=timezone.utc)
+PRIVATE_BUNDLE_UNAVAILABLE = not (
+    live.b.ROOT / 'outputs/cp2-v2/prospective_callback_v2/bundle.json'
+).is_file()
+requires_private_bundle = pytest.mark.skipif(
+    PRIVATE_BUNDLE_UNAVAILABLE,
+    reason='Frozen private bundle is unavailable in this checkout; replay is verified locally',
+)
 
 
 def snapshot(records):
@@ -156,10 +163,12 @@ def test_single_oversized_sheet_row_fails_closed():
         live.source_chunks([{'source_sheet_row': 1, 'source_column_001': 'x' * 200}], maximum_bytes=100)
 
 
+@requires_private_bundle
 def test_exact_frozen_compiled_and_macro_contract_is_current():
     assert len(live.validate_frozen_source_contract()) == 64
 
 
+@requires_private_bundle
 def test_compiled_feature_sql_drift_blocks_live_derivation(tmp_path, monkeypatch):
     pin = json.loads(live.PIN.read_text(encoding='utf-8'))
     pin['compiled_query_hashes']['sales.sql'] = '0' * 64
@@ -170,6 +179,7 @@ def test_compiled_feature_sql_drift_blocks_live_derivation(tmp_path, monkeypatch
         live.validate_frozen_source_contract()
 
 
+@requires_private_bundle
 def test_canonical_anchor_macro_hash_wins_over_older_windows_key(tmp_path, monkeypatch):
     source = live.b.ROOT
     registry = json.loads((source/'config/cp2_model_current.json').read_text(encoding='utf-8'))

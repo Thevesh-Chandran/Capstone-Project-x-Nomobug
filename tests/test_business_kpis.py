@@ -127,5 +127,6 @@ def test_fresh_drift_is_reported_without_publishing_or_hiding_changes():
 def test_validation_evidence_is_private_and_immutable(tmp_path):
     with pytest.raises(ValueError):
         kpi.private_output(tmp_path / "public")
+    (ROOT / "outputs").mkdir(exist_ok=True)
     with pytest.raises(ValueError, match="already exists"):
         kpi.private_output(ROOT / "outputs")
