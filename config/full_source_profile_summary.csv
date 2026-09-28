@@ -1,0 +1,23 @@
+source_system,resource_name,object_name,loaded_rows,loaded_columns,exact_duplicate_rows,duplicate_percent,earliest_record_utc,latest_record_utc,header_status,profile_date
+Google Sheets,Prospects List - Nomobug,B2B FOLLOW UP,188,25,32,17.02,,,confirmed_header_row,2026-08-02
+Google Sheets,Prospects List - Nomobug,FUTURE FOLLOW UP,339,9,0,0.00,,,confirmed_header_row,2026-08-02
+Google Sheets,Prospects List - Nomobug,2026,32580,24,17959,55.12,,,confirmed_header_row,2026-08-02
+Google Sheets,Prospects List - Nomobug,Year End Promo 2025,1449,8,68,4.69,,,generic_columns_no_reliable_header,2026-08-02
+Google Sheets,Prospects List - Nomobug,B2B,1063,18,0,0.00,,,confirmed_header_row,2026-08-02
+Google Sheets,Prospects List - Nomobug,RM399 PROMO,1328,9,4,0.30,,,confirmed_header_row,2026-08-02
+Google Sheets,Prospects List - Nomobug,Experiment,156,16,0,0.00,,,confirmed_header_row,2026-08-02
+Google Sheets,Prospects List - Nomobug,Experiment 13.01.26,121,18,0,0.00,,,confirmed_header_row,2026-08-02
+Google Sheets,SESSION & PAYMENT (NMB)- CHIA,SALES,2335,42,10,0.43,,,confirmed_header_row,2026-08-02
+Google Sheets,SESSION & PAYMENT (NMB)- CHIA,PAYMENTS,3109,12,14,0.45,,,confirmed_header_row,2026-08-02
+Google Sheets,SESSION & PAYMENT (NMB)- CHIA,PAYMENT LINK,2165,9,4,0.18,,,confirmed_header_row,2026-08-02
+Google Sheets,SESSION & PAYMENT (NMB)- CHIA,WARRANTY CLAIM,360,18,0,0.00,,,confirmed_header_row,2026-08-02
+Google Sheets,SESSION & PAYMENT (NMB)- CHIA,Commercial Clients,336,29,0,0.00,,,confirmed_header_row,2026-08-02
+Google Sheets,SESSION & PAYMENT (NMB)- CHIA,REFUND,49,11,0,0.00,,,confirmed_header_row,2026-08-02
+Google Sheets,SESSION & PAYMENT (NMB)- CHIA,LTV,4031,4,102,2.53,,,generic_columns_no_reliable_header,2026-08-02
+Google Sheets,SESSION & PAYMENT (NMB)- CHIA,Recurring Payments,16,38,0,0.00,,,confirmed_header_row,2026-08-02
+Google Calendar,Nomobug Calendars,TEAM DASH,1750,15,0,0.00,2025-04-29T03:30:00Z,2026-08-01T09:45:00Z,api_event_schema,2026-08-02
+Google Calendar,Nomobug Calendars,SALES TEAM,126,15,0,0.00,2026-03-30T06:00:00Z,2026-07-30T06:30:00Z,api_event_schema,2026-08-02
+Google Calendar,Nomobug Calendars,TEAM ACE,3206,15,0,0.00,2023-10-02T02:00:00Z,2026-08-01T09:30:00Z,api_event_schema,2026-08-02
+Google Calendar,Nomobug Calendars,TEAM BEAST,1771,15,0,0.00,2024-10-19T02:00:00Z,2026-07-10T01:30:00Z,api_event_schema,2026-08-02
+Google Calendar,Nomobug Calendars,TEAM CHARLIE,2156,15,0,0.00,2025-03-17T01:00:00Z,2026-08-01T11:00:00Z,api_event_schema,2026-08-02
+Google Calendar,Nomobug Calendars,REPLACEMENT TECHNICIAN,1029,15,0,0.00,2025-03-10T01:00:00Z,2026-08-01T09:30:00Z,api_event_schema,2026-08-02

@@ -1,0 +1,27 @@
+version: 2
+seeds:
+  - name: calendar_warranty_review_overrides
+    description: "Event-specific user decisions from the 27 September 2026 warranty audit. Event row and ID must both match; no names or free text are included."
+    config:
+      tags: ['calendar', 'gold']
+      column_types:
+        calendar_event_row: int64
+        event_id: string
+        review_id: string
+        review_label: string
+        reviewed_at: date
+    columns:
+      - name: calendar_event_row
+        data_tests: [not_null, unique]
+      - name: event_id
+        data_tests: [not_null]
+      - name: review_id
+        data_tests: [not_null, unique]
+      - name: review_label
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['Confirmed warranty claim', 'Not a warranty claim', 'Unclear']
+      - name: reviewed_at
+        data_tests: [not_null]

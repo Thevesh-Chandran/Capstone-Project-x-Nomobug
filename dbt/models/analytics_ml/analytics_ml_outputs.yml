@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: analytics_ml_outputs
+    database: profound-keel-500007-s4
+    schema: analytics_ml
+    tables:
+      - name: warranty_risk_3session_run_metrics
+        identifier: warranty_risk_3session_run_metrics

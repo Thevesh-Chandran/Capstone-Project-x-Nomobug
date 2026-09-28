@@ -1,0 +1,15 @@
+# Uses existing local Google Application Default Credentials; no keys stored here.
+nomobug:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: profound-keel-500007-s4
+      dataset: silver
+      location: asia-southeast1
+      threads: 1
+      job_execution_timeout_seconds: 120
+      job_retries: 0
+      priority: interactive
+      maximum_bytes_billed: "{{ env_var('NOMOBUG_BQ_MAX_BYTES_BILLED', '104857600') | int }}"

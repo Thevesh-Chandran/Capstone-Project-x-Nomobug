@@ -1,0 +1,48 @@
+{
+  "status": "verified_correctness_repairs",
+  "history_availability": {
+    "pre2026_anchors_with_future_created_history": 389,
+    "old_2026_anchors_with_future_created_history": 109,
+    "gate": "historical_event_created_at<=anchor_service_end",
+    "regional_history_window_days": 90
+  },
+  "maturity": {
+    "source": "Calendar snapshot metadata",
+    "rule": "min(requested coverage end, extraction local day minus one, today local day minus one)",
+    "old_complete_day": "2026-09-12",
+    "new_complete_day": "2026-09-26",
+    "old_partial_day_anchors": 10
+  },
+  "score_alignment": "canonical service keys; strict one-to-one outcomes and predictions",
+  "refreshed_source": {
+    "Calendar_rows": 11486,
+    "new_ids": 476,
+    "absent_ids": 204,
+    "substantive_updates": 10,
+    "all_metadata_inclusive_updates": 89,
+    "changed_geocodes_invalidated": 7,
+    "production_source_pin_changed": false
+  },
+  "common_historical_label_changes": 0,
+  "old_anchors_excluded": 3,
+  "source_replay": {
+    "rows": 5695,
+    "keys_labels_counts_exact": true,
+    "numeric_atol": 1e-12,
+    "maximum_observed_float_difference": 8.881784197e-16,
+    "terminal_job_id": "e8b930f9-ba4c-4f1d-a0d5-73e35dd74847"
+  },
+  "checks": {
+    "pytest_passed": 312,
+    "warnings": 19,
+    "dbt_compile": "passed",
+    "model_replay_rows": 5695,
+    "model_replay_max_difference": 3.4e-16
+  },
+  "limits": [
+    "Older field revisions are not fully reconstructable.",
+    "Live scoring extractor not connected.",
+    "Only five positive windows in the new holdout.",
+    "First-service callback detection unresolved."
+  ]
+}

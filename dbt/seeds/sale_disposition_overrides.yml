@@ -1,0 +1,11 @@
+version: 2
+seeds:
+  - name: sale_disposition_overrides
+    columns:
+      - name: sales_record_id
+        data_tests: [not_null, unique]
+      - name: disposition
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [cancelled]

@@ -1,0 +1,9 @@
+-r requirements-reporting.txt
+catboost==1.2.10
+openpyxl==3.1.5
+psycopg[binary]==3.3.5
+pytest==9.1.1
+rasterio==1.5.1
+scikit-learn==1.9.0
+scipy==1.18.1
+SQLAlchemy==2.0.52

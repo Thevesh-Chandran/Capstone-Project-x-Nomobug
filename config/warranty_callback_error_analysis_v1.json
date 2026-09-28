@@ -1,0 +1,2742 @@
+{
+  "input_sha256": "464bb51386c1bcce9744f74f61b4d0b4265be4a4631c1ede97063b62346914d9",
+  "source": "profound-keel-500007-s4.analytics_ml.warranty_callback_fixed_horizon_dataset",
+  "source_job_id": "2cda4cf7-894d-497d-bc6c-5050ec1b4698",
+  "source_bytes_processed": 3415267,
+  "source_executed_at": "2026-09-27T08:46:17.867957+00:00",
+  "source_evidence_sha256": "14cd3c474227af41932475a154b6de42ed8dadc9511cfb48e4f3325d3cfe962d",
+  "source_sql": "with events as (\nselect d.population, d.sales_record_id, cast(d.anchor_date as string) anchor_date,\n d.anchor_event_row, d.warranty_signal_within_30d as live_target,\n d.warranty_claim_count_30d, cast(d.observed_through as string) observed_through,\n a.calendar_name as anchor_calendar, a.match_status as anchor_match_status,\n a.location_precision_tier, a.completion_evidence,\n raw.summary as anchor_title,\n array_agg(if(w.calendar_event_row is null, null, struct(\n   w.calendar_event_row as event_row, cast(w.event_date_local as string) as event_date,\n   date_diff(w.event_date_local,d.anchor_date,day) as days_after_anchor,\n   w.calendar_name as calendar_name, return_raw.summary as title,\n   w.warranty_claim_candidate as is_callback, w.warranty_claim_reason as reason,\n   w.event_category as event_category, w.match_status as match_status,\n   w.session_current as session_current, w.session_total as session_total,\n   r.warranty_label_provenance as label_provenance,\n   r.warranty_label_review_status as review_status,\n   if(a.address_hash is null or w.address_hash is null, null,\n      a.address_hash=w.address_hash) as same_property_hash,\n   if(a.service_geography is null or w.service_geography is null,null,\n      st_distance(a.service_geography,w.service_geography)) as geocode_distance_m,\n   a.location_uncertainty_radius_m as anchor_uncertainty_m,\n   w.location_uncertainty_radius_m as return_uncertainty_m\n )) ignore nulls) as following_events\nfrom `profound-keel-500007-s4.analytics_ml.warranty_callback_fixed_horizon_dataset` d\njoin `profound-keel-500007-s4.gold.calendar_service_event_facts` a\n on a.calendar_event_row=d.anchor_event_row\njoin `profound-keel-500007-s4.bronze.calendar_events_78147d417f3d97d3c1d9ef0be59638fd7850e4195108e1fc7b879483c7f35b66` raw\n on raw.calendar_event_row=a.calendar_event_row\nleft join `profound-keel-500007-s4.gold.calendar_service_event_facts` w\n on w.sales_record_id=d.sales_record_id and w.event_date_local>d.anchor_date\n and w.event_date_local<=date_add(d.anchor_date, interval 60 day)\n and w.event_date_local<=d.observed_through\nleft join `profound-keel-500007-s4.silver.calendar_events` r on r.calendar_event_row=w.calendar_event_row\nleft join `profound-keel-500007-s4.bronze.calendar_events_78147d417f3d97d3c1d9ef0be59638fd7850e4195108e1fc7b879483c7f35b66` return_raw on return_raw.calendar_event_row=w.calendar_event_row\nwhere d.anchor_date>='2026-01-01'\ngroup by 1,2,3,4,5,6,7,8,9,10,11,12\n), records as (\nselect d.population,d.sales_record_id,cast(d.anchor_date as string) anchor_date,\n countif(c.recorded_claim_date>d.anchor_date and c.recorded_claim_date<=d.outcome_end_date\n   and not c.claim_date_needs_review) as dated_claim_record_count\nfrom `profound-keel-500007-s4.analytics_ml.warranty_callback_fixed_horizon_dataset` d\nleft join `profound-keel-500007-s4.gold.warranty_claim_record_facts` c using(sales_record_id)\nwhere d.anchor_date>='2026-01-01'\ngroup by 1,2,3)\nselect events.*,records.dated_claim_record_count from events join records using(population,sales_record_id,anchor_date)",
+  "start": "2026-01-02",
+  "end": "2026-08-14",
+  "threshold_summary": {
+    "rows": 1975,
+    "positive_rows": 179,
+    "TP": 130,
+    "FN": 49,
+    "FP": 584,
+    "TN": 1212,
+    "callback_rate": 0.09063291139240506,
+    "alert_rows": 714,
+    "recall": 0.7262569832402235,
+    "precision": 0.18207282913165265,
+    "false_positive_rate": 0.32516703786191536,
+    "recall_wilson_95": [
+      0.6566984469671839,
+      0.7863079585772874
+    ],
+    "false_positive_rate_wilson_95": [
+      0.3038953380655646,
+      0.34718506812129096
+    ]
+  },
+  "top20pct_summary": {
+    "rows": 1975,
+    "positive_rows": 179,
+    "TP": 100,
+    "FN": 79,
+    "FP": 295,
+    "TN": 1501,
+    "callback_rate": 0.09063291139240506,
+    "alert_rows": 395,
+    "recall": 0.5586592178770949,
+    "precision": 0.25316455696202533,
+    "false_positive_rate": 0.16425389755011136,
+    "recall_wilson_95": [
+      0.48544163488238934,
+      0.6294118776661772
+    ],
+    "false_positive_rate_wilson_95": [
+      0.14783827490204524,
+      0.1821027599090181
+    ]
+  },
+  "segments": [
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "ANT",
+      "rows": 48,
+      "positive_rows": 1,
+      "TP": 0,
+      "FN": 1,
+      "FP": 0,
+      "TN": 47,
+      "callback_rate": 0.020833333333333332,
+      "alert_rows": 0,
+      "recall": 0.0,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": [
+        0.0,
+        0.7934567085261071
+      ],
+      "false_positive_rate_wilson_95": [
+        6.938893903907228e-18,
+        0.0755601711983887
+      ],
+      "share_of_all_FN": 0.02040816326530612,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 48,
+        "positive_rows": 1,
+        "TP": 0,
+        "FN": 1,
+        "FP": 0,
+        "TN": 47,
+        "callback_rate": 0.020833333333333332,
+        "alert_rows": 0,
+        "recall": 0.0,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": [
+          0.0,
+          0.7934567085261071
+        ],
+        "false_positive_rate_wilson_95": [
+          6.938893903907228e-18,
+          0.0755601711983887
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "ANT|BED_BUG|COCKROACH|RODENT",
+      "rows": 3,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 3,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.5615060804490177
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 3,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 3,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.5615060804490177
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "ANT|COCKROACH",
+      "rows": 91,
+      "positive_rows": 11,
+      "TP": 0,
+      "FN": 11,
+      "FP": 3,
+      "TN": 77,
+      "callback_rate": 0.12087912087912088,
+      "alert_rows": 3,
+      "recall": 0.0,
+      "precision": 0.0,
+      "false_positive_rate": 0.0375,
+      "recall_wilson_95": [
+        2.7755575615628914e-17,
+        0.2588400172488141
+      ],
+      "false_positive_rate_wilson_95": [
+        0.012834336300788757,
+        0.10454891974394322
+      ],
+      "share_of_all_FN": 0.22448979591836735,
+      "share_of_all_FP": 0.005136986301369863,
+      "supported": true,
+      "budget": {
+        "rows": 91,
+        "positive_rows": 11,
+        "TP": 0,
+        "FN": 11,
+        "FP": 0,
+        "TN": 80,
+        "callback_rate": 0.12087912087912088,
+        "alert_rows": 0,
+        "recall": 0.0,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": [
+          2.7755575615628914e-17,
+          0.2588400172488141
+        ],
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.0458197362645751
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "ANT|COCKROACH|OTHER",
+      "rows": 15,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 15,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.20388926630434784
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 15,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 15,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.20388926630434784
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "ANT|COCKROACH|RODENT",
+      "rows": 201,
+      "positive_rows": 6,
+      "TP": 0,
+      "FN": 6,
+      "FP": 0,
+      "TN": 195,
+      "callback_rate": 0.029850746268656716,
+      "alert_rows": 0,
+      "recall": 0.0,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": [
+        0.0,
+        0.3903430336530645
+      ],
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.019319900865814796
+      ],
+      "share_of_all_FN": 0.12244897959183673,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 201,
+        "positive_rows": 6,
+        "TP": 0,
+        "FN": 6,
+        "FP": 0,
+        "TN": 195,
+        "callback_rate": 0.029850746268656716,
+        "alert_rows": 0,
+        "recall": 0.0,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": [
+          0.0,
+          0.3903430336530645
+        ],
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.019319900865814796
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "ANT|FLY|OTHER",
+      "rows": 1,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 1,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.7934567085261071
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 1,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 1,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.7934567085261071
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "ANT|RODENT",
+      "rows": 11,
+      "positive_rows": 1,
+      "TP": 0,
+      "FN": 1,
+      "FP": 0,
+      "TN": 10,
+      "callback_rate": 0.09090909090909091,
+      "alert_rows": 0,
+      "recall": 0.0,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": [
+        0.0,
+        0.7934567085261071
+      ],
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.2775401687666166
+      ],
+      "share_of_all_FN": 0.02040816326530612,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 11,
+        "positive_rows": 1,
+        "TP": 0,
+        "FN": 1,
+        "FP": 0,
+        "TN": 10,
+        "callback_rate": 0.09090909090909091,
+        "alert_rows": 0,
+        "recall": 0.0,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": [
+          0.0,
+          0.7934567085261071
+        ],
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.2775401687666166
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "COCKROACH",
+      "rows": 1380,
+      "positive_rows": 151,
+      "TP": 130,
+      "FN": 21,
+      "FP": 577,
+      "TN": 652,
+      "callback_rate": 0.10942028985507246,
+      "alert_rows": 707,
+      "recall": 0.8609271523178808,
+      "precision": 0.18387553041018387,
+      "false_positive_rate": 0.4694873881204231,
+      "recall_wilson_95": [
+        0.7967393701331015,
+        0.9072058228899619
+      ],
+      "false_positive_rate_wilson_95": [
+        0.44172351459974896,
+        0.4974414194842403
+      ],
+      "share_of_all_FN": 0.42857142857142855,
+      "share_of_all_FP": 0.988013698630137,
+      "supported": true,
+      "budget": {
+        "rows": 1380,
+        "positive_rows": 151,
+        "TP": 100,
+        "FN": 51,
+        "FP": 294,
+        "TN": 935,
+        "callback_rate": 0.10942028985507246,
+        "alert_rows": 394,
+        "recall": 0.6622516556291391,
+        "precision": 0.25380710659898476,
+        "false_positive_rate": 0.23921887713588283,
+        "recall_wilson_95": [
+          0.5836236861551637,
+          0.7328287400662136
+        ],
+        "false_positive_rate_wilson_95": [
+          0.2162037523734619,
+          0.2638592175977006
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "COCKROACH|FLY",
+      "rows": 3,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 3,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.5615060804490177
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 3,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 3,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.5615060804490177
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "COCKROACH|OTHER",
+      "rows": 29,
+      "positive_rows": 1,
+      "TP": 0,
+      "FN": 1,
+      "FP": 2,
+      "TN": 26,
+      "callback_rate": 0.034482758620689655,
+      "alert_rows": 2,
+      "recall": 0.0,
+      "precision": 0.0,
+      "false_positive_rate": 0.07142857142857142,
+      "recall_wilson_95": [
+        0.0,
+        0.7934567085261071
+      ],
+      "false_positive_rate_wilson_95": [
+        0.019811647447770794,
+        0.2264573842591786
+      ],
+      "share_of_all_FN": 0.02040816326530612,
+      "share_of_all_FP": 0.003424657534246575,
+      "supported": false,
+      "budget": {
+        "rows": 29,
+        "positive_rows": 1,
+        "TP": 0,
+        "FN": 1,
+        "FP": 0,
+        "TN": 28,
+        "callback_rate": 0.034482758620689655,
+        "alert_rows": 0,
+        "recall": 0.0,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": [
+          0.0,
+          0.7934567085261071
+        ],
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.12064720365810762
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "COCKROACH|OTHER|RODENT",
+      "rows": 4,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 4,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.48990002040399916
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 4,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 4,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.48990002040399916
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "COCKROACH|RODENT",
+      "rows": 93,
+      "positive_rows": 2,
+      "TP": 0,
+      "FN": 2,
+      "FP": 0,
+      "TN": 91,
+      "callback_rate": 0.021505376344086023,
+      "alert_rows": 0,
+      "recall": 0.0,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": [
+        0.0,
+        0.6576280471103807
+      ],
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.04050543221539915
+      ],
+      "share_of_all_FN": 0.04081632653061224,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 93,
+        "positive_rows": 2,
+        "TP": 0,
+        "FN": 2,
+        "FP": 0,
+        "TN": 91,
+        "callback_rate": 0.021505376344086023,
+        "alert_rows": 0,
+        "recall": 0.0,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": [
+          0.0,
+          0.6576280471103807
+        ],
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.04050543221539915
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "FLY",
+      "rows": 3,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 3,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.5615060804490177
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 3,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 3,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.5615060804490177
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "GENERAL_CONTROL|OTHER|TERMITE",
+      "rows": 3,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 3,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.5615060804490177
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 3,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 3,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.5615060804490177
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "RODENT",
+      "rows": 57,
+      "positive_rows": 4,
+      "TP": 0,
+      "FN": 4,
+      "FP": 0,
+      "TN": 53,
+      "callback_rate": 0.07017543859649122,
+      "alert_rows": 0,
+      "recall": 0.0,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": [
+        0.0,
+        0.48990002040399916
+      ],
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.06758430445307662
+      ],
+      "share_of_all_FN": 0.08163265306122448,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 57,
+        "positive_rows": 4,
+        "TP": 0,
+        "FN": 4,
+        "FP": 0,
+        "TN": 53,
+        "callback_rate": 0.07017543859649122,
+        "alert_rows": 0,
+        "recall": 0.0,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": [
+          0.0,
+          0.48990002040399916
+        ],
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.06758430445307662
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "TERMITE",
+      "rows": 30,
+      "positive_rows": 2,
+      "TP": 0,
+      "FN": 2,
+      "FP": 2,
+      "TN": 26,
+      "callback_rate": 0.06666666666666667,
+      "alert_rows": 2,
+      "recall": 0.0,
+      "precision": 0.0,
+      "false_positive_rate": 0.07142857142857142,
+      "recall_wilson_95": [
+        0.0,
+        0.6576280471103807
+      ],
+      "false_positive_rate_wilson_95": [
+        0.019811647447770794,
+        0.2264573842591786
+      ],
+      "share_of_all_FN": 0.04081632653061224,
+      "share_of_all_FP": 0.003424657534246575,
+      "supported": false,
+      "budget": {
+        "rows": 30,
+        "positive_rows": 2,
+        "TP": 0,
+        "FN": 2,
+        "FP": 1,
+        "TN": 27,
+        "callback_rate": 0.06666666666666667,
+        "alert_rows": 1,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_positive_rate": 0.03571428571428571,
+        "recall_wilson_95": [
+          0.0,
+          0.6576280471103807
+        ],
+        "false_positive_rate_wilson_95": [
+          0.00633235649754188,
+          0.17712576118498663
+        ]
+      }
+    },
+    {
+      "dimension": "normalized_pest_category",
+      "segment": "UNSPECIFIED",
+      "rows": 3,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 3,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.5615060804490177
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 3,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 3,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.5615060804490177
+        ]
+      }
+    },
+    {
+      "dimension": "package_tier",
+      "segment": "12x",
+      "rows": 64,
+      "positive_rows": 2,
+      "TP": 0,
+      "FN": 2,
+      "FP": 10,
+      "TN": 52,
+      "callback_rate": 0.03125,
+      "alert_rows": 10,
+      "recall": 0.0,
+      "precision": 0.0,
+      "false_positive_rate": 0.16129032258064516,
+      "recall_wilson_95": [
+        0.0,
+        0.6576280471103807
+      ],
+      "false_positive_rate_wilson_95": [
+        0.09003972354068436,
+        0.2720656930956064
+      ],
+      "share_of_all_FN": 0.04081632653061224,
+      "share_of_all_FP": 0.017123287671232876,
+      "supported": false,
+      "budget": {
+        "rows": 64,
+        "positive_rows": 2,
+        "TP": 0,
+        "FN": 2,
+        "FP": 8,
+        "TN": 54,
+        "callback_rate": 0.03125,
+        "alert_rows": 8,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_positive_rate": 0.12903225806451613,
+        "recall_wilson_95": [
+          0.0,
+          0.6576280471103807
+        ],
+        "false_positive_rate_wilson_95": [
+          0.06685798258498754,
+          0.23449556896904517
+        ]
+      }
+    },
+    {
+      "dimension": "package_tier",
+      "segment": "15x",
+      "rows": 96,
+      "positive_rows": 2,
+      "TP": 0,
+      "FN": 2,
+      "FP": 0,
+      "TN": 94,
+      "callback_rate": 0.020833333333333332,
+      "alert_rows": 0,
+      "recall": 0.0,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": [
+        0.0,
+        0.6576280471103807
+      ],
+      "false_positive_rate_wilson_95": [
+        3.469446951953614e-18,
+        0.03926346257624569
+      ],
+      "share_of_all_FN": 0.04081632653061224,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 96,
+        "positive_rows": 2,
+        "TP": 0,
+        "FN": 2,
+        "FP": 0,
+        "TN": 94,
+        "callback_rate": 0.020833333333333332,
+        "alert_rows": 0,
+        "recall": 0.0,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": [
+          0.0,
+          0.6576280471103807
+        ],
+        "false_positive_rate_wilson_95": [
+          3.469446951953614e-18,
+          0.03926346257624569
+        ]
+      }
+    },
+    {
+      "dimension": "package_tier",
+      "segment": "1x",
+      "rows": 92,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 92,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.04008280329209862
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 92,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 92,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.04008280329209862
+        ]
+      }
+    },
+    {
+      "dimension": "package_tier",
+      "segment": "2x",
+      "rows": 6,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 6,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.3903430336530645
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 6,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 6,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.3903430336530645
+        ]
+      }
+    },
+    {
+      "dimension": "package_tier",
+      "segment": "3x",
+      "rows": 1431,
+      "positive_rows": 165,
+      "TP": 129,
+      "FN": 36,
+      "FP": 547,
+      "TN": 719,
+      "callback_rate": 0.11530398322851153,
+      "alert_rows": 676,
+      "recall": 0.7818181818181819,
+      "precision": 0.1908284023668639,
+      "false_positive_rate": 0.4320695102685624,
+      "recall_wilson_95": [
+        0.7127783138933665,
+        0.8380338082376724
+      ],
+      "false_positive_rate_wilson_95": [
+        0.40502805773441286,
+        0.45952197748257784
+      ],
+      "share_of_all_FN": 0.7346938775510204,
+      "share_of_all_FP": 0.9366438356164384,
+      "supported": true,
+      "budget": {
+        "rows": 1431,
+        "positive_rows": 165,
+        "TP": 99,
+        "FN": 66,
+        "FP": 273,
+        "TN": 993,
+        "callback_rate": 0.11530398322851153,
+        "alert_rows": 372,
+        "recall": 0.6,
+        "precision": 0.2661290322580645,
+        "false_positive_rate": 0.2156398104265403,
+        "recall_wilson_95": [
+          0.5237935361880482,
+          0.6716559265036107
+        ],
+        "false_positive_rate_wilson_95": [
+          0.19386315196887952,
+          0.2391369954510821
+        ]
+      }
+    },
+    {
+      "dimension": "package_tier",
+      "segment": "48x",
+      "rows": 22,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 22,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        1.3877787807814457e-17,
+        0.14865952572596125
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 22,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 22,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          1.3877787807814457e-17,
+          0.14865952572596125
+        ]
+      }
+    },
+    {
+      "dimension": "package_tier",
+      "segment": "4x",
+      "rows": 163,
+      "positive_rows": 7,
+      "TP": 1,
+      "FN": 6,
+      "FP": 24,
+      "TN": 132,
+      "callback_rate": 0.04294478527607362,
+      "alert_rows": 25,
+      "recall": 0.14285714285714285,
+      "precision": 0.04,
+      "false_positive_rate": 0.15384615384615385,
+      "recall_wilson_95": [
+        0.02567895594897479,
+        0.51313450331903
+      ],
+      "false_positive_rate_wilson_95": [
+        0.10561581573913466,
+        0.21871527203776447
+      ],
+      "share_of_all_FN": 0.12244897959183673,
+      "share_of_all_FP": 0.0410958904109589,
+      "supported": false,
+      "budget": {
+        "rows": 163,
+        "positive_rows": 7,
+        "TP": 1,
+        "FN": 6,
+        "FP": 13,
+        "TN": 143,
+        "callback_rate": 0.04294478527607362,
+        "alert_rows": 14,
+        "recall": 0.14285714285714285,
+        "precision": 0.07142857142857142,
+        "false_positive_rate": 0.08333333333333333,
+        "recall_wilson_95": [
+          0.02567895594897479,
+          0.51313450331903
+        ],
+        "false_positive_rate_wilson_95": [
+          0.049345180039177615,
+          0.13734964784042314
+        ]
+      }
+    },
+    {
+      "dimension": "package_tier",
+      "segment": "5x",
+      "rows": 3,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 3,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.5615060804490177
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 3,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 3,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.5615060804490177
+        ]
+      }
+    },
+    {
+      "dimension": "package_tier",
+      "segment": "6x",
+      "rows": 68,
+      "positive_rows": 2,
+      "TP": 0,
+      "FN": 2,
+      "FP": 3,
+      "TN": 63,
+      "callback_rate": 0.029411764705882353,
+      "alert_rows": 3,
+      "recall": 0.0,
+      "precision": 0.0,
+      "false_positive_rate": 0.045454545454545456,
+      "recall_wilson_95": [
+        0.0,
+        0.6576280471103807
+      ],
+      "false_positive_rate_wilson_95": [
+        0.015577991894810295,
+        0.1253351601521073
+      ],
+      "share_of_all_FN": 0.04081632653061224,
+      "share_of_all_FP": 0.005136986301369863,
+      "supported": false,
+      "budget": {
+        "rows": 68,
+        "positive_rows": 2,
+        "TP": 0,
+        "FN": 2,
+        "FP": 1,
+        "TN": 65,
+        "callback_rate": 0.029411764705882353,
+        "alert_rows": 1,
+        "recall": 0.0,
+        "precision": 0.0,
+        "false_positive_rate": 0.015151515151515152,
+        "recall_wilson_95": [
+          0.0,
+          0.6576280471103807
+        ],
+        "false_positive_rate_wilson_95": [
+          0.0026795715344567483,
+          0.08096112398225534
+        ]
+      }
+    },
+    {
+      "dimension": "package_tier",
+      "segment": "7x",
+      "rows": 27,
+      "positive_rows": 1,
+      "TP": 0,
+      "FN": 1,
+      "FP": 0,
+      "TN": 26,
+      "callback_rate": 0.037037037037037035,
+      "alert_rows": 0,
+      "recall": 0.0,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": [
+        0.0,
+        0.7934567085261071
+      ],
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.12873304380462175
+      ],
+      "share_of_all_FN": 0.02040816326530612,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 27,
+        "positive_rows": 1,
+        "TP": 0,
+        "FN": 1,
+        "FP": 0,
+        "TN": 26,
+        "callback_rate": 0.037037037037037035,
+        "alert_rows": 0,
+        "recall": 0.0,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": [
+          0.0,
+          0.7934567085261071
+        ],
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.12873304380462175
+        ]
+      }
+    },
+    {
+      "dimension": "package_tier",
+      "segment": "9x",
+      "rows": 3,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 3,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.5615060804490177
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 3,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 3,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.5615060804490177
+        ]
+      }
+    },
+    {
+      "dimension": "premise_type",
+      "segment": "COMMERCIAL",
+      "rows": 395,
+      "positive_rows": 8,
+      "TP": 1,
+      "FN": 7,
+      "FP": 40,
+      "TN": 347,
+      "callback_rate": 0.020253164556962026,
+      "alert_rows": 41,
+      "recall": 0.125,
+      "precision": 0.024390243902439025,
+      "false_positive_rate": 0.10335917312661498,
+      "recall_wilson_95": [
+        0.02241690886329617,
+        0.4708948057698615
+      ],
+      "false_positive_rate_wilson_95": [
+        0.076825615416663,
+        0.13768993257004059
+      ],
+      "share_of_all_FN": 0.14285714285714285,
+      "share_of_all_FP": 0.0684931506849315,
+      "supported": false,
+      "budget": {
+        "rows": 395,
+        "positive_rows": 8,
+        "TP": 1,
+        "FN": 7,
+        "FP": 21,
+        "TN": 366,
+        "callback_rate": 0.020253164556962026,
+        "alert_rows": 22,
+        "recall": 0.125,
+        "precision": 0.045454545454545456,
+        "false_positive_rate": 0.05426356589147287,
+        "recall_wilson_95": [
+          0.02241690886329617,
+          0.4708948057698615
+        ],
+        "false_positive_rate_wilson_95": [
+          0.03576216633858012,
+          0.08152729312530499
+        ]
+      }
+    },
+    {
+      "dimension": "premise_type",
+      "segment": "RESIDENTIAL",
+      "rows": 1580,
+      "positive_rows": 171,
+      "TP": 129,
+      "FN": 42,
+      "FP": 544,
+      "TN": 865,
+      "callback_rate": 0.10822784810126582,
+      "alert_rows": 673,
+      "recall": 0.7543859649122807,
+      "precision": 0.19167904903417535,
+      "false_positive_rate": 0.3860894251242016,
+      "recall_wilson_95": [
+        0.6847469331584664,
+        0.8128463169604985
+      ],
+      "false_positive_rate_wilson_95": [
+        0.36101058910351214,
+        0.41178772034603983
+      ],
+      "share_of_all_FN": 0.8571428571428571,
+      "share_of_all_FP": 0.9315068493150684,
+      "supported": true,
+      "budget": {
+        "rows": 1580,
+        "positive_rows": 171,
+        "TP": 99,
+        "FN": 72,
+        "FP": 274,
+        "TN": 1135,
+        "callback_rate": 0.10822784810126582,
+        "alert_rows": 373,
+        "recall": 0.5789473684210527,
+        "precision": 0.26541554959785524,
+        "false_positive_rate": 0.19446415897799857,
+        "recall_wilson_95": [
+          0.5040073023185133,
+          0.6504181890977171
+        ],
+        "false_positive_rate_wilson_95": [
+          0.17464002739079226,
+          0.21594983066548246
+        ]
+      }
+    },
+    {
+      "dimension": "service_stage",
+      "segment": "final",
+      "rows": 520,
+      "positive_rows": 118,
+      "TP": 98,
+      "FN": 20,
+      "FP": 275,
+      "TN": 127,
+      "callback_rate": 0.22692307692307692,
+      "alert_rows": 373,
+      "recall": 0.8305084745762712,
+      "precision": 0.26273458445040215,
+      "false_positive_rate": 0.6840796019900498,
+      "recall_wilson_95": [
+        0.7526576836199572,
+        0.8875177572803592
+      ],
+      "false_positive_rate_wilson_95": [
+        0.6370742886379709,
+        0.7276000079348793
+      ],
+      "share_of_all_FN": 0.40816326530612246,
+      "share_of_all_FP": 0.4708904109589041,
+      "supported": true,
+      "budget": {
+        "rows": 520,
+        "positive_rows": 118,
+        "TP": 95,
+        "FN": 23,
+        "FP": 266,
+        "TN": 136,
+        "callback_rate": 0.22692307692307692,
+        "alert_rows": 361,
+        "recall": 0.8050847457627118,
+        "precision": 0.2631578947368421,
+        "false_positive_rate": 0.6616915422885572,
+        "recall_wilson_95": [
+          0.7244709740380223,
+          0.8664602021776543
+        ],
+        "false_positive_rate_wilson_95": [
+          0.6141033416417896,
+          0.7062186756181463
+        ]
+      }
+    },
+    {
+      "dimension": "service_stage",
+      "segment": "first",
+      "rows": 673,
+      "positive_rows": 11,
+      "TP": 0,
+      "FN": 11,
+      "FP": 0,
+      "TN": 662,
+      "callback_rate": 0.01634472511144131,
+      "alert_rows": 0,
+      "recall": 0.0,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": [
+        2.7755575615628914e-17,
+        0.2588400172488141
+      ],
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.005769540383178221
+      ],
+      "share_of_all_FN": 0.22448979591836735,
+      "share_of_all_FP": 0.0,
+      "supported": true,
+      "budget": {
+        "rows": 673,
+        "positive_rows": 11,
+        "TP": 0,
+        "FN": 11,
+        "FP": 0,
+        "TN": 662,
+        "callback_rate": 0.01634472511144131,
+        "alert_rows": 0,
+        "recall": 0.0,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": [
+          2.7755575615628914e-17,
+          0.2588400172488141
+        ],
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.005769540383178221
+        ]
+      }
+    },
+    {
+      "dimension": "service_stage",
+      "segment": "middle",
+      "rows": 782,
+      "positive_rows": 50,
+      "TP": 32,
+      "FN": 18,
+      "FP": 309,
+      "TN": 423,
+      "callback_rate": 0.0639386189258312,
+      "alert_rows": 341,
+      "recall": 0.64,
+      "precision": 0.093841642228739,
+      "false_positive_rate": 0.42213114754098363,
+      "recall_wilson_95": [
+        0.5014076201030195,
+        0.7586143703281711
+      ],
+      "false_positive_rate_wilson_95": [
+        0.3868490016931788,
+        0.4582263514806565
+      ],
+      "share_of_all_FN": 0.3673469387755102,
+      "share_of_all_FP": 0.5291095890410958,
+      "supported": true,
+      "budget": {
+        "rows": 782,
+        "positive_rows": 50,
+        "TP": 5,
+        "FN": 45,
+        "FP": 29,
+        "TN": 703,
+        "callback_rate": 0.0639386189258312,
+        "alert_rows": 34,
+        "recall": 0.1,
+        "precision": 0.14705882352941177,
+        "false_positive_rate": 0.03961748633879782,
+        "recall_wilson_95": [
+          0.04347512399157111,
+          0.2136049033478839
+        ],
+        "false_positive_rate_wilson_95": [
+          0.027723680884467743,
+          0.05631831945908445
+        ]
+      }
+    },
+    {
+      "dimension": "calendar_service_method_category",
+      "segment": "FOGGING_OR_MISTING",
+      "rows": 9,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 9,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.2991527535509594
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 9,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 9,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.2991527535509594
+        ]
+      }
+    },
+    {
+      "dimension": "calendar_service_method_category",
+      "segment": "GEL_OR_BAIT",
+      "rows": 6,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 6,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.3903430336530645
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 6,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 6,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.3903430336530645
+        ]
+      }
+    },
+    {
+      "dimension": "calendar_service_method_category",
+      "segment": "SPRAY",
+      "rows": 2,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 2,
+      "TN": 0,
+      "callback_rate": 0.0,
+      "alert_rows": 2,
+      "recall": null,
+      "precision": 0.0,
+      "false_positive_rate": 1.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.34237195288961925,
+        1.0
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.003424657534246575,
+      "supported": false,
+      "budget": {
+        "rows": 2,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 1,
+        "TN": 1,
+        "callback_rate": 0.0,
+        "alert_rows": 1,
+        "recall": null,
+        "precision": 0.0,
+        "false_positive_rate": 0.5,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.09452865480086614,
+          0.9054713451991339
+        ]
+      }
+    },
+    {
+      "dimension": "calendar_service_method_category",
+      "segment": "UNSPECIFIED",
+      "rows": 1958,
+      "positive_rows": 179,
+      "TP": 130,
+      "FN": 49,
+      "FP": 582,
+      "TN": 1197,
+      "callback_rate": 0.09141981613891727,
+      "alert_rows": 712,
+      "recall": 0.7262569832402235,
+      "precision": 0.18258426966292135,
+      "false_positive_rate": 0.327150084317032,
+      "recall_wilson_95": [
+        0.6566984469671839,
+        0.7863079585772874
+      ],
+      "false_positive_rate_wilson_95": [
+        0.30574063231320836,
+        0.34930443731047556
+      ],
+      "share_of_all_FN": 1.0,
+      "share_of_all_FP": 0.9965753424657534,
+      "supported": true,
+      "budget": {
+        "rows": 1958,
+        "positive_rows": 179,
+        "TP": 100,
+        "FN": 79,
+        "FP": 294,
+        "TN": 1485,
+        "callback_rate": 0.09141981613891727,
+        "alert_rows": 394,
+        "recall": 0.5586592178770949,
+        "precision": 0.25380710659898476,
+        "false_positive_rate": 0.16526138279932545,
+        "recall_wilson_95": [
+          0.48544163488238934,
+          0.6294118776661772
+        ],
+        "false_positive_rate_wilson_95": [
+          0.14872665608452224,
+          0.18323867386963633
+        ]
+      }
+    },
+    {
+      "dimension": "calendar_pest_text_category",
+      "segment": "ANT",
+      "rows": 40,
+      "positive_rows": 3,
+      "TP": 3,
+      "FN": 0,
+      "FP": 14,
+      "TN": 23,
+      "callback_rate": 0.075,
+      "alert_rows": 17,
+      "recall": 1.0,
+      "precision": 0.17647058823529413,
+      "false_positive_rate": 0.3783783783783784,
+      "recall_wilson_95": [
+        0.43849391955098227,
+        1.0
+      ],
+      "false_positive_rate_wilson_95": [
+        0.2406378746389103,
+        0.5389985744718004
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.023972602739726026,
+      "supported": false,
+      "budget": {
+        "rows": 40,
+        "positive_rows": 3,
+        "TP": 3,
+        "FN": 0,
+        "FP": 8,
+        "TN": 29,
+        "callback_rate": 0.075,
+        "alert_rows": 11,
+        "recall": 1.0,
+        "precision": 0.2727272727272727,
+        "false_positive_rate": 0.21621621621621623,
+        "recall_wilson_95": [
+          0.43849391955098227,
+          1.0
+        ],
+        "false_positive_rate_wilson_95": [
+          0.11386376851955585,
+          0.37195461273876906
+        ]
+      }
+    },
+    {
+      "dimension": "calendar_pest_text_category",
+      "segment": "COCKROACH",
+      "rows": 7,
+      "positive_rows": 0,
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 7,
+      "callback_rate": 0.0,
+      "alert_rows": 0,
+      "recall": null,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": null,
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.35433884297520657
+      ],
+      "share_of_all_FN": 0.0,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 7,
+        "positive_rows": 0,
+        "TP": 0,
+        "FN": 0,
+        "FP": 0,
+        "TN": 7,
+        "callback_rate": 0.0,
+        "alert_rows": 0,
+        "recall": null,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": null,
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.35433884297520657
+        ]
+      }
+    },
+    {
+      "dimension": "calendar_pest_text_category",
+      "segment": "RODENT",
+      "rows": 5,
+      "positive_rows": 1,
+      "TP": 0,
+      "FN": 1,
+      "FP": 0,
+      "TN": 4,
+      "callback_rate": 0.2,
+      "alert_rows": 0,
+      "recall": 0.0,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": [
+        0.0,
+        0.7934567085261071
+      ],
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.48990002040399916
+      ],
+      "share_of_all_FN": 0.02040816326530612,
+      "share_of_all_FP": 0.0,
+      "supported": false,
+      "budget": {
+        "rows": 5,
+        "positive_rows": 1,
+        "TP": 0,
+        "FN": 1,
+        "FP": 0,
+        "TN": 4,
+        "callback_rate": 0.2,
+        "alert_rows": 0,
+        "recall": 0.0,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": [
+          0.0,
+          0.7934567085261071
+        ],
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.48990002040399916
+        ]
+      }
+    },
+    {
+      "dimension": "calendar_pest_text_category",
+      "segment": "TERMITE",
+      "rows": 8,
+      "positive_rows": 1,
+      "TP": 0,
+      "FN": 1,
+      "FP": 1,
+      "TN": 6,
+      "callback_rate": 0.125,
+      "alert_rows": 1,
+      "recall": 0.0,
+      "precision": 0.0,
+      "false_positive_rate": 0.14285714285714285,
+      "recall_wilson_95": [
+        0.0,
+        0.7934567085261071
+      ],
+      "false_positive_rate_wilson_95": [
+        0.02567895594897479,
+        0.51313450331903
+      ],
+      "share_of_all_FN": 0.02040816326530612,
+      "share_of_all_FP": 0.0017123287671232876,
+      "supported": false,
+      "budget": {
+        "rows": 8,
+        "positive_rows": 1,
+        "TP": 0,
+        "FN": 1,
+        "FP": 0,
+        "TN": 7,
+        "callback_rate": 0.125,
+        "alert_rows": 0,
+        "recall": 0.0,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": [
+          0.0,
+          0.7934567085261071
+        ],
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.35433884297520657
+        ]
+      }
+    },
+    {
+      "dimension": "calendar_pest_text_category",
+      "segment": "UNSPECIFIED",
+      "rows": 1915,
+      "positive_rows": 174,
+      "TP": 127,
+      "FN": 47,
+      "FP": 569,
+      "TN": 1172,
+      "callback_rate": 0.09086161879895562,
+      "alert_rows": 696,
+      "recall": 0.7298850574712644,
+      "precision": 0.1824712643678161,
+      "false_positive_rate": 0.32682366456059736,
+      "recall_wilson_95": [
+        0.6594715154990002,
+        0.7903669924766367
+      ],
+      "false_positive_rate_wilson_95": [
+        0.3051926972131273,
+        0.34921719306000704
+      ],
+      "share_of_all_FN": 0.9591836734693877,
+      "share_of_all_FP": 0.9743150684931506,
+      "supported": true,
+      "budget": {
+        "rows": 1915,
+        "positive_rows": 174,
+        "TP": 97,
+        "FN": 77,
+        "FP": 287,
+        "TN": 1454,
+        "callback_rate": 0.09086161879895562,
+        "alert_rows": 384,
+        "recall": 0.5574712643678161,
+        "precision": 0.2526041666666667,
+        "false_positive_rate": 0.16484778862722574,
+        "recall_wilson_95": [
+          0.4832195078044475,
+          0.6292401191894619
+        ],
+        "false_positive_rate_wilson_95": [
+          0.14815991206315235,
+          0.18301146761967965
+        ]
+      }
+    },
+    {
+      "dimension": "weather_14d_missing",
+      "segment": "available",
+      "rows": 1975,
+      "positive_rows": 179,
+      "TP": 130,
+      "FN": 49,
+      "FP": 584,
+      "TN": 1212,
+      "callback_rate": 0.09063291139240506,
+      "alert_rows": 714,
+      "recall": 0.7262569832402235,
+      "precision": 0.18207282913165265,
+      "false_positive_rate": 0.32516703786191536,
+      "recall_wilson_95": [
+        0.6566984469671839,
+        0.7863079585772874
+      ],
+      "false_positive_rate_wilson_95": [
+        0.3038953380655646,
+        0.34718506812129096
+      ],
+      "share_of_all_FN": 1.0,
+      "share_of_all_FP": 1.0,
+      "supported": true,
+      "budget": {
+        "rows": 1975,
+        "positive_rows": 179,
+        "TP": 100,
+        "FN": 79,
+        "FP": 295,
+        "TN": 1501,
+        "callback_rate": 0.09063291139240506,
+        "alert_rows": 395,
+        "recall": 0.5586592178770949,
+        "precision": 0.25316455696202533,
+        "false_positive_rate": 0.16425389755011136,
+        "recall_wilson_95": [
+          0.48544163488238934,
+          0.6294118776661772
+        ],
+        "false_positive_rate_wilson_95": [
+          0.14783827490204524,
+          0.1821027599090181
+        ]
+      }
+    },
+    {
+      "dimension": "waterway_missing",
+      "segment": "available",
+      "rows": 1458,
+      "positive_rows": 168,
+      "TP": 130,
+      "FN": 38,
+      "FP": 584,
+      "TN": 706,
+      "callback_rate": 0.11522633744855967,
+      "alert_rows": 714,
+      "recall": 0.7738095238095238,
+      "precision": 0.18207282913165265,
+      "false_positive_rate": 0.45271317829457364,
+      "recall_wilson_95": [
+        0.7048368947626369,
+        0.830539870816827
+      ],
+      "false_positive_rate_wilson_95": [
+        0.4257304125713376,
+        0.4799767466357865
+      ],
+      "share_of_all_FN": 0.7755102040816326,
+      "share_of_all_FP": 1.0,
+      "supported": true,
+      "budget": {
+        "rows": 1458,
+        "positive_rows": 168,
+        "TP": 100,
+        "FN": 68,
+        "FP": 295,
+        "TN": 995,
+        "callback_rate": 0.11522633744855967,
+        "alert_rows": 395,
+        "recall": 0.5952380952380952,
+        "precision": 0.25316455696202533,
+        "false_positive_rate": 0.22868217054263565,
+        "recall_wilson_95": [
+          0.5196880914809959,
+          0.666529913937948
+        ],
+        "false_positive_rate_wilson_95": [
+          0.20658871242111532,
+          0.25238679122631724
+        ]
+      }
+    },
+    {
+      "dimension": "waterway_missing",
+      "segment": "missing",
+      "rows": 517,
+      "positive_rows": 11,
+      "TP": 0,
+      "FN": 11,
+      "FP": 0,
+      "TN": 506,
+      "callback_rate": 0.02127659574468085,
+      "alert_rows": 0,
+      "recall": 0.0,
+      "precision": null,
+      "false_positive_rate": 0.0,
+      "recall_wilson_95": [
+        2.7755575615628914e-17,
+        0.2588400172488141
+      ],
+      "false_positive_rate_wilson_95": [
+        0.0,
+        0.0075348892675685935
+      ],
+      "share_of_all_FN": 0.22448979591836735,
+      "share_of_all_FP": 0.0,
+      "supported": true,
+      "budget": {
+        "rows": 517,
+        "positive_rows": 11,
+        "TP": 0,
+        "FN": 11,
+        "FP": 0,
+        "TN": 506,
+        "callback_rate": 0.02127659574468085,
+        "alert_rows": 0,
+        "recall": 0.0,
+        "precision": null,
+        "false_positive_rate": 0.0,
+        "recall_wilson_95": [
+          2.7755575615628914e-17,
+          0.2588400172488141
+        ],
+        "false_positive_rate_wilson_95": [
+          0.0,
+          0.0075348892675685935
+        ]
+      }
+    },
+    {
+      "dimension": "geocode_quality",
+      "segment": "501-2000m",
+      "rows": 1203,
+      "positive_rows": 110,
+      "TP": 81,
+      "FN": 29,
+      "FP": 356,
+      "TN": 737,
+      "callback_rate": 0.0914380714879468,
+      "alert_rows": 437,
+      "recall": 0.7363636363636363,
+      "precision": 0.1853546910755149,
+      "false_positive_rate": 0.32570905763952424,
+      "recall_wilson_95": [
+        0.6470570975969133,
+        0.8097179301609537
+      ],
+      "false_positive_rate_wilson_95": [
+        0.29857813026836544,
+        0.35406086518913726
+      ],
+      "share_of_all_FN": 0.5918367346938775,
+      "share_of_all_FP": 0.6095890410958904,
+      "supported": true,
+      "budget": {
+        "rows": 1203,
+        "positive_rows": 110,
+        "TP": 63,
+        "FN": 47,
+        "FP": 178,
+        "TN": 915,
+        "callback_rate": 0.0914380714879468,
+        "alert_rows": 241,
+        "recall": 0.5727272727272728,
+        "precision": 0.26141078838174275,
+        "false_positive_rate": 0.16285452881976212,
+        "recall_wilson_95": [
+          0.4793675269277536,
+          0.6611786354592826
+        ],
+        "false_positive_rate_wilson_95": [
+          0.14215180895328952,
+          0.1859188987952131
+        ]
+      }
+    },
+    {
+      "dimension": "geocode_quality",
+      "segment": "<=500m",
+      "rows": 144,
+      "positive_rows": 15,
+      "TP": 13,
+      "FN": 2,
+      "FP": 25,
+      "TN": 104,
+      "callback_rate": 0.10416666666666667,
+      "alert_rows": 38,
+      "recall": 0.8666666666666667,
+      "precision": 0.34210526315789475,
+      "false_positive_rate": 0.1937984496124031,
+      "recall_wilson_95": [
+        0.6211750079348376,
+        0.9626395301086407
+      ],
+      "false_positive_rate_wilson_95": [
+        0.13485458233735692,
+        0.2704521890354661
+      ],
+      "share_of_all_FN": 0.04081632653061224,
+      "share_of_all_FP": 0.04280821917808219,
+      "supported": true,
+      "budget": {
+        "rows": 144,
+        "positive_rows": 15,
+        "TP": 8,
+        "FN": 7,
+        "FP": 13,
+        "TN": 116,
+        "callback_rate": 0.10416666666666667,
+        "alert_rows": 21,
+        "recall": 0.5333333333333333,
+        "precision": 0.38095238095238093,
+        "false_positive_rate": 0.10077519379844961,
+        "recall_wilson_95": [
+          0.3011663015105079,
+          0.7519077474025355
+        ],
+        "false_positive_rate_wilson_95": [
+          0.05984278118812802,
+          0.1647976928802361
+        ]
+      }
+    },
+    {
+      "dimension": "geocode_quality",
+      "segment": ">2000m",
+      "rows": 628,
+      "positive_rows": 54,
+      "TP": 36,
+      "FN": 18,
+      "FP": 203,
+      "TN": 371,
+      "callback_rate": 0.08598726114649681,
+      "alert_rows": 239,
+      "recall": 0.6666666666666666,
+      "precision": 0.1506276150627615,
+      "false_positive_rate": 0.35365853658536583,
+      "recall_wilson_95": [
+        0.5336071462745029,
+        0.7775875647984964
+      ],
+      "false_positive_rate_wilson_95": [
+        0.315636349178355,
+        0.39362653532148023
+      ],
+      "share_of_all_FN": 0.3673469387755102,
+      "share_of_all_FP": 0.3476027397260274,
+      "supported": true,
+      "budget": {
+        "rows": 628,
+        "positive_rows": 54,
+        "TP": 29,
+        "FN": 25,
+        "FP": 104,
+        "TN": 470,
+        "callback_rate": 0.08598726114649681,
+        "alert_rows": 133,
+        "recall": 0.5370370370370371,
+        "precision": 0.21804511278195488,
+        "false_positive_rate": 0.18118466898954705,
+        "recall_wilson_95": [
+          0.4060512701625496,
+          0.6631031100758948
+        ],
+        "false_positive_rate_wilson_95": [
+          0.15182729542717854,
+          0.21478113151889117
+        ]
+      }
+    },
+    {
+      "dimension": "prior_property_callback",
+      "segment": "none_recorded",
+      "rows": 1865,
+      "positive_rows": 172,
+      "TP": 128,
+      "FN": 44,
+      "FP": 551,
+      "TN": 1142,
+      "callback_rate": 0.09222520107238606,
+      "alert_rows": 679,
+      "recall": 0.7441860465116279,
+      "precision": 0.18851251840942562,
+      "false_positive_rate": 0.325457767277023,
+      "recall_wilson_95": [
+        0.674140205833831,
+        0.8035624538325961
+      ],
+      "false_positive_rate_wilson_95": [
+        0.3035554591039619,
+        0.34815039252060914
+      ],
+      "share_of_all_FN": 0.8979591836734694,
+      "share_of_all_FP": 0.9434931506849316,
+      "supported": true,
+      "budget": {
+        "rows": 1865,
+        "positive_rows": 172,
+        "TP": 98,
+        "FN": 74,
+        "FP": 274,
+        "TN": 1419,
+        "callback_rate": 0.09222520107238606,
+        "alert_rows": 372,
+        "recall": 0.5697674418604651,
+        "precision": 0.26344086021505375,
+        "false_positive_rate": 0.16184288245717662,
+        "recall_wilson_95": [
+          0.49504680907437226,
+          0.6414396651160355
+        ],
+        "false_positive_rate_wilson_95": [
+          0.14506727373693762,
+          0.1801496469231877
+        ]
+      }
+    },
+    {
+      "dimension": "prior_property_callback",
+      "segment": "previous_recorded_callback",
+      "rows": 110,
+      "positive_rows": 7,
+      "TP": 2,
+      "FN": 5,
+      "FP": 33,
+      "TN": 70,
+      "callback_rate": 0.06363636363636363,
+      "alert_rows": 35,
+      "recall": 0.2857142857142857,
+      "precision": 0.05714285714285714,
+      "false_positive_rate": 0.32038834951456313,
+      "recall_wilson_95": [
+        0.0822171657090155,
+        0.6410709098517873
+      ],
+      "false_positive_rate_wilson_95": [
+        0.23812916022953895,
+        0.4155637833430022
+      ],
+      "share_of_all_FN": 0.10204081632653061,
+      "share_of_all_FP": 0.05650684931506849,
+      "supported": false,
+      "budget": {
+        "rows": 110,
+        "positive_rows": 7,
+        "TP": 2,
+        "FN": 5,
+        "FP": 21,
+        "TN": 82,
+        "callback_rate": 0.06363636363636363,
+        "alert_rows": 23,
+        "recall": 0.2857142857142857,
+        "precision": 0.08695652173913043,
+        "false_positive_rate": 0.20388349514563106,
+        "recall_wilson_95": [
+          0.0822171657090155,
+          0.6410709098517873
+        ],
+        "false_positive_rate_wilson_95": [
+          0.13739723831977257,
+          0.2916641010836059
+        ]
+      }
+    },
+    {
+      "dimension": "month",
+      "segment": "2026-01",
+      "rows": 234,
+      "positive_rows": 19,
+      "TP": 14,
+      "FN": 5,
+      "FP": 62,
+      "TN": 153,
+      "callback_rate": 0.0811965811965812,
+      "alert_rows": 76,
+      "recall": 0.7368421052631579,
+      "precision": 0.18421052631578946,
+      "false_positive_rate": 0.28837209302325584,
+      "recall_wilson_95": [
+        0.5120803155892935,
+        0.8819376166045982
+      ],
+      "false_positive_rate_wilson_95": [
+        0.2319524447847143,
+        0.35222167933062765
+      ],
+      "share_of_all_FN": 0.10204081632653061,
+      "share_of_all_FP": 0.10616438356164383,
+      "supported": true,
+      "budget": {
+        "rows": 234,
+        "positive_rows": 19,
+        "TP": 12,
+        "FN": 7,
+        "FP": 37,
+        "TN": 178,
+        "callback_rate": 0.0811965811965812,
+        "alert_rows": 49,
+        "recall": 0.631578947368421,
+        "precision": 0.24489795918367346,
+        "false_positive_rate": 0.17209302325581396,
+        "recall_wilson_95": [
+          0.4103915749815672,
+          0.8085072762372616
+        ],
+        "false_positive_rate_wilson_95": [
+          0.12750824229242377,
+          0.2281901258423367
+        ]
+      }
+    },
+    {
+      "dimension": "month",
+      "segment": "2026-02",
+      "rows": 250,
+      "positive_rows": 16,
+      "TP": 12,
+      "FN": 4,
+      "FP": 85,
+      "TN": 149,
+      "callback_rate": 0.064,
+      "alert_rows": 97,
+      "recall": 0.75,
+      "precision": 0.12371134020618557,
+      "false_positive_rate": 0.36324786324786323,
+      "recall_wilson_95": [
+        0.5050123107060135,
+        0.8981809801576265
+      ],
+      "false_positive_rate_wilson_95": [
+        0.304294586755927,
+        0.42661876061476
+      ],
+      "share_of_all_FN": 0.08163265306122448,
+      "share_of_all_FP": 0.14554794520547945,
+      "supported": true,
+      "budget": {
+        "rows": 250,
+        "positive_rows": 16,
+        "TP": 8,
+        "FN": 8,
+        "FP": 36,
+        "TN": 198,
+        "callback_rate": 0.064,
+        "alert_rows": 44,
+        "recall": 0.5,
+        "precision": 0.18181818181818182,
+        "false_positive_rate": 0.15384615384615385,
+        "recall_wilson_95": [
+          0.2799923761135083,
+          0.7200076238864916
+        ],
+        "false_positive_rate_wilson_95": [
+          0.11324329350304904,
+          0.20563111702900258
+        ]
+      }
+    },
+    {
+      "dimension": "month",
+      "segment": "2026-03",
+      "rows": 253,
+      "positive_rows": 24,
+      "TP": 18,
+      "FN": 6,
+      "FP": 84,
+      "TN": 145,
+      "callback_rate": 0.09486166007905138,
+      "alert_rows": 102,
+      "recall": 0.75,
+      "precision": 0.17647058823529413,
+      "false_positive_rate": 0.36681222707423583,
+      "recall_wilson_95": [
+        0.5510017468789357,
+        0.8800079652065766
+      ],
+      "false_positive_rate_wilson_95": [
+        0.30706735112500017,
+        0.4309519718825724
+      ],
+      "share_of_all_FN": 0.12244897959183673,
+      "share_of_all_FP": 0.14383561643835616,
+      "supported": true,
+      "budget": {
+        "rows": 253,
+        "positive_rows": 24,
+        "TP": 16,
+        "FN": 8,
+        "FP": 40,
+        "TN": 189,
+        "callback_rate": 0.09486166007905138,
+        "alert_rows": 56,
+        "recall": 0.6666666666666666,
+        "precision": 0.2857142857142857,
+        "false_positive_rate": 0.17467248908296942,
+        "recall_wilson_95": [
+          0.4670595949408046,
+          0.8202802131162036
+        ],
+        "false_positive_rate_wilson_95": [
+          0.1309756886188563,
+          0.22910429708816513
+        ]
+      }
+    },
+    {
+      "dimension": "month",
+      "segment": "2026-04",
+      "rows": 304,
+      "positive_rows": 28,
+      "TP": 21,
+      "FN": 7,
+      "FP": 94,
+      "TN": 182,
+      "callback_rate": 0.09210526315789473,
+      "alert_rows": 115,
+      "recall": 0.75,
+      "precision": 0.1826086956521739,
+      "false_positive_rate": 0.34057971014492755,
+      "recall_wilson_95": [
+        0.566439747592954,
+        0.8732366505779922
+      ],
+      "false_positive_rate_wilson_95": [
+        0.2871998390182833,
+        0.3983365501390115
+      ],
+      "share_of_all_FN": 0.14285714285714285,
+      "share_of_all_FP": 0.16095890410958905,
+      "supported": true,
+      "budget": {
+        "rows": 304,
+        "positive_rows": 28,
+        "TP": 14,
+        "FN": 14,
+        "FP": 43,
+        "TN": 233,
+        "callback_rate": 0.09210526315789473,
+        "alert_rows": 57,
+        "recall": 0.5,
+        "precision": 0.24561403508771928,
+        "false_positive_rate": 0.15579710144927536,
+        "recall_wilson_95": [
+          0.3263284683244634,
+          0.6736715316755366
+        ],
+        "false_positive_rate_wilson_95": [
+          0.11776872828379598,
+          0.20327574830581757
+        ]
+      }
+    },
+    {
+      "dimension": "month",
+      "segment": "2026-05",
+      "rows": 276,
+      "positive_rows": 22,
+      "TP": 17,
+      "FN": 5,
+      "FP": 86,
+      "TN": 168,
+      "callback_rate": 0.07971014492753623,
+      "alert_rows": 103,
+      "recall": 0.7727272727272727,
+      "precision": 0.1650485436893204,
+      "false_positive_rate": 0.33858267716535434,
+      "recall_wilson_95": [
+        0.5655964393704065,
+        0.8987710920517964
+      ],
+      "false_positive_rate_wilson_95": [
+        0.28317460304377307,
+        0.3988006872119497
+      ],
+      "share_of_all_FN": 0.10204081632653061,
+      "share_of_all_FP": 0.14726027397260275,
+      "supported": true,
+      "budget": {
+        "rows": 276,
+        "positive_rows": 22,
+        "TP": 13,
+        "FN": 9,
+        "FP": 43,
+        "TN": 211,
+        "callback_rate": 0.07971014492753623,
+        "alert_rows": 56,
+        "recall": 0.5909090909090909,
+        "precision": 0.23214285714285715,
+        "false_positive_rate": 0.16929133858267717,
+        "recall_wilson_95": [
+          0.38734477382893806,
+          0.7674444033117963
+        ],
+        "false_positive_rate_wilson_95": [
+          0.12817990482643762,
+          0.22025727520967756
+        ]
+      }
+    },
+    {
+      "dimension": "month",
+      "segment": "2026-06",
+      "rows": 266,
+      "positive_rows": 35,
+      "TP": 24,
+      "FN": 11,
+      "FP": 85,
+      "TN": 146,
+      "callback_rate": 0.13157894736842105,
+      "alert_rows": 109,
+      "recall": 0.6857142857142857,
+      "precision": 0.22018348623853212,
+      "false_positive_rate": 0.36796536796536794,
+      "recall_wilson_95": [
+        0.5201992812074803,
+        0.8144934194021753
+      ],
+      "false_positive_rate_wilson_95": [
+        0.3084076898321453,
+        0.43184275983264997
+      ],
+      "share_of_all_FN": 0.22448979591836735,
+      "share_of_all_FP": 0.14554794520547945,
+      "supported": true,
+      "budget": {
+        "rows": 266,
+        "positive_rows": 35,
+        "TP": 16,
+        "FN": 19,
+        "FP": 38,
+        "TN": 193,
+        "callback_rate": 0.13157894736842105,
+        "alert_rows": 54,
+        "recall": 0.45714285714285713,
+        "precision": 0.2962962962962963,
+        "false_positive_rate": 0.1645021645021645,
+        "recall_wilson_95": [
+          0.3046577363376085,
+          0.6181054865986247
+        ],
+        "false_positive_rate_wilson_95": [
+          0.1222575393712655,
+          0.21772311141632927
+        ]
+      }
+    },
+    {
+      "dimension": "month",
+      "segment": "2026-07",
+      "rows": 270,
+      "positive_rows": 23,
+      "TP": 16,
+      "FN": 7,
+      "FP": 64,
+      "TN": 183,
+      "callback_rate": 0.08518518518518518,
+      "alert_rows": 80,
+      "recall": 0.6956521739130435,
+      "precision": 0.2,
+      "false_positive_rate": 0.2591093117408907,
+      "recall_wilson_95": [
+        0.49133870939427393,
+        0.8439617197902755
+      ],
+      "false_positive_rate_wilson_95": [
+        0.20845123807933577,
+        0.3171457920783415
+      ],
+      "share_of_all_FN": 0.14285714285714285,
+      "share_of_all_FP": 0.1095890410958904,
+      "supported": true,
+      "budget": {
+        "rows": 270,
+        "positive_rows": 23,
+        "TP": 14,
+        "FN": 9,
+        "FP": 37,
+        "TN": 210,
+        "callback_rate": 0.08518518518518518,
+        "alert_rows": 51,
+        "recall": 0.6086956521739131,
+        "precision": 0.27450980392156865,
+        "false_positive_rate": 0.14979757085020243,
+        "recall_wilson_95": [
+          0.4078517960374599,
+          0.7784262201761787
+        ],
+        "false_positive_rate_wilson_95": [
+          0.11067225200011907,
+          0.19964948091818477
+        ]
+      }
+    },
+    {
+      "dimension": "month",
+      "segment": "2026-08",
+      "rows": 122,
+      "positive_rows": 12,
+      "TP": 8,
+      "FN": 4,
+      "FP": 24,
+      "TN": 86,
+      "callback_rate": 0.09836065573770492,
+      "alert_rows": 32,
+      "recall": 0.6666666666666666,
+      "precision": 0.25,
+      "false_positive_rate": 0.21818181818181817,
+      "recall_wilson_95": [
+        0.3906175873976139,
+        0.8618821601026385
+      ],
+      "false_positive_rate_wilson_95": [
+        0.15122852088416217,
+        0.3041550998660733
+      ],
+      "share_of_all_FN": 0.08163265306122448,
+      "share_of_all_FP": 0.0410958904109589,
+      "supported": true,
+      "budget": {
+        "rows": 122,
+        "positive_rows": 12,
+        "TP": 7,
+        "FN": 5,
+        "FP": 21,
+        "TN": 89,
+        "callback_rate": 0.09836065573770492,
+        "alert_rows": 28,
+        "recall": 0.5833333333333334,
+        "precision": 0.25,
+        "false_positive_rate": 0.19090909090909092,
+        "recall_wilson_95": [
+          0.3195073356553728,
+          0.8067425380947535
+        ],
+        "false_positive_rate_wilson_95": [
+          0.12839312602494252,
+          0.27428568383015445
+        ]
+      }
+    }
+  ],
+  "label_evidence_flags": {
+    "complimentary_30d": {
+      "TP": 1,
+      "FN": 1,
+      "FP": 0,
+      "TN": 3
+    },
+    "dated_claim_record_without_calendar_callback": {
+      "TP": 0,
+      "FN": 0,
+      "FP": 74,
+      "TN": 56
+    },
+    "different_hash_positive": {
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 0
+    },
+    "distant_location_positive": {
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 0
+    },
+    "later_callback_31_60d": {
+      "TP": 65,
+      "FN": 21,
+      "FP": 124,
+      "TN": 165
+    },
+    "manual_review_positive": {
+      "TP": 9,
+      "FN": 7,
+      "FP": 0,
+      "TN": 0
+    },
+    "post_package_only_positive": {
+      "TP": 120,
+      "FN": 35,
+      "FP": 0,
+      "TN": 0
+    },
+    "unreviewed_extra_30d": {
+      "TP": 0,
+      "FN": 0,
+      "FP": 0,
+      "TN": 0
+    }
+  },
+  "distinct_callback_events": 179,
+  "callback_event_anchor_links": 244,
+  "positive_anchor_rows": 179,
+  "all_frozen_labels_and_counts_reconstructed": true,
+  "private_review_queue_rows": 30,
+  "limits": [
+    "Recorded scheduled corrective visits are not completion or biological recurrence proof",
+    "A negative means no qualifying linked calendar visit in 30 days, not no actual pest problem",
+    "Segments overlap across dimensions and small subgroup estimates are unstable",
+    "Wilson intervals are descriptive anchor-level bounds; package/property dependence is not accounted for",
+    "31\u201360 day follow-up is censored at observed_through; absence is not a mature 60-day negative",
+    "Flags are candidates for review, not confirmed mislabeled records; no labels changed"
+  ]
+}

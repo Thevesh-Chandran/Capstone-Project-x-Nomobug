@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: landcover_quality
+    database: profound-keel-500007-s4
+    schema: quality
+    tables:
+      - name: worldcover_2021_context_by_location
+        description: "ESA WorldCover 2021 v200 native-pixel fractions in approximately circular 250m and 1km buffers. CC BY 4.0, DOI 10.5281/zenodo.7254221. Static regional context, not current property conditions or proof of flooding."
+        columns:
+          - name: location_id
+            data_tests: [not_null, unique]
+          - name: worldcover_year
+            data_tests:
+              - accepted_values:
+                  arguments:
+                    values: [2021]
+                    quote: false

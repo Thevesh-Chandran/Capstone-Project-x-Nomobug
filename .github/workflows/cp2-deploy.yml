@@ -1,0 +1,108 @@
+name: Deploy CP2 reporting job
+
+on:
+  workflow_dispatch:
+    inputs:
+      observed_spend_myr:
+        description: Current project cost in MYR from Billing Reports
+        required: true
+        type: string
+      observed_at_utc:
+        description: Billing Reports observation time in UTC, for example 2026-09-28T10:00:00Z
+        required: true
+        type: string
+      run_after_deploy:
+        description: Execute the reporting job once after deployment
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: cp2-reporting-deploy
+  cancel-in-progress: false
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+          cache: pip
+      - run: python -m pip install -r requirements-ci.txt
+      - run: python -m pytest tests -q
+      - name: Parse dbt
+        env:
+          NOMOBUG_BQ_MAX_BYTES_BILLED: '104857600'
+        run: >-
+          dbt parse --project-dir dbt --profiles-dir dbt --no-partial-parse
+          --vars '{"prospects_snapshot_id":"0000000000000000000000000000000000000000000000000000000000000000","prospects_snapshot_extracted_at":"2026-09-01T00:00:00Z"}'
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.repository_id == '1289685547'
+    needs: checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    environment: cp2-production
+    env:
+      PROJECT: profound-keel-500007-s4
+      REGION: asia-southeast1
+      JOB: cp2-reporting-daily
+      IMAGE: asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/release
+      OBSERVED_SPEND_MYR: ${{ inputs.observed_spend_myr }}
+      OBSERVED_AT_UTC: ${{ inputs.observed_at_utc }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: projects/964813222593/locations/global/workloadIdentityPools/cp2-github/providers/cp2-main
+          service_account: cp2-reporting-deployer@profound-keel-500007-s4.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v3
+        with:
+          project_id: profound-keel-500007-s4
+      - name: Verify target and source revision
+        run: |
+          test "$GITHUB_REF" = refs/heads/main
+          gcloud config set project "$PROJECT" --quiet
+          gcloud billing projects describe "$PROJECT" --format='value(billingEnabled)' | grep -qx True
+          python3 - <<'PY'
+          from datetime import datetime, timezone
+          from decimal import Decimal
+          import os
+          spend = Decimal(os.environ['OBSERVED_SPEND_MYR'])
+          observed = datetime.fromisoformat(os.environ['OBSERVED_AT_UTC'].replace('Z', '+00:00'))
+          age = datetime.now(timezone.utc) - observed.astimezone(timezone.utc)
+          if spend < 0 or spend >= 30 or not 0 <= age.total_seconds() <= 48 * 3600:
+              raise SystemExit('Billing Reports preflight failed: cost is at the ceiling or observation is stale')
+          print(f'Project spend preflight: RM{spend}; observed {observed.isoformat()}')
+          PY
+      - name: Build and push immutable image
+        run: |
+          gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
+          docker build --tag "${IMAGE}:${GITHUB_SHA}" .
+          docker run --rm --entrypoint python "${IMAGE}:${GITHUB_SHA}" -m scripts.cp2_reporting_release --help
+          docker push "${IMAGE}:${GITHUB_SHA}"
+      - name: Update bounded Cloud Run Job
+        run: |
+          gcloud run jobs deploy "$JOB" \
+            --project "$PROJECT" --region "$REGION" \
+            --image "${IMAGE}:${GITHUB_SHA}" \
+            --service-account "cp2-reporting-job@${PROJECT}.iam.gserviceaccount.com" \
+            --tasks 1 --parallelism 1 --task-timeout 20m --max-retries 0 \
+            --cpu 1 --memory 2Gi \
+            --set-env-vars 'NOMOBUG_BQ_PROJECT=profound-keel-500007-s4,NOMOBUG_BQ_LOCATION=asia-southeast1,NOMOBUG_BQ_UPLOAD_APPROVED=yes,NOMOBUG_BQ_MAX_BYTES_BILLED=104857600,NOMOBUG_GOOGLE_TOKEN=/var/run/secrets/cp2-token/token.json,NOMOBUG_GOOGLE_SOURCE_IDS=/var/run/secrets/cp2-ids/source_ids.json,NOMOBUG_GOOGLE_METADATA=/var/run/secrets/cp2-metadata/metadata.json' \
+            --set-secrets '/var/run/secrets/cp2-token/token.json=cp2-google-readonly-token:latest,/var/run/secrets/cp2-ids/source_ids.json=cp2-google-source-ids:latest,/var/run/secrets/cp2-metadata/metadata.json=cp2-google-source-metadata:latest' \
+            --quiet
+      - name: Show bounded job configuration
+        run: >-
+          gcloud run jobs describe "$JOB" --project "$PROJECT" --region "$REGION"
+          --format='yaml(metadata.name,spec.template.spec.taskCount,spec.template.spec.parallelism,spec.template.spec.template.spec.maxRetries,spec.template.spec.template.spec.timeoutSeconds)'
+      - name: Execute once when requested
+        if: inputs.run_after_deploy
+        run: gcloud run jobs execute "$JOB" --project "$PROJECT" --region "$REGION" --wait --quiet

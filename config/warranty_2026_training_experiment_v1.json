@@ -1,0 +1,1025 @@
+{
+  "dataset_input_sha256": "464bb51386c1bcce9744f74f61b4d0b4265be4a4631c1ede97063b62346914d9",
+  "target": "recorded_corrective_callback_within_30d",
+  "reporting_caveat": "2026 previously inspected; exploratory, not an independent final test",
+  "final_start": "2026-07-01",
+  "final_end_inclusive": "2026-08-14",
+  "development_windows": [
+    [
+      "march",
+      "2026-03-01",
+      "2026-04-01"
+    ],
+    [
+      "april",
+      "2026-04-01",
+      "2026-05-01"
+    ],
+    [
+      "may",
+      "2026-05-01",
+      "2026-06-01"
+    ]
+  ],
+  "all_development_outcomes_before_final_cutoff": true,
+  "final_groups_excluded_before_selection_and_calibration": true,
+  "recent_training_means_anchor_2026_not_erased_historical_predictors": true,
+  "candidate_evaluations": 30,
+  "split_audit": {
+    "embargoed_training_rows": 266,
+    "property_purged_training_rows": 313
+  },
+  "test_keys_sha256": "d9d50856dd2a3edcc9b88d97a59bd05448efccc38ca91c2697adc8d314f16488",
+  "results": {
+    "frozen_v4": {
+      "variant": "frozen_v4",
+      "training_rows": 3051,
+      "training_positive_rows": 290,
+      "selection": {
+        "feature_set": "base_weather_environment",
+        "model": "extra_trees_depth6",
+        "mean_average_precision": 0.23798962205854612,
+        "sd_average_precision": 0.11935441183608483,
+        "mean_roc_auc": 0.7514540353652587,
+        "mean_brier": 0.18513382389794528,
+        "mean_ap_lift_over_prevalence": 2.651438266304609,
+        "development_folds": 3
+      },
+      "selected_features": [
+        "service_number",
+        "package_sessions_recorded",
+        "sale_total_rm",
+        "days_since_previous_service",
+        "days_sale_to_anchor",
+        "prior_package_warranty_claims",
+        "prior_package_service_events",
+        "prior_property_warranty_claims",
+        "prior_property_service_events",
+        "days_since_prior_property_claim",
+        "prior_property_claims_90d",
+        "prior_area_claims_90d",
+        "prior_area_services_90d",
+        "anchor_month_sin",
+        "anchor_month_cos",
+        "location_uncertainty_radius_m",
+        "prior_1d_precipitation_mm",
+        "prior_3d_precipitation_mm",
+        "prior_7d_precipitation_mm",
+        "prior_14d_precipitation_mm",
+        "prior_30d_precipitation_mm",
+        "prior_7d_wet_days_1mm",
+        "prior_14d_wet_days_1mm",
+        "prior_30d_wet_days_1mm",
+        "prior_14d_heavy_rain_days_10mm",
+        "prior_14d_max_daily_precipitation_mm",
+        "days_since_last_rain_1mm_capped_30d",
+        "prior_7d_temperature_mean_c",
+        "prior_7d_temperature_max_c",
+        "prior_30d_temperature_mean_c",
+        "prior_7d_relative_humidity_mean_pct",
+        "prior_30d_relative_humidity_mean_pct",
+        "prior_7d_soil_moisture_0_to_7cm_mean",
+        "prior_30d_soil_moisture_0_to_7cm_mean",
+        "prior_3d_vs_previous_11d_daily_rain_trend_mm",
+        "elevation_m",
+        "local_relief_500m_m",
+        "nearest_mapped_water_m",
+        "nearest_mapped_forest_m",
+        "hotosm_nearest_waterway_m",
+        "hotosm_water_features_500m",
+        "hotosm_water_features_1km",
+        "hotosm_water_features_2km",
+        "hotosm_nearest_drainage_m",
+        "hotosm_nearest_flowing_water_m",
+        "hotosm_nearest_standing_water_m",
+        "log1p_waterway_distance",
+        "water_rain_interaction",
+        "drainage_rain_interaction",
+        "rain_soil_interaction",
+        "pest_has_ant",
+        "pest_has_cockroach",
+        "pest_has_rodent",
+        "pest_has_bed_bug",
+        "pest_has_termite",
+        "pest_has_mosquito",
+        "pest_has_fly",
+        "pest_has_general_control",
+        "pest_has_other_terms",
+        "pest_distinct_known_types",
+        "pest_category",
+        "package_category",
+        "calendar_pest_text_category",
+        "calendar_service_method_category",
+        "premise_type",
+        "normalized_pest_category"
+      ],
+      "feature_preparation_options": {
+        "premise_context": true,
+        "normalize_pest_context": true
+      },
+      "calibration": {
+        "method": "platt_on_pre2026_purged_walk_forward_oof",
+        "fitted_rows": 2481,
+        "slope": 1.4784577935752956,
+        "intercept": -2.0428006178369875,
+        "development_calibrated_brier_is_in_sample_for_calibration": true,
+        "ranking_invariant": true,
+        "applied": true
+      },
+      "diagnostic": {
+        "rows": 392,
+        "positives": 35,
+        "prevalence": 0.08928571428571429,
+        "roc_auc": 0.817687074829932,
+        "average_precision": 0.2953939167920234,
+        "brier_score": 0.07287178222499544,
+        "accuracy": 0.7474489795918368,
+        "balanced_accuracy": 0.7196078431372549,
+        "precision": 0.21428571428571427,
+        "recall": 0.6857142857142857,
+        "f1": 0.32653061224489793,
+        "alert_rows": 112,
+        "threshold": 0.12000000000000001,
+        "majority_class_accuracy": 0.9107142857142857,
+        "ap_lift_over_prevalence": 3.3084118680706625
+      },
+      "priority_top20pct": {
+        "target_fraction": 0.2,
+        "target_rows": 79,
+        "selected_rows_including_ties": 79,
+        "realized_fraction": 0.20153061224489796,
+        "score_cutoff": 0.16475205737723625,
+        "cutoff_tied_rows": 1,
+        "precision": 0.26582278481012656,
+        "recall": 0.6,
+        "precision_lift_over_prevalence": 2.977215189873417,
+        "selection": "within_batch_top_fraction_including_cutoff_ties"
+      }
+    },
+    "all_history_locked": {
+      "variant": "all_history_locked",
+      "training_rows": 4627,
+      "training_positive_rows": 438,
+      "selection": {
+        "feature_set": "base_weather_environment",
+        "model": "extra_trees_depth6",
+        "mean_average_precision": 0.24427399617933557,
+        "mean_roc_auc": 0.7515187455089621,
+        "folds": [
+          {
+            "fold": "march",
+            "training_rows": 3579,
+            "embargoed_training_rows": 251,
+            "property_purged_training_rows": 60,
+            "rows": 236,
+            "positives": 24,
+            "prevalence": 0.1016949152542373,
+            "roc_auc": 0.7547169811320754,
+            "average_precision": 0.24557004736579718,
+            "brier_score": 0.18657837983181835,
+            "accuracy": 0.6059322033898306,
+            "balanced_accuracy": 0.6882861635220126,
+            "precision": 0.17757009345794392,
+            "recall": 0.7916666666666666,
+            "f1": 0.2900763358778626,
+            "alert_rows": 107,
+            "threshold": 0.5,
+            "majority_class_accuracy": 0.8983050847457628,
+            "ap_lift_over_prevalence": 2.414772132430339
+          },
+          {
+            "fold": "april",
+            "training_rows": 3810,
+            "embargoed_training_rows": 233,
+            "property_purged_training_rows": 83,
+            "rows": 269,
+            "positives": 26,
+            "prevalence": 0.09665427509293681,
+            "roc_auc": 0.8037353592909149,
+            "average_precision": 0.30313800535569085,
+            "brier_score": 0.17854034338814967,
+            "accuracy": 0.6133828996282528,
+            "balanced_accuracy": 0.7516619183285851,
+            "precision": 0.19047619047619047,
+            "recall": 0.9230769230769231,
+            "f1": 0.3157894736842105,
+            "alert_rows": 126,
+            "threshold": 0.5,
+            "majority_class_accuracy": 0.9033457249070632,
+            "ap_lift_over_prevalence": 3.136312440026186
+          },
+          {
+            "fold": "may",
+            "training_rows": 4030,
+            "embargoed_training_rows": 269,
+            "property_purged_training_rows": 96,
+            "rows": 232,
+            "positives": 22,
+            "prevalence": 0.09482758620689655,
+            "roc_auc": 0.6961038961038962,
+            "average_precision": 0.18411393581651875,
+            "brier_score": 0.19556497045595042,
+            "accuracy": 0.5603448275862069,
+            "balanced_accuracy": 0.6554112554112554,
+            "precision": 0.14912280701754385,
+            "recall": 0.7727272727272727,
+            "f1": 0.25,
+            "alert_rows": 114,
+            "threshold": 0.5,
+            "majority_class_accuracy": 0.9051724137931034,
+            "ap_lift_over_prevalence": 1.941565141337834
+          }
+        ]
+      },
+      "selected_features": [
+        "service_number",
+        "package_sessions_recorded",
+        "sale_total_rm",
+        "days_since_previous_service",
+        "days_sale_to_anchor",
+        "prior_package_warranty_claims",
+        "prior_package_service_events",
+        "prior_property_warranty_claims",
+        "prior_property_service_events",
+        "days_since_prior_property_claim",
+        "prior_property_claims_90d",
+        "prior_area_claims_90d",
+        "prior_area_services_90d",
+        "anchor_month_sin",
+        "anchor_month_cos",
+        "location_uncertainty_radius_m",
+        "prior_1d_precipitation_mm",
+        "prior_3d_precipitation_mm",
+        "prior_7d_precipitation_mm",
+        "prior_14d_precipitation_mm",
+        "prior_30d_precipitation_mm",
+        "prior_7d_wet_days_1mm",
+        "prior_14d_wet_days_1mm",
+        "prior_30d_wet_days_1mm",
+        "prior_14d_heavy_rain_days_10mm",
+        "prior_14d_max_daily_precipitation_mm",
+        "days_since_last_rain_1mm_capped_30d",
+        "prior_7d_temperature_mean_c",
+        "prior_7d_temperature_max_c",
+        "prior_30d_temperature_mean_c",
+        "prior_7d_relative_humidity_mean_pct",
+        "prior_30d_relative_humidity_mean_pct",
+        "prior_7d_soil_moisture_0_to_7cm_mean",
+        "prior_30d_soil_moisture_0_to_7cm_mean",
+        "prior_3d_vs_previous_11d_daily_rain_trend_mm",
+        "elevation_m",
+        "local_relief_500m_m",
+        "nearest_mapped_water_m",
+        "nearest_mapped_forest_m",
+        "hotosm_nearest_waterway_m",
+        "hotosm_water_features_500m",
+        "hotosm_water_features_1km",
+        "hotosm_water_features_2km",
+        "hotosm_nearest_drainage_m",
+        "hotosm_nearest_flowing_water_m",
+        "hotosm_nearest_standing_water_m",
+        "log1p_waterway_distance",
+        "water_rain_interaction",
+        "drainage_rain_interaction",
+        "rain_soil_interaction",
+        "pest_has_ant",
+        "pest_has_cockroach",
+        "pest_has_rodent",
+        "pest_has_bed_bug",
+        "pest_has_termite",
+        "pest_has_mosquito",
+        "pest_has_fly",
+        "pest_has_general_control",
+        "pest_has_other_terms",
+        "pest_distinct_known_types",
+        "pest_category",
+        "package_category",
+        "calendar_pest_text_category",
+        "calendar_service_method_category",
+        "premise_type",
+        "normalized_pest_category"
+      ],
+      "feature_preparation_options": {
+        "premise_context": true,
+        "normalize_pest_context": true
+      },
+      "calibration": {
+        "method": "platt_on_march_to_may2026_purged_oof",
+        "fitted_rows": 737,
+        "slope": 1.4746933233296833,
+        "intercept": -1.9858280389497935,
+        "development_calibrated_brier_is_in_sample_for_calibration": true,
+        "ranking_invariant": true,
+        "applied": true,
+        "outcomes_known_before": "2026-07-01"
+      },
+      "diagnostic": {
+        "rows": 392,
+        "positives": 35,
+        "prevalence": 0.08928571428571429,
+        "roc_auc": 0.8099239695878351,
+        "average_precision": 0.24265527809573628,
+        "brier_score": 0.07275308983376222,
+        "accuracy": 0.8061224489795918,
+        "balanced_accuracy": 0.7260504201680672,
+        "precision": 0.25882352941176473,
+        "recall": 0.6285714285714286,
+        "f1": 0.36666666666666664,
+        "alert_rows": 85,
+        "threshold": 0.16999999999999998,
+        "majority_class_accuracy": 0.9107142857142857,
+        "ap_lift_over_prevalence": 2.7177391146722463
+      },
+      "priority_top20pct": {
+        "target_fraction": 0.2,
+        "target_rows": 79,
+        "selected_rows_including_ties": 79,
+        "realized_fraction": 0.20153061224489796,
+        "score_cutoff": 0.17488511973409854,
+        "cutoff_tied_rows": 1,
+        "precision": 0.27848101265822783,
+        "recall": 0.6285714285714286,
+        "precision_lift_over_prevalence": 3.1189873417721516,
+        "selection": "within_batch_top_fraction_including_cutoff_ties"
+      }
+    },
+    "all_history_selected": {
+      "variant": "all_history_selected",
+      "training_rows": 4627,
+      "training_positive_rows": 438,
+      "selection": {
+        "feature_set": "base",
+        "model": "lr_c1.0_plain",
+        "mean_average_precision": 0.3233981380233513,
+        "mean_roc_auc": 0.7892331361277902,
+        "folds": [
+          {
+            "fold": "march",
+            "training_rows": 3579,
+            "embargoed_training_rows": 251,
+            "property_purged_training_rows": 60,
+            "rows": 236,
+            "positives": 24,
+            "prevalence": 0.1016949152542373,
+            "roc_auc": 0.8335298742138365,
+            "average_precision": 0.37180945903542434,
+            "brier_score": 0.08237470710239848,
+            "accuracy": 0.8983050847457628,
+            "balanced_accuracy": 0.5,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "alert_rows": 0,
+            "threshold": 0.5,
+            "majority_class_accuracy": 0.8983050847457628,
+            "ap_lift_over_prevalence": 3.6561263471816723
+          },
+          {
+            "fold": "april",
+            "training_rows": 3810,
+            "embargoed_training_rows": 233,
+            "property_purged_training_rows": 83,
+            "rows": 269,
+            "positives": 26,
+            "prevalence": 0.09665427509293681,
+            "roc_auc": 0.8133903133903134,
+            "average_precision": 0.33156296623413295,
+            "brier_score": 0.0814758033144673,
+            "accuracy": 0.9033457249070632,
+            "balanced_accuracy": 0.5,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "alert_rows": 0,
+            "threshold": 0.5,
+            "majority_class_accuracy": 0.9033457249070632,
+            "ap_lift_over_prevalence": 3.430401458345452
+          },
+          {
+            "fold": "may",
+            "training_rows": 4030,
+            "embargoed_training_rows": 269,
+            "property_purged_training_rows": 96,
+            "rows": 232,
+            "positives": 22,
+            "prevalence": 0.09482758620689655,
+            "roc_auc": 0.7207792207792207,
+            "average_precision": 0.2668219888004967,
+            "brier_score": 0.08648042627235182,
+            "accuracy": 0.9094827586206896,
+            "balanced_accuracy": 0.5227272727272727,
+            "precision": 1.0,
+            "recall": 0.045454545454545456,
+            "f1": 0.08695652173913043,
+            "alert_rows": 1,
+            "threshold": 0.5,
+            "majority_class_accuracy": 0.9051724137931034,
+            "ap_lift_over_prevalence": 2.8137591546234195
+          }
+        ]
+      },
+      "selected_features": [
+        "service_number",
+        "package_sessions_recorded",
+        "sale_total_rm",
+        "days_since_previous_service",
+        "days_sale_to_anchor",
+        "prior_package_warranty_claims",
+        "prior_package_service_events",
+        "prior_property_warranty_claims",
+        "prior_property_service_events",
+        "days_since_prior_property_claim",
+        "prior_property_claims_90d",
+        "prior_area_claims_90d",
+        "prior_area_services_90d",
+        "anchor_month_sin",
+        "anchor_month_cos",
+        "location_uncertainty_radius_m",
+        "pest_has_ant",
+        "pest_has_cockroach",
+        "pest_has_rodent",
+        "pest_has_bed_bug",
+        "pest_has_termite",
+        "pest_has_mosquito",
+        "pest_has_fly",
+        "pest_has_general_control",
+        "pest_has_other_terms",
+        "pest_distinct_known_types",
+        "pest_category",
+        "package_category",
+        "calendar_pest_text_category",
+        "calendar_service_method_category",
+        "premise_type",
+        "normalized_pest_category"
+      ],
+      "feature_preparation_options": {
+        "premise_context": true,
+        "normalize_pest_context": true
+      },
+      "calibration": {
+        "method": "platt_on_march_to_may2026_purged_oof",
+        "fitted_rows": 737,
+        "slope": 0.682770209826891,
+        "intercept": -0.4308520087733383,
+        "development_calibrated_brier_is_in_sample_for_calibration": true,
+        "ranking_invariant": true,
+        "applied": true,
+        "outcomes_known_before": "2026-07-01"
+      },
+      "diagnostic": {
+        "rows": 392,
+        "positives": 35,
+        "prevalence": 0.08928571428571429,
+        "roc_auc": 0.7949579831932774,
+        "average_precision": 0.2570692237416487,
+        "brier_score": 0.07298023812770725,
+        "accuracy": 0.7270408163265306,
+        "balanced_accuracy": 0.7084033613445377,
+        "precision": 0.2,
+        "recall": 0.6857142857142857,
+        "f1": 0.3096774193548387,
+        "alert_rows": 120,
+        "threshold": 0.13,
+        "majority_class_accuracy": 0.9107142857142857,
+        "ap_lift_over_prevalence": 2.8791753059064655
+      },
+      "priority_top20pct": {
+        "target_fraction": 0.2,
+        "target_rows": 79,
+        "selected_rows_including_ties": 79,
+        "realized_fraction": 0.20153061224489796,
+        "score_cutoff": 0.18023916129863926,
+        "cutoff_tied_rows": 1,
+        "precision": 0.27848101265822783,
+        "recall": 0.6285714285714286,
+        "precision_lift_over_prevalence": 3.1189873417721516,
+        "selection": "within_batch_top_fraction_including_cutoff_ties"
+      }
+    },
+    "2026_only_locked": {
+      "variant": "2026_only_locked",
+      "training_rows": 1166,
+      "training_positive_rows": 106,
+      "selection": {
+        "feature_set": "base_weather_environment",
+        "model": "extra_trees_depth6",
+        "mean_average_precision": 0.2764508683508788,
+        "mean_roc_auc": 0.7625022468925334,
+        "folds": [
+          {
+            "fold": "march",
+            "training_rows": 165,
+            "embargoed_training_rows": 251,
+            "property_purged_training_rows": 13,
+            "rows": 236,
+            "positives": 24,
+            "prevalence": 0.1016949152542373,
+            "roc_auc": 0.7582547169811321,
+            "average_precision": 0.3331940843370949,
+            "brier_score": 0.19847252264573917,
+            "accuracy": 0.5932203389830508,
+            "balanced_accuracy": 0.699685534591195,
+            "precision": 0.17857142857142858,
+            "recall": 0.8333333333333334,
+            "f1": 0.29411764705882354,
+            "alert_rows": 112,
+            "threshold": 0.5,
+            "majority_class_accuracy": 0.8983050847457628,
+            "ap_lift_over_prevalence": 3.2764084959814332
+          },
+          {
+            "fold": "april",
+            "training_rows": 408,
+            "embargoed_training_rows": 233,
+            "property_purged_training_rows": 24,
+            "rows": 269,
+            "positives": 26,
+            "prevalence": 0.09665427509293681,
+            "roc_auc": 0.8173472617917062,
+            "average_precision": 0.30022489498699634,
+            "brier_score": 0.17554421003546744,
+            "accuracy": 0.6356877323420075,
+            "balanced_accuracy": 0.7468344412788857,
+            "precision": 0.19491525423728814,
+            "recall": 0.8846153846153846,
+            "f1": 0.3194444444444444,
+            "alert_rows": 118,
+            "threshold": 0.5,
+            "majority_class_accuracy": 0.9033457249070632,
+            "ap_lift_over_prevalence": 3.1061729519808465
+          },
+          {
+            "fold": "may",
+            "training_rows": 613,
+            "embargoed_training_rows": 269,
+            "property_purged_training_rows": 52,
+            "rows": 232,
+            "positives": 22,
+            "prevalence": 0.09482758620689655,
+            "roc_auc": 0.7119047619047619,
+            "average_precision": 0.19593362572854506,
+            "brier_score": 0.20730724188025548,
+            "accuracy": 0.5603448275862069,
+            "balanced_accuracy": 0.6554112554112554,
+            "precision": 0.14912280701754385,
+            "recall": 0.7727272727272727,
+            "f1": 0.25,
+            "alert_rows": 114,
+            "threshold": 0.5,
+            "majority_class_accuracy": 0.9051724137931034,
+            "ap_lift_over_prevalence": 2.0662091440464754
+          }
+        ]
+      },
+      "selected_features": [
+        "service_number",
+        "package_sessions_recorded",
+        "sale_total_rm",
+        "days_since_previous_service",
+        "days_sale_to_anchor",
+        "prior_package_warranty_claims",
+        "prior_package_service_events",
+        "prior_property_warranty_claims",
+        "prior_property_service_events",
+        "days_since_prior_property_claim",
+        "prior_property_claims_90d",
+        "prior_area_claims_90d",
+        "prior_area_services_90d",
+        "anchor_month_sin",
+        "anchor_month_cos",
+        "location_uncertainty_radius_m",
+        "prior_1d_precipitation_mm",
+        "prior_3d_precipitation_mm",
+        "prior_7d_precipitation_mm",
+        "prior_14d_precipitation_mm",
+        "prior_30d_precipitation_mm",
+        "prior_7d_wet_days_1mm",
+        "prior_14d_wet_days_1mm",
+        "prior_30d_wet_days_1mm",
+        "prior_14d_heavy_rain_days_10mm",
+        "prior_14d_max_daily_precipitation_mm",
+        "days_since_last_rain_1mm_capped_30d",
+        "prior_7d_temperature_mean_c",
+        "prior_7d_temperature_max_c",
+        "prior_30d_temperature_mean_c",
+        "prior_7d_relative_humidity_mean_pct",
+        "prior_30d_relative_humidity_mean_pct",
+        "prior_7d_soil_moisture_0_to_7cm_mean",
+        "prior_30d_soil_moisture_0_to_7cm_mean",
+        "prior_3d_vs_previous_11d_daily_rain_trend_mm",
+        "elevation_m",
+        "local_relief_500m_m",
+        "nearest_mapped_water_m",
+        "nearest_mapped_forest_m",
+        "hotosm_nearest_waterway_m",
+        "hotosm_water_features_500m",
+        "hotosm_water_features_1km",
+        "hotosm_water_features_2km",
+        "hotosm_nearest_drainage_m",
+        "hotosm_nearest_flowing_water_m",
+        "hotosm_nearest_standing_water_m",
+        "log1p_waterway_distance",
+        "water_rain_interaction",
+        "drainage_rain_interaction",
+        "rain_soil_interaction",
+        "pest_has_ant",
+        "pest_has_cockroach",
+        "pest_has_rodent",
+        "pest_has_bed_bug",
+        "pest_has_termite",
+        "pest_has_mosquito",
+        "pest_has_fly",
+        "pest_has_general_control",
+        "pest_has_other_terms",
+        "pest_distinct_known_types",
+        "pest_category",
+        "package_category",
+        "calendar_pest_text_category",
+        "calendar_service_method_category",
+        "premise_type",
+        "normalized_pest_category"
+      ],
+      "feature_preparation_options": {
+        "premise_context": true,
+        "normalize_pest_context": true
+      },
+      "calibration": {
+        "method": "platt_on_march_to_may2026_purged_oof",
+        "fitted_rows": 737,
+        "slope": 1.0324642921730793,
+        "intercept": -2.0371980977347723,
+        "development_calibrated_brier_is_in_sample_for_calibration": true,
+        "ranking_invariant": true,
+        "applied": true,
+        "outcomes_known_before": "2026-07-01"
+      },
+      "diagnostic": {
+        "rows": 392,
+        "positives": 35,
+        "prevalence": 0.08928571428571429,
+        "roc_auc": 0.8104041616646659,
+        "average_precision": 0.26102507458544705,
+        "brier_score": 0.07333352827048405,
+        "accuracy": 0.8290816326530612,
+        "balanced_accuracy": 0.7,
+        "precision": 0.2714285714285714,
+        "recall": 0.5428571428571428,
+        "f1": 0.3619047619047619,
+        "alert_rows": 70,
+        "threshold": 0.15,
+        "majority_class_accuracy": 0.9107142857142857,
+        "ap_lift_over_prevalence": 2.9234808353570068
+      },
+      "priority_top20pct": {
+        "target_fraction": 0.2,
+        "target_rows": 79,
+        "selected_rows_including_ties": 79,
+        "realized_fraction": 0.20153061224489796,
+        "score_cutoff": 0.13976864343911052,
+        "cutoff_tied_rows": 1,
+        "precision": 0.26582278481012656,
+        "recall": 0.6,
+        "precision_lift_over_prevalence": 2.977215189873417,
+        "selection": "within_batch_top_fraction_including_cutoff_ties"
+      }
+    },
+    "2026_only_selected": {
+      "variant": "2026_only_selected",
+      "training_rows": 1166,
+      "training_positive_rows": 106,
+      "selection": {
+        "feature_set": "compact_history",
+        "model": "catboost_depth4_plain",
+        "mean_average_precision": 0.31044334512694344,
+        "mean_roc_auc": 0.7996492369505125,
+        "folds": [
+          {
+            "fold": "march",
+            "training_rows": 165,
+            "embargoed_training_rows": 251,
+            "property_purged_training_rows": 13,
+            "rows": 236,
+            "positives": 24,
+            "prevalence": 0.1016949152542373,
+            "roc_auc": 0.8145636792452831,
+            "average_precision": 0.38092570783358315,
+            "brier_score": 0.09452350612182098,
+            "accuracy": 0.8686440677966102,
+            "balanced_accuracy": 0.612814465408805,
+            "precision": 0.3333333333333333,
+            "recall": 0.2916666666666667,
+            "f1": 0.3111111111111111,
+            "alert_rows": 21,
+            "threshold": 0.5,
+            "majority_class_accuracy": 0.8983050847457628,
+            "ap_lift_over_prevalence": 3.7457694603635674
+          },
+          {
+            "fold": "april",
+            "training_rows": 408,
+            "embargoed_training_rows": 233,
+            "property_purged_training_rows": 24,
+            "rows": 269,
+            "positives": 26,
+            "prevalence": 0.09665427509293681,
+            "roc_auc": 0.8039727761949985,
+            "average_precision": 0.28622140667389384,
+            "brier_score": 0.07880452888863398,
+            "accuracy": 0.9033457249070632,
+            "balanced_accuracy": 0.5,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "alert_rows": 0,
+            "threshold": 0.5,
+            "majority_class_accuracy": 0.9033457249070632,
+            "ap_lift_over_prevalence": 2.961290707510671
+          },
+          {
+            "fold": "may",
+            "training_rows": 613,
+            "embargoed_training_rows": 269,
+            "property_purged_training_rows": 52,
+            "rows": 232,
+            "positives": 22,
+            "prevalence": 0.09482758620689655,
+            "roc_auc": 0.7804112554112554,
+            "average_precision": 0.2641829208733532,
+            "brier_score": 0.08373157430691422,
+            "accuracy": 0.8922413793103449,
+            "balanced_accuracy": 0.5335497835497836,
+            "precision": 0.2857142857142857,
+            "recall": 0.09090909090909091,
+            "f1": 0.13793103448275862,
+            "alert_rows": 7,
+            "threshold": 0.5,
+            "majority_class_accuracy": 0.9051724137931034,
+            "ap_lift_over_prevalence": 2.7859289837553614
+          }
+        ]
+      },
+      "selected_features": [
+        "service_number",
+        "package_sessions_recorded",
+        "days_since_previous_service",
+        "prior_package_warranty_claims",
+        "prior_property_warranty_claims",
+        "days_since_prior_property_claim",
+        "prior_property_claims_90d",
+        "anchor_month_sin",
+        "anchor_month_cos",
+        "pest_has_ant",
+        "pest_has_cockroach",
+        "pest_has_rodent",
+        "pest_has_bed_bug",
+        "pest_has_termite",
+        "pest_has_mosquito",
+        "pest_has_fly",
+        "pest_has_general_control",
+        "pest_has_other_terms",
+        "pest_distinct_known_types",
+        "pest_category",
+        "package_category",
+        "calendar_pest_text_category",
+        "calendar_service_method_category",
+        "premise_type",
+        "normalized_pest_category"
+      ],
+      "feature_preparation_options": {
+        "premise_context": true,
+        "normalize_pest_context": true
+      },
+      "calibration": {
+        "method": "platt_on_march_to_may2026_purged_oof",
+        "fitted_rows": 737,
+        "slope": 0.7402294967416619,
+        "intercept": -0.7104661385573903,
+        "development_calibrated_brier_is_in_sample_for_calibration": true,
+        "ranking_invariant": true,
+        "applied": true,
+        "outcomes_known_before": "2026-07-01"
+      },
+      "diagnostic": {
+        "rows": 392,
+        "positives": 35,
+        "prevalence": 0.08928571428571429,
+        "roc_auc": 0.8054021608643457,
+        "average_precision": 0.2933243128328222,
+        "brier_score": 0.07443763479066103,
+        "accuracy": 0.8163265306122449,
+        "balanced_accuracy": 0.7058823529411764,
+        "precision": 0.2597402597402597,
+        "recall": 0.5714285714285714,
+        "f1": 0.35714285714285715,
+        "alert_rows": 77,
+        "threshold": 0.11,
+        "majority_class_accuracy": 0.9107142857142857,
+        "ap_lift_over_prevalence": 3.285232303727608
+      },
+      "priority_top20pct": {
+        "target_fraction": 0.2,
+        "target_rows": 79,
+        "selected_rows_including_ties": 79,
+        "realized_fraction": 0.20153061224489796,
+        "score_cutoff": 0.10415932800528416,
+        "cutoff_tied_rows": 1,
+        "precision": 0.25316455696202533,
+        "recall": 0.5714285714285714,
+        "precision_lift_over_prevalence": 2.8354430379746836,
+        "selection": "within_batch_top_fraction_including_cutoff_ties"
+      }
+    }
+  },
+  "paired_cluster_bootstraps": {
+    "all_history_locked": {
+      "direction": "all_history_locked_minus_frozen_v4",
+      "valid_repeats": 200,
+      "groups": 236,
+      "confidence_95pct": {
+        "roc_auc": [
+          -0.022958917118531645,
+          0.005267729301641549
+        ],
+        "average_precision": [
+          -0.14808997857059095,
+          0.005527725479644815
+        ],
+        "brier_score": [
+          -0.0010246284240228653,
+          0.0007316532765352432
+        ],
+        "accuracy": [
+          0.034943227411330414,
+          0.0831716287101716
+        ],
+        "precision": [
+          0.009347435092370796,
+          0.07512899095565002
+        ],
+        "recall": [
+          -0.12003030303030303,
+          0.0
+        ],
+        "f1": [
+          0.0006275153105861624,
+          0.07726925934736184
+        ]
+      }
+    },
+    "all_history_selected": {
+      "direction": "all_history_selected_minus_frozen_v4",
+      "valid_repeats": 200,
+      "groups": 236,
+      "confidence_95pct": {
+        "roc_auc": [
+          -0.06162310030395141,
+          0.011443468118624336
+        ],
+        "average_precision": [
+          -0.13047518642227154,
+          0.06073607168147152
+        ],
+        "brier_score": [
+          -0.002863173969069643,
+          0.002996078901818739
+        ],
+        "accuracy": [
+          -0.04617531294360565,
+          0.01066616434713233
+        ],
+        "precision": [
+          -0.052674617130099174,
+          0.03006268487644128
+        ],
+        "recall": [
+          -0.14663029525032092,
+          0.16696428571428576
+        ],
+        "f1": [
+          -0.07321772095990572,
+          0.05445660779317989
+        ]
+      }
+    },
+    "2026_only_locked": {
+      "direction": "2026_only_locked_minus_frozen_v4",
+      "valid_repeats": 200,
+      "groups": 236,
+      "confidence_95pct": {
+        "roc_auc": [
+          -0.04260138619085298,
+          0.029009909672893273
+        ],
+        "average_precision": [
+          -0.16356389524280662,
+          0.08758306228965314
+        ],
+        "brier_score": [
+          -0.001979126214551767,
+          0.003027243750603293
+        ],
+        "accuracy": [
+          0.045977806660796906,
+          0.11053393875116002
+        ],
+        "precision": [
+          -0.010510719976821672,
+          0.11012026087640096
+        ],
+        "recall": [
+          -0.31710088691796,
+          0.037198067632850225
+        ],
+        "f1": [
+          -0.06954904567133205,
+          0.11529756506190043
+        ]
+      }
+    },
+    "2026_only_selected": {
+      "direction": "2026_only_selected_minus_frozen_v4",
+      "valid_repeats": 200,
+      "groups": 236,
+      "confidence_95pct": {
+        "roc_auc": [
+          -0.06271582431860323,
+          0.04848579375378593
+        ],
+        "average_precision": [
+          -0.1171762527816834,
+          0.0922472053772386
+        ],
+        "brier_score": [
+          -0.0020946481511319804,
+          0.004665139134682266
+        ],
+        "accuracy": [
+          0.02275719529347193,
+          0.11539948453608251
+        ],
+        "precision": [
+          -0.022574338292790045,
+          0.11939702950558213
+        ],
+        "recall": [
+          -0.29279828609096903,
+          0.10017857142857156
+        ],
+        "f1": [
+          -0.06091826882268058,
+          0.13421786639433853
+        ]
+      }
+    },
+    "2026_only_minus_all_history_locked": {
+      "direction": "2026_only_locked_minus_all_history_locked",
+      "valid_repeats": 200,
+      "groups": 236,
+      "confidence_95pct": {
+        "roc_auc": [
+          -0.03131532531389321,
+          0.031136523488086012
+        ],
+        "average_precision": [
+          -0.059255969005499176,
+          0.10535665322338719
+        ],
+        "brier_score": [
+          -0.0019339952286714763,
+          0.003281581409667926
+        ],
+        "accuracy": [
+          0.0,
+          0.04749654479205931
+        ],
+        "precision": [
+          -0.05402020283723022,
+          0.07044277426160336
+        ],
+        "recall": [
+          -0.27285353535353535,
+          0.07264285714285738
+        ],
+        "f1": [
+          -0.09780720154170967,
+          0.08074940196449075
+        ]
+      }
+    }
+  },
+  "model_version": "warranty_callback_2026_training_experiment_v1",
+  "status": "diagnostic_only_not_operational",
+  "recommendation": "retain_frozen_v4_callback_baseline",
+  "verification": {
+    "local_tests_passed": 231,
+    "fresh_process_models_verified": 5,
+    "predictions_per_model": 392
+  },
+  "target_type": "binary_categorical",
+  "prediction_type": "numerical_probability_0_to_1",
+  "horizon_days": 30,
+  "final_group_exclusion_applies_to": "both_updated_regimes_not_original_frozen_development",
+  "frozen_reference_final_fit_disjoint": true,
+  "frozen_reference_historical_development_overlap_rows": 122,
+  "frozen_reference_historical_development_overlap_components": 32
+}

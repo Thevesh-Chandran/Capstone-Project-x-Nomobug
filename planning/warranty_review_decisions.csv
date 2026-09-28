@@ -1,0 +1,81 @@
+review_id,calendar_event_row,event_id,review_label,original_system_positive,review_stratum,confidence
+WR-001,911,335bktrids36kblfbf2m1l37pp,Confirmed warranty claim,False,NEGATIVE_COMPLIMENTARY,1
+WR-002,7941,0jo6rh3k61lqd2uteltgs456pd,Confirmed warranty claim,False,NEGATIVE_COMPLIMENTARY,1
+WR-003,9237,3gttdedq45to87vtlmnuc6bp3d,Not a warranty claim,False,NEGATIVE_COMPLIMENTARY,1
+WR-004,1736,481brt1pedlhrf1bsq7prqofha,Not a warranty claim,False,NEGATIVE_COMPLIMENTARY,1
+WR-005,1905,6vvqb8j52u2kulk3npfr4eoqra,Not a warranty claim,False,NEGATIVE_COMPLIMENTARY,1
+WR-006,10711,0hbo4ir9vn3u763jrsk8p09irn,Confirmed warranty claim,False,NEGATIVE_COMPLIMENTARY,1
+WR-007,5671,3h4qq2ccb35tuev0l68thon4p3,Confirmed warranty claim,False,NEGATIVE_COMPLIMENTARY,1
+WR-008,9892,372snjh5bm04m5ujshr1fj6ld9,Confirmed warranty claim,False,NEGATIVE_COMPLIMENTARY,1
+WR-009,2488,chi36p9m6hh32bb3cpi36b9k6krjcbb270o66bb46sp3gd1o6cpm4chico,Unclear,False,NEGATIVE_OTHER_MATCHED,1
+WR-010,2489,lsnstvftroknh3498683bahmmg,Unclear,False,NEGATIVE_OTHER_MATCHED,1
+WR-011,6855,137fm93n987fh8n2gmp0fa1ak0,Not a warranty claim,False,NEGATIVE_OTHER_MATCHED,1
+WR-012,6262,19ireo2dsttd0en81e2pjoauvb,Not a warranty claim,False,NEGATIVE_OTHER_MATCHED,1
+WR-013,6735,56pm9j9u6epocbeins82ei3mdv,Not a warranty claim,False,NEGATIVE_OTHER_MATCHED,1
+WR-014,1699,7t4avqko5im62824qu21po22fb,Not a warranty claim,False,NEGATIVE_OTHER_MATCHED,1
+WR-015,5642,3ed2a84e6pm5f5t6u0d4fftkb2,Not a warranty claim,False,NEGATIVE_OTHER_MATCHED,1
+WR-016,10972,4o0crsv124mikoh191kq9qgq71,Not a warranty claim,False,NEGATIVE_OTHER_MATCHED,1
+WR-017,5894,6pktt5spvvcbdmve96fhut81p0,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-018,830,49cg5qeg51b4h25v6u3obtqg97,Not a warranty claim,True,POSITIVE_EXPLICIT,1
+WR-019,8560,4p74uuiomor1oiejehc4d74rqc,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-020,3716,1lht3fmr2rukjr61lb83j7a64c,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-021,4619,5ftar6mjprmaf4ef05cn10vtc6,Not a warranty claim,True,POSITIVE_EXPLICIT,1
+WR-022,6233,56p12pu85ik0a6k9ppcchohq22,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-023,6967,58ver08kcj4ribd6s2k82c8e8n,Not a warranty claim,True,POSITIVE_EXPLICIT,1
+WR-024,7013,04boa73osc678gevqh5aomr1cp,Not a warranty claim,True,POSITIVE_EXPLICIT,1
+WR-025,8271,5jnsn0eljjemnrvpn9a3mql884,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-026,675,6rus2009dp6776h6jmri2o918g,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-027,4190,5md1psp6f8cavr4f0rrob1d2i4,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-028,4663,4g4cua3ntb51e0p492bi65kfpd,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-029,4687,1mpeen2clhfiispqp00cf63atp,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-030,6562,590qdnajimn0b4au0fo85jtd95,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-031,6826,12jj4a2njopvu1iv31neq1uqmc,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-032,8272,6kifbr52a7pvji8higg3khnega,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-033,10191,5m9o1g29e8pt3l4f2jc7n12qdr,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-034,10345,4tubrii2aiha96b53hfivgeuj7,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-035,4875,15a684j9un04dudb4n3o2k38kp,Not a warranty claim,True,POSITIVE_EXPLICIT,1
+WR-036,4932,4istqqdtj6j8ve6pguno7f9rcn,Not a warranty claim,True,POSITIVE_EXPLICIT,1
+WR-037,4744,3k8lts5hc6iup90bjktqpkkm6b,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-038,7247,1ritbjllfrgfkc270as9lsv9he,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-039,8901,7e7pl627f2vvenfsr6dtucugnr,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-040,10771,4lfbbrutr1dmlrr0tnfdr4i8vu,Confirmed warranty claim,True,POSITIVE_EXPLICIT,1
+WR-041,5954,48kmm0v9okguvvclh4jg7nt2bp,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-042,3228,1necnlvjsms6nc5s6i69qlekms,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-043,205,01inu0olk7bf2qg6bjkei19eqg,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-044,700,3etq1jqephb4ot7f1g8grcceok,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-045,763,43mp15kaoo0n53q4b9h7knbpsb,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-046,4117,6tmtjnblst58o5vj53thchieht,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-047,4387,65aa4m7kpcg5dt0tkq507ndons,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-048,4392,6g0nlcoapd4la7ve981g27i2dr,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-049,4529,45n3v9vlmb23rtlo3pvd9c9l24,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-050,6003,4ick967td2or8u7cqq8opkelcf,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-051,6806,0vcbgkp0lfc6pgj1gndsc0k646,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-052,6870,691cuhjmoveku80vk1lq8tb9a6,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-053,8225,1p60p917ndl2bvnmkcd0c49dp6,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-054,8469,2m4f7j06960ep5oa226k823r06,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-055,8529,4vvp3i1f0aicmuamgs66nv9149,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-056,8779,4gcnp8ofbqm29i290jgbrrbgt0,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-057,8793,1o03eol8g01srr0e7e8oduoggk,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-058,1931,1kbbb3d3brov664lhtb7bqr2j4,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-059,4748,5dnht5vv1rngmap7i4lgrr4u5t,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-060,5207,1ge62qg0c944s8oup8bpv5pan3,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-061,5255,2uh152b4tj66uomd3ocij2nkmk,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-062,5348,4l2n50m3e231ptgq9c0ubb87tc,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-063,5400,5lsmj7l8fbk87hl6crdi4h84tj,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-064,5594,1avb6hk4hochh0iq3nklj58j1j,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-065,7089,4lmi1d7gid5a175s7c7c7tmkmh,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-066,7254,4a1jhlvcapl5mtss1194jh9le8,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-067,8944,2dl4s2148a4s8ck7kjotqv02ov,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-068,8979,7l9j3t8ghqm2mj1fjnh7tph17v,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-069,9346,4je89g723civm0b0g1qj1t343l,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-070,11037,5m4dhnqti2p9ivkc2nrc84g4a2,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-071,11069,1sf9u3rttfu05k07ddv1upnvio,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-072,11100,2f3gee9hkfh2237uirj23simrn,Confirmed warranty claim,True,POSITIVE_SEQUENCE_ELIGIBLE,1
+WR-073,2408,o23d0ls8jupd0mi998i882ojks,Confirmed warranty claim,True,POSITIVE_SEQUENCE_POLICY_REVIEW,1
+WR-074,2691,2a8aqrj3ohjfh1kr5v9vubdl1s,Confirmed warranty claim,True,POSITIVE_SEQUENCE_POLICY_REVIEW,1
+WR-075,3325,5hug2jslq9tnn087ps737dgakr,Not a warranty claim,True,POSITIVE_SEQUENCE_POLICY_REVIEW,1
+WR-076,2742,6nov1hm3jv955mdaabqssm6b3e,Confirmed warranty claim,True,POSITIVE_SEQUENCE_POLICY_REVIEW,1
+WR-077,7748,5qq48gal2obhlg1f139ftt0rpg,Confirmed warranty claim,True,POSITIVE_SEQUENCE_POLICY_REVIEW,1
+WR-078,10342,6gos6a1epgn9c5lpuqe7r7e87d,Confirmed warranty claim,True,POSITIVE_SEQUENCE_POLICY_REVIEW,1
+WR-079,6756,7i0kev60rbnqoa7ohvt9b61q22,Confirmed warranty claim,True,POSITIVE_SEQUENCE_POLICY_REVIEW,1
+WR-080,8773,2sh24bjj1ip78r6obftl6d1c9u,Confirmed warranty claim,True,POSITIVE_SEQUENCE_POLICY_REVIEW,1

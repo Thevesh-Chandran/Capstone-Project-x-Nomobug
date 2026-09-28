@@ -1,0 +1,15 @@
+{
+  "version": "cp2_live_features_v1",
+  "bundle_sha256": "6ace4314b4a5e170ea1bd6feee40dadbdd14eb3c986db9223d888b3c3ee302e0",
+  "compiled_query_hashes": {
+    "sales.sql": "4f62609ac751796aba3f2fa77423ff54bdb57f1fb3795d061421abc9c50c6327",
+    "gold/sales_package_facts.sql": "3fe7c2b7e874f68c64168e495ef6303d627712a5caf3fd41d46991fcc6a09089",
+    "calendar_events.sql": "9dd119507e79720440f52d6af4a77562fc4b336451da0f7529e9722d56d80f8e",
+    "calendar_event_matches.sql": "570ff2151e5f74f586b37aff364ad22adc25447123cc9084c16a7657d3705375",
+    "calendar_event_locations.sql": "42bfce56f1103b3ae50bbb5afd10137ffc944150babb641e7021e07a2dedb809",
+    "gold/calendar_service_event_facts.sql": "64b53713cf38b84a4774624d683e31dc0df6245148e2b242187fdf38adae069d",
+    "analytics_ml/warranty_anchor_environment_features.sql": "875ed5a61f40a56877bbad154f36cf3b79107cc11655ec4e72827a2871800acc",
+    "analytics_ml/warranty_callback_fixed_horizon_dataset.sql": "c35ccf1ccb9d1eb9f43663a39b496586f787d2805c48a43981ec1fd203761b2d"
+  },
+  "purpose": "Exact compiled feature source pin for read-only live predictions against frozen v5 bundle. Review and update only with model/source contract revision."
+}

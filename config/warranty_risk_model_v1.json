@@ -1,0 +1,29 @@
+{
+  "model_version": "warranty_risk_60d_v1",
+  "status": "superseded_due_to_event_day_weather_leakage",
+  "superseded_by": "warranty_risk_60d_v2",
+  "selected_horizon_days": 60,
+  "prediction_time": "immediately_after_recorded_3_of_3_calendar_event",
+  "label_definition": "recorded_calendar_warranty_signal_within_60d_after_3_of_3",
+  "feature_set": "risk_core_without_team_v1",
+  "feature_source_constant": "scripts.train_warranty_risk_baseline.RISK_CORE_NO_TEAM_FEATURES",
+  "feature_count": 60,
+  "ordered_feature_sha256": "ab93977c8cfd8cedb38bdfe5dac63d9c2432029bf247cf19d98ce1d4a8e5ab08",
+  "excluded_feature_groups": [
+    "team_identity_and_team_historical_performance",
+    "salesperson_and_acquisition_channel",
+    "billing_and_payment_history",
+    "static_environmental_context"
+  ],
+  "frozen_alert_threshold": 0.44,
+  "threshold_objective": "maximum_f1_on_final_chronological_20pct_of_pre_2026_training_data",
+  "selection_rule": "shortest horizon with ROC-AUC >= 0.55 and average precision within 0.01 of the best reliable horizon",
+  "minimum_segment_rows_for_reported_auc": 20,
+  "limitations": [
+    "This superseded contract included event-day weather that was not known at prediction time; do not deploy it.",
+    "The target records Calendar warranty activity rather than confirmed biological recurrence.",
+    "The model cannot attribute outcomes to weather, employees, or treatment quality.",
+    "The 2026 reporting period was inspected during earlier experiments and is not a pristine final test set.",
+    "Commercial premises have insufficient positive examples for dependable alerts."
+  ]
+}

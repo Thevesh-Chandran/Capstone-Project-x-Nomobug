@@ -9,7 +9,13 @@ venv/
 __pycache__/
 *.pyc
 .pytest_cache/
+.pytest_tmp*/
 .ruff_cache/
+/dbt/target/
+/dbt/logs/
+/dbt/dbt_packages/
+/dbt/tmp/
+/dbt/.user.yml
 .ipynb_checkpoints/
 .DS_Store
 uploads/
@@ -18,6 +24,9 @@ verification/
 *.log
 .codex-qa/
 .codex-tmp/
+/tmp/
+/outputs/
+/secrets/
 
 # Local-only CP1 documents and authoring utilities
 /docs/
@@ -32,6 +41,11 @@ data/exports/
 data/generated/
 data/rendered_proposal/
 data/rendered_*/
+data/profiles/
+data/source_inventory.local.csv
+data/source_columns.local.csv
+calendar_events_selected_calendars.csv
+open_meteo_history_sample.csv
 googlesheetscredentials.json
 credentials*.json
 *credentials*.json

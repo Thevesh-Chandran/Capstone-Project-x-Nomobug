@@ -1,55 +1,30 @@
-<p align="center"><img src="assets/hero.svg" alt="Nomobug Analytics" width="960"></p>
+# Nomobug CP2: recorded callback risk
 
-<h1 align="center">Nomobug Analytics</h1>
+Start with [the model guide](planning/CP2_START_HERE.md). It explains the prediction, current evidence and which files to use. [Project status](planning/PROJECT_STATUS.md) holds the detailed implementation history.
 
-<p align="center">Weather-aware analytics for pest-control operations.</p>
+The main experimental model ranks paid services by the risk of a recorded corrective Calendar callback within the following 30 days. It produces a numerical risk score for a binary outcome. Warranty entitlement is calculated separately from the owner's policy.
 
-<p align="center"><a href="#overview">Overview</a> · <a href="#explore">Explore</a> · <a href="#getting-started">Getting started</a></p>
+The current experimental candidate is **corrected v5 ExtraTrees, depth 10**. On 100 newer services it found four of five callback-positive windows within 20 reviews, versus three for the corrected reference. Five positives are too few to establish a dependable improvement. [Current model evidence](planning/CP2_CORRECTED_MODEL_CANDIDATES_V5.md) explains the selection, corrections and limits.
 
-<p align="center"><img src="https://img.shields.io/badge/DATA%20ENGINEERING-86c9ad" alt="DATA ENGINEERING">
-<img src="https://img.shields.io/badge/PYTHON-86c9ad" alt="PYTHON">
-<img src="https://img.shields.io/badge/CAPSTONE-86c9ad" alt="CAPSTONE"></p>
+The future-test refit trains on all 5,695 mature services, including 2,075 from 2026. Use `scripts/cp2_model.py status` or `verify` for the current model. The live feature feed is not connected and no future accuracy has been measured. First-service detection remains weak; dashboard work is deferred.
 
-## Overview
+## Find the right files
 
-An ongoing Sunway University capstone project exploring how operational, service-outcome, scheduling, location and weather data can support pest-control management decisions.
-
-The intended system will help investigate recurring service problems, weather-associated patterns and geographic hotspots through analysis and dashboards.
-
-## Explore
-
-| Public repository content | Purpose |
+| Folder | Use |
 |---|---|
-| [Calendar extraction prototype](scripts/fetch_calendar_events.py) | Read selected events and parse booking details |
-| [Weather retrieval prototype](scripts/test_open_meteo_history.py) | Explore historical Open-Meteo weather data |
-| [Implementation notes](CP2_START_HERE.md) | Initial CP2 planning and build order |
-| [Data workspace](data/) | Data-handling guidance and placeholders |
+| [planning/](planning/README.md) | Current model guide, policy, evidence and next steps |
+| [planning/archive/](planning/archive/README.md) | Completed evaluations and historical setup notes |
+| [config/](config/README.md) | Model contracts, experiment provenance and source dictionaries |
+| [scripts/](scripts/README.md) | Repeatable extraction, warehouse, analysis and model commands |
+| dbt/ | Tested warehouse transformations and source lineage |
+| tests/ | Synthetic regression checks |
+| templates/ | Blank structured recording templates |
+| notebooks/ | Introductory profiling notebooks |
+| outputs/ and tmp/ | Private generated model artifacts, source snapshots and working files; ignored by Git |
+| data/, docs/ and secrets/ | Private local data, preserved CP1 documents and credentials; ignored by Git |
 
-## Current progress
-
-The local CP2 project has reached live-source integration: an initial prospects API-to-Neon PostgreSQL load and unchanged-snapshot rerun were verified with 32,580 rows. A BigQuery loader is prepared; live migration remains pending.
-
-**This public repository contains the earlier extraction prototypes and planning material.** The newer local pipeline is not included here. Transformations, predictive modelling, clustering and hosted dashboards remain in development or planned.
-
-## Planned architecture
-
-```mermaid
-flowchart LR
-    A[Google Sheets and Calendar] --> C[Python extraction and profiling]
-    B[Open-Meteo weather] --> C
-    C --> D[BigQuery warehouse]
-    D --> E[dbt transformations]
-    E --> F[Analysis and machine learning]
-    E --> G[Apache Superset dashboards]
-    F --> G
-```
-
-The current plan uses Python/Pandas, BigQuery, dbt Core, scikit-learn, GitHub Actions and Preset-hosted Apache Superset. Neon PostgreSQL remains a manual fallback. The diagram describes the planned system, not a completed deployment.
-
-## Getting started
-
-Start with the [implementation notes](CP2_START_HERE.md) and inspect the source prototypes. They require source-specific configuration, credentials and further validation; there is no complete public one-command application to launch yet.
+Run commands from the repository root using `.venv/Scripts/python.exe`. BigQuery is the primary warehouse; `scripts/neon/` is a preserved manual fallback and `scripts/prototypes/` contains older exploration. See [the script inventory](scripts/README.md) before running a command.
 
 ## Data handling
 
-Raw company exports, customer or employee data, credentials and identifying generated outputs stay outside version control. Use anonymised or synthetic samples for shared tests and examples.
+Keep raw exports, customer details, Calendar descriptions, credentials and generated private predictions outside version control. Use synthetic or anonymized test data. Frozen experiment inputs and saved models are retained for reproducibility; their local outputs are not duplicate source records to merge into a dataset.

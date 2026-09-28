@@ -1,0 +1,53 @@
+{
+  "model_version": "warranty_risk_60d_v2",
+  "status": "superseded_due_to_warranty_policy_scope_and_horizon",
+  "selected_horizon_days": 60,
+  "prediction_time": "immediately_after_recorded_3_of_3_calendar_event",
+  "label_definition": "recorded_calendar_warranty_signal_within_60d_after_3_of_3",
+  "model_family": "random_forest_classifier",
+  "model_variant": "rf_regularized",
+  "model_parameters": {
+    "n_estimators": 500,
+    "max_depth": 6,
+    "min_samples_leaf": 20,
+    "class_weight": "balanced_subsample",
+    "random_state": 42
+  },
+  "feature_set": "prediction_safe_risk_core_without_team_v2",
+  "feature_source_constant": "scripts.train_warranty_risk_baseline.RISK_CORE_NO_TEAM_FEATURES",
+  "feature_count": 56,
+  "ordered_feature_sha256": "aa8c74698103addf1f12b52084c4fbf6b6734049a1e978e3b3838c1b87131576",
+  "excluded_feature_groups": [
+    "event_day_weather_not_known_at_prediction_time",
+    "team_identity_and_team_historical_performance",
+    "salesperson_and_acquisition_channel",
+    "billing_and_payment_history",
+    "static_environmental_context"
+  ],
+  "selection_method": "three_pre_2026_walk_forward_quarterly_folds",
+  "calibration_method": "platt_on_pooled_pre_2026_walk_forward_predictions",
+  "feature_pruning_decision": "retain_full_safe_feature_set_because_only_three_development_folds_exist_and_the_stable_subset_underperformed_in_2026_reporting",
+  "minimum_development_folds_for_automatic_feature_removal": 4,
+  "operational_risk_banding": "priority_review_top_50pct_within_scoring_batch;_high_risk_disabled_until_supported",
+  "priority_review_percentile_cutoff": 0.5,
+  "high_risk_tier_supported": false,
+  "reporting_metrics_2026": {
+    "rows": 405,
+    "roc_auc": 0.6215,
+    "average_precision": 0.4343,
+    "raw_brier_score": 0.2457,
+    "calibrated_brier_score": 0.2258,
+    "priority_review_rows": 203,
+    "priority_review_precision": 0.4828,
+    "priority_review_recall": 0.6533
+  },
+  "limitations": [
+    "The target records Calendar warranty activity rather than confirmed biological recurrence.",
+    "The model cannot attribute outcomes to weather, employees, or treatment quality.",
+    "The 2026 reporting period was inspected during earlier experiments and is not a pristine final test set.",
+    "Only three independent development folds exist, so automatic feature removal is disabled.",
+    "Commercial premises have insufficient positive examples for dependable alerts.",
+    "Risk bands are relative to the current scoring batch and are not absolute probabilities of recurrence."
+  ],
+  "superseded_by": "warranty_risk_residential_3x_30d_v3"
+}

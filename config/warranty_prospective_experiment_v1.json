@@ -1,0 +1,85 @@
+{
+  "version": "prospective_callback_v1",
+  "status": "frozen_not_operational_no_future_performance",
+  "frozen_at_utc": "2026-09-27T13:05:55.654426+00:00",
+  "cohort_start": "2026-09-28",
+  "cohort_end": "2026-10-27",
+  "earliest_final_evaluation_date": "2026-11-27",
+  "target": "recorded_corrective_calendar_callback_within_30d",
+  "date_authority": "Calendar",
+  "review_fraction": 0.2,
+  "input_file_sha256": "464bb51386c1bcce9744f74f61b4d0b4265be4a4631c1ede97063b62346914d9",
+  "training_rows": 5598,
+  "training_positive_rows": 517,
+  "training_2026_rows": 1975,
+  "latest_training_anchor": "2026-08-14",
+  "latest_training_outcome_end": "2026-09-13",
+  "training_segment_support": {
+    "all": {
+      "rows": 5598,
+      "positive_rows": 517
+    },
+    "first_service": {
+      "rows": 2065,
+      "positive_rows": 44
+    },
+    "mixed_pest": {
+      "rows": 865,
+      "positive_rows": 42
+    },
+    "target_union": {
+      "rows": 2612,
+      "positive_rows": 81
+    },
+    "other_pests": {
+      "rows": 1396,
+      "positive_rows": 70
+    }
+  },
+  "models": {
+    "reference_all_history": {
+      "file": "reference_all_history.joblib",
+      "sha256": "e3c2d8065f628fd68d204312a8b35f668b1824fff1a720da57d3532aaa540612",
+      "selection_name": "base__extra_trees_depth6__standard",
+      "threshold": 0.16999999999999998,
+      "source_development_artifact_sha256": "a71113732833e6fe699aa3f889b2d6d4f5b560ea769f8c0d4cb25ee3cb5a13d2"
+    },
+    "challenger_all_history": {
+      "file": "challenger_all_history.joblib",
+      "sha256": "699d1f4ffe2b350240f12c8a8b7cedab0821ac887c133734b97b1c0ab3421aea",
+      "selection_name": "targeted__rf_depth6__focus_positive_2x",
+      "threshold": 0.13,
+      "source_development_artifact_sha256": "363c480b3da584fd045d9f881f280add34d1f97ea35fde13b41b480536996337"
+    }
+  },
+  "limits": [
+    "These all-history refits are distinct from the 108-versus-100 diagnostic models.",
+    "No training-set scores establish future model accuracy.",
+    "Calibrators and thresholds remain from earlier purged development; monitor future calibration.",
+    "Timestamp declarations cannot independently prove every upstream predictor was available.",
+    "The all-mature-data reference is an experimental refit; governing v4 is not replaced.",
+    "Prospective services can include previously seen customers; this differs from retrospective group-disjoint generalization.",
+    "Source refresh/feature extraction and complete Calendar outcome capture remain required."
+  ],
+  "training_replay_sha256": "f5efcb5e7b5819b3fad73affb4ab9831d38b829c95404e8f933e4e5f9137f48e",
+  "feature_preparation_hashes": {
+    "scripts/benchmark_warranty_models.py": "b2fc7f588c4cd98059203b6058376e21ce8af2e0cbe55c47d4628228182bd06d",
+    "scripts/compare_callback_blind_spots.py": "c12f7bbc80912ad4299d06d120733ca889a309b9ef178f8f9287af3370ddd90d"
+  },
+  "manifest_correction": {
+    "recorded_at_utc": "2026-09-27T13:07:31.057338+00:00",
+    "detail": "Final evaluation occurs after the inclusive final 30-day outcome date; clarified before any prospective rows were logged. Model artifacts and cohort are unchanged."
+  },
+  "validation": {
+    "suite_passed": 269,
+    "warnings": 19,
+    "max_replay_absolute_difference": 3.4e-16
+  },
+  "source_refresh": {
+    "status": "blocked_google_invalid_grant",
+    "checked_date": "2026-09-27",
+    "requested_start": "2026-08-15",
+    "requested_end": "2026-09-27",
+    "records_retrieved": false
+  }
+}

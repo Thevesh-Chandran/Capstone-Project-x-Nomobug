@@ -1,0 +1,41 @@
+name: CP2 checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.14'
+          cache: pip
+      - name: Install project dependencies
+        run: python -m pip install -r requirements-ci.txt
+      - name: Python tests
+        run: python -m pytest tests -q
+      - name: Parse dbt without warehouse access
+        env:
+          NOMOBUG_BQ_MAX_BYTES_BILLED: '104857600'
+        run: >-
+          dbt parse --project-dir dbt --profiles-dir dbt --no-partial-parse
+          --vars '{"prospects_snapshot_id":"0000000000000000000000000000000000000000000000000000000000000000","prospects_snapshot_extracted_at":"2026-09-01T00:00:00Z"}'
+
+  image-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - name: Build private-data-free image
+        run: docker build --tag cp2-reporting:ci .
+      - name: Check entry point without Google access
+        run: docker run --rm --entrypoint python cp2-reporting:ci -m scripts.cp2_reporting_release --help
