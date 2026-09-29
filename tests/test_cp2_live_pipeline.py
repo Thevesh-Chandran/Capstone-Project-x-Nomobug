@@ -180,6 +180,18 @@ def test_missed_window_is_recorded_even_if_no_tick_saw_it_due(tmp_path, monkeypa
     assert second['newly_missed_event_windows']==0 and second['missed_event_windows']==1
 
 
+def test_task_exit_code_distinguishes_new_miss_from_historical_coverage(monkeypatch, capsys):
+    result = {'status': 'idle', 'coverage_status': 'incomplete',
+              'missed_event_windows': 8, 'newly_missed_event_windows': 0}
+    monkeypatch.setattr(tick, 'poll', lambda: result)
+    assert tick.main() == 0
+    result['newly_missed_event_windows'] = 1
+    assert tick.main() == 1
+    result.update(status='refresh_failed', newly_missed_event_windows=0)
+    assert tick.main() == 1
+    capsys.readouterr()
+
+
 def test_previous_day_gap_is_fetched_for_missed_coverage(tmp_path, monkeypatch):
     monkeypatch.setattr(pipe, 'ROOT', tmp_path)
     bundle = tmp_path/'outputs/bundle';bundle.mkdir(parents=True)
