@@ -313,3 +313,105 @@ def test_v2_source_linked_logs_join_final_labels_and_reject_modified_truth(tmp_p
     result=p.evaluate(bundle,labels,logs)
     assert result['rows']==1 and result['results']['challenger']['priority_top20pct']['recall']==1
     with pytest.raises(ValueError,match='already recorded'):p.evaluate(bundle,labels,logs)
+
+
+def test_repaired_protocol_preserves_bundle_and_requires_complete_new_cohort(tmp_path,monkeypatch):
+    bundle=tmp_path/'outputs/bundle';bundle.mkdir(parents=True)
+    manifest=manifest_fixture()|{'version':'prospective_callback_v2_corrected',
+      'target':'recorded_corrective_calendar_callback_within_30d',
+      'earliest_final_evaluation_date':'2026-11-27','review_fraction':.2}
+    manifest['models']={name:{'features':['anchor_is_first','anchor_is_mixed_pest']}
+      for name in ['reference','challenger']}
+    (bundle/'bundle.json').write_text(json.dumps(manifest))
+    class Pipeline:
+        def predict_proba(self,frame):return np.tile([.75,.25],(len(frame),1))
+    models={name:{'features':info['features'],'pipeline':Pipeline(),'calibrator':None,'threshold':.5}
+      for name,info in manifest['models'].items()}
+    monkeypatch.setattr(p,'load_bundle',lambda output:(manifest,models))
+    protocol={'schema_version':1,'name':'cp2_repaired_2026',
+      'declared_at_utc':'2026-09-29T13:00:00Z','cohort_start':'2026-09-30',
+      'cohort_end':'2026-10-27','earliest_final_evaluation_date':'2026-11-27',
+      'bundle_sha256':p.digest(bundle/'bundle.json'),'target':manifest['target'],
+      'date_authority':'Calendar'}
+    protocol['record_sha256']=p.record_digest(protocol)
+    protocol_path=tmp_path/'protocol.json';protocol_path.write_text(json.dumps(protocol))
+    clock=[p.timestamp('2026-09-28T11:02:00+08:00')]
+    monkeypatch.setattr(p,'datetime',SimpleNamespace(now=lambda tz:clock[0],fromisoformat=datetime.fromisoformat))
+    logs=tmp_path/'outputs/logs'
+    raws=[]
+    for day in ['28','30']:
+        raw=raw_fixture().drop(columns=[b.TARGET]).assign(sales_record_id='sale-'+day)
+        for column in ['anchor_date','outcome_end_date','prediction_at','feature_snapshot_at',
+                'service_start_at','service_end_at']:
+            raw[column]=raw[column].str.replace('2026-09-28','2026-09-'+day,regex=False)
+        if day=='30':
+            raw['outcome_end_date']='2026-10-30'
+        raws.append(raw)
+        clock[0]=p.timestamp(f'2026-09-{day}T11:02:00+08:00')
+        input_path=tmp_path/f'input-{day}.json';input_path.write_text(raw.to_json(orient='records'))
+        receipt=source_receipt(input_path)
+        for field in ['extracted_at_utc','prediction_generated_at_utc']:
+            receipt[field]=receipt[field].replace('2026-09-28','2026-09-'+day)
+        assert p.score(bundle,input_path,logs,source_receipt=receipt)['logged_rows']==1
+    clock[0]=p.timestamp('2026-11-27T12:00:00+08:00')
+    truth=pd.concat([raw.assign(**{b.TARGET:True}) for raw in raws],ignore_index=True)
+    truth_path=tmp_path/'truth.json';truth.to_json(truth_path,orient='records')
+    receipt={'source':p.SOURCE_NAME,'extracted_at_utc':'2026-11-27T11:00:00+08:00',
+      'snapshot_sha256':'a'*64,'feature_input_sha256':p.digest(truth_path),
+      'complete_calendar_inventory':True,'calendar_coverage_start':'2000-01-01',
+      'complete_outcomes_through':'2026-11-26'}
+    labels=tmp_path/'outputs/repaired_labels.json'
+    with pytest.raises(ValueError,match='completed-day'):
+        p.prepare_labels(bundle,truth_path,receipt|{'complete_outcomes_through':'2026-11-25'},
+          labels,protocol_path=protocol_path)
+    assert p.prepare_labels(bundle,truth_path,receipt,labels,protocol_path=protocol_path)['complete_cohort_anchors']==1
+    assert json.loads(labels.read_text())['records'][0]['sales_record_id']=='sale-30'
+    changed=protocol|{'cohort_start':'2026-10-01'}
+    protocol_path.write_text(json.dumps(changed))
+    with pytest.raises(ValueError,match='protocol'):
+        p.evaluate(bundle,labels,logs,protocol_path=protocol_path)
+    protocol_path.write_text(json.dumps(protocol))
+    (bundle/'bundle.json').write_text(json.dumps(manifest,indent=2))
+    with pytest.raises(ValueError,match='protocol'):
+        p.evaluate(bundle,labels,logs,protocol_path=protocol_path)
+    (bundle/'bundle.json').write_text(json.dumps(manifest))
+    new_log=next(path for path in logs.glob('*.json') if
+      json.loads(path.read_text())['row']['sales_record_id']=='sale-30')
+    record=json.loads(new_log.read_text());new_log.unlink()
+    with pytest.raises(ValueError,match='coverage|No prospectively'):
+        p.evaluate(bundle,labels,logs,protocol_path=protocol_path)
+    record['logged_at_utc']='2026-09-30T11:07:00+08:00'
+    record['record_sha256']=p.record_digest(record);new_log.write_text(json.dumps(record))
+    with pytest.raises(ValueError,match='backfill|service end'):
+        p.evaluate(bundle,labels,logs,protocol_path=protocol_path)
+    record['logged_at_utc']='2026-09-30T11:02:00+08:00'
+    record['record_sha256']=p.record_digest(record);new_log.write_text(json.dumps(record))
+    result=p.evaluate(bundle,labels,logs,protocol_path=protocol_path)
+    assert result['rows']==1 and result['cohort_start']=='2026-09-30'
+    assert (bundle/'prospective_repaired_evaluation.json').exists()
+    assert not (bundle/'prospective_evaluation.json').exists()
+    with pytest.raises(ValueError,match='already recorded'):
+        p.evaluate(bundle,labels,logs,protocol_path=protocol_path)
+
+
+def test_registered_repaired_protocol_hash_rejects_changed_file(tmp_path):
+    bundle=tmp_path/'outputs/bundle';bundle.mkdir(parents=True)
+    manifest=manifest_fixture()|{'target':'recorded_corrective_calendar_callback_within_30d',
+      'earliest_final_evaluation_date':'2026-11-27'}
+    (bundle/'bundle.json').write_text(json.dumps(manifest))
+    protocol={'schema_version':1,'name':'cp2_repaired_2026',
+      'declared_at_utc':'2026-09-29T13:00:00Z','cohort_start':'2026-09-30',
+      'cohort_end':'2026-10-27','earliest_final_evaluation_date':'2026-11-27',
+      'bundle_sha256':p.digest(bundle/'bundle.json'),'target':manifest['target'],
+      'date_authority':'Calendar'}
+    protocol['record_sha256']=p.record_digest(protocol)
+    config=tmp_path/'config';config.mkdir()
+    path=config/'cp2_repaired_cohort.json';path.write_text(json.dumps(protocol))
+    (config/'cp2_model_current.json').write_text(json.dumps({
+      'repaired_cohort_protocol_sha256':p.digest(path)}))
+    assert p.cohort_contract(bundle,manifest,path)['cohort_start']=='2026-09-30'
+    protocol['eligibility']='changed after declaration'
+    protocol['record_sha256']=p.record_digest(protocol)
+    path.write_text(json.dumps(protocol))
+    with pytest.raises(ValueError,match='registered immutable hash'):
+        p.cohort_contract(bundle,manifest,path)

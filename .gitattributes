@@ -5,3 +5,4 @@ scripts/compare_callback_candidates_v2.py text eol=lf
 dbt/macros/calendar_history_available.sql text eol=lf
 dbt/macros/calendar_snapshot_observation_sql.sql text eol=lf
 dbt/macros/warranty_anchor_dataset_sql.sql text eol=lf
+config/cp2_repaired_cohort.json text eol=lf

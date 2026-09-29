@@ -245,6 +245,35 @@ def load_bundle(output):
     return manifest,models
 
 
+def cohort_contract(output, manifest, protocol_path=None):
+    """Keep the original frozen cohort or validate a predeclared narrower cohort."""
+    if protocol_path is None:
+        return {'cohort_start':manifest['cohort_start'], 'cohort_end':manifest['cohort_end'],
+            'earliest_final_evaluation_date':manifest['earliest_final_evaluation_date'],
+            'result_path':output/'prospective_evaluation.json', 'protocol_sha256':None}
+    path=Path(protocol_path)
+    if path.resolve()==(b.ROOT/'config/cp2_repaired_cohort.json').resolve():
+        registry=json.loads((b.ROOT/'config/cp2_model_current.json').read_text(encoding='utf-8'))
+        if registry.get('repaired_cohort_protocol_sha256')!=digest(path):
+            raise ValueError('Repaired cohort protocol differs from registered immutable hash')
+    protocol=json.loads(path.read_text(encoding='utf-8'))
+    start=pd.Timestamp(protocol['cohort_start']);end=pd.Timestamp(protocol['cohort_end'])
+    declared=timestamp(protocol['declared_at_utc'])
+    if (protocol.get('schema_version')!=1 or protocol.get('name')!='cp2_repaired_2026'
+            or protocol.get('record_sha256')!=record_digest(protocol)
+            or protocol.get('bundle_sha256')!=digest(output/'bundle.json')
+            or protocol.get('target')!=manifest['target']
+            or protocol.get('date_authority')!='Calendar'
+            or not pd.Timestamp(manifest['cohort_start'])<=start<=end==pd.Timestamp(manifest['cohort_end'])
+            or declared>=start.tz_localize(LOCAL).tz_convert('UTC').to_pydatetime()
+            or protocol.get('earliest_final_evaluation_date')!=manifest['earliest_final_evaluation_date']):
+        raise ValueError('Repaired cohort protocol or frozen model contract differs')
+    return {'cohort_start':protocol['cohort_start'], 'cohort_end':protocol['cohort_end'],
+        'earliest_final_evaluation_date':protocol['earliest_final_evaluation_date'],
+        'result_path':output/'prospective_repaired_evaluation.json',
+        'protocol_sha256':digest(path)}
+
+
 def verify(output):
     configure_contracts(False);manifest,models=load_bundle(output)
     replay_input=b.ROOT/manifest['training_input_relative_path'] if 'training_input_relative_path' in manifest else INPUT
@@ -320,17 +349,18 @@ def score(output,input_path,log_dir,*,source_receipt=None):
       'performance':'not_available_until_mature_outcomes'}
 
 
-def prepare_labels(output,input_path,source_receipt,labels_path):
+def prepare_labels(output,input_path,source_receipt,labels_path,*,protocol_path=None):
     """Create final labels from a fresh, complete source-derived mature dataset."""
     labels_path=private_path(labels_path)
-    manifest,_=load_bundle(output);now=datetime.now(timezone.utc)
-    if now.astimezone(LOCAL).date()<pd.Timestamp(manifest['earliest_final_evaluation_date']).date():
+    manifest,_=load_bundle(output);contract=cohort_contract(output,manifest,protocol_path)
+    now=datetime.now(timezone.utc)
+    if now.astimezone(LOCAL).date()<pd.Timestamp(contract['earliest_final_evaluation_date']).date():
         raise ValueError('Prospective cohort and inclusive 30-day outcomes have not matured')
     extracted=validate_source_receipt(source_receipt,input_path,now,outcomes=True)
-    last_outcome=pd.Timestamp(manifest['cohort_end'])+pd.Timedelta(days=30)
+    last_outcome=pd.Timestamp(contract['cohort_end'])+pd.Timedelta(days=30)
     coverage=pd.Timestamp(source_receipt['complete_outcomes_through'])
     if (source_receipt.get('complete_calendar_inventory') is not True
-            or pd.Timestamp(source_receipt['calendar_coverage_start'])>pd.Timestamp(manifest['cohort_start'])
+            or pd.Timestamp(source_receipt['calendar_coverage_start'])>pd.Timestamp(contract['cohort_start'])
             or coverage<last_outcome
             or coverage.date()>extracted.astimezone(LOCAL).date()-timedelta(days=1)):
         raise ValueError('Full Calendar inventory and completed-day outcome coverage required')
@@ -338,7 +368,7 @@ def prepare_labels(output,input_path,source_receipt,labels_path):
     required=KEYS+[b.TARGET]
     if not set(required).issubset(raw):raise ValueError('Source-derived dataset lacks outcome keys')
     raw=raw.copy();raw.anchor_date=pd.to_datetime(raw.anchor_date).dt.normalize()
-    raw=raw[raw.anchor_date.between(pd.Timestamp(manifest['cohort_start']),pd.Timestamp(manifest['cohort_end']))]
+    raw=raw[raw.anchor_date.between(pd.Timestamp(contract['cohort_start']),pd.Timestamp(contract['cohort_end']))]
     if raw[required].isna().any().any() or raw.duplicated(KEYS).any():
         raise ValueError('Unresolved or duplicate Calendar cohort outcomes')
     if not all(type(value) in [bool,np.bool_] for value in raw[b.TARGET]):
@@ -349,10 +379,12 @@ def prepare_labels(output,input_path,source_receipt,labels_path):
     truth=raw[required].copy();truth.sales_record_id=truth.sales_record_id.astype(str)
     truth.anchor_date=truth.anchor_date.dt.strftime('%Y-%m-%d')
     labels={'schema_version':2,'date_authority':'Calendar','cohort_complete':True,
-      'cohort_start':manifest['cohort_start'],'cohort_end':manifest['cohort_end'],
+      'cohort_start':contract['cohort_start'],'cohort_end':contract['cohort_end'],
       'calendar_coverage_through':coverage.strftime('%Y-%m-%d'),'expected_cohort_anchors':len(truth),
       'source_receipt':source_receipt,'prepared_at_utc':now.isoformat(),
       'records':json.loads(truth.to_json(orient='records'))}
+    if protocol_path is not None:
+        labels['repaired_protocol_sha256']=contract['protocol_sha256']
     labels['record_sha256']=record_digest(labels)
     with append_lock(labels_path.parent):
         if labels_path.exists():raise ValueError('Prepared prospective labels already exist')
@@ -361,18 +393,19 @@ def prepare_labels(output,input_path,source_receipt,labels_path):
       'positive_anchors':int(raw[b.TARGET].sum()),'source_input_sha256':digest(input_path)}
 
 
-def evaluate(output,labels_path,log_dir):
+def evaluate(output,labels_path,log_dir,*,protocol_path=None):
     private_path(output);log_dir=private_path(log_dir)
-    manifest,models=load_bundle(output);now=datetime.now(timezone.utc)
-    if now.astimezone(LOCAL).date()<pd.Timestamp(manifest['earliest_final_evaluation_date']).date():
+    manifest,models=load_bundle(output);contract=cohort_contract(output,manifest,protocol_path)
+    now=datetime.now(timezone.utc)
+    if now.astimezone(LOCAL).date()<pd.Timestamp(contract['earliest_final_evaluation_date']).date():
         raise ValueError('Prospective cohort and inclusive 30-day outcomes have not matured')
-    result_path=output/'prospective_evaluation.json'
+    result_path=contract['result_path']
     if result_path.exists():
         raise ValueError('Final prospective evaluation already recorded; do not repeatedly tune this cohort')
     labels=json.loads(labels_path.read_text())
     if labels.get('date_authority')!='Calendar' or labels.get('cohort_complete') is not True:
         raise ValueError('Complete Calendar-derived cohort outcomes required')
-    last_outcome=pd.Timestamp(manifest['cohort_end'])+pd.Timedelta(days=30)
+    last_outcome=pd.Timestamp(contract['cohort_end'])+pd.Timedelta(days=30)
     if pd.Timestamp(labels['calendar_coverage_through'])<last_outcome:
         raise ValueError('Calendar coverage is incomplete for the full outcome window')
     if manifest.get('version','').startswith('prospective_callback_v2'):
@@ -381,9 +414,10 @@ def evaluate(output,labels_path,log_dir):
             raise ValueError('Prepared outcome labels changed after source derivation')
         if (labels.get('schema_version')!=2 or receipt.get('source')!=SOURCE_NAME
                 or receipt.get('complete_calendar_inventory') is not True
-                or labels.get('cohort_start')!=manifest['cohort_start']
-                or labels.get('cohort_end')!=manifest['cohort_end']
-                or pd.Timestamp(receipt.get('calendar_coverage_start','2100-01-01'))>pd.Timestamp(manifest['cohort_start'])
+                or labels.get('cohort_start')!=contract['cohort_start']
+                or labels.get('cohort_end')!=contract['cohort_end']
+                or labels.get('repaired_protocol_sha256')!=contract['protocol_sha256']
+                or pd.Timestamp(receipt.get('calendar_coverage_start','2100-01-01'))>pd.Timestamp(contract['cohort_start'])
                 or pd.Timestamp(receipt.get('complete_outcomes_through','1900-01-01'))<last_outcome):
             raise ValueError('Source-derived prospective v2 labels and coverage receipt required')
         for field in ['snapshot_sha256','feature_input_sha256']:
@@ -413,7 +447,9 @@ def evaluate(output,labels_path,log_dir):
                 raise ValueError('Prospective source/prediction timing differs')
         one=pd.DataFrame([entry['row']]);one.anchor_date=pd.to_datetime(one.anchor_date)
         validate_prediction_times(one,manifest,entry['logged_at_utc'])
-        records.append(entry['row'])
+        if one.anchor_date.between(pd.Timestamp(contract['cohort_start']),
+                pd.Timestamp(contract['cohort_end'])).all():
+            records.append(entry['row'])
     if not records:
         raise ValueError('No prospectively logged anchors; historical backfill is not an evaluation')
     if type(labels.get('expected_cohort_anchors')) is not int or len(labels['records'])!=labels['expected_cohort_anchors']:
@@ -444,12 +480,14 @@ def evaluate(output,labels_path,log_dir):
     names=list(models)
     interval=paired_intervals(frame,predictions[names[0]],predictions[names[1]])
     interval['direction']=names[1]+'_minus_'+names[0]
-    result={'evaluated_at_utc':now.isoformat(),'cohort_start':manifest['cohort_start'],
-      'cohort_end':manifest['cohort_end'],'rows':len(frame),'source_labels_sha256':digest(labels_path),
+    result={'evaluated_at_utc':now.isoformat(),'cohort_start':contract['cohort_start'],
+      'cohort_end':contract['cohort_end'],'rows':len(frame),'source_labels_sha256':digest(labels_path),
       'bundle_sha256':digest(output/'bundle.json'),'results':results,'paired_intervals':interval,
       'limits':['Complete-source coverage is a declared source contract, not proof of biological recurrence.',
         'Known customers may appear in both historical training and prospective services.',
         'The cohort must not be used to retune thresholds, feature sets or training emphasis.']}
+    if protocol_path is not None:
+        result['repaired_protocol_sha256']=contract['protocol_sha256']
     with append_lock(output):
         if result_path.exists():raise ValueError('Final prospective evaluation already recorded')
         atomic_create_json(result_path,result)
