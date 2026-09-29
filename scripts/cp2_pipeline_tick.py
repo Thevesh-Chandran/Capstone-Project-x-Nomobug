@@ -184,7 +184,7 @@ def main():
     result = poll()
     print(json.dumps(result, indent=2))
     return 1 if (result['status'] in {'refresh_failed','refresh_without_complete_prospective_logging'}
-                 or result.get('coverage_status') == 'incomplete') else 0
+                 or result.get('newly_missed_event_windows', 0) > 0) else 0
 
 
 if __name__ == '__main__':
