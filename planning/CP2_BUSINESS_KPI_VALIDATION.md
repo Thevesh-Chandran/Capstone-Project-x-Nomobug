@@ -1,5 +1,7 @@
 # CP2 business KPI validation — 28 September 2026
 
+**Later release update:** The pinned September 12–13 totals and source-drift analysis below are a historical checkpoint. A governed fresh release `20260928081442aba7ea` was published on 28 September using new immutable source snapshots; its independent validation returned `pass_with_business_caveats`. Use [the October submission record](CP2_OCTOBER_SUBMISSION.md) and the current Gold views for present reporting, rather than copying the historical figures below as current totals.
+
 **Assessment: ready within the checked *recorded-activity* scope, with freshness and business caveats.** A read-only acceptance run independently recomputed selected deployed reporting facts and monthly aggregates from their exact pinned, immutable Bronze snapshots. All **12 checks passed** across **20 BigQuery queries** (9.01 MB processed; each query capped at 100 MiB). It also compared the pinned Sheet inputs to a fresh private Sheets extraction taken on **27 September 2026**. Fresh changes exist and are **not** represented by the deployed Gold totals below.
 
 ## What the checks establish
