@@ -1,11 +1,12 @@
-param([ValidateSet('Status','Install','InstallFinal','Remove')][string]$Mode='Status')
+param([ValidateSet('Status','Install','InstallFinal','Repair','Remove')][string]$Mode='Status')
 
 $ErrorActionPreference='Stop'
 $taskName='Nomobug CP2 Prospective Local'
 $finalTaskName='Nomobug CP2 Final Evaluation'
 $root=(Resolve-Path (Join-Path $PSScriptRoot '..')).Path
-$python=Join-Path $root '.venv\Scripts\python.exe'
+$python=Join-Path $root '.venv\Scripts\pythonw.exe'
 $runner=Join-Path $root 'scripts\cp2_pipeline_tick.py'
+$final=Join-Path $root 'scripts\cp2_pipeline.py'
 
 if ($Mode -eq 'Status') {
     foreach ($name in @($taskName,$finalTaskName)) {
@@ -17,8 +18,37 @@ if ($Mode -eq 'Status') {
         $info=Get-ScheduledTaskInfo -TaskName $name
         [pscustomobject]@{ TaskName=$name; State=$task.State;
             LastRunTime=$info.LastRunTime; LastTaskResult=$info.LastTaskResult;
-            NextRunTime=$info.NextRunTime }
+            NextRunTime=$info.NextRunTime;
+            RunsOnBattery=(-not $task.Settings.DisallowStartIfOnBatteries -and
+                -not $task.Settings.StopIfGoingOnBatteries) }
     }
+    return
+}
+if ($Mode -eq 'Repair') {
+    if (-not (Test-Path -LiteralPath $python -PathType Leaf)) { throw 'Project windowless Python missing.' }
+    foreach ($name in @($taskName,$finalTaskName)) {
+        $task=Get-ScheduledTask -TaskName $name -ErrorAction SilentlyContinue
+        if ($null -eq $task) { throw "Scheduled task missing: $name" }
+        $settings=$task.Settings
+        $settings.DisallowStartIfOnBatteries=$false
+        $settings.StopIfGoingOnBatteries=$false
+        $script=if ($name -eq $taskName) { $runner } else { $final }
+        $argument=('"'+$script+'"')
+        if ($name -eq $finalTaskName) { $argument+=' final-evaluation-repaired' }
+        $action=New-ScheduledTaskAction -Execute $python -Argument $argument -WorkingDirectory $root
+        Set-ScheduledTask -TaskName $name -Settings $settings -Action $action | Out-Null
+        $verified=Get-ScheduledTask -TaskName $name
+        if ($verified.Settings.DisallowStartIfOnBatteries -or $verified.Settings.StopIfGoingOnBatteries) {
+            throw "Battery settings did not persist for: $name"
+        }
+    }
+    $start=(Get-Date).AddMinutes(1)
+    $end=[datetime]::new(2026,10,28,0,0,0)
+    if ($start -ge $end) { throw 'Collector enrollment window has ended.' }
+    $trigger=New-ScheduledTaskTrigger -Once -At $start -RepetitionInterval (New-TimeSpan -Minutes 2) `
+        -RepetitionDuration ($end-$start)
+    Set-ScheduledTask -TaskName $taskName -Trigger $trigger | Out-Null
+    Write-Output 'CP2 tasks repaired: windowless Python, battery allowed, fresh two-minute collector trigger.'
     return
 }
 if ($Mode -eq 'Remove') {
@@ -38,11 +68,10 @@ if ($Mode -eq 'InstallFinal') {
     if ($null -ne (Get-ScheduledTask -TaskName $finalTaskName -ErrorAction SilentlyContinue)) {
         throw 'Final evaluation task already exists. Inspect it before replacing.'
     }
-    $final=Join-Path $root 'scripts\cp2_pipeline.py'
-    $action=New-ScheduledTaskAction -Execute $python -Argument ('"'+$final+'" final-evaluation') -WorkingDirectory $root
+    $action=New-ScheduledTaskAction -Execute $python -Argument ('"'+$final+'" final-evaluation-repaired') -WorkingDirectory $root
     $trigger=New-ScheduledTaskTrigger -Once -At ([datetime]::new(2026,11,27,9,0,0))
     $settings=New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Minutes 20) `
-        -StartWhenAvailable
+        -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
     $principal=New-ScheduledTaskPrincipal -UserId ([Security.Principal.WindowsIdentity]::GetCurrent().Name) `
         -LogonType Interactive -RunLevel Limited
     Register-ScheduledTask -TaskName $finalTaskName -Action $action -Trigger $trigger -Settings $settings `
@@ -54,10 +83,13 @@ if ($null -ne (Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContin
     throw 'Task already exists. Inspect it before replacing.'
 }
 $action=New-ScheduledTaskAction -Execute $python -Argument ('"'+$runner+'"') -WorkingDirectory $root
-$trigger=New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1) `
-    -RepetitionInterval (New-TimeSpan -Minutes 2) -RepetitionDuration (New-TimeSpan -Days 31)
+$start=(Get-Date).AddMinutes(1)
+$end=[datetime]::new(2026,10,28,0,0,0)
+if ($start -ge $end) { throw 'Collector enrollment window has ended.' }
+$trigger=New-ScheduledTaskTrigger -Once -At $start `
+    -RepetitionInterval (New-TimeSpan -Minutes 2) -RepetitionDuration ($end-$start)
 $settings=New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Minutes 10) `
-    -StartWhenAvailable
+    -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
 $principal=New-ScheduledTaskPrincipal -UserId ([Security.Principal.WindowsIdentity]::GetCurrent().Name) `
     -LogonType Interactive -RunLevel Limited
 Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Settings $settings `

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "name": "cp2_repaired_2026",
+  "declared_at_utc": "2026-09-29T13:42:31.436094+00:00",
+  "cohort_start": "2026-09-30",
+  "cohort_end": "2026-10-27",
+  "earliest_final_evaluation_date": "2026-11-27",
+  "bundle_sha256": "6ace4314b4a5e170ea1bd6feee40dadbdd14eb3c986db9223d888b3c3ee302e0",
+  "target": "recorded_corrective_calendar_callback_within_30d",
+  "date_authority": "Calendar",
+  "eligibility": "Every matched paid service with a Calendar anchor date in the declared interval; one source-linked score within five minutes after its scheduled end; no historical backfill.",
+  "baseline_missed_event_windows": 20,
+  "baseline_prospective_logs": 0,
+  "record_sha256": "9b605e5e1a7e7be79e1a7474e66385f3a43b99d0bc0bd68dfa36fe0538dde938"
+}

@@ -467,7 +467,7 @@ def status(base=None):
     return result
 
 
-def final_evaluation():
+def final_evaluation(*, repaired=False):
     """After full cohort maturity, refresh source-derived labels and score once."""
     try:
         from scripts import cp2_model as model
@@ -477,10 +477,12 @@ def final_evaluation():
         import freeze_callback_prospective as prospective
     _, bundle = model.current_bundle()
     manifest, _ = prospective.load_bundle(bundle)
+    protocol_path = ROOT/'config/cp2_repaired_cohort.json' if repaired else None
+    contract = prospective.cohort_contract(bundle, manifest, protocol_path)
     if utcnow().astimezone(LOCAL).date() < datetime.fromisoformat(
-            manifest['earliest_final_evaluation_date']).date():
+            contract['earliest_final_evaluation_date']).date():
         raise ValueError('Future cohort 30-day outcomes are not complete yet')
-    if (bundle/'prospective_evaluation.json').exists():
+    if contract['result_path'].exists():
         raise ValueError('One-time final future evaluation already recorded')
     state = run()
     run_dir = BASE/'runs'/state['run_id']
@@ -493,22 +495,25 @@ def final_evaluation():
         source_extraction_min_at_utc=source['earliest_extraction_at_utc'],
         source_extraction_max_at_utc=source['extracted_at_utc'])
     path = run_dir/'prospective_labels_private.json'
-    prepared = prospective.prepare_labels(bundle, mature_input, evidence, path)
-    evaluated = prospective.evaluate(bundle, path, BASE/'prospective_logs')
+    prepared = prospective.prepare_labels(bundle, mature_input, evidence, path,
+        protocol_path=protocol_path)
+    evaluated = prospective.evaluate(bundle, path, BASE/'prospective_logs',
+        protocol_path=protocol_path)
     return {'cohort_anchors': prepared['complete_cohort_anchors'],
         'source_run_id': state['run_id'], 'evaluation_rows': evaluated['rows'],
-        'result_path': str(bundle/'prospective_evaluation.json')}
+        'result_path': str(contract['result_path'])}
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=['run', 'resume', 'status', 'final-evaluation'])
+    parser.add_argument('mode', choices=['run', 'resume', 'status', 'final-evaluation',
+        'final-evaluation-repaired'])
     parser.add_argument('--run-id')
     args = parser.parse_args()
     if args.mode == 'status':
         result = status()
-    elif args.mode == 'final-evaluation':
-        result = final_evaluation()
+    elif args.mode in {'final-evaluation', 'final-evaluation-repaired'}:
+        result = final_evaluation(repaired=args.mode == 'final-evaluation-repaired')
     else:
         if args.mode == 'resume' and not args.run_id:
             parser.error('resume requires --run-id')

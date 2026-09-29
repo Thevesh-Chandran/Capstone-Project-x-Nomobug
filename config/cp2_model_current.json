@@ -35,6 +35,13 @@
     "2026-09-28",
     "2026-10-27"
   ],
+  "original_cohort_status": "incomplete_collection_no_full_cohort_accuracy_claim",
+  "repaired_cohort_protocol": "config/cp2_repaired_cohort.json",
+  "repaired_cohort_protocol_sha256": "b539fb77fcee8808b48e3200afd11e055af44457a8cdb24774557e1b8f7698cc",
+  "repaired_cohort": [
+    "2026-09-30",
+    "2026-10-27"
+  ],
   "earliest_final_evaluation": "2026-11-27",
   "live_feature_feed": "local_read_only_google_to_temporary_bigquery_to_model_connected_not_hosted",
   "report": "planning/CP2_CORRECTED_MODEL_CANDIDATES_V5.md",
