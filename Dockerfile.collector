@@ -1,0 +1,16 @@
+FROM python:3.14-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+WORKDIR /app
+COPY requirements-reporting.txt requirements-collector.txt /app/
+RUN python -m pip install --no-cache-dir -r requirements-collector.txt \
+    && useradd --uid 10002 --create-home --shell /usr/sbin/nologin cp2 \
+    && mkdir -p /app/outputs/cp2-v2 /app/dbt/target/compiled \
+    && chown -R cp2:cp2 /app/outputs /app/dbt/target
+COPY --chown=cp2:cp2 scripts /app/scripts
+COPY --chown=cp2:cp2 config/cp2_model_current.json config/cp2_live_feature_contract.json config/cp2_repaired_cohort.json config/cp2_cloud_artifacts.json /app/config/
+COPY --chown=cp2:cp2 dbt/macros /app/dbt/macros
+USER 10002:10002
+CMD ["python", "-m", "scripts.cp2_cloud_collector"]

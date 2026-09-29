@@ -231,7 +231,8 @@ def freeze(output):
 def load_bundle(output):
     manifest=json.loads((output/'bundle.json').read_text())
     for relative,expected_hash in manifest['feature_preparation_hashes'].items():
-        if digest(b.ROOT/relative)!=expected_hash:
+        # The frozen manifest was written on Windows; Cloud Run uses POSIX paths.
+        if digest(b.ROOT/relative.replace('\\','/'))!=expected_hash:
             raise ValueError('Frozen feature-preparation code changed')
     models={}
     for name,info in manifest['models'].items():
@@ -344,7 +345,17 @@ def score(output,input_path,log_dir,*,source_receipt=None):
             pending.append((path,record))
         # Validate the entire batch before committing any new row. If a process
         # dies between atomic commits, rerunning the EXACT input safely resumes.
-        for path,record in pending:atomic_create_json(path,record)
+        for path,record in pending:
+            # Cloud Run has an ephemeral filesystem. Commit the immutable receipt
+            # to private object storage before acknowledging a local write.
+            bucket_name=os.getenv('NOMOBUG_CP2_COLLECTOR_BUCKET')
+            if bucket_name:
+                from google.cloud import storage
+                object_name='prospective_logs/'+path.name
+                payload=json.dumps(record,indent=2,allow_nan=False).encode('utf-8')
+                storage.Client().bucket(bucket_name).blob(object_name).upload_from_string(
+                    payload,content_type='application/json',if_generation_match=0)
+            atomic_create_json(path,record)
     return {'logged_rows':len(pending),'already_logged_rows':existing_count,'models':list(models),
       'performance':'not_available_until_mature_outcomes'}
 
