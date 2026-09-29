@@ -1,6 +1,7 @@
 {
   "version": "cp2_live_features_v1",
   "bundle_sha256": "6ace4314b4a5e170ea1bd6feee40dadbdd14eb3c986db9223d888b3c3ee302e0",
+  "current_anchor_macro_sha256": "d3b7bd1a85dc0616dd8006a651691df886277f4e0a182098ba31458c3df200c8",
   "compiled_query_hashes": {
     "sales.sql": "4f62609ac751796aba3f2fa77423ff54bdb57f1fb3795d061421abc9c50c6327",
     "gold/sales_package_facts.sql": "3fe7c2b7e874f68c64168e495ef6303d627712a5caf3fd41d46991fcc6a09089",

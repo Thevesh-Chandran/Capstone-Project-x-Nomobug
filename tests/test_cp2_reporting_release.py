@@ -62,3 +62,22 @@ def test_partial_promotion_restores_prior_view(monkeypatch, tmp_path):
         release.promote(client, inventory, tmp_path)
     assert client.tables["p.silver.a"].view_query == "SELECT 1 AS old_value"
     assert client.tables["p.gold.b"].view_query == "SELECT 1 AS old_value"
+
+
+def test_source_exit_is_audited_as_failed_without_promotion(monkeypatch, tmp_path):
+    statuses = []
+
+    class Client:
+        def close(self):
+            pass
+
+    monkeypatch.setenv("NOMOBUG_BQ_UPLOAD_APPROVED", "yes")
+    monkeypatch.setattr(release, "ROOT", tmp_path)
+    monkeypatch.setattr(release.bigquery, "Client", lambda **kwargs: Client())
+    monkeypatch.setattr(release, "ensure_audit", lambda client: None)
+    monkeypatch.setattr(release, "audit", lambda client, run_id, status, *args: statuses.append(status))
+    monkeypatch.setattr(release.cp2_pipeline, "source_stage",
+                        lambda run_dir: (_ for _ in ()).throw(SystemExit("Missing token")))
+    with pytest.raises(SystemExit, match="Missing token"):
+        release.run()
+    assert statuses == ["STARTED", "FAILED"]

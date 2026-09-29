@@ -88,7 +88,7 @@ def dbt_variables(manifest: dict) -> dict:
 
 
 def audit(client: bigquery.Client, run_id: str, status: str, manifest: dict | None = None,
-          error: Exception | None = None) -> None:
+          error: BaseException | None = None) -> None:
     table = f"{PROJECT}.audit.release_runs"
     row = {"run_id": run_id, "event_at": datetime.now(timezone.utc).isoformat(),
         "status": status, "manifest_json": json.dumps(manifest, sort_keys=True) if manifest else None,
@@ -345,7 +345,7 @@ def run() -> dict:
         safe_json(run_dir / "release_manifest.json", manifest)
         audit(client, run_id, "BRONZE_VERIFIED", manifest)
         return finish_release(client, run_dir, manifest)
-    except Exception as error:
+    except (Exception, SystemExit) as error:
         safe_json(run_dir / "failure.json", {"status": "FAILED", "run_id": run_id,
             "error_type": type(error).__name__, "message": str(error)})
         audit(client, run_id, "FAILED", manifest, error)

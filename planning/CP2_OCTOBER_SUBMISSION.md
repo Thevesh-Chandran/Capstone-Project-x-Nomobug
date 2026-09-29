@@ -22,19 +22,22 @@ The dashboard is a management artifact, not a customer risk list. It should show
 |---|---|
 | Fresh source → candidate build → independent reconciliation → publish | Passed on 28 September; release ID above |
 | Python/dbt CI and container smoke | GitHub CI passed for the deploy revision; local full Python suite passed 376 tests; Linux image build and CLI smoke passed |
-| Frozen model replay | Previously passed for all 5,695 current-bundle scores; rerun during final acceptance |
+| Frozen model replay | Passed again on 29 September for all 5,695 current-bundle scores; maximum probability difference below 3.9e-16 |
 | Manual cloud job | Passed: execution `cp2-reporting-daily-7jfzx` completed; audit release `20260928134056afeb07` is `PUBLISHED` |
-| 06:00 MYT scheduled cloud job | Trigger configured and enabled for `0 6 * * *` Asia/Kuala_Lumpur; verify the first actual 06:00 execution and audit row |
-| Deliberate cloud failure and recovery | The first deployed execution failed on a missing scoped quality write grant; the previous Gold pointers remained intact. The corrected manual run published successfully. A separate deliberate failure injection is still pending if required for acceptance. |
+| 06:00 MYT scheduled cloud job | Passed: Scheduler-triggered execution `cp2-reporting-daily-wkh6q` started at 06:00 MYT on 29 September and published audit release `202609282200221fcb3a` |
+| Deliberate cloud failure and recovery | Execution-only invalid token path caused `cp2-reporting-daily-wrwbl` to fail; the Gold views stayed on release `202609282200221fcb3a`, and the persistent job configuration retained the correct token path. A normal retry is underway. The earlier real IAM failure also preserved the prior Gold pointers and recovered. |
 | Dashboard totals, filters, privacy, viewer access and narrow-screen rendering | Owner is finishing the dashboard; pending final checks |
 | Prospective collection | Local collector installed; report logged predictions and missed windows from its immutable operational records at submission |
 | Project cost below RM 30/month operator ceiling | Check actual project Billing Reports spend before each deployment and while schedule runs; budget alerts do not cap charges |
 
-As of the 28 September 13:33 UTC collector tick, **zero prospective predictions** were committed and **seven service windows** were marked missed; no new misses occurred in that tick. This is incomplete collection evidence, not a future accuracy result. The missed windows cannot be backfilled as prospective scores. Reassess collection at submission and, if full-cohort coverage is impossible, state that the 27 November full-cohort test is blocked and predeclare a new cohort rather than relabel a retrospective test as prospective.
+As of the 29 September 01:22 UTC collector tick, **zero prospective predictions** were committed and **eight service windows** were marked missed; no new misses occurred in that tick. The PC was not recording ticks overnight, consistent with the local signed-in/awake dependency. This is incomplete collection evidence, not a future accuracy result. The missed windows cannot be backfilled as prospective scores. Reassess collection at submission and, if full-cohort coverage is impossible, state that the 27 November full-cohort test is blocked and predeclare a new cohort rather than relabel a retrospective test as prospective.
 
 ## Remaining before 31 October
 
-1. Observe a completed Cloud Scheduler-triggered execution and the first actual 06:00 MYT release; verify both have matching audit rows.
-2. If acceptance specifically requires a deliberate fault injection beyond the observed real IAM failure, run one safely without changing the model, and verify unchanged Gold pointers and a successful retry.
-3. Recheck current source-to-Gold reconciliation and owner examples after the final release. Confirm dashboard totals, filters, privacy, viewer permissions, and narrow-screen use with the owner.
-4. Run the final Python/dbt suites, frozen replay and container smoke against the submission revision. Record the actual prospective log and missed-window counts, latest cost observation, and any unresolved blockers.
+1. Recheck current source-to-Gold reconciliation and owner examples after the final release. Confirm dashboard totals, filters, privacy, viewer permissions, and narrow-screen use with the owner.
+2. Run the final Python/dbt suites, frozen replay and container smoke against the submission revision. Record the actual prospective log and missed-window counts, latest cost observation, and any unresolved blockers.
+3. Confirm the normal retry after the deliberate fault publishes, then record both execution and audit IDs.
+
+The 29 September local verification initially rejected byte hashes after Git converted frozen Python and SQL sources to Windows CRLF. The byte-identical LF contents replayed the unchanged model. Repository line-ending attributes now preserve LF for the exact hashed files. A separate post-freeze production anchor-macro optimization has an explicit current-source hash in the live feature pin; the frozen compiled SQL pin remains exact. The live feature guard still rejects arbitrary macro or compiled-SQL changes. The model bundle and its 30-day target were not changed.
+
+The deliberate missing-token execution exposed an audit edge case: a Google source reader exits with `SystemExit`, which the release runner did not previously classify as a failed run. The failed Cloud Run execution and unchanged Gold pointer were verified, then its stranded `STARTED` audit record was reconciled to `FAILED` from that execution evidence. The runner now audits source `SystemExit` failures directly; a regression test covers this path. No source data or model artifact was changed by the fault injection.
