@@ -1,4 +1,4 @@
-# Nomobug CP2 — current status and batch checklist
+# Nomobug CP2 — implementation history
 
 **Current October delivery record:** [CP2_OCTOBER_SUBMISSION.md](CP2_OCTOBER_SUBMISSION.md). The reporting release was refreshed and published on 28 September; Cloud Run and its first actual 06:00 MYT scheduled release passed on 29 September. The seven-page management report exists, and the owner is finishing dashboard editing. The older checkpoints below remain historical evidence, including their former statements that hosting, fresh Gold and dashboard work were open.
 

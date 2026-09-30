@@ -12,10 +12,10 @@ For the 31 October deliverable, use the [October submission record](CP2_OCTOBER_
 | [CP2_CALLBACK_RECORDING_GUIDE.md](CP2_CALLBACK_RECORDING_GUIDE.md) | Structured recording needed to improve labels and features |
 | [CP2_ENVIRONMENTAL_FEATURE_NOTES.md](CP2_ENVIRONMENTAL_FEATURE_NOTES.md) | Weather, waterways, land-cover and flood-source interpretation |
 | [CP2_GOAL_COVERAGE_AUDIT.md](CP2_GOAL_COVERAGE_AUDIT.md) | Capstone requirements versus implemented evidence |
-| [PROJECT_STATUS.md](PROJECT_STATUS.md) | Detailed checkpoints and implementation history |
-| [cp2_scope.md](cp2_scope.md) | Business scope and required deliverables |
+| [CP2_PROJECT_HISTORY.md](CP2_PROJECT_HISTORY.md) | Historical checkpoints and implementation decisions |
+| [CP2_SCOPE_AND_DELIVERABLES.md](CP2_SCOPE_AND_DELIVERABLES.md) | Business scope and required deliverables |
 
-[The current v5 report](CP2_CORRECTED_MODEL_CANDIDATES_V5.md) also defines the corrected future-test bundle and its 28 September–27 October cohort. Use the single model entry point in [the script index](../scripts/README.md).
+[The current v5 report](CP2_CORRECTED_MODEL_CANDIDATES_V5.md) explains model selection and the frozen bundle. The earlier September cohorts are incomplete; the separate [1–27 October cloud cohort](../config/cp2_cloud_cohort.json) is the future test. Use the single model entry point in [the script index](../scripts/README.md).
 
 [The archive](archive/README.md) preserves superseded v4 models, the earlier blind-spot experiment, the frozen v1 protocol, completed comparisons, source audits and historical setup plans. The former [dashboard specification](deferred/LOOKER_STUDIO_BUILD_SPEC.md) is an older design reference; the owner is finishing the current management report. `WRITING_VOICE_GUIDE.md` is a report-writing reference.
 

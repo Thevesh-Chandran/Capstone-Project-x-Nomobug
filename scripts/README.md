@@ -8,9 +8,11 @@ Start with [the model guide](../planning/CP2_START_HERE.md) before running an ex
 |---|---|
 | `cp2_model.py status` | Read the current corrected v5 model pointer, training coverage and evaluation limits |
 | `cp2_model.py verify` | Replay the current corrected future bundle and check its hashes |
-| `cp2_pipeline.py run`, `resume --run-id <id>`, `status` | Live read-only Google→temporary BigQuery→private scoring, stage journal, recovery and last-success integrity |
-| `cp2_pipeline_tick.py` | Calendar-only two-minute trigger for just-ending service predictions |
-| `install_cp2_local_runner.ps1 -Mode Status/Install/Remove` | Local interactive Windows Task Scheduler runner for the frozen future cohort; PC must be awake |
+| `cp2_reporting_release.py` | Active daily Cloud Run reporting release: immutable source snapshots, dbt and KPI checks, then Gold promotion |
+| `cp2_cloud_collector.py` | Active private Cloud Run collector called every two minutes; logs timely frozen-model predictions |
+| `cp2_pipeline.py run`, `resume --run-id <id>`, `status` | Local diagnostic path for the same sources and features; not the active scheduled collector |
+| `cp2_pipeline_tick.py` | Retired local Calendar trigger; kept for audit and recovery |
+| `install_cp2_local_runner.ps1 -Mode Status/Install/Remove` | Retired local Windows task manager; keep the local task disabled while cloud collection runs |
 | `validate_business_kpis.py --output-dir outputs/<private-run>` | Independent pinned-Bronze vs deployed Gold KPI checks and optional fresh Sheets drift report |
 | `cp2_model.py predict --input-json <private predictors> --output-csv outputs/<private scores>.csv` | Generate risk scores without manufacturing observed outcomes; this does not register prospective evidence |
 | `cp2_model.py log-prospective --input-json <private predictors> --source-receipt <private receipt>` | Log the current frozen comparison with strict timing and immutable source evidence |

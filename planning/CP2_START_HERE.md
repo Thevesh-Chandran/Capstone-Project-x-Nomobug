@@ -37,4 +37,4 @@ The command also supports `predict`, `log-prospective` and `evaluate-prospective
 | [archive/](archive/README.md) | Completed experiments and historical setup |
 | [October submission record](CP2_OCTOBER_SUBMISSION.md) | Reporting architecture, acceptance status and dashboard handoff |
 
-The current candidate supersedes the earlier v4 recommendation. Earlier contracts remain at stable paths where tests/replay still require them. Source data and owner reviews are preserved. [Detailed status](PROJECT_STATUS.md).
+The current candidate supersedes the earlier v4 recommendation. Earlier contracts remain at stable paths where tests/replay still require them. Source data and owner reviews are preserved. [Detailed history](CP2_PROJECT_HISTORY.md).

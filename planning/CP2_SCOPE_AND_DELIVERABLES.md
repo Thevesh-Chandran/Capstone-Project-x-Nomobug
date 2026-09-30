@@ -1,4 +1,4 @@
-# Nomobug CP2 Scope
+# Nomobug CP2 scope and deliverables
 
 Repository-relative paths are used throughout.
 
@@ -75,7 +75,7 @@ Build a web-based analytics decision-support system that combines Nomobug's Goog
 - Preserve every source observation and its original row position before transformations. Distinguish genuine repeat enquiries, exact repeats, blank/template rows and reload duplication.
 - Free-plan limits, privacy approval for third-party storage, unattended OAuth, model labels and coordinate availability must be validated. Do not silently remove predictive ML or DBSCAN when feasibility is weak.
 - Business/dashboard areas remain required; related areas may share dashboard pages. No additional model or decorative chart work before core acceptance checks pass.
-- Follow `planning/PROJECT_STATUS.md` for verified-versus-planned status. The dated plan is a milestone guide; its older platform references are superseded by the current scope and status.
+- Follow `planning/CP2_OCTOBER_SUBMISSION.md` for current acceptance status and `planning/CP2_PROJECT_HISTORY.md` for older checkpoints. The dated plan is a milestone guide; its older platform references are superseded by the current scope and status.
 
 ## Required Dashboard Areas
 
