@@ -1,5 +1,7 @@
 # Current dashboard handoff — 1 October 2026
 
+For step-by-step page settings and stakeholder decisions, use [the detailed dashboard build guide](CP2_DASHBOARD_BUILD_GUIDE.md). Read [the metric dictionary](CP2_METRIC_DICTIONARY.md) and [model explanation](CP2_MODEL_EXPLAINED.md) before interpreting charts.
+
 The owner builds the Looker Studio report. The latest validated reporting release at handoff is `2026093011124282606c`; subsequent successful daily releases update the same stable Gold view names. Connect to `profound-keel-500007-s4.gold`, never to a dated `cp2r_...` candidate dataset. Keep source freshness visible using `dashboard_source_freshness`.
 
 | Management content | Stable Gold view | Interpretation |

@@ -46,8 +46,11 @@ neither service count is proof of completed treatment.
 Below the cards: separate sales/payment trends, scheduled and warranty visit
 trends, then a Needs attention section when its record-level evidence is built.
 Do not populate a fabricated or empty-zero attention queue while it is unavailable.
-Do not stack normal_package_service_event_rows with warranty_claim_event_rows:
-current SQL predicates can overlap. Derive mutually exclusive categories first.
+Current normal package and warranty event categories are mutually exclusive.
+For a complete stack use normal, warranty and other scheduled entries; other is
+total scheduled entries minus normal minus warranty. The broader extra-visit
+indicator overlaps warranty/complimentary categories and cannot be another
+exclusive stack component. Follow the current build guide.
 
 Use 2026 as reporting-year scope with month selection and visible source freshness.
 Default comparisons should use the latest complete common reporting month only

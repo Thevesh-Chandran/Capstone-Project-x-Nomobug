@@ -8,6 +8,11 @@ For the 31 October deliverable, use the [October submission record](CP2_OCTOBER_
 |---|---|
 | [CP2_START_HERE.md](CP2_START_HERE.md) | Short model guide and file map |
 | [CP2_DASHBOARD_HANDOFF.md](CP2_DASHBOARD_HANDOFF.md) | Current Gold sources, metric labels, v5 model page and acceptance checks |
+| [CP2_DASHBOARD_BUILD_GUIDE.md](CP2_DASHBOARD_BUILD_GUIDE.md) | Detailed source/field/chart/filter settings for every management page |
+| [CP2_METRIC_DICTIONARY.md](CP2_METRIC_DICTIONARY.md) | Plain meanings of customer, sales, payment, enquiry and package records |
+| [CP2_OPERATIONS_METRIC_DICTIONARY.md](CP2_OPERATIONS_METRIC_DICTIONARY.md) | Visit, return, geography, weather and quality field meanings |
+| [CP2_MODEL_EXPLAINED.md](CP2_MODEL_EXPLAINED.md) | Model target, all predictor groups and performance metrics explained |
+| [CP2_DASHBOARD_FIELD_REFERENCE.md](CP2_DASHBOARD_FIELD_REFERENCE.md) | Exact deployed Gold field names and types |
 | [CP2_CORRECTED_MODEL_CANDIDATES_V5.md](CP2_CORRECTED_MODEL_CANDIDATES_V5.md) | Current corrected v5 model, newer evaluation and limits |
 | [WARRANTY_POLICY_RULES.md](WARRANTY_POLICY_RULES.md) | Owner-confirmed contractual eligibility rules |
 | [CP2_CALLBACK_RECORDING_GUIDE.md](CP2_CALLBACK_RECORDING_GUIDE.md) | Structured recording needed to improve labels and features |
