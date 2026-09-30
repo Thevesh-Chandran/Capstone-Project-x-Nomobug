@@ -7,6 +7,17 @@ from google.api_core.exceptions import PreconditionFailed
 from scripts import cp2_cloud_collector as cloud
 
 
+def test_artifact_prefix_is_stable_across_json_line_endings(tmp_path, monkeypatch):
+    monkeypatch.setattr(cloud, "ROOT", tmp_path)
+    path = tmp_path / "config/cp2_live_feature_contract.json"
+    path.parent.mkdir()
+    path.write_bytes(b'{\n  "version": "test",\n  "hash": "abc"\n}\n')
+    first = cloud.artifact_prefix()
+    path.write_bytes(b'{\r\n  "hash": "abc",\r\n  "version": "test"\r\n}\r\n')
+    assert cloud.artifact_prefix() == first
+    assert first.startswith("artifacts/")
+
+
 class Lock:
     generation = 7
     updated = datetime.now(timezone.utc)

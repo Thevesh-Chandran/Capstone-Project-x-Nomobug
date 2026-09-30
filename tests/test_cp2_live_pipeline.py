@@ -97,6 +97,8 @@ def test_trigger_only_follows_just_finished_timed_service():
     assert not tick.timed_service(service|{'summary': 'GPC 4/3'}, now)
     assert not tick.timed_service(service|{'summary': 'GPC 5/3'}, now)
     assert not tick.timed_service(service|{'summary': 'GPC 0/3'}, now)
+    assert not tick.timed_service(service|{'summary': 'CANCELLED GPC 3/3'}, now)
+    assert not tick.timed_service(service|{'summary': 'CANCELED GPC 3/3'}, now)
     assert not tick.timed_service(service|{'status': 'cancelled'}, now)
     assert not tick.timed_service(service|{'end_raw': (now-timedelta(minutes=5)).isoformat()}, now)
     assert tick.timed_service(service|{'end_raw': (now+timedelta(minutes=1)).isoformat()}, now)

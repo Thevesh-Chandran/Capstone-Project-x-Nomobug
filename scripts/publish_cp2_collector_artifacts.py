@@ -8,7 +8,7 @@ import json
 from google.api_core.exceptions import PreconditionFailed
 from google.cloud import storage
 
-from scripts.cp2_cloud_collector import ARTIFACTS, ROOT
+from scripts.cp2_cloud_collector import ARTIFACTS, ROOT, artifact_prefix
 
 
 def inventory():
@@ -36,8 +36,9 @@ def inventory():
 
 def publish(bucket_name, manifest):
     bucket = storage.Client().bucket(bucket_name)
+    prefix = artifact_prefix()
     for name, digest in manifest.items():
-        blob = bucket.blob("artifacts/" + name)
+        blob = bucket.blob(prefix + name)
         if blob.exists():
             if sha256(blob.download_as_bytes()).hexdigest() != digest:
                 raise ValueError(f"Existing cloud artifact differs: {name}")
@@ -47,7 +48,7 @@ def publish(bucket_name, manifest):
         except PreconditionFailed:
             if sha256(blob.download_as_bytes()).hexdigest() != digest:
                 raise ValueError(f"Concurrent cloud artifact differs: {name}") from None
-    blob = bucket.blob("artifacts/manifest.json")
+    blob = bucket.blob(prefix + "manifest.json")
     payload = json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode()
     if blob.exists():
         if blob.download_as_bytes() != payload:

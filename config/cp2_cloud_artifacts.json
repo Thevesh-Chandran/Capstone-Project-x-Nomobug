@@ -3,7 +3,7 @@
   "dbt/target/compiled/nomobug/models/analytics_ml/warranty_callback_fixed_horizon_dataset.sql": "0e4f0a8d82812ae56c195e5b6ded90a2729998bb7892bd838844362768f1b6d7",
   "dbt/target/compiled/nomobug/models/calendar_event_locations.sql": "682e2e35d7fa3b8a47ddd7a1d215d1de4ecd1d43fb0448db5b6dbddfdf996bbf",
   "dbt/target/compiled/nomobug/models/calendar_event_matches.sql": "0e0e606690667e7f87142feaafa07a792b6e97b4275bd70421596c5ef6ee53d0",
-  "dbt/target/compiled/nomobug/models/calendar_events.sql": "ed98c6f4e8fe3d9a7deb64ed793d8e723db7453461824e128ad660005f598486",
+  "dbt/target/compiled/nomobug/models/calendar_events.sql": "02e0aa28b33905742b5cc292f38975519a6606d0ec0feed621fe8325e31bac79",
   "dbt/target/compiled/nomobug/models/gold/calendar_service_event_facts.sql": "e6fc2b9ed14cfa7f49dd0451577af998535d56c7d76be0c1d231363dd0124285",
   "dbt/target/compiled/nomobug/models/gold/sales_package_facts.sql": "d266ed832b40c6914510e654ca1a9eff5b6fd96101912b51fa2f3d173f97b6b0",
   "dbt/target/compiled/nomobug/models/sales.sql": "874440213b7f6670fa69fa4590c7da6df93a892a9c3c03e4a94e495a7d46162c",
