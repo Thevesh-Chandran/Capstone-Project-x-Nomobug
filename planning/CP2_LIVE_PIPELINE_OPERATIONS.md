@@ -8,6 +8,8 @@ At 13:30 MYT on 30 September, a scheduled run logged one of two simultaneous thi
 
 The same title/status mismatch affected The Jing House: a 17 September `CANCELLED GPC 2/12` entry and a 30 September `GPC 2/12` appointment were both treated as service anchors before the correction. The latter became the 26th raw miss at 16:36 MYT. By 17:46 MYT, five 30 September predictions were indexed; the new collector revision had handled two scheduled idle ticks with HTTP 200. The frozen model still contains nine negative 2024–25 training anchors with this title/status mismatch; report that limitation when interpreting historical metrics.
 
+Revision `00007` was deployed before the reporting Gold override view exposed its required `event_identity_hash` field. Three 18:00 MYT service windows were missed while feature queries failed; the raw total reached 29 by 18:12. Traffic returned to working revision `00006` at 18:07. The failed reporting candidate left published Gold unchanged, and its dbt cancellation assertion was repaired. A new collector startup schema check prevents this deployment order from silently taking traffic again. Restore the corrected collector only after the fresh Gold release passes and then verify a real service-end receipt. Neither September cohort becomes complete through this repair; the October cloud cohort is still separate.
+
 The current v5 model answers whether a **recorded corrective Calendar callback** occurs during days 1–30 after a matched paid service. Its output is a risk probability, not warranty entitlement or proof that treatment was completed. [Current model and limits](CP2_START_HERE.md).
 
 ## Fresh local run

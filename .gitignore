@@ -12,6 +12,7 @@ __pycache__/
 .pytest_tmp*/
 .ruff_cache/
 /dbt/target/
+/dbt/outputs/
 /dbt/logs/
 /dbt/dbt_packages/
 /dbt/tmp/

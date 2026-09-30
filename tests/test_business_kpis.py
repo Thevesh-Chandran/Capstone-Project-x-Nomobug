@@ -100,6 +100,8 @@ def test_owner_review_and_consultation_precedence_for_callback_signal():
     assert kpi.calendar_category("GPC 4/3", "confirmed", "Not a warranty claim") == "service"
     assert kpi.calendar_category("GPC 4/3", "confirmed", "Unclear") == "label_unresolved"
     assert kpi.calendar_category("GPC WARRANTY", "cancelled", "Confirmed warranty claim") == "cancelled"
+    assert kpi.calendar_category("CANCELLED GPC 4/3", "confirmed") == "cancelled"
+    assert kpi.calendar_category("CANCELED GPC 2/12", "confirmed") == "cancelled"
 
 
 def test_followup_placeholders_are_not_prospect_or_confirmed_sale():
