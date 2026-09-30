@@ -17,6 +17,7 @@ The future-test refit trains on all 5,695 mature services, including 2,075 from 
 | [config/](config/README.md) | Model contracts, experiment provenance and source dictionaries |
 | [scripts/](scripts/README.md) | Repeatable extraction, warehouse, analysis and model commands |
 | dbt/ | Tested warehouse transformations and source lineage |
+| [infra/](infra/CP2_CLOUD_RESOURCE_MAP.md) | Cloud resource map, hosting setup and cleanup record |
 | tests/ | Synthetic regression checks |
 | templates/ | Blank structured recording templates |
 | notebooks/ | Introductory profiling notebooks |

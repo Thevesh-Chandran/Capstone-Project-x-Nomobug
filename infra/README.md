@@ -1,5 +1,7 @@
 # CP2 reporting job runbook
 
+For a plain-language inventory of the live service, job, schedules, datasets, storage and images, plus the 30 September cleanup record, see [the cloud resource map](CP2_CLOUD_RESOURCE_MAP.md).
+
 The daily batch runs `python -m scripts.cp2_reporting_release run` in one Cloud Run Job task at **06:00 Asia/Kuala_Lumpur**. It reads the approved Google Sheets and Calendar sources through an OAuth refresh token with only `spreadsheets.readonly` and `calendar.readonly`, snapshots Bronze, builds candidate dbt Silver/Gold, validates KPIs, then publishes. A separate [Cloud Run collector](CP2_PROSPECTIVE_CLOUD.md) handles the two-minute prospective timing gate with the unchanged frozen v5 model. The local Windows collector remains disabled.
 
 The Cloud Run Job uses one task, parallelism one, 20-minute timeout, zero automatic task retries, 1 vCPU and 2 GiB. Each dbt and validation query has a 100 MiB billed-bytes ceiling in the project configuration. Cloud Scheduler also has zero retries. These are per-execution limits. At the owner's request, there is **no RM30 operator stop-work ceiling**. The existing RM30 budget remains an informational alert at 50/80/100%; [ordinary budgets alert but do not stop spend](https://docs.cloud.google.com/billing/docs/how-to/budgets). No Cloud Run spend cap was installed.
