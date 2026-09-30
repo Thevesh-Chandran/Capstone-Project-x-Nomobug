@@ -23,8 +23,7 @@ $OwnerId = '53994531'
 $JobIdentity = "cp2-reporting-job@$Project.iam.gserviceaccount.com"
 $SchedulerIdentity = "cp2-reporting-scheduler@$Project.iam.gserviceaccount.com"
 $DeployerIdentity = "cp2-reporting-deployer@$Project.iam.gserviceaccount.com"
-# Keep the existing budget name for idempotency; it is now an alert only.
-$BudgetName = 'CP2 project monthly stop-work alert RM30'
+$BudgetName = 'CP2 project monthly cost alert RM30'
 $Secrets = @('cp2-google-readonly-token', 'cp2-google-source-ids', 'cp2-google-source-metadata')
 
 function Invoke-Gcloud([string[]]$Arguments) {
@@ -49,7 +48,7 @@ if ($LASTEXITCODE -ne 0 -or $Account.currencyCode -ne 'MYR' -or -not $Account.op
 }
 
 if (-not $Apply) {
-    Write-Output 'Dry-run: budget RM30 MYR, three scoped secrets, three service accounts, one Docker repository, numeric-ID GitHub WIF provider. No changes made.'
+    Write-Output 'Dry-run: informational RM30 MYR budget alert, three scoped secrets, three service accounts, one Docker repository, numeric-ID GitHub WIF provider. No changes made.'
     Write-Output 'To apply, supply the current project-scoped Billing Reports amount and observation time.'
     return
 }
