@@ -36,6 +36,13 @@ ARTIFACTS = {
 STATE = ("watch_events.json", "last_tick.json", "last_attempt.json", "last_success.json")
 
 
+def artifact_prefix():
+    """Version the private artifact inventory by its exact live-feature pin."""
+    pin = pipeline.read(ROOT / "config/cp2_live_feature_contract.json")
+    canonical = json.dumps(pin, sort_keys=True, separators=(",", ":")).encode()
+    return "artifacts/" + sha256(canonical).hexdigest()[:16] + "/"
+
+
 def _download(blob, destination):
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_bytes(blob.download_as_bytes())
@@ -47,7 +54,8 @@ def hydrate_artifacts(bucket):
     pin = pipeline.read(ROOT / "config/cp2_live_feature_contract.json")
     compiled = {f"dbt/target/compiled/nomobug/models/{name}" for name in pin["compiled_query_hashes"]}
     expected = ARTIFACTS | compiled
-    manifest = json.loads(bucket.blob("artifacts/manifest.json").download_as_text())
+    prefix = artifact_prefix()
+    manifest = json.loads(bucket.blob(prefix + "manifest.json").download_as_text())
     pinned = pipeline.read(ROOT / "config/cp2_cloud_artifacts.json")
     if set(manifest) != expected or manifest != pinned:
         raise ValueError("Cloud artifact inventory differs from the frozen collector contract")
@@ -56,7 +64,7 @@ def hydrate_artifacts(bucket):
             raise ValueError("Invalid cloud artifact digest")
         target = ROOT / relative
         if not target.exists() or sha256(target.read_bytes()).hexdigest() != digest:
-            _download(bucket.blob("artifacts/" + relative), target)
+            _download(bucket.blob(prefix + relative), target)
         if sha256(target.read_bytes()).hexdigest() != digest:
             raise ValueError("Cloud artifact integrity mismatch")
     if pipeline.digest(ROOT / "outputs/cp2-v2/prospective_callback_v2/bundle.json") != registry["bundle_sha256"]:

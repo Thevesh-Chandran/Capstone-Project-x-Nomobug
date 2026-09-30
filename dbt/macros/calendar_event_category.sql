@@ -9,7 +9,8 @@ regexp_contains(
 
 {% macro calendar_event_category(summary_upper, status, session_current, session_total, include_warranty=true) -%}
 case
-    when upper({{ status }}) = 'CANCELLED' then 'cancelled'
+    when upper({{ status }}) = 'CANCELLED'
+      or regexp_contains({{ summary_upper }}, r'^\s*CANCEL(?:L)?ED\b') then 'cancelled'
     when regexp_contains({{ summary_upper }},
         r'\b(?:CHECK|REVIEW|CALCULATE)\b.*\bCONVERSION\s+RATE\b') then 'administrative'
     {% if include_warranty %}

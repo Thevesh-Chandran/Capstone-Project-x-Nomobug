@@ -29,6 +29,8 @@ def service_window(event):
     if (event.get('status') or '').upper() != 'CONFIRMED' or event.get('is_all_day'):
         return None
     title = (event.get('summary') or '').upper()
+    if re.search(r'^\s*CANCEL(?:L)?ED\b', title):
+        return None
     title = re.sub(r'\b(?:NO|WITHOUT)\s+WARRANTY\b', '', title)
     package_visit = re.search(r'\b(\d{1,2})\s*/\s*(\d{1,2})\b', title)
     if not package_visit:
