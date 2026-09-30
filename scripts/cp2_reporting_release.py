@@ -250,6 +250,24 @@ def grant_collector_candidate_reader(client: bigquery.Client, stage_prefix: str)
             raise ValueError("Collector candidate access was not persisted")
 
 
+def verify_live_warranty_reviews(client: bigquery.Client, stage_prefix: str) -> None:
+    """Stop if the collector's stable review table differs from the candidate seed."""
+    if not re.fullmatch(r"cp2r_[0-9]{14}[0-9a-f]{6}_", stage_prefix):
+        raise ValueError("Invalid candidate dataset prefix")
+    candidate = f"`{PROJECT}.{stage_prefix}gold.calendar_warranty_review_overrides`"
+    stable = f"`{PROJECT}.gold.calendar_warranty_review_overrides`"
+    fields = ("calendar_event_row", "event_id", "review_label", "reviewed_at",
+              "event_identity_hash")
+    different = " OR ".join(f"c.{field} IS DISTINCT FROM s.{field}" for field in fields)
+    query = ("SELECT COUNT(*) AS mismatches FROM " + candidate + " c FULL OUTER JOIN "
+             + stable + " s USING (review_id) WHERE c.review_id IS NULL OR "
+             "s.review_id IS NULL OR " + different)
+    settings = bigquery.QueryJobConfig(maximum_bytes_billed=LIMIT)
+    rows = list(client.query(query, job_config=settings, location=LOCATION).result(timeout=120))
+    if len(rows) != 1 or rows[0]["mismatches"]:
+        raise ValueError("Stable warranty review overrides differ from candidate seed")
+
+
 def promote(client: bigquery.Client, inventory: list[tuple[str, str, str]], run_dir: Path) -> None:
     """Repoint stable views; restore every changed definition on partial failure."""
     backups = []
@@ -316,6 +334,7 @@ def finish_release(client: bigquery.Client, run_dir: Path, manifest: dict) -> di
         serials_table=manifest["snapshot_tables"]["payments_date_serials"])
     if validation["status"] != "pass_with_business_caveats":
         raise ValueError("Candidate KPI reconciliation failed")
+    verify_live_warranty_reviews(client, stage_prefix)
     audit(client, run_id, "VALIDATED", manifest)
     inventory = view_inventory(client, stage_prefix)
     promote(client, inventory, run_dir)
