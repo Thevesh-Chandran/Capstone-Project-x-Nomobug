@@ -1,7 +1,7 @@
 # CP2 goal coverage audit
 
 Reviewed against the CP1 proposal `Thevesh AL Chandran_24017717_proposal.pdf`,
-the current `planning/cp2_scope.md`, and the deployed dbt/Python structure on
+the current `planning/CP2_SCOPE_AND_DELIVERABLES.md`, and the deployed dbt/Python structure on
 15 September 2026. The proposal is historical context; the current scope and
 owner-confirmed operating rules take precedence. Current updates were reviewed
 on 28 September 2026; old dated evidence below remains historical context.

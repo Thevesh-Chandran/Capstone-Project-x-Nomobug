@@ -2,7 +2,7 @@
 
 # CP2 Implementation Guide
 
-> Current progress and batch order: **[PROJECT_STATUS.md](../../PROJECT_STATUS.md)**.
+> Current progress and batch order: **[CP2_OCTOBER_SUBMISSION.md](../../CP2_OCTOBER_SUBMISSION.md)**. Historical checkpoints: [CP2_PROJECT_HISTORY.md](../../CP2_PROJECT_HISTORY.md).
 > This older guide contains historical implementation notes below. Do not use its
 > old Immediate Next Task or verification statements as current project status.
 
@@ -14,7 +14,7 @@ CP2 will implement the data engineering and analytics workflow proposed during C
 
 The selected stack is Python/pandas API extraction, BigQuery, dbt Core with `dbt-bigquery`, scikit-learn predictive modelling and DBSCAN, Cloud Run Jobs with Cloud Scheduler, and Looker Studio. GitHub Actions supports CI/deployment. Neon Free is retained as a manual fallback, not an automatic failover. Docker packages execution; dashboard users only need a browser. Billing-linked BigQuery targets low/no charges but zero spending cannot be guaranteed.
 
-Use `planning/PROJECT_STATUS.md` for verified progress and `planning/archive/implementation/CP2_SEP_NOV_IMPLEMENTATION_PLAN.md` for milestone dates. Older provider references within the dated plan are superseded by the current stack above. Sessions are at most one hour, and can pull future work forward. Deadline feasibility must be reviewed, not assumed.
+Use `planning/CP2_OCTOBER_SUBMISSION.md` for current verified progress, `planning/CP2_PROJECT_HISTORY.md` for earlier checkpoints, and `planning/archive/implementation/CP2_SEP_NOV_IMPLEMENTATION_PLAN.md` for historical milestone dates. Older provider references within the dated plan are superseded by the current stack above. Sessions are at most one hour, and can pull future work forward. Deadline feasibility must be reviewed, not assumed.
 
 ## First Milestone: Understand the Real Data
 

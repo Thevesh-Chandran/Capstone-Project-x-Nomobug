@@ -4,9 +4,9 @@
 
 Paths and commands are relative to the repository root.
 
-Reconciled 3 September 2026. This is the active schedule; `planning/cp2_scope.md` defines business scope. The previous plan is preserved at `planning/archive/implementation/cp2_plan_before_zero_cost_revision.md`. CP1 documents and the proposal are unchanged.
+Reconciled 3 September 2026. This is a historical schedule; `planning/CP2_SCOPE_AND_DELIVERABLES.md` defines business scope and `planning/CP2_OCTOBER_SUBMISSION.md` tracks the current deadline. The previous plan is preserved at `planning/archive/implementation/cp2_plan_before_zero_cost_revision.md`. CP1 documents and the proposal are unchanged.
 
-Current implementation checkpoint is `planning/PROJECT_STATUS.md`. The dates below remain planning targets, but the older Neon/Preset/GitHub-scheduled platform references are historical. The selected stack is BigQuery, dbt, Cloud Run Jobs + Scheduler, Looker Studio, GitHub Actions CI, and Neon as manual fallback. Verified deployment and remaining work are recorded in `planning/PROJECT_STATUS.md`.
+Current implementation evidence is in `planning/CP2_OCTOBER_SUBMISSION.md`; earlier checkpoints are in `planning/CP2_PROJECT_HISTORY.md`. The dates below are historical planning targets, including older Neon/Preset/GitHub-scheduled platform references. The selected stack is BigQuery, dbt, Cloud Run Jobs + Scheduler, Looker Studio, GitHub Actions CI, and Neon as manual fallback.
 
 ## Working agreement and capacity
 
