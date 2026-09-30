@@ -114,3 +114,28 @@ def test_collector_receives_candidate_reads_before_promotion(monkeypatch):
     assert len(client.updated) == 2
     with pytest.raises(ValueError, match="Invalid candidate"):
         release.grant_collector_candidate_reader(client, "wrong_")
+
+
+def test_reporting_release_rejects_warranty_review_seed_drift(monkeypatch):
+    monkeypatch.setattr(release, "PROJECT", "p")
+    prefix = "cp2r_20261001000000abcdef_"
+
+    class Client:
+        mismatches = 0
+
+        def query(self, sql, job_config, location):
+            assert f"`p.{prefix}gold.calendar_warranty_review_overrides`" in sql
+            assert "`p.gold.calendar_warranty_review_overrides`" in sql
+            assert "event_identity_hash" in sql
+            assert job_config.maximum_bytes_billed == release.LIMIT
+            assert location == release.LOCATION
+            return self
+
+        def result(self, timeout):
+            return [{"mismatches": self.mismatches}]
+
+    client = Client()
+    release.verify_live_warranty_reviews(client, prefix)
+    client.mismatches = 1
+    with pytest.raises(ValueError, match="differ"):
+        release.verify_live_warranty_reviews(client, prefix)
