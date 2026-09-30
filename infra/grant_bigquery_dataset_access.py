@@ -19,13 +19,18 @@ READ_ONLY = ("analytics_ml",)
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--apply", action="store_true", help="Update dataset ACLs")
+    parser.add_argument("--collector", action="store_true", help="Grant the prospective collector its narrower dataset access")
     args = parser.parse_args()
-    principal = f"cp2-reporting-job@{PROJECT}.iam.gserviceaccount.com"
+    principal = (f"cp2-prospective-job@{PROJECT}.iam.gserviceaccount.com" if args.collector
+                 else f"cp2-reporting-job@{PROJECT}.iam.gserviceaccount.com")
+    grants = ([(name, "READER") for name in
+               ("bronze", "silver", "gold", "quality", "analytics_ml")]
+              + [("audit", "WRITER")]) if args.collector else (
+              [(name, "WRITER") for name in WRITABLE]
+              + [(name, "READER") for name in READ_ONLY])
     client = bigquery.Client(project=PROJECT, location=REGION)
     try:
-        for name, role in [(name, "WRITER") for name in WRITABLE] + [
-            (name, "READER") for name in READ_ONLY
-        ]:
+        for name, role in grants:
             dataset = client.get_dataset(f"{PROJECT}.{name}")
             if dataset.location.lower() != REGION:
                 raise ValueError(f"Unexpected dataset region: {name}")

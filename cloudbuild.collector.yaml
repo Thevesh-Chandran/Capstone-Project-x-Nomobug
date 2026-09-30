@@ -1,0 +1,14 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -f
+      - Dockerfile.collector
+      - -t
+      - asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/collector:$BUILD_ID
+      - .
+images:
+  - asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/collector:$BUILD_ID
+serviceAccount: projects/profound-keel-500007-s4/serviceAccounts/cp2-reporting-deployer@profound-keel-500007-s4.iam.gserviceaccount.com
+options:
+  logging: CLOUD_LOGGING_ONLY

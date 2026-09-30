@@ -415,3 +415,28 @@ def test_registered_repaired_protocol_hash_rejects_changed_file(tmp_path):
     path.write_text(json.dumps(protocol))
     with pytest.raises(ValueError,match='registered immutable hash'):
         p.cohort_contract(bundle,manifest,path)
+
+
+def test_registered_cloud_protocol_is_separate_and_immutable(tmp_path):
+    bundle=tmp_path/'outputs/bundle';bundle.mkdir(parents=True)
+    manifest=manifest_fixture()|{'target':'recorded_corrective_calendar_callback_within_30d',
+      'earliest_final_evaluation_date':'2026-11-27'}
+    (bundle/'bundle.json').write_text(json.dumps(manifest))
+    protocol={'schema_version':1,'name':'cp2_cloud_2026',
+      'declared_at_utc':'2026-09-30T03:55:43Z','cohort_start':'2026-10-01',
+      'cohort_end':'2026-10-27','earliest_final_evaluation_date':'2026-11-27',
+      'bundle_sha256':p.digest(bundle/'bundle.json'),'target':manifest['target'],
+      'date_authority':'Calendar'}
+    protocol['record_sha256']=p.record_digest(protocol)
+    config=tmp_path/'config';config.mkdir()
+    path=config/'cp2_cloud_cohort.json';path.write_text(json.dumps(protocol))
+    (config/'cp2_model_current.json').write_text(json.dumps({
+      'cloud_cohort_protocol_sha256':p.digest(path)}))
+    contract=p.cohort_contract(bundle,manifest,path)
+    assert contract['cohort_start']=='2026-10-01'
+    assert contract['result_path'].name=='prospective_cloud_evaluation.json'
+    protocol['eligibility']='changed after declaration'
+    protocol['record_sha256']=p.record_digest(protocol)
+    path.write_text(json.dumps(protocol))
+    with pytest.raises(ValueError,match='immutable hash'):
+        p.cohort_contract(bundle,manifest,path)

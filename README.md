@@ -6,7 +6,7 @@ The main experimental model ranks paid services by the risk of a recorded correc
 
 The current experimental candidate is **corrected v5 ExtraTrees, depth 10**. On 100 newer services it found four of five callback-positive windows within 20 reviews, versus three for the corrected reference. Five positives are too few to establish a dependable improvement. [Current model evidence](planning/CP2_CORRECTED_MODEL_CANDIDATES_V5.md) explains the selection, corrections and limits.
 
-The future-test refit trains on all 5,695 mature services, including 2,075 from 2026. Use `scripts/cp2_model.py status` or `verify` for the current model. A read-only local feed now scores recent services for the frozen prospective experiment, and a separate Cloud Run job publishes reconciled reporting views daily at 06:00 MYT. No future accuracy has been measured: the local collector has already missed service windows, and first-service detection remains weak. The owner is finishing the management dashboard. [October submission status](planning/CP2_OCTOBER_SUBMISSION.md) tracks what has passed and what remains.
+The future-test refit trains on all 5,695 mature services, including 2,075 from 2026. Use `scripts/cp2_model.py status` or `verify` for the current model. A private Cloud Run collector now checks every two minutes for the frozen prospective experiment; a separate Cloud Run job publishes reconciled reporting views daily at 06:00 MYT. No future accuracy has been measured: the earlier cohorts missed service windows, and first-service detection remains weak. A new cloud cohort starts 1 October. The owner is finishing the management dashboard. [October submission status](planning/CP2_OCTOBER_SUBMISSION.md) tracks what has passed and what remains.
 
 ## Find the right files
 

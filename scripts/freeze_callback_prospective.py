@@ -231,7 +231,8 @@ def freeze(output):
 def load_bundle(output):
     manifest=json.loads((output/'bundle.json').read_text())
     for relative,expected_hash in manifest['feature_preparation_hashes'].items():
-        if digest(b.ROOT/relative)!=expected_hash:
+        # The frozen manifest was written on Windows; Cloud Run uses POSIX paths.
+        if digest(b.ROOT/relative.replace('\\','/'))!=expected_hash:
             raise ValueError('Frozen feature-preparation code changed')
     models={}
     for name,info in manifest['models'].items():
@@ -252,14 +253,23 @@ def cohort_contract(output, manifest, protocol_path=None):
             'earliest_final_evaluation_date':manifest['earliest_final_evaluation_date'],
             'result_path':output/'prospective_evaluation.json', 'protocol_sha256':None}
     path=Path(protocol_path)
-    if path.resolve()==(b.ROOT/'config/cp2_repaired_cohort.json').resolve():
+    registered={
+        (b.ROOT/'config/cp2_repaired_cohort.json').resolve():
+            ('repaired_cohort_protocol_sha256','cp2_repaired_2026',
+             'prospective_repaired_evaluation.json'),
+        (b.ROOT/'config/cp2_cloud_cohort.json').resolve():
+            ('cloud_cohort_protocol_sha256','cp2_cloud_2026',
+             'prospective_cloud_evaluation.json')}
+    registry_key,name,result_name=registered.get(path.resolve(),
+        (None,'cp2_repaired_2026','prospective_repaired_evaluation.json'))
+    if registry_key:
         registry=json.loads((b.ROOT/'config/cp2_model_current.json').read_text(encoding='utf-8'))
-        if registry.get('repaired_cohort_protocol_sha256')!=digest(path):
-            raise ValueError('Repaired cohort protocol differs from registered immutable hash')
+        if registry.get(registry_key)!=digest(path):
+            raise ValueError('Cohort protocol differs from registered immutable hash')
     protocol=json.loads(path.read_text(encoding='utf-8'))
     start=pd.Timestamp(protocol['cohort_start']);end=pd.Timestamp(protocol['cohort_end'])
     declared=timestamp(protocol['declared_at_utc'])
-    if (protocol.get('schema_version')!=1 or protocol.get('name')!='cp2_repaired_2026'
+    if (protocol.get('schema_version')!=1 or protocol.get('name')!=name
             or protocol.get('record_sha256')!=record_digest(protocol)
             or protocol.get('bundle_sha256')!=digest(output/'bundle.json')
             or protocol.get('target')!=manifest['target']
@@ -270,7 +280,7 @@ def cohort_contract(output, manifest, protocol_path=None):
         raise ValueError('Repaired cohort protocol or frozen model contract differs')
     return {'cohort_start':protocol['cohort_start'], 'cohort_end':protocol['cohort_end'],
         'earliest_final_evaluation_date':protocol['earliest_final_evaluation_date'],
-        'result_path':output/'prospective_repaired_evaluation.json',
+        'result_path':output/result_name,
         'protocol_sha256':digest(path)}
 
 
@@ -344,7 +354,17 @@ def score(output,input_path,log_dir,*,source_receipt=None):
             pending.append((path,record))
         # Validate the entire batch before committing any new row. If a process
         # dies between atomic commits, rerunning the EXACT input safely resumes.
-        for path,record in pending:atomic_create_json(path,record)
+        for path,record in pending:
+            # Cloud Run has an ephemeral filesystem. Commit the immutable receipt
+            # to private object storage before acknowledging a local write.
+            bucket_name=os.getenv('NOMOBUG_CP2_COLLECTOR_BUCKET')
+            if bucket_name:
+                from google.cloud import storage
+                object_name='prospective_logs/'+path.name
+                payload=json.dumps(record,indent=2,allow_nan=False).encode('utf-8')
+                storage.Client().bucket(bucket_name).blob(object_name).upload_from_string(
+                    payload,content_type='application/json',if_generation_match=0)
+            atomic_create_json(path,record)
     return {'logged_rows':len(pending),'already_logged_rows':existing_count,'models':list(models),
       'performance':'not_available_until_mature_outcomes'}
 
