@@ -30,7 +30,13 @@ def service_window(event):
         return None
     title = (event.get('summary') or '').upper()
     title = re.sub(r'\b(?:NO|WITHOUT)\s+WARRANTY\b', '', title)
-    if not re.search(r'\b\d{1,2}\s*/\s*\d{1,2}\b', title):
+    package_visit = re.search(r'\b(\d{1,2})\s*/\s*(\d{1,2})\b', title)
+    if not package_visit:
+        return None
+    visit_number, package_sessions = map(int, package_visit.groups())
+    # Calendar 4/3, 5/3, etc. are extra warranty visits after the paid
+    # package's scheduled sessions. Keep them out of the paid-service cohort.
+    if visit_number < 1 or package_sessions < 1 or visit_number > package_sessions:
         return None
     if re.search(r'\b(?:WARRANTY|CLAIMS?|CALLBACK|CONSULTATION|INSPECTION|EXTRA|COMPLIMENTARY)\b', title):
         return None
@@ -114,13 +120,17 @@ def poll(now=None, *, fetch=None, run=None, base=None):
     events = fetch() if first_day <= last_day else []
     processed = set(history['processed'])
     unresolved = dict(history.get('unresolved', {}))
+    unresolved_anchor_dates = dict(history.get('unresolved_anchor_dates', {}))
     missed = dict(history.get('missed', {}))
+    missed_anchor_dates = dict(history.get('missed_anchor_dates', {}))
     missed_before = set(missed)
     committed = committed_event_keys(base, bundle)
     processed.update(committed)
     for key in committed:
         unresolved.pop(key, None)
+        unresolved_anchor_dates.pop(key, None)
         missed.pop(key, None)
+        missed_anchor_dates.pop(key, None)
     due = {}
     for row in events:
         window = service_window(row)
@@ -133,20 +143,32 @@ def poll(now=None, *, fetch=None, run=None, base=None):
         if key in committed:
             processed.add(key)
             unresolved.pop(key, None)
+            unresolved_anchor_dates.pop(key, None)
             missed.pop(key, None)
+            missed_anchor_dates.pop(key, None)
             continue
         if (now-finish).total_seconds() > 300 and key not in processed:
             missed.setdefault(key, finish.isoformat())
+            missed_anchor_dates.setdefault(key, start.astimezone(pipeline.LOCAL).date().isoformat())
             unresolved.pop(key, None)
+            unresolved_anchor_dates.pop(key, None)
         elif timed_service(row, now):
             due[key] = finish
     for key, end in due.items():
         if key not in processed:
             unresolved.setdefault(key, end.isoformat())
+            matching = next((row for row in events if event_key(row) == key), None)
+            if matching is not None:
+                unresolved_anchor_dates.setdefault(key, service_window(matching)[0].astimezone(
+                    pipeline.LOCAL).date().isoformat())
     for key, ended_at in list(unresolved.items()):
         if now-timestamp(ended_at) > timedelta(minutes=5):
             missed[key] = ended_at
+            anchor = unresolved_anchor_dates.get(key)
+            if anchor is not None:
+                missed_anchor_dates.setdefault(key, anchor)
             unresolved.pop(key)
+            unresolved_anchor_dates.pop(key, None)
     pending = set(due)-processed-set(missed)
     result = {'checked_at_utc': now.isoformat(), 'status': 'idle',
         'calendar_events_checked': len(events), 'due_events': len(due),
@@ -155,6 +177,17 @@ def poll(now=None, *, fetch=None, run=None, base=None):
         'reconciled_committed_windows': len(missed_before-set(missed)),
         'coverage_status': 'incomplete' if missed else 'complete_so_far',
         'full_refresh_started': bool(pending)}
+    cloud_cohort = registry.get('cloud_cohort')
+    if isinstance(cloud_cohort, list) and len(cloud_cohort) == 2:
+        cloud_start, cloud_end = (datetime.fromisoformat(value).date()
+                                  for value in cloud_cohort)
+        cloud_missed = sum(cloud_start <= datetime.fromisoformat(
+            missed_anchor_dates.get(key) or timestamp(ended_at).astimezone(
+                pipeline.LOCAL).date().isoformat()).date() <= cloud_end
+            for key, ended_at in missed.items())
+        result['cloud_cohort_missed_event_windows'] = cloud_missed
+        result['cloud_cohort_coverage_status'] = (
+            'incomplete' if cloud_missed else 'complete_so_far')
     if pending:
         try:
             # Never hold an already-ended service behind a later appointment.
@@ -170,12 +203,16 @@ def poll(now=None, *, fetch=None, run=None, base=None):
                 prospective_logged_rows=receipt.get('logged_rows', 0),
                 already_logged_rows=receipt.get('already_logged_rows', 0))
             processed.update(acknowledged)
-            for key in acknowledged: unresolved.pop(key, None)
+            for key in acknowledged:
+                unresolved.pop(key, None)
+                unresolved_anchor_dates.pop(key, None)
             result['acknowledged_event_keys'] = len(acknowledged)
             if len(acknowledged) < len(pending):
                 result['status'] = 'refresh_without_complete_prospective_logging'
     pipeline.atomic_json(seen_path, {'processed': sorted(processed), 'unresolved': unresolved,
-        'missed': missed, 'last_poll_at_utc': now.isoformat()})
+        'unresolved_anchor_dates': unresolved_anchor_dates,
+        'missed': missed, 'missed_anchor_dates': missed_anchor_dates,
+        'last_poll_at_utc': now.isoformat()})
     pipeline.atomic_json(base/'last_tick.json', result)
     return result
 

@@ -94,6 +94,9 @@ def test_trigger_only_follows_just_finished_timed_service():
     assert tick.timed_service(service|{'summary': 'GPC 1/1 NO WARRANTY'}, now)
     assert tick.timed_service(service|{'summary': 'GPC 1/1 WITHOUT WARRANTY'}, now)
     assert not tick.timed_service(service|{'summary': 'GPC 4/3 warranty'}, now)
+    assert not tick.timed_service(service|{'summary': 'GPC 4/3'}, now)
+    assert not tick.timed_service(service|{'summary': 'GPC 5/3'}, now)
+    assert not tick.timed_service(service|{'summary': 'GPC 0/3'}, now)
     assert not tick.timed_service(service|{'status': 'cancelled'}, now)
     assert not tick.timed_service(service|{'end_raw': (now-timedelta(minutes=5)).isoformat()}, now)
     assert tick.timed_service(service|{'end_raw': (now+timedelta(minutes=1)).isoformat()}, now)
@@ -178,6 +181,52 @@ def test_missed_window_is_recorded_even_if_no_tick_saw_it_due(tmp_path, monkeypa
     assert tick.event_key(event) in pipe.read(base/'watch_events.json')['missed']
     second=tick.poll(now+timedelta(minutes=2),fetch=lambda:[event],run=should_not_run,base=base)
     assert second['newly_missed_event_windows']==0 and second['missed_event_windows']==1
+
+
+def test_cloud_cohort_coverage_excludes_prior_misses_and_extra_warranty_visits(tmp_path, monkeypatch):
+    monkeypatch.setattr(pipe, 'ROOT', tmp_path)
+    bundle=tmp_path/'outputs/bundle';bundle.mkdir(parents=True)
+    (bundle/'bundle.json').write_text(json.dumps({
+        'cohort_start':'2026-09-28','cohort_end':'2026-10-27'}))
+    monkeypatch.setattr(tick.cp2_model, 'current_bundle', lambda: (
+        {'cloud_cohort':['2026-10-01','2026-10-27']},bundle))
+    now=datetime(2026,10,1,2,0,tzinfo=timezone.utc)
+    base=tmp_path/'outputs/live'
+    pipe.atomic_json(base/'watch_events.json',{'processed':[],'unresolved':{},
+        'missed':{'prior':'2026-09-30T02:00:00+00:00'},
+        'last_poll_at_utc':'2026-09-30T02:00:00+00:00'})
+    template={'calendar_id':'a','status':'confirmed','is_all_day':False,
+        'start_raw':(now-timedelta(hours=2)).isoformat(),
+        'end_raw':(now-timedelta(minutes=30)).isoformat()}
+    paid=template|{'event_id':'paid','summary':'GPC 1/3'}
+    warranty=template|{'event_id':'warranty','summary':'GPC 4/3'}
+    result=tick.poll(now,fetch=lambda:[paid,warranty],base=base)
+    assert result['missed_event_windows']==2
+    assert result['cloud_cohort_missed_event_windows']==1
+    assert result['cloud_cohort_coverage_status']=='incomplete'
+    history=pipe.read(base/'watch_events.json')
+    assert tick.event_key(paid) in history['missed']
+    assert tick.event_key(warranty) not in history['missed']
+
+
+def test_cloud_cohort_uses_service_start_for_overnight_miss(tmp_path, monkeypatch):
+    monkeypatch.setattr(pipe, 'ROOT', tmp_path)
+    bundle=tmp_path/'outputs/bundle';bundle.mkdir(parents=True)
+    (bundle/'bundle.json').write_text(json.dumps({
+        'cohort_start':'2026-09-28','cohort_end':'2026-10-27'}))
+    monkeypatch.setattr(tick.cp2_model, 'current_bundle', lambda: (
+        {'cloud_cohort':['2026-10-01','2026-10-27']},bundle))
+    base=tmp_path/'outputs/live'
+    now=datetime(2026,10,27,17,0,tzinfo=timezone.utc)
+    event={'calendar_id':'a','event_id':'overnight','status':'confirmed',
+        'is_all_day':False,'summary':'GPC 1/3',
+        'start_raw':'2026-10-27T15:00:00+00:00',
+        'end_raw':'2026-10-27T16:30:00+00:00'}
+    result=tick.poll(now,fetch=lambda:[event],base=base)
+    assert result['missed_event_windows']==1
+    assert result['cloud_cohort_missed_event_windows']==1
+    assert pipe.read(base/'watch_events.json')['missed_anchor_dates'][
+        tick.event_key(event)]=='2026-10-27'
 
 
 def test_task_exit_code_distinguishes_new_miss_from_historical_coverage(monkeypatch, capsys):
