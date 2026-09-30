@@ -17,6 +17,7 @@ with fixtures as (
     select 'cancelled_claim', 'GPC WARRANTY EXAMPLE', 'cancelled', null, null, 'cancelled' union all
     select 'cancelled_title', 'CANCELLED GPC 3/3 EXAMPLE', 'confirmed', 3, 3, 'cancelled' union all
     select 'canceled_title', 'CANCELED GPC 2/3 EXAMPLE', 'confirmed', 2, 3, 'cancelled' union all
+    select 'cancelled_overrun', 'CANCELLED GPC 4/3 EXAMPLE', 'confirmed', 4, 3, 'cancelled' union all
     select 'admin_terms', 'CHECK CONVERSION RATE WARRANTY', 'confirmed', null, null, 'administrative' union all
     select 'complimentary_only', 'GPC COMPLIMENTARY EXAMPLE', 'confirmed', null, null, 'complimentary' union all
     select 'non_claim_word', 'UNCLAIMED PAYMENT', 'confirmed', null, null, 'other'

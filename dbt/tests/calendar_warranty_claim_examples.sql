@@ -5,7 +5,7 @@ select calendar_event_row
 from {{ ref('calendar_events') }}
 where status = 'confirmed' and sequence_over_package
   and warranty_label_review_status = 'Not reviewed'
-  and event_category not in ('consultation', 'administrative') and (
+  and event_category not in ('consultation', 'administrative', 'cancelled') and (
     event_category != 'warranty'
     or not warranty_claim_candidate
 )
