@@ -75,6 +75,23 @@ def hydrate_artifacts(bucket):
             raise ValueError("Cloud compiled SQL differs from live feature pin")
 
 
+def preflight_dependencies():
+    """Reject a new revision before traffic moves if its SQL needs unpublished Gold fields."""
+    bucket = storage.Client(project=PROJECT).bucket(os.environ["NOMOBUG_CP2_COLLECTOR_BUCKET"])
+    hydrate_artifacts(bucket)
+    calendar_sql = (ROOT / "dbt/target/compiled/nomobug/models/calendar_events.sql").read_text(
+        encoding="utf-8")
+    if "r.event_identity_hash" in calendar_sql:
+        client = bigquery.Client(project=PROJECT, location=LOCATION)
+        try:
+            fields = {field.name for field in client.get_table(
+                f"{PROJECT}.gold.calendar_warranty_review_overrides").schema}
+        finally:
+            client.close()
+        if "event_identity_hash" not in fields:
+            raise ValueError("Published Gold warranty review schema is incompatible with live SQL")
+
+
 def hydrate_state(bucket):
     base = pipeline.BASE
     for name in STATE:
@@ -237,6 +254,7 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def main():
+    preflight_dependencies()
     HTTPServer(("0.0.0.0", int(os.getenv("PORT", "8080"))), Handler).serve_forever()
 
 

@@ -18,6 +18,32 @@ def test_artifact_prefix_is_stable_across_json_line_endings(tmp_path, monkeypatc
     assert first.startswith("artifacts/")
 
 
+def test_startup_rejects_unpublished_gold_field(tmp_path, monkeypatch):
+    monkeypatch.setattr(cloud, "ROOT", tmp_path)
+    sql = tmp_path / "dbt/target/compiled/nomobug/models/calendar_events.sql"
+    sql.parent.mkdir(parents=True)
+    sql.write_text("SELECT r.event_identity_hash", encoding="utf-8")
+    monkeypatch.setenv("NOMOBUG_CP2_COLLECTOR_BUCKET", "private-test")
+    monkeypatch.setattr(cloud.storage, "Client", lambda **kwargs: type(
+        "Storage", (), {"bucket": lambda self, name: object()})())
+    monkeypatch.setattr(cloud, "hydrate_artifacts", lambda bucket: None)
+
+    class BigQuery:
+        def get_table(self, name):
+            return type("Table", (), {"schema": [type("Field", (), {"name": "calendar_event_row"})()]})()
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(cloud.bigquery, "Client", lambda **kwargs: BigQuery())
+    with pytest.raises(ValueError, match="incompatible"):
+        cloud.preflight_dependencies()
+
+    BigQuery.get_table = lambda self, name: type("Table", (), {"schema": [
+        type("Field", (), {"name": "event_identity_hash"})()]})()
+    cloud.preflight_dependencies()
+
+
 class Lock:
     generation = 7
     updated = datetime.now(timezone.utc)

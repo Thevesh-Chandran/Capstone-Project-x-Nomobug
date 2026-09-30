@@ -193,7 +193,7 @@ def expected_payments(raw: list[dict], serials: list[dict]) -> list[dict]:
 
 def calendar_category(summary: str, status: str, review: str | None = None) -> str:
     title = (summary or "").upper()
-    if (status or "").upper() == "CANCELLED":
+    if (status or "").upper() == "CANCELLED" or re.search(r"^\s*CANCEL(?:L)?ED\b", title):
         return "cancelled"
     if re.search(r"\b(?:CHECK|REVIEW|CALCULATE)\b.*\bCONVERSION\s+RATE\b", title):
         return "administrative"
@@ -463,7 +463,8 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
     checks["owner_linked_1x_upsell_2x"] = {"status": "pass" if linked_ok else "fail",
         "case": "two_paid_sales_rows_and_reviewed_nonwarranty_visit", "source_rows_checked": 2}
     overrun_rows = [r for r in raw["calendar"] if r["status"] == "confirmed" and
-        re.search(r"\b4\s*/\s*3\b", r["summary"] or "")]
+        re.search(r"\b4\s*/\s*3\b", r["summary"] or "") and
+        not re.search(r"^\s*CANCEL(?:L)?ED\b", (r["summary"] or "").upper())]
     actual_calendar = {r["calendar_event_row"]: r for r in actual["calendar"]}
     overrun_ok = bool(overrun_rows) and all(
         actual_calendar.get(r["calendar_event_row"], {}).get("warranty_claim_candidate") is True
