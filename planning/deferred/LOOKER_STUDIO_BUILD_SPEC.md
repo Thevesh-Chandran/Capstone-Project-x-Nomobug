@@ -1,5 +1,7 @@
 # Nomobug Looker Studio build specification
 
+**Current handoff (1 October):** Start with [the current dashboard handoff](../CP2_DASHBOARD_HANDOFF.md). It supersedes historical source-readiness and model statements below. Stable Gold views are refreshed by the daily governed cloud release.
+
 Status (16 September 2026): user created the Looker report, connected 13 sources,
 and built a first overview draft. User approved the business-focused redesign
 below. The older page instructions further below are retained as source reference;
@@ -75,7 +77,8 @@ review and monthly service, warranty, location, weather, sales/payment and refun
 review. It is decision support, not a CRM, proof of treatment completion, proof
 of cash settlement, or an automated customer-risk system.
 
-Connect Looker Studio only to the approved `gold.dashboard_*` views listed here.
+Connect Looker Studio only to the aggregate Gold views in the current handoff,
+including the explicitly listed sales and payments monthly views.
 Do not connect the report to Bronze, restricted Silver, raw Calendar text, exact
 event coordinates, or the experiment prediction table.
 
@@ -157,15 +160,18 @@ property weather or a causal driver.
 Use only aggregate evaluation outputs, never package-level reporting scores.
 Show the selected model, ROC AUC, average precision, Brier score, reporting
 population and positive count. Display the status prominently as `experimental
-priority-review ranking — not causal or production ready`. The current v3 model is a 30-day logistic ranking benchmark for eligible
-residential 3x packages, selected on three pre-2026 walk-forward folds. Its 2026
-reporting cohort is not a pristine final holdout and discrimination is weak.
+priority-review ranking`. Use `gold.dashboard_ml_evaluation` for the selected
+v5 ExtraTrees depth-10 model and corrected reference. The held-out population
+contains 100 services and five callback-positive windows; the selected model
+found four positives among the highest-risk 20 services. Its ROC AUC is 0.8905
+and average precision is 0.3051. The small positive sample prevents a dependable
+improvement claim.
 
-The target is a recorded Calendar warranty signal within 30 days after a unique
-3/3 event. Prediction time is immediately after 3/3. The model may support
-aggregate feasibility reporting only; it is not a score for scheduling,
-customer treatment, employee assessment or automated action. The high-risk tier
-must remain disabled unless a later independent evaluation supports it.
+The target is a recorded corrective Calendar callback within days 1–30 after
+a matched paid service, scored immediately after its scheduled end. Contractual
+warranty eligibility is separate. Show aggregate evaluation and limitations;
+keep individual experimental risk scores private. Follow the current handoff
+for the separate October collection and November outcome-evaluation dates.
 
 ## Controls and metric policy
 

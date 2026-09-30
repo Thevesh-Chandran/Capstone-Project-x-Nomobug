@@ -7,6 +7,7 @@ For the 31 October deliverable, use the [October submission record](CP2_OCTOBER_
 | Current file | Purpose |
 |---|---|
 | [CP2_START_HERE.md](CP2_START_HERE.md) | Short model guide and file map |
+| [CP2_DASHBOARD_HANDOFF.md](CP2_DASHBOARD_HANDOFF.md) | Current Gold sources, metric labels, v5 model page and acceptance checks |
 | [CP2_CORRECTED_MODEL_CANDIDATES_V5.md](CP2_CORRECTED_MODEL_CANDIDATES_V5.md) | Current corrected v5 model, newer evaluation and limits |
 | [WARRANTY_POLICY_RULES.md](WARRANTY_POLICY_RULES.md) | Owner-confirmed contractual eligibility rules |
 | [CP2_CALLBACK_RECORDING_GUIDE.md](CP2_CALLBACK_RECORDING_GUIDE.md) | Structured recording needed to improve labels and features |
