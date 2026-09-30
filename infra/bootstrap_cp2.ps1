@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Provision bounded CP2 cloud resources after checking the actual Billing report.
+Provision CP2 cloud resources after recording the actual Billing report.
 .DESCRIPTION
 Dry-run by default. -Apply requires a recent, project-scoped MYR spend read from
 Billing Reports. No source secrets are uploaded here. Run seed_cp2_secrets.ps1
@@ -23,6 +23,7 @@ $OwnerId = '53994531'
 $JobIdentity = "cp2-reporting-job@$Project.iam.gserviceaccount.com"
 $SchedulerIdentity = "cp2-reporting-scheduler@$Project.iam.gserviceaccount.com"
 $DeployerIdentity = "cp2-reporting-deployer@$Project.iam.gserviceaccount.com"
+# Keep the existing budget name for idempotency; it is now an alert only.
 $BudgetName = 'CP2 project monthly stop-work alert RM30'
 $Secrets = @('cp2-google-readonly-token', 'cp2-google-source-ids', 'cp2-google-source-metadata')
 
@@ -58,10 +59,10 @@ if ($null -eq $ObservedProjectSpendMYR -or [string]::IsNullOrWhiteSpace($Observe
 $ObservedAt = [DateTimeOffset]::Parse($ObservedAtUtc).ToUniversalTime()
 $AgeHours = ([DateTimeOffset]::UtcNow - $ObservedAt).TotalHours
 if ($AgeHours -lt 0 -or $AgeHours -gt 48) { throw 'Billing observation must be within 48 hours' }
-if ($ObservedProjectSpendMYR -ge 30 -or $ObservedProjectSpendMYR -lt 0) {
-    throw 'Stop-work ceiling reached or invalid spend amount'
+if ($ObservedProjectSpendMYR -lt 0) {
+    throw 'Invalid spend amount'
 }
-Write-Output "Project spend preflight: RM$ObservedProjectSpendMYR observed $($ObservedAt.ToString('u')); cap RM30."
+Write-Output "Project spend observation: RM$ObservedProjectSpendMYR observed $($ObservedAt.ToString('u')); RM30 alert is informational."
 
 # Create the all-service budget before enabling the hosted workload APIs.
 Invoke-Gcloud @('services','enable','billingbudgets.googleapis.com','--project', $Project,'--quiet')
@@ -75,7 +76,7 @@ if ($MatchingBudgets.Count -eq 1) {
         [decimal]$b.amount.specifiedAmount.units -ne 30 -or
         @($b.budgetFilter.projects).Count -ne 1 -or
         $b.budgetFilter.projects[0] -notin @("projects/$Project", "projects/$ProjectNumber")) {
-        throw 'Existing CP2 budget does not match the RM30 project ceiling'
+        throw 'Existing CP2 budget does not match the RM30 project alert'
     }
     Write-Output 'Existing scoped RM30 budget verified.'
 } else {

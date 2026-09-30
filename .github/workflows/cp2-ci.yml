@@ -39,3 +39,7 @@ jobs:
         run: docker build --tag cp2-reporting:ci .
       - name: Check entry point without Google access
         run: docker run --rm --entrypoint python cp2-reporting:ci -m scripts.cp2_reporting_release --help
+      - name: Build prospective collector image
+        run: docker build -f Dockerfile.collector --tag cp2-collector:ci .
+      - name: Check prospective collector import without Google access
+        run: docker run --rm --entrypoint python cp2-collector:ci -c 'from scripts import cp2_cloud_collector; assert cp2_cloud_collector.PROJECT'

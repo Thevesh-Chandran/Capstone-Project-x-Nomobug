@@ -12,7 +12,7 @@ On 100 newer services with five positive callback windows, reviewing the highest
 
 On the larger, previously inspected 2026 diagnostic, v5 found 103 of 179 positives in 395 reviews; the corrected reference found 97. First-service detection remains weak: zero of eleven at that review budget. See the full report for precision, AP and uncertainty.
 
-The final future-test refit uses **all 5,695 mature services, including 2,075 from 2026**. Its training scores are not accuracy evidence. A local read-only Google → temporary BigQuery → model feed is connected for the timing-sensitive prospective collector. The separate fresh reporting release now runs daily at 06:00 MYT on Cloud Run; its first scheduled execution published successfully on 29 September. The latest full local scoring run generated **205 private scores**, with **zero prospective logs**. The collector later marked eight service windows missed, so full-cohort coverage is currently incomplete. Exact sanitized-address reuse of an existing trusted geocode reduced missing coordinates from 103 to **39** of those 205 anchors and raised complete prior-30-day weather coverage from 102 to **166**. This is a feature-coverage gain, not measured accuracy. [Operations and future-test guide](CP2_LIVE_PIPELINE_OPERATIONS.md) and [October submission status](CP2_OCTOBER_SUBMISSION.md).
+The final future-test refit uses **all 5,695 mature services, including 2,075 from 2026**. Its training scores are not accuracy evidence. A private Cloud Run collector now reads Google sources, derives temporary BigQuery features and records time-stamped predictions; the owner's laptop can be off. The separate reporting release runs daily at 06:00 MYT. By 30 September, the collector had marked **24 missed windows** across the original and repaired cohorts, then logged one real prediction **1.56 minutes** after a service ended. The new 1–27 October cloud cohort was declared before its start and needs complete timely coverage before a future accuracy claim. Earlier address reuse reduced missing coordinates from 103 to **39** of 205 scored anchors and raised complete prior-30-day weather coverage from 102 to **166**. That is a feature-coverage gain, not measured accuracy. [Operations and future-test guide](CP2_LIVE_PIPELINE_OPERATIONS.md) and [October submission status](CP2_OCTOBER_SUBMISSION.md).
 
 ## Use one command
 
@@ -32,7 +32,7 @@ The command also supports `predict`, `log-prospective` and `evaluate-prospective
 | [config/](../config/README.md) | Current pointer and reproducible experiment evidence |
 | [scripts/](../scripts/README.md) | Current entry point and extraction/training tools |
 | [Recording guide](CP2_CALLBACK_RECORDING_GUIDE.md) | Better future callback and treatment data |
-| [Live pipeline operations](CP2_LIVE_PIPELINE_OPERATIONS.md) | Local refresh, failure recovery, timed logging, and final outcome test |
+| [Live pipeline operations](CP2_LIVE_PIPELINE_OPERATIONS.md) | Cloud collection, failure recovery, timed logging, and final outcome test |
 | [Business KPI validation](CP2_BUSINESS_KPI_VALIDATION.md) | Source-backed checks and known KPI freshness gap |
 | [archive/](archive/README.md) | Completed experiments and historical setup |
 | [October submission record](CP2_OCTOBER_SUBMISSION.md) | Reporting architecture, acceptance status and dashboard handoff |

@@ -11,6 +11,7 @@ scripts/**/*.pyc
 !config/cp2_model_current.json
 !config/cp2_live_feature_contract.json
 !config/cp2_repaired_cohort.json
+!config/cp2_cloud_cohort.json
 !config/cp2_cloud_artifacts.json
 !scripts/cp2_reporting_release.py
 !scripts/cp2_pipeline.py

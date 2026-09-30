@@ -149,7 +149,7 @@ def mirror_predictions(bucket):
     return count
 
 
-def run_tick(*, full_smoke=False):
+def run_tick(*, full_smoke=False, final_evaluation=False):
     name = os.environ["NOMOBUG_CP2_COLLECTOR_BUCKET"]
     bucket = storage.Client(project=PROJECT).bucket(name)
     lock = bucket.blob("control/active_tick.json")
@@ -175,7 +175,20 @@ def run_tick(*, full_smoke=False):
     try:
         hydrate_artifacts(bucket)
         hydrate_state(bucket)
-        if full_smoke:
+        if final_evaluation:
+            destination = bucket.blob("evaluations/cloud_2026.json")
+            if destination.exists():
+                return {"status": "already_finalized"}
+            result_path = ROOT / "outputs/cp2-v2/prospective_callback_v2/prospective_cloud_evaluation.json"
+            # Only a durable cloud result is final. A warm instance may retain
+            # a local result from a request that failed before its upload.
+            result_path.unlink(missing_ok=True)
+            evaluated = pipeline.final_evaluation(cloud=True)
+            destination.upload_from_filename(str(result_path), content_type="application/json",
+                                             if_generation_match=0)
+            result = {"status": "finalized", "cohort_anchors": evaluated["cohort_anchors"],
+                      "evaluation_rows": evaluated["evaluation_rows"]}
+        elif full_smoke:
             state = pipeline.run()
             result = {"status": state["status"], "run_id": state["run_id"],
                       "full_pipeline_smoke": True,
@@ -194,11 +207,12 @@ def run_tick(*, full_smoke=False):
 
 class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
-        if self.path not in {"/tick", "/smoke-full"}:
+        if self.path not in {"/tick", "/smoke-full", "/evaluate-cloud"}:
             self.send_error(404)
             return
         try:
-            result = run_tick(full_smoke=self.path == "/smoke-full")
+            result = run_tick(full_smoke=self.path == "/smoke-full",
+                              final_evaluation=self.path == "/evaluate-cloud")
             status = (409 if result.get("status") == "another_cloud_tick_active" else
                       500 if result.get("status") in {
                           "refresh_failed", "refresh_without_complete_prospective_logging"} else 200)

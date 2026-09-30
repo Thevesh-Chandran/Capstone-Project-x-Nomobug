@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "name": "cp2_cloud_2026",
+  "declared_at_utc": "2026-09-30T03:55:43.596045+00:00",
+  "cohort_start": "2026-10-01",
+  "cohort_end": "2026-10-27",
+  "earliest_final_evaluation_date": "2026-11-27",
+  "bundle_sha256": "6ace4314b4a5e170ea1bd6feee40dadbdd14eb3c986db9223d888b3c3ee302e0",
+  "target": "recorded_corrective_calendar_callback_within_30d",
+  "date_authority": "Calendar",
+  "eligibility": "Every matched paid service with a Calendar anchor date in the declared interval; one source-linked score within five minutes after its scheduled end; no historical backfill.",
+  "baseline_missed_event_windows": 24,
+  "baseline_prospective_logs": 0,
+  "prior_cohort_status": "2026-09-30 cohort incomplete; three missed 30 September service windows when cloud schedule was paused",
+  "record_sha256": "d8516ae4c5ca1824d300e1d397bc8ace170ed2a417a7cea0068c6f7cbef86a14"
+}

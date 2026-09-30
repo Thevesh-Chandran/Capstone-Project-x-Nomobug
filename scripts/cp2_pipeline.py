@@ -467,7 +467,7 @@ def status(base=None):
     return result
 
 
-def final_evaluation(*, repaired=False):
+def final_evaluation(*, repaired=False, cloud=False):
     """After full cohort maturity, refresh source-derived labels and score once."""
     try:
         from scripts import cp2_model as model
@@ -477,7 +477,10 @@ def final_evaluation(*, repaired=False):
         import freeze_callback_prospective as prospective
     _, bundle = model.current_bundle()
     manifest, _ = prospective.load_bundle(bundle)
-    protocol_path = ROOT/'config/cp2_repaired_cohort.json' if repaired else None
+    if repaired and cloud:
+        raise ValueError('Select only one prospective cohort')
+    protocol_path = (ROOT/'config/cp2_cloud_cohort.json' if cloud else
+        ROOT/'config/cp2_repaired_cohort.json' if repaired else None)
     contract = prospective.cohort_contract(bundle, manifest, protocol_path)
     if utcnow().astimezone(LOCAL).date() < datetime.fromisoformat(
             contract['earliest_final_evaluation_date']).date():
@@ -507,13 +510,15 @@ def final_evaluation(*, repaired=False):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('mode', choices=['run', 'resume', 'status', 'final-evaluation',
-        'final-evaluation-repaired'])
+        'final-evaluation-repaired', 'final-evaluation-cloud'])
     parser.add_argument('--run-id')
     args = parser.parse_args()
     if args.mode == 'status':
         result = status()
-    elif args.mode in {'final-evaluation', 'final-evaluation-repaired'}:
-        result = final_evaluation(repaired=args.mode == 'final-evaluation-repaired')
+    elif args.mode in {'final-evaluation', 'final-evaluation-repaired',
+            'final-evaluation-cloud'}:
+        result = final_evaluation(repaired=args.mode == 'final-evaluation-repaired',
+            cloud=args.mode == 'final-evaluation-cloud')
     else:
         if args.mode == 'resume' and not args.run_id:
             parser.error('resume requires --run-id')

@@ -1,6 +1,6 @@
 {
   "version": "cp2_callback_v5",
-  "status": "current_experimental_candidate_not_deployed",
+  "status": "frozen_experimental_candidate_prospective_cloud_collector_deployed",
   "primary_model": "ExtraTrees depth 10, min leaf 5, 300 trees",
   "primary_selection": "et10_leaf5",
   "primary_bundle_model": "challenger_all_history",
@@ -43,7 +43,13 @@
     "2026-10-27"
   ],
   "earliest_final_evaluation": "2026-11-27",
-  "live_feature_feed": "local_read_only_google_to_temporary_bigquery_to_model_connected_not_hosted",
+  "live_feature_feed": "private_cloud_run_2min_google_to_bigquery_to_frozen_model_connected",
   "report": "planning/CP2_CORRECTED_MODEL_CANDIDATES_V5.md",
-  "historical_v4": "retained_for_reproduction_superseded_as_current_candidate"
+  "historical_v4": "retained_for_reproduction_superseded_as_current_candidate",
+  "cloud_cohort_protocol": "config/cp2_cloud_cohort.json",
+  "cloud_cohort_protocol_sha256": "66a38ed9fa5e6d327481ee57225a9cda5ad6d3b27621e600d28873db6fdb3991",
+  "cloud_cohort": [
+    "2026-10-01",
+    "2026-10-27"
+  ]
 }

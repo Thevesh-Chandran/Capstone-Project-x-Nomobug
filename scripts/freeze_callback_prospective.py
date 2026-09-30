@@ -253,14 +253,23 @@ def cohort_contract(output, manifest, protocol_path=None):
             'earliest_final_evaluation_date':manifest['earliest_final_evaluation_date'],
             'result_path':output/'prospective_evaluation.json', 'protocol_sha256':None}
     path=Path(protocol_path)
-    if path.resolve()==(b.ROOT/'config/cp2_repaired_cohort.json').resolve():
+    registered={
+        (b.ROOT/'config/cp2_repaired_cohort.json').resolve():
+            ('repaired_cohort_protocol_sha256','cp2_repaired_2026',
+             'prospective_repaired_evaluation.json'),
+        (b.ROOT/'config/cp2_cloud_cohort.json').resolve():
+            ('cloud_cohort_protocol_sha256','cp2_cloud_2026',
+             'prospective_cloud_evaluation.json')}
+    registry_key,name,result_name=registered.get(path.resolve(),
+        (None,'cp2_repaired_2026','prospective_repaired_evaluation.json'))
+    if registry_key:
         registry=json.loads((b.ROOT/'config/cp2_model_current.json').read_text(encoding='utf-8'))
-        if registry.get('repaired_cohort_protocol_sha256')!=digest(path):
-            raise ValueError('Repaired cohort protocol differs from registered immutable hash')
+        if registry.get(registry_key)!=digest(path):
+            raise ValueError('Cohort protocol differs from registered immutable hash')
     protocol=json.loads(path.read_text(encoding='utf-8'))
     start=pd.Timestamp(protocol['cohort_start']);end=pd.Timestamp(protocol['cohort_end'])
     declared=timestamp(protocol['declared_at_utc'])
-    if (protocol.get('schema_version')!=1 or protocol.get('name')!='cp2_repaired_2026'
+    if (protocol.get('schema_version')!=1 or protocol.get('name')!=name
             or protocol.get('record_sha256')!=record_digest(protocol)
             or protocol.get('bundle_sha256')!=digest(output/'bundle.json')
             or protocol.get('target')!=manifest['target']
@@ -271,7 +280,7 @@ def cohort_contract(output, manifest, protocol_path=None):
         raise ValueError('Repaired cohort protocol or frozen model contract differs')
     return {'cohort_start':protocol['cohort_start'], 'cohort_end':protocol['cohort_end'],
         'earliest_final_evaluation_date':protocol['earliest_final_evaluation_date'],
-        'result_path':output/'prospective_repaired_evaluation.json',
+        'result_path':output/result_name,
         'protocol_sha256':digest(path)}
 
 
