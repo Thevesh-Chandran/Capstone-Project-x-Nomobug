@@ -6,6 +6,7 @@ This script deliberately does not grant project-wide dataEditor or dataViewer.
 from __future__ import annotations
 
 import argparse
+import re
 
 from google.cloud import bigquery
 
@@ -30,6 +31,10 @@ def main() -> None:
               + [(name, "READER") for name in READ_ONLY])
     client = bigquery.Client(project=PROJECT, location=REGION)
     try:
+        if args.collector:
+            grants += [(item.dataset_id, "READER") for item in client.list_datasets(project=PROJECT)
+                       if re.fullmatch(r"cp2r_[0-9]{14}[0-9a-f]{6}_(?:silver|gold)",
+                                       item.dataset_id)]
         for name, role in grants:
             dataset = client.get_dataset(f"{PROJECT}.{name}")
             if dataset.location.lower() != REGION:

@@ -28,6 +28,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT = "profound-keel-500007-s4"
 LOCATION = "asia-southeast1"
 LIMIT = 100 * 1024 * 1024
+COLLECTOR_PRINCIPAL = f"cp2-prospective-job@{PROJECT}.iam.gserviceaccount.com"
 SNAPSHOT_LIMIT = 64  # Bounded through October with existing history; stop for review.
 BASELINE_CALENDAR = "calendar_events_78147d417f3d97d3c1d9ef0be59638fd7850e4195108e1fc7b879483c7f35b66"
 BASELINE_GEOCODES = "calendar_event_geocodes_all_v2"
@@ -223,6 +224,32 @@ def view_inventory(client: bigquery.Client, stage_prefix: str) -> list[tuple[str
     return inventory
 
 
+def grant_collector_candidate_reader(client: bigquery.Client, stage_prefix: str) -> None:
+    """Grant the private collector read access before stable views point here."""
+    if not re.fullmatch(r"cp2r_[0-9]{14}[0-9a-f]{6}_", stage_prefix):
+        raise ValueError("Invalid candidate dataset prefix")
+    for schema in ("silver", "gold"):
+        dataset_id = f"{PROJECT}.{stage_prefix}{schema}"
+        dataset = client.get_dataset(dataset_id)
+        if dataset.location.lower() != LOCATION:
+            raise ValueError("Candidate dataset region mismatch")
+        entries = list(dataset.access_entries)
+        matching = [entry for entry in entries if entry.entity_type == "userByEmail"
+                    and entry.entity_id == COLLECTOR_PRINCIPAL]
+        if matching and (len(matching) != 1 or matching[0].role != "READER"):
+            raise ValueError("Unexpected collector candidate access")
+        if not matching:
+            entries.append(bigquery.AccessEntry(role="READER", entity_type="userByEmail",
+                                                entity_id=COLLECTOR_PRINCIPAL))
+            dataset.access_entries = entries
+            client.update_dataset(dataset, ["access_entries"])
+        confirmed = client.get_dataset(dataset_id)
+        if not any(entry.entity_type == "userByEmail" and
+                   entry.entity_id == COLLECTOR_PRINCIPAL and entry.role == "READER"
+                   for entry in confirmed.access_entries):
+            raise ValueError("Collector candidate access was not persisted")
+
+
 def promote(client: bigquery.Client, inventory: list[tuple[str, str, str]], run_dir: Path) -> None:
     """Repoint stable views; restore every changed definition on partial failure."""
     backups = []
@@ -282,6 +309,7 @@ def finish_release(client: bigquery.Client, run_dir: Path, manifest: dict) -> di
     variables = dbt_variables(manifest)
     dbt_build(variables, run_dir)
     stage_prefix = variables["release_schema_prefix"]
+    grant_collector_candidate_reader(client, stage_prefix)
     validation = validate_business_kpis.validate(run_dir / "kpi_validation",
         project=PROJECT, location=LOCATION,
         silver_schema=stage_prefix + "silver", gold_schema=stage_prefix + "gold",
