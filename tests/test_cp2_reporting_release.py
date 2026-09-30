@@ -81,3 +81,36 @@ def test_source_exit_is_audited_as_failed_without_promotion(monkeypatch, tmp_pat
     with pytest.raises(SystemExit, match="Missing token"):
         release.run()
     assert statuses == ["STARTED", "FAILED"]
+
+
+def test_collector_receives_candidate_reads_before_promotion(monkeypatch):
+    monkeypatch.setattr(release, "PROJECT", "p")
+    monkeypatch.setattr(release, "COLLECTOR_PRINCIPAL", "collector@p.iam.gserviceaccount.com")
+    prefix = "cp2r_20261001000000abcdef_"
+
+    class Dataset:
+        location = release.LOCATION
+        def __init__(self):
+            self.access_entries = []
+
+    class Client:
+        def __init__(self):
+            self.datasets = {f"p.{prefix}{schema}": Dataset()
+                             for schema in ("silver", "gold")}
+            self.updated = []
+        def get_dataset(self, identifier):
+            return self.datasets[identifier]
+        def update_dataset(self, dataset, fields):
+            assert fields == ["access_entries"]
+            self.updated.append(dataset)
+
+    client = Client()
+    release.grant_collector_candidate_reader(client, prefix)
+    assert len(client.updated) == 2
+    for dataset in client.datasets.values():
+        assert [(entry.role, entry.entity_id) for entry in dataset.access_entries] == [
+            ("READER", "collector@p.iam.gserviceaccount.com")]
+    release.grant_collector_candidate_reader(client, prefix)
+    assert len(client.updated) == 2
+    with pytest.raises(ValueError, match="Invalid candidate"):
+        release.grant_collector_candidate_reader(client, "wrong_")

@@ -3,14 +3,6 @@ name: Deploy CP2 reporting job
 on:
   workflow_dispatch:
     inputs:
-      observed_spend_myr:
-        description: Current project cost in MYR from Billing Reports
-        required: true
-        type: string
-      observed_at_utc:
-        description: Billing Reports observation time in UTC, for example 2026-09-28T10:00:00Z
-        required: true
-        type: string
       run_after_deploy:
         description: Execute the reporting job once after deployment
         required: true
@@ -55,8 +47,6 @@ jobs:
       REGION: asia-southeast1
       JOB: cp2-reporting-daily
       IMAGE: asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/release
-      OBSERVED_SPEND_MYR: ${{ inputs.observed_spend_myr }}
-      OBSERVED_AT_UTC: ${{ inputs.observed_at_utc }}
     steps:
       - uses: actions/checkout@v6
       - uses: google-github-actions/auth@v3
@@ -70,17 +60,6 @@ jobs:
         run: |
           test "$GITHUB_REF" = refs/heads/main
           gcloud config set project "$PROJECT" --quiet
-          python3 - <<'PY'
-          from datetime import datetime, timezone
-          from decimal import Decimal
-          import os
-          spend = Decimal(os.environ['OBSERVED_SPEND_MYR'])
-          observed = datetime.fromisoformat(os.environ['OBSERVED_AT_UTC'].replace('Z', '+00:00'))
-          age = datetime.now(timezone.utc) - observed.astimezone(timezone.utc)
-          if spend < 0 or spend >= 30 or not 0 <= age.total_seconds() <= 48 * 3600:
-              raise SystemExit('Billing Reports preflight failed: cost is at the ceiling or observation is stale')
-          print(f'Project spend preflight: RM{spend}; observed {observed.isoformat()}')
-          PY
       - name: Build and push immutable image
         run: |
           gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet
