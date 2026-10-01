@@ -1,7 +1,8 @@
 # Confirmed warranty policy rules
 
 These rules were confirmed by the business owner on 21 September 2026 and are
-the source of truth for eligibility logic.
+the source of truth for eligibility logic, with the scheduling clarification
+confirmed on 1 October 2026 below.
 
 | Client and package | Eligible | Eligibility interpretation |
 |---|---:|---|
@@ -9,6 +10,14 @@ the source of truth for eligibility logic.
 | Residential 1x, any pest | No | Exclude from warranty-risk cohorts |
 | Residential 3x, any pest | Yes | A claim must be recorded within 30 days after the third service |
 | Residential 4x, 6x, or 12x, any pest | Yes | Coverage begins with the first service, remains active through the service programme, and ends 30 days after the final service; multiple claims are allowed during this period |
+
+For residential 3x, completing all three paid services within 14 days is a
+scheduling expectation, **not a warranty eligibility condition**. Client
+rescheduling or insufficient appointment slots can extend the programme beyond
+14 days without removing warranty. The 30-day claim window follows the valid
+third-service date recorded in Calendar, excluding cancelled/rescheduled-away
+entries; it is not anchored to the originally planned completion date. The
+current fixed-horizon anchor logic has no first-to-third-service 14-day cutoff.
 
 Pest type does not change warranty eligibility. Premise values are normalized
 to `RESIDENTIAL`, `COMMERCIAL`, `VEHICLE`, or `UNKNOWN`; vehicle, unknown, and
