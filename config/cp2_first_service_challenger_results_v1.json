@@ -1,0 +1,1111 @@
+{
+  "status": "exploratory_only_frozen_cloud_model_unchanged",
+  "source_sha256": "eb5f0a85c207ab802b3ba99b2cb58b012980e93dc608d7fd9f1c6bbdb5ffdd24",
+  "protocol_sha256": "95e0b41372400af5706ac53dd83e51114e066fdcf7032f32ceaba1e6e57fe671",
+  "experiment_code_sha256": "6584d556a575a9eca8436480f45a214a8b41c722a147605c9d2c3641108e0936",
+  "selection_sha256": "59c033ea6adbc391c9896423e93e30d95f61b1cd6befc61efc9751a27af06545",
+  "selection": {
+    "name": "v5_control__reserve0",
+    "model": "v5_control",
+    "first_review_reserve": 0.0,
+    "mean_ap": 0.2406643480830334,
+    "mean_review_recall": 0.5185073002731643,
+    "mean_first_recall": 0.0,
+    "folds": [
+      {
+        "fold": "2025_q2",
+        "average_precision": 0.11130939353837645,
+        "review": {
+          "all": {
+            "services": 796,
+            "positives": 31,
+            "reviewed": 160,
+            "found": 19,
+            "recall": 0.6129032258064516,
+            "precision": 0.11875
+          },
+          "first_service": {
+            "services": 292,
+            "positives": 2,
+            "reviewed": 0,
+            "found": 0,
+            "recall": 0.0,
+            "precision": null
+          }
+        }
+      },
+      {
+        "fold": "2025_q3",
+        "average_precision": 0.2523297731913764,
+        "review": {
+          "all": {
+            "services": 772,
+            "positives": 71,
+            "reviewed": 155,
+            "found": 38,
+            "recall": 0.5352112676056338,
+            "precision": 0.24516129032258063
+          },
+          "first_service": {
+            "services": 261,
+            "positives": 1,
+            "reviewed": 0,
+            "found": 0,
+            "recall": 0.0,
+            "precision": null
+          }
+        }
+      },
+      {
+        "fold": "2025_q4",
+        "average_precision": 0.3583538775193474,
+        "review": {
+          "all": {
+            "services": 410,
+            "positives": 81,
+            "reviewed": 82,
+            "found": 33,
+            "recall": 0.4074074074074074,
+            "precision": 0.4024390243902439
+          },
+          "first_service": {
+            "services": 127,
+            "positives": 10,
+            "reviewed": 0,
+            "found": 0,
+            "recall": 0.0,
+            "precision": null
+          }
+        }
+      }
+    ]
+  },
+  "development": [
+    {
+      "name": "v5_control__reserve0",
+      "model": "v5_control",
+      "first_review_reserve": 0.0,
+      "mean_ap": 0.2406643480830334,
+      "mean_review_recall": 0.5185073002731643,
+      "mean_first_recall": 0.0,
+      "folds": [
+        {
+          "fold": "2025_q2",
+          "average_precision": 0.11130939353837645,
+          "review": {
+            "all": {
+              "services": 796,
+              "positives": 31,
+              "reviewed": 160,
+              "found": 19,
+              "recall": 0.6129032258064516,
+              "precision": 0.11875
+            },
+            "first_service": {
+              "services": 292,
+              "positives": 2,
+              "reviewed": 0,
+              "found": 0,
+              "recall": 0.0,
+              "precision": null
+            }
+          }
+        },
+        {
+          "fold": "2025_q3",
+          "average_precision": 0.2523297731913764,
+          "review": {
+            "all": {
+              "services": 772,
+              "positives": 71,
+              "reviewed": 155,
+              "found": 38,
+              "recall": 0.5352112676056338,
+              "precision": 0.24516129032258063
+            },
+            "first_service": {
+              "services": 261,
+              "positives": 1,
+              "reviewed": 0,
+              "found": 0,
+              "recall": 0.0,
+              "precision": null
+            }
+          }
+        },
+        {
+          "fold": "2025_q4",
+          "average_precision": 0.3583538775193474,
+          "review": {
+            "all": {
+              "services": 410,
+              "positives": 81,
+              "reviewed": 82,
+              "found": 33,
+              "recall": 0.4074074074074074,
+              "precision": 0.4024390243902439
+            },
+            "first_service": {
+              "services": 127,
+              "positives": 10,
+              "reviewed": 0,
+              "found": 0,
+              "recall": 0.0,
+              "precision": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "v5_control__reserve10",
+      "model": "v5_control",
+      "first_review_reserve": 0.1,
+      "mean_ap": 0.2406643480830334,
+      "mean_review_recall": 0.48543965238397063,
+      "mean_first_recall": 0.03333333333333333,
+      "folds": [
+        {
+          "fold": "2025_q2",
+          "average_precision": 0.11130939353837645,
+          "review": {
+            "all": {
+              "services": 796,
+              "positives": 31,
+              "reviewed": 160,
+              "found": 18,
+              "recall": 0.5806451612903226,
+              "precision": 0.1125
+            },
+            "first_service": {
+              "services": 292,
+              "positives": 2,
+              "reviewed": 16,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q3",
+          "average_precision": 0.2523297731913764,
+          "review": {
+            "all": {
+              "services": 772,
+              "positives": 71,
+              "reviewed": 155,
+              "found": 35,
+              "recall": 0.49295774647887325,
+              "precision": 0.22580645161290322
+            },
+            "first_service": {
+              "services": 261,
+              "positives": 1,
+              "reviewed": 16,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q4",
+          "average_precision": 0.3583538775193474,
+          "review": {
+            "all": {
+              "services": 410,
+              "positives": 81,
+              "reviewed": 82,
+              "found": 31,
+              "recall": 0.38271604938271603,
+              "precision": 0.3780487804878049
+            },
+            "first_service": {
+              "services": 127,
+              "positives": 10,
+              "reviewed": 9,
+              "found": 1,
+              "recall": 0.1,
+              "precision": 0.1111111111111111
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "v5_control__reserve25",
+      "model": "v5_control",
+      "first_review_reserve": 0.25,
+      "mean_ap": 0.2406643480830334,
+      "mean_review_recall": 0.39171495186437894,
+      "mean_first_recall": 0.43333333333333335,
+      "folds": [
+        {
+          "fold": "2025_q2",
+          "average_precision": 0.11130939353837645,
+          "review": {
+            "all": {
+              "services": 796,
+              "positives": 31,
+              "reviewed": 160,
+              "found": 16,
+              "recall": 0.5161290322580645,
+              "precision": 0.1
+            },
+            "first_service": {
+              "services": 292,
+              "positives": 2,
+              "reviewed": 40,
+              "found": 2,
+              "recall": 1.0,
+              "precision": 0.05
+            }
+          }
+        },
+        {
+          "fold": "2025_q3",
+          "average_precision": 0.2523297731913764,
+          "review": {
+            "all": {
+              "services": 772,
+              "positives": 71,
+              "reviewed": 155,
+              "found": 24,
+              "recall": 0.3380281690140845,
+              "precision": 0.15483870967741936
+            },
+            "first_service": {
+              "services": 261,
+              "positives": 1,
+              "reviewed": 39,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q4",
+          "average_precision": 0.3583538775193474,
+          "review": {
+            "all": {
+              "services": 410,
+              "positives": 81,
+              "reviewed": 82,
+              "found": 26,
+              "recall": 0.32098765432098764,
+              "precision": 0.3170731707317073
+            },
+            "first_service": {
+              "services": 127,
+              "positives": 10,
+              "reviewed": 21,
+              "found": 3,
+              "recall": 0.3,
+              "precision": 0.14285714285714285
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "first_weight4__reserve0",
+      "model": "first_weight4",
+      "first_review_reserve": 0.0,
+      "mean_ap": 0.22492852116606674,
+      "mean_review_recall": 0.5036393857636727,
+      "mean_first_recall": 0.0,
+      "folds": [
+        {
+          "fold": "2025_q2",
+          "average_precision": 0.10352698132644608,
+          "review": {
+            "all": {
+              "services": 796,
+              "positives": 31,
+              "reviewed": 160,
+              "found": 18,
+              "recall": 0.5806451612903226,
+              "precision": 0.1125
+            },
+            "first_service": {
+              "services": 292,
+              "positives": 2,
+              "reviewed": 7,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q3",
+          "average_precision": 0.23912859604079728,
+          "review": {
+            "all": {
+              "services": 772,
+              "positives": 71,
+              "reviewed": 155,
+              "found": 38,
+              "recall": 0.5352112676056338,
+              "precision": 0.24516129032258063
+            },
+            "first_service": {
+              "services": 261,
+              "positives": 1,
+              "reviewed": 0,
+              "found": 0,
+              "recall": 0.0,
+              "precision": null
+            }
+          }
+        },
+        {
+          "fold": "2025_q4",
+          "average_precision": 0.3321299861309568,
+          "review": {
+            "all": {
+              "services": 410,
+              "positives": 81,
+              "reviewed": 82,
+              "found": 32,
+              "recall": 0.3950617283950617,
+              "precision": 0.3902439024390244
+            },
+            "first_service": {
+              "services": 127,
+              "positives": 10,
+              "reviewed": 0,
+              "found": 0,
+              "recall": 0.0,
+              "precision": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "first_weight4__reserve10",
+      "model": "first_weight4",
+      "first_review_reserve": 0.1,
+      "mean_ap": 0.22492852116606674,
+      "mean_review_recall": 0.44689376134678777,
+      "mean_first_recall": 0.03333333333333333,
+      "folds": [
+        {
+          "fold": "2025_q2",
+          "average_precision": 0.10352698132644608,
+          "review": {
+            "all": {
+              "services": 796,
+              "positives": 31,
+              "reviewed": 160,
+              "found": 16,
+              "recall": 0.5161290322580645,
+              "precision": 0.1
+            },
+            "first_service": {
+              "services": 292,
+              "positives": 2,
+              "reviewed": 16,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q3",
+          "average_precision": 0.23912859604079728,
+          "review": {
+            "all": {
+              "services": 772,
+              "positives": 71,
+              "reviewed": 155,
+              "found": 34,
+              "recall": 0.4788732394366197,
+              "precision": 0.21935483870967742
+            },
+            "first_service": {
+              "services": 261,
+              "positives": 1,
+              "reviewed": 16,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q4",
+          "average_precision": 0.3321299861309568,
+          "review": {
+            "all": {
+              "services": 410,
+              "positives": 81,
+              "reviewed": 82,
+              "found": 28,
+              "recall": 0.345679012345679,
+              "precision": 0.34146341463414637
+            },
+            "first_service": {
+              "services": 127,
+              "positives": 10,
+              "reviewed": 9,
+              "found": 1,
+              "recall": 0.1,
+              "precision": 0.1111111111111111
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "first_weight4__reserve25",
+      "model": "first_weight4",
+      "first_review_reserve": 0.25,
+      "mean_ap": 0.22492852116606674,
+      "mean_review_recall": 0.39504677073458944,
+      "mean_first_recall": 0.2333333333333333,
+      "folds": [
+        {
+          "fold": "2025_q2",
+          "average_precision": 0.10352698132644608,
+          "review": {
+            "all": {
+              "services": 796,
+              "positives": 31,
+              "reviewed": 160,
+              "found": 15,
+              "recall": 0.4838709677419355,
+              "precision": 0.09375
+            },
+            "first_service": {
+              "services": 292,
+              "positives": 2,
+              "reviewed": 40,
+              "found": 1,
+              "recall": 0.5,
+              "precision": 0.025
+            }
+          }
+        },
+        {
+          "fold": "2025_q3",
+          "average_precision": 0.23912859604079728,
+          "review": {
+            "all": {
+              "services": 772,
+              "positives": 71,
+              "reviewed": 155,
+              "found": 27,
+              "recall": 0.38028169014084506,
+              "precision": 0.17419354838709677
+            },
+            "first_service": {
+              "services": 261,
+              "positives": 1,
+              "reviewed": 39,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q4",
+          "average_precision": 0.3321299861309568,
+          "review": {
+            "all": {
+              "services": 410,
+              "positives": 81,
+              "reviewed": 82,
+              "found": 26,
+              "recall": 0.32098765432098764,
+              "precision": 0.3170731707317073
+            },
+            "first_service": {
+              "services": 127,
+              "positives": 10,
+              "reviewed": 21,
+              "found": 2,
+              "recall": 0.2,
+              "precision": 0.09523809523809523
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "first_weight8__reserve0",
+      "model": "first_weight8",
+      "first_review_reserve": 0.0,
+      "mean_ap": 0.22485890162339853,
+      "mean_review_recall": 0.4692087210639384,
+      "mean_first_recall": 0.16666666666666666,
+      "folds": [
+        {
+          "fold": "2025_q2",
+          "average_precision": 0.08517529555467226,
+          "review": {
+            "all": {
+              "services": 796,
+              "positives": 31,
+              "reviewed": 160,
+              "found": 16,
+              "recall": 0.5161290322580645,
+              "precision": 0.1
+            },
+            "first_service": {
+              "services": 292,
+              "positives": 2,
+              "reviewed": 23,
+              "found": 1,
+              "recall": 0.5,
+              "precision": 0.043478260869565216
+            }
+          }
+        },
+        {
+          "fold": "2025_q3",
+          "average_precision": 0.24847875853754114,
+          "review": {
+            "all": {
+              "services": 772,
+              "positives": 71,
+              "reviewed": 155,
+              "found": 37,
+              "recall": 0.5211267605633803,
+              "precision": 0.23870967741935484
+            },
+            "first_service": {
+              "services": 261,
+              "positives": 1,
+              "reviewed": 0,
+              "found": 0,
+              "recall": 0.0,
+              "precision": null
+            }
+          }
+        },
+        {
+          "fold": "2025_q4",
+          "average_precision": 0.3409226507779822,
+          "review": {
+            "all": {
+              "services": 410,
+              "positives": 81,
+              "reviewed": 82,
+              "found": 30,
+              "recall": 0.37037037037037035,
+              "precision": 0.36585365853658536
+            },
+            "first_service": {
+              "services": 127,
+              "positives": 10,
+              "reviewed": 0,
+              "found": 0,
+              "recall": 0.0,
+              "precision": null
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "first_weight8__reserve10",
+      "model": "first_weight8",
+      "first_review_reserve": 0.1,
+      "mean_ap": 0.22485890162339853,
+      "mean_review_recall": 0.43338886364783685,
+      "mean_first_recall": 0.19999999999999998,
+      "folds": [
+        {
+          "fold": "2025_q2",
+          "average_precision": 0.08517529555467226,
+          "review": {
+            "all": {
+              "services": 796,
+              "positives": 31,
+              "reviewed": 160,
+              "found": 16,
+              "recall": 0.5161290322580645,
+              "precision": 0.1
+            },
+            "first_service": {
+              "services": 292,
+              "positives": 2,
+              "reviewed": 23,
+              "found": 1,
+              "recall": 0.5,
+              "precision": 0.043478260869565216
+            }
+          }
+        },
+        {
+          "fold": "2025_q3",
+          "average_precision": 0.24847875853754114,
+          "review": {
+            "all": {
+              "services": 772,
+              "positives": 71,
+              "reviewed": 155,
+              "found": 32,
+              "recall": 0.4507042253521127,
+              "precision": 0.2064516129032258
+            },
+            "first_service": {
+              "services": 261,
+              "positives": 1,
+              "reviewed": 16,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q4",
+          "average_precision": 0.3409226507779822,
+          "review": {
+            "all": {
+              "services": 410,
+              "positives": 81,
+              "reviewed": 82,
+              "found": 27,
+              "recall": 0.3333333333333333,
+              "precision": 0.32926829268292684
+            },
+            "first_service": {
+              "services": 127,
+              "positives": 10,
+              "reviewed": 9,
+              "found": 1,
+              "recall": 0.1,
+              "precision": 0.1111111111111111
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "first_weight8__reserve25",
+      "model": "first_weight8",
+      "first_review_reserve": 0.25,
+      "mean_ap": 0.22485890162339853,
+      "mean_review_recall": 0.40226384191248643,
+      "mean_first_recall": 0.39999999999999997,
+      "folds": [
+        {
+          "fold": "2025_q2",
+          "average_precision": 0.08517529555467226,
+          "review": {
+            "all": {
+              "services": 796,
+              "positives": 31,
+              "reviewed": 160,
+              "found": 16,
+              "recall": 0.5161290322580645,
+              "precision": 0.1
+            },
+            "first_service": {
+              "services": 292,
+              "positives": 2,
+              "reviewed": 40,
+              "found": 2,
+              "recall": 1.0,
+              "precision": 0.05
+            }
+          }
+        },
+        {
+          "fold": "2025_q3",
+          "average_precision": 0.24847875853754114,
+          "review": {
+            "all": {
+              "services": 772,
+              "positives": 71,
+              "reviewed": 155,
+              "found": 28,
+              "recall": 0.39436619718309857,
+              "precision": 0.18064516129032257
+            },
+            "first_service": {
+              "services": 261,
+              "positives": 1,
+              "reviewed": 39,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q4",
+          "average_precision": 0.3409226507779822,
+          "review": {
+            "all": {
+              "services": 410,
+              "positives": 81,
+              "reviewed": 82,
+              "found": 24,
+              "recall": 0.2962962962962963,
+              "precision": 0.2926829268292683
+            },
+            "first_service": {
+              "services": 127,
+              "positives": 10,
+              "reviewed": 21,
+              "found": 2,
+              "recall": 0.2,
+              "precision": 0.09523809523809523
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "stage_reduced__reserve0",
+      "model": "stage_reduced",
+      "first_review_reserve": 0.0,
+      "mean_ap": 0.20540191438589642,
+      "mean_review_recall": 0.41188348730375085,
+      "mean_first_recall": 0.0,
+      "folds": [
+        {
+          "fold": "2025_q2",
+          "average_precision": 0.08216364183750884,
+          "review": {
+            "all": {
+              "services": 796,
+              "positives": 31,
+              "reviewed": 160,
+              "found": 14,
+              "recall": 0.45161290322580644,
+              "precision": 0.0875
+            },
+            "first_service": {
+              "services": 292,
+              "positives": 2,
+              "reviewed": 2,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q3",
+          "average_precision": 0.23120463827401308,
+          "review": {
+            "all": {
+              "services": 772,
+              "positives": 71,
+              "reviewed": 155,
+              "found": 32,
+              "recall": 0.4507042253521127,
+              "precision": 0.2064516129032258
+            },
+            "first_service": {
+              "services": 261,
+              "positives": 1,
+              "reviewed": 5,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q4",
+          "average_precision": 0.3028374630461673,
+          "review": {
+            "all": {
+              "services": 410,
+              "positives": 81,
+              "reviewed": 82,
+              "found": 27,
+              "recall": 0.3333333333333333,
+              "precision": 0.32926829268292684
+            },
+            "first_service": {
+              "services": 127,
+              "positives": 10,
+              "reviewed": 1,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "stage_reduced__reserve10",
+      "model": "stage_reduced",
+      "first_review_reserve": 0.1,
+      "mean_ap": 0.20540191438589642,
+      "mean_review_recall": 0.37939544875785974,
+      "mean_first_recall": 0.03333333333333333,
+      "folds": [
+        {
+          "fold": "2025_q2",
+          "average_precision": 0.08216364183750884,
+          "review": {
+            "all": {
+              "services": 796,
+              "positives": 31,
+              "reviewed": 160,
+              "found": 13,
+              "recall": 0.41935483870967744,
+              "precision": 0.08125
+            },
+            "first_service": {
+              "services": 292,
+              "positives": 2,
+              "reviewed": 16,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q3",
+          "average_precision": 0.23120463827401308,
+          "review": {
+            "all": {
+              "services": 772,
+              "positives": 71,
+              "reviewed": 155,
+              "found": 30,
+              "recall": 0.4225352112676056,
+              "precision": 0.1935483870967742
+            },
+            "first_service": {
+              "services": 261,
+              "positives": 1,
+              "reviewed": 16,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q4",
+          "average_precision": 0.3028374630461673,
+          "review": {
+            "all": {
+              "services": 410,
+              "positives": 81,
+              "reviewed": 82,
+              "found": 24,
+              "recall": 0.2962962962962963,
+              "precision": 0.2926829268292683
+            },
+            "first_service": {
+              "services": 127,
+              "positives": 10,
+              "reviewed": 9,
+              "found": 1,
+              "recall": 0.1,
+              "precision": 0.1111111111111111
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "stage_reduced__reserve25",
+      "model": "stage_reduced",
+      "first_review_reserve": 0.25,
+      "mean_ap": 0.20540191438589642,
+      "mean_review_recall": 0.32264982434097483,
+      "mean_first_recall": 0.06666666666666667,
+      "folds": [
+        {
+          "fold": "2025_q2",
+          "average_precision": 0.08216364183750884,
+          "review": {
+            "all": {
+              "services": 796,
+              "positives": 31,
+              "reviewed": 160,
+              "found": 11,
+              "recall": 0.3548387096774194,
+              "precision": 0.06875
+            },
+            "first_service": {
+              "services": 292,
+              "positives": 2,
+              "reviewed": 40,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q3",
+          "average_precision": 0.23120463827401308,
+          "review": {
+            "all": {
+              "services": 772,
+              "positives": 71,
+              "reviewed": 155,
+              "found": 26,
+              "recall": 0.36619718309859156,
+              "precision": 0.16774193548387098
+            },
+            "first_service": {
+              "services": 261,
+              "positives": 1,
+              "reviewed": 39,
+              "found": 0,
+              "recall": 0.0,
+              "precision": 0.0
+            }
+          }
+        },
+        {
+          "fold": "2025_q4",
+          "average_precision": 0.3028374630461673,
+          "review": {
+            "all": {
+              "services": 410,
+              "positives": 81,
+              "reviewed": 82,
+              "found": 20,
+              "recall": 0.24691358024691357,
+              "precision": 0.24390243902439024
+            },
+            "first_service": {
+              "services": 127,
+              "positives": 10,
+              "reviewed": 21,
+              "found": 2,
+              "recall": 0.2,
+              "precision": 0.09523809523809523
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "fold_support": [
+    {
+      "fold": "2025_q2",
+      "training_services": 808,
+      "validation_services": 796,
+      "first_positive_windows": 2,
+      "embargoed_training_rows": 175,
+      "property_purged_training_rows": 87
+    },
+    {
+      "fold": "2025_q3",
+      "training_services": 1525,
+      "validation_services": 772,
+      "first_positive_windows": 1,
+      "embargoed_training_rows": 226,
+      "property_purged_training_rows": 115
+    },
+    {
+      "fold": "2025_q4",
+      "training_services": 2371,
+      "validation_services": 410,
+      "first_positive_windows": 10,
+      "embargoed_training_rows": 161,
+      "property_purged_training_rows": 106
+    }
+  ],
+  "development_services": 3048,
+  "diagnostic_services": 1975,
+  "diagnostic_positives": 179,
+  "diagnostic": {
+    "control": {
+      "contract": "v5_control__reserve0",
+      "rows": 1975,
+      "positives": 179,
+      "prevalence": 0.09063291139240506,
+      "roc_auc": 0.7871838100807506,
+      "average_precision": 0.23194961265225184,
+      "brier_score": 0.07427463495415303,
+      "accuracy": 0.8227848101265823,
+      "balanced_accuracy": 0.6963394756815269,
+      "precision": 0.26575342465753427,
+      "recall": 0.5418994413407822,
+      "f1": 0.35661764705882354,
+      "alert_rows": 365,
+      "threshold": 0.19,
+      "majority_class_accuracy": 0.909367088607595,
+      "ap_lift_over_prevalence": 2.5592205865262425,
+      "review": {
+        "all": {
+          "services": 1975,
+          "positives": 179,
+          "reviewed": 395,
+          "found": 103,
+          "recall": 0.5754189944134078,
+          "precision": 0.2607594936708861
+        },
+        "first_service": {
+          "services": 673,
+          "positives": 11,
+          "reviewed": 0,
+          "found": 0,
+          "recall": 0.0,
+          "precision": null
+        }
+      },
+      "artifact_sha256": "30a645e2d24fd8cd3aa3c868f86b45e2ef7bef87c0560a34f352a9b6a4b08ff9",
+      "replay_max_difference": 2.220446049250313e-16
+    },
+    "challenger": {
+      "contract": "v5_control__reserve0",
+      "rows": 1975,
+      "positives": 179,
+      "prevalence": 0.09063291139240506,
+      "roc_auc": 0.7871838100807506,
+      "average_precision": 0.23194961265225184,
+      "brier_score": 0.07427463495415303,
+      "accuracy": 0.8227848101265823,
+      "balanced_accuracy": 0.6963394756815269,
+      "precision": 0.26575342465753427,
+      "recall": 0.5418994413407822,
+      "f1": 0.35661764705882354,
+      "alert_rows": 365,
+      "threshold": 0.19,
+      "majority_class_accuracy": 0.909367088607595,
+      "ap_lift_over_prevalence": 2.5592205865262425,
+      "review": {
+        "all": {
+          "services": 1975,
+          "positives": 179,
+          "reviewed": 395,
+          "found": 103,
+          "recall": 0.5754189944134078,
+          "precision": 0.2607594936708861
+        },
+        "first_service": {
+          "services": 673,
+          "positives": 11,
+          "reviewed": 0,
+          "found": 0,
+          "recall": 0.0,
+          "precision": null
+        }
+      },
+      "artifact_sha256": "30a645e2d24fd8cd3aa3c868f86b45e2ef7bef87c0560a34f352a9b6a4b08ff9",
+      "replay_max_difference": 2.220446049250313e-16
+    }
+  },
+  "limits": [
+    "Development folds have already been used in prior model selection.",
+    "Feature ideas are motivated by previously inspected first-service errors.",
+    "No August held-out result or October future-test outcome may select this challenger.",
+    "Frozen source retains documented historical cancellation-classification limitations.",
+    "Do not deploy or replace the frozen October model based on this experiment."
+  ]
+}
