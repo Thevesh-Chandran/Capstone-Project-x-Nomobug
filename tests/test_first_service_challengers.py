@@ -13,6 +13,15 @@ def test_late_august_holdout_is_excluded_before_preparation():
     assert f.allowed_source(source).marker.tolist() == [1]
 
 
+def test_private_outputs_cannot_escape_ignored_experiment_directory():
+    assert f.private_output(b.ROOT / 'outputs/cp2-v2/challenger') == (
+        b.ROOT / 'outputs/cp2-v2/challenger').resolve()
+    with pytest.raises(ValueError, match='ignored outputs'):
+        f.private_output(b.ROOT / 'planning/private_predictions')
+    with pytest.raises(ValueError, match='ignored outputs'):
+        f.private_output(b.ROOT / 'outputs/../planning/private_predictions')
+
+
 def test_first_reservation_preserves_exact_common_budget_and_high_scores():
     scores = np.array([.9, .8, .7, .6, .5, .4, .3, .2, .1, 0.])
     first = np.array([False] * 7 + [True] * 3)

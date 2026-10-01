@@ -5,6 +5,8 @@ Use [the model guide](../planning/CP2_START_HERE.md) to choose the active model.
 | Contract | Role |
 |---|---|
 | `cp2_model_current.json` | One current corrected v5 model pointer |
+| `cp2_first_service_challenger_v1.json` | Fixed exploratory weighting, feature-ablation and review-allocation protocol |
+| `cp2_first_service_challenger_results_v1.json` | Aggregate results of the completed comparison; no accepted replacement |
 | `warranty_model_experiment_v5.json` | Fixed candidate selection on corrected development data |
 | `warranty_new_holdout_v5.json` | One final newer-date evaluation |
 | `warranty_prospective_experiment_v2.json` | Corrected refit using all mature data |

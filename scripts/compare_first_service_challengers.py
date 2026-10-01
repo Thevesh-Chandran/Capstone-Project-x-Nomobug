@@ -39,6 +39,13 @@ def allowed_source(source):
     return source.loc[dates.lt('2026-08-15')].copy()
 
 
+def private_output(path):
+    resolved = path.resolve()
+    if not resolved.is_relative_to((b.ROOT / 'outputs').resolve()):
+        raise ValueError('Private experiment evidence must remain in ignored outputs')
+    return resolved
+
+
 def feature_columns(name):
     if name not in MODEL_NAMES:
         raise ValueError('Unknown bounded model contract')
@@ -128,11 +135,14 @@ def main():
     parser.add_argument('--output-dir', type=Path,
                         default=b.ROOT / 'outputs/cp2-v2/first_service_challenger_v1')
     args = parser.parse_args()
-    out = args.output_dir
+    out = private_output(args.output_dir)
     if out.exists():
         raise ValueError('Preserve experiment evidence; choose a new output directory')
     protocol_bytes = PROTOCOL.read_bytes()
     protocol = json.loads(protocol_bytes)
+    frozen_bundle = b.ROOT / 'outputs/cp2-v2/prospective_callback_v2/bundle.json'
+    if hashlib.sha256(frozen_bundle.read_bytes()).hexdigest() != protocol['frozen_bundle_sha256']:
+        raise ValueError('Frozen cloud bundle differs from the experiment boundary')
     source_path = b.ROOT / protocol['source_relative_path']
     if hashlib.sha256(source_path.read_bytes()).hexdigest() != protocol['source_sha256']:
         raise ValueError('Source hash differs from predeclared protocol')
@@ -177,6 +187,7 @@ def main():
     selected = select_candidate(candidates)
     declaration = {'created_at_utc': datetime.now(timezone.utc).isoformat(),
                    'protocol_sha256': hashlib.sha256(protocol_bytes).hexdigest(),
+                   'experiment_code_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                    'split_audit': split_audit, 'fold_support': support,
                    'candidates': candidates, 'selected': selected,
                    'selection_before_diagnostic_scoring': True}
@@ -188,7 +199,10 @@ def main():
         role_dir.mkdir()
         pooled = pd.concat(oof[candidate['model']], ignore_index=True)
         calibrator, calibration = b.fit_calibrator(pooled[b.TARGET], pooled.raw_probability)
+        threshold = b.select_threshold(pooled[b.TARGET],
+                                       b.apply_calibrator(calibrator, pooled.raw_probability))
         artifact = {'member': fit_member(candidate['model'], train), 'calibrator': calibrator,
+                    'threshold': threshold,
                     'calibration': calibration, 'selected': candidate,
                     'training_services': len(train), 'training_positives': int(train[b.TARGET].sum()),
                     'purpose': 'exploratory_old2026_diagnostic_not_for_cloud_deployment',
@@ -207,18 +221,21 @@ def main():
                     reviewed=review_mask(raw, diagnostic.service_number.eq(1), candidate['first_review_reserve']))
         private.to_csv(role_dir / 'diagnostic_predictions_private.csv', index=False)
         diagnostic_results[role] = {'contract': candidate['name'],
-                                    **b.score(diagnostic[b.TARGET], probability),
+                                    **b.score(diagnostic[b.TARGET], probability, threshold),
                                     'review': review_metrics(diagnostic, raw, candidate['first_review_reserve']),
                                     'artifact_sha256': hashlib.sha256(model_path.read_bytes()).hexdigest(),
                                     'replay_max_difference': float(np.max(np.abs(probability - replay.probability)))}
     result = {'status': 'exploratory_only_frozen_cloud_model_unchanged',
               'source_sha256': protocol['source_sha256'],
               'protocol_sha256': declaration['protocol_sha256'],
+              'experiment_code_sha256': declaration['experiment_code_sha256'],
               'selection_sha256': hashlib.sha256(selection_path.read_bytes()).hexdigest(),
               'selection': selected, 'development': candidates, 'fold_support': support,
               'development_services': len(train), 'diagnostic_services': len(diagnostic),
               'diagnostic_positives': int(diagnostic[b.TARGET].sum()),
               'diagnostic': diagnostic_results, 'limits': protocol['limits']}
+    if hashlib.sha256(frozen_bundle.read_bytes()).hexdigest() != protocol['frozen_bundle_sha256']:
+        raise ValueError('Frozen cloud bundle changed during the experiment')
     (out / 'results.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
     print(json.dumps({'selected': selected['name'], 'diagnostic': diagnostic_results}, indent=2))
 
