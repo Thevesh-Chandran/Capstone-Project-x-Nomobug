@@ -109,3 +109,13 @@ def test_audit_counts_service_windows_and_refuses_duplicates():
 def test_predictor_replay_refuses_changed_challenger_code():
     with pytest.raises(ValueError, match='code changed'):
         x.predict_artifact({'code_sha256': 'changed'}, pd.DataFrame())
+
+
+def test_plain_catboost_fits_without_passing_json_null_to_native_options(monkeypatch):
+    monkeypatch.setattr(x.b, 'CATEGORICAL', ['pest'])
+    monkeypatch.setattr(x, 'numeric_contract', lambda _: ['x'])
+    frame = pd.DataFrame({'x': np.arange(40), 'pest': ['A', 'B'] * 20,
+                          x.b.TARGET: [True, False] * 20})
+    spec = {'name': 'plain_test', 'family': 'cat', 'features': 'targeted',
+            'params': {'iterations': 2, 'auto_class_weights': None}}
+    assert np.isfinite(x.predict_member(x.fit(spec, frame), frame)).all()

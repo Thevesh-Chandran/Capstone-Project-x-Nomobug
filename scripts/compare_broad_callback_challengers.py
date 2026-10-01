@@ -84,7 +84,9 @@ def pipeline(spec):
         return b.make_model(spec['model'], numeric)
     if family == 'cat':
         pipe = b.make_model('catboost_depth3_plain', numeric)
-        pipe.named_steps['classifier'].set_params(**spec['params'])
+        # CatBoost omits None constructor options but set_params(None) sends
+        # JSON null to its native parser. Plain class weighting is the default.
+        pipe.named_steps['classifier'].set_params(**{k: v for k, v in spec['params'].items() if v is not None})
         return pipe
     pipe = b.make_model('extra_trees_depth6', numeric)
     if family in {'et', 'stage_expert'}:
