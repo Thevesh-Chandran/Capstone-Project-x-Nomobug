@@ -13,6 +13,7 @@ For the 31 October deliverable, use the [October submission record](CP2_OCTOBER_
 | [CP2_OPERATIONS_METRIC_DICTIONARY.md](CP2_OPERATIONS_METRIC_DICTIONARY.md) | Visit, return, geography, weather and quality field meanings |
 | [CP2_MODEL_EXPLAINED.md](CP2_MODEL_EXPLAINED.md) | Model target, all predictor groups and performance metrics explained |
 | [CP2_FIRST_SERVICE_CHALLENGER.md](CP2_FIRST_SERVICE_CHALLENGER.md) | Completed twelve-contract improvement experiment; v5 retained because alternatives lost overall performance |
+| [CP2_BROAD_MODEL_REVIEW.md](CP2_BROAD_MODEL_REVIEW.md) | Completed 37-contract model/feature comparison, source checks and separate later-period validation |
 | [CP2_DASHBOARD_FIELD_REFERENCE.md](CP2_DASHBOARD_FIELD_REFERENCE.md) | Exact deployed Gold field names and types |
 | [CP2_CORRECTED_MODEL_CANDIDATES_V5.md](CP2_CORRECTED_MODEL_CANDIDATES_V5.md) | Current corrected v5 model, newer evaluation and limits |
 | [WARRANTY_POLICY_RULES.md](WARRANTY_POLICY_RULES.md) | Owner-confirmed contractual eligibility rules |

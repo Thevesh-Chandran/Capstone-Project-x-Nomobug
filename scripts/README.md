@@ -21,6 +21,8 @@ Start with [the model guide](../planning/CP2_START_HERE.md) before running an ex
 | `compare_callback_candidates_v2.py` | Reproduce the corrected v5 fixed candidate selection and artifact generation |
 | `python -m scripts.compare_first_service_challengers` | Separate exploratory first-service comparison; writes private artifacts under outputs and preserves the frozen model |
 | `python -m scripts.prepare_service_observation_features` | Validate versioned inspection/callback records and prepare private as-of candidate features; does not train or deploy |
+| `python -m scripts.compare_broad_callback_challengers` | Fixed 37-contract exploratory comparison with outcome embargo, group purging and twelve engineered variables |
+| `python -m scripts.evaluate_broad_callback_challenger` | One-time declared later-period check; rejects changed hashes, immature outcomes and repeated evaluation |
 | `refresh_callback_validation.py` | Derive a separate corrected candidate input from refreshed source evidence |
 | `evaluate_callback_holdout.py` | Evaluate the frozen selected models on the reserved newer-date cohort; refuses result overwrite |
 | `reconcile_callback_evidence.py` and `trace_claim_service_dates.py` | Preserve source-label/date audit evidence |

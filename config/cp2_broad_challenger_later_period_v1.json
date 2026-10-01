@@ -1,0 +1,184 @@
+{
+  "status": "one_time_retrospective_later_period_not_online_prediction",
+  "evaluated_at_utc": "2026-10-01T05:23:25.618687+00:00",
+  "protocol_sha256": "d164ab7ca3773fe7e078ace91b032f4553e0302dc96b1ef5cd47fb445b583fa0",
+  "selection_sha256": "5850e7d4cd22080a4f4992816481965b58d7bb00552bdb6a0a29a1b94c613ddb",
+  "evaluator_sha256": "5c8ea776bf951f95be14b8b7362a2f5cf9c5d8e6327863e478685f2a42e92996",
+  "source_run_receipt_sha256": "a99573bc6382b9653904e6c816d87bd0f0e1a724e08d53b89ea8f3087f6e63b9",
+  "feature_receipt_sha256": "968f3e6b44ed5a4d896f1198a1303e5b9526838a859acaf86e4aa1812bca3be5",
+  "cohort_input_sha256": "09ffefb846305d69ec440a01a665a4348db37b69369364a464b3f4e2a19fd517",
+  "period": {
+    "start": "2026-08-28",
+    "end": "2026-08-31",
+    "outcomes_complete_through": "2026-09-30",
+    "historical_training_outcomes_end_exclusive": "2026-08-28",
+    "purpose": "one-time later-period validation only, not selection; cannot claim independent model win with inadequate positives"
+  },
+  "rows": 13,
+  "positive_windows": 1,
+  "role_results": {
+    "control": {
+      "selection": "v5_control",
+      "rows": 13,
+      "positives": 1,
+      "prevalence": 0.07692307692307693,
+      "roc_auc": 0.41666666666666663,
+      "average_precision": 0.125,
+      "brier_score": 0.07379413331377321,
+      "accuracy": 0.9230769230769231,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "alert_rows": 0,
+      "threshold": 0.19,
+      "majority_class_accuracy": 0.9230769230769231,
+      "ap_lift_over_prevalence": 1.625,
+      "review": {
+        "all": {
+          "services": 13,
+          "positives": 1,
+          "reviewed": 3,
+          "found": 0,
+          "recall": 0.0,
+          "precision": 0.0
+        },
+        "first_service": {
+          "services": 3,
+          "positives": 0,
+          "reviewed": 0,
+          "found": 0,
+          "recall": null,
+          "precision": null
+        }
+      }
+    },
+    "primary": {
+      "selection": "v5_control",
+      "rows": 13,
+      "positives": 1,
+      "prevalence": 0.07692307692307693,
+      "roc_auc": 0.41666666666666663,
+      "average_precision": 0.125,
+      "brier_score": 0.07379413331377321,
+      "accuracy": 0.9230769230769231,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "alert_rows": 0,
+      "threshold": 0.19,
+      "majority_class_accuracy": 0.9230769230769231,
+      "ap_lift_over_prevalence": 1.625,
+      "review": {
+        "all": {
+          "services": 13,
+          "positives": 1,
+          "reviewed": 3,
+          "found": 0,
+          "recall": 0.0,
+          "precision": 0.0
+        },
+        "first_service": {
+          "services": 3,
+          "positives": 0,
+          "reviewed": 0,
+          "found": 0,
+          "recall": null,
+          "precision": null
+        }
+      }
+    },
+    "priority": {
+      "selection": "v5_control",
+      "rows": 13,
+      "positives": 1,
+      "prevalence": 0.07692307692307693,
+      "roc_auc": 0.41666666666666663,
+      "average_precision": 0.125,
+      "brier_score": 0.07379413331377321,
+      "accuracy": 0.9230769230769231,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "alert_rows": 0,
+      "threshold": 0.19,
+      "majority_class_accuracy": 0.9230769230769231,
+      "ap_lift_over_prevalence": 1.625,
+      "review": {
+        "all": {
+          "services": 13,
+          "positives": 1,
+          "reviewed": 3,
+          "found": 0,
+          "recall": 0.0,
+          "precision": 0.0
+        },
+        "first_service": {
+          "services": 3,
+          "positives": 0,
+          "reviewed": 0,
+          "found": 0,
+          "recall": null,
+          "precision": null
+        }
+      }
+    }
+  },
+  "paired_uncertainty": {
+    "primary": {
+      "direction": "challenger_minus_control",
+      "components": 13,
+      "requested_repeats": 300,
+      "valid_repeats": {
+        "roc_auc": 180,
+        "average_precision": 180,
+        "review_recall": 180
+      },
+      "intervals_95pct": {
+        "roc_auc": [
+          0.0,
+          0.0
+        ],
+        "average_precision": [
+          0.0,
+          0.0
+        ],
+        "review_recall": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "priority": {
+      "direction": "challenger_minus_control",
+      "components": 13,
+      "requested_repeats": 300,
+      "valid_repeats": {
+        "roc_auc": 180,
+        "average_precision": 180,
+        "review_recall": 180
+      },
+      "intervals_95pct": {
+        "roc_auc": [
+          0.0,
+          0.0
+        ],
+        "average_precision": [
+          0.0,
+          0.0
+        ],
+        "review_recall": [
+          0.0,
+          0.0
+        ]
+      }
+    }
+  },
+  "limits": [
+    "Only four calendar days of services; limited positives cannot establish a dependable win.",
+    "Returning customers allowed; historical source revisions cannot all be reconstructed.",
+    "No model reselection, threshold tuning, or October-model replacement from these outcomes."
+  ]
+}
