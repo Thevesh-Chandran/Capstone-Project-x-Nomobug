@@ -20,6 +20,7 @@ Start with [the model guide](../planning/CP2_START_HERE.md) before running an ex
 | `cp2_model.py evaluate-prospective --input-json <private Calendar labels>` | Evaluate the mature frozen cohort once, with complete coverage, no earlier than 27 November |
 | `compare_callback_candidates_v2.py` | Reproduce the corrected v5 fixed candidate selection and artifact generation |
 | `python -m scripts.compare_first_service_challengers` | Separate exploratory first-service comparison; writes private artifacts under outputs and preserves the frozen model |
+| `python -m scripts.prepare_service_observation_features` | Validate versioned inspection/callback records and prepare private as-of candidate features; does not train or deploy |
 | `refresh_callback_validation.py` | Derive a separate corrected candidate input from refreshed source evidence |
 | `evaluate_callback_holdout.py` | Evaluate the frozen selected models on the reserved newer-date cohort; refuses result overwrite |
 | `reconcile_callback_evidence.py` and `trace_claim_service_dates.py` | Preserve source-label/date audit evidence |

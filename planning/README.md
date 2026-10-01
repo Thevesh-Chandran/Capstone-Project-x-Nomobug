@@ -16,7 +16,7 @@ For the 31 October deliverable, use the [October submission record](CP2_OCTOBER_
 | [CP2_DASHBOARD_FIELD_REFERENCE.md](CP2_DASHBOARD_FIELD_REFERENCE.md) | Exact deployed Gold field names and types |
 | [CP2_CORRECTED_MODEL_CANDIDATES_V5.md](CP2_CORRECTED_MODEL_CANDIDATES_V5.md) | Current corrected v5 model, newer evaluation and limits |
 | [WARRANTY_POLICY_RULES.md](WARRANTY_POLICY_RULES.md) | Owner-confirmed contractual eligibility rules |
-| [CP2_CALLBACK_RECORDING_GUIDE.md](CP2_CALLBACK_RECORDING_GUIDE.md) | Structured recording needed to improve labels and features |
+| [CP2_CALLBACK_RECORDING_GUIDE.md](CP2_CALLBACK_RECORDING_GUIDE.md) | New versioned recording templates, as-of feature validator and source-readiness requirements |
 | [CP2_ENVIRONMENTAL_FEATURE_NOTES.md](CP2_ENVIRONMENTAL_FEATURE_NOTES.md) | Weather, waterways, land-cover and flood-source interpretation |
 | [CP2_GOAL_COVERAGE_AUDIT.md](CP2_GOAL_COVERAGE_AUDIT.md) | Capstone requirements versus implemented evidence |
 | [CP2_PROJECT_HISTORY.md](CP2_PROJECT_HISTORY.md) | Historical checkpoints and implementation decisions |
