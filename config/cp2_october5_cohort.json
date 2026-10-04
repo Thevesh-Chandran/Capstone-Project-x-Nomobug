@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "name": "cp2_october5_2026",
+  "declared_at_utc": "2026-10-04T13:39:20.802416+00:00",
+  "cohort_start": "2026-10-05",
+  "cohort_end": "2026-10-27",
+  "earliest_final_evaluation_date": "2026-11-27",
+  "bundle_sha256": "6ace4314b4a5e170ea1bd6feee40dadbdd14eb3c986db9223d888b3c3ee302e0",
+  "target": "recorded_corrective_calendar_callback_within_30d",
+  "date_authority": "Calendar",
+  "eligibility": "Every matched paid service with a Calendar start date in 5–27 October 2026; one source-linked immutable score within five minutes after scheduled end and before the first local outcome day. No backfill, outcome-based exclusions, model refit or threshold tuning.",
+  "prior_cohorts": "Original, repaired and 1 October cloud cohorts remain separately recorded; this protocol does not repair their missing predictions.",
+  "known_operating_limit": "A service ending after its local start date cannot meet the unchanged pre-outcome-day score rule. It remains an eligible missed case if no timely score exists; no silent exclusion is allowed.",
+  "acceptance": "Complete source-derived outcomes and timely prediction for every eligible service; reject incomplete coverage. A completed result does not guarantee good accuracy.",
+  "record_sha256": "c42a803c7e09fe31c95f13750dc0e62a2b300b93dbe884e146502097869a00a2"
+}
