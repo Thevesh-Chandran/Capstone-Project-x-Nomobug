@@ -1,19 +1,22 @@
 {
   "schema_version": 1,
   "name": "cp2_october10_2026",
-  "declared_at_utc": "2026-10-09T01:56:07.822401+00:00",
+  "declared_at_utc": "2026-10-09T02:41:27.876604+00:00",
   "cohort_start": "2026-10-10",
-  "cohort_end": "2026-10-27",
-  "earliest_final_evaluation_date": "2026-11-27",
+  "cohort_end": "2026-10-30",
+  "earliest_final_evaluation_date": "2026-11-30",
   "bundle_sha256": "6ace4314b4a5e170ea1bd6feee40dadbdd14eb3c986db9223d888b3c3ee302e0",
   "target": "recorded_corrective_calendar_callback_within_30d",
   "date_authority": "Calendar",
   "timing_policy": "post_end_or_overnight_2345_v1",
-  "eligibility": "Every unique matched paid service in the unchanged frozen predictor population with Calendar start date 10–27 October. Unmatched/ambiguous/source-excluded appointments are tracked separately and never silently treated as eligible services or completed predictions.",
+  "eligibility": "Every unique matched paid service in the unchanged frozen predictor population with Calendar start date 10–30 October. Unmatched/ambiguous/source-excluded appointments are tracked separately and never silently treated as eligible services or completed predictions.",
   "prediction_timing": "Daytime: within five minutes after scheduled end. Overnight: within five minutes after 23:45 Malaysia time on the scheduled start date, using only information available then. Overnight scores concern a planned service and may precede its start. Never score after the first local outcome day begins.",
   "outcome_window": "Unchanged: Calendar callback dates 1–30 after the scheduled START date; never move the clock to the end date.",
   "acceptance": "Complete Calendar outcomes, stable eligibility, and one timely source-bound immutable prediction for every eligible service; reject incomplete coverage, altered protocol/model/source, or repeat evaluation.",
   "prior_cohorts": "All original protocols, predictions, missed timestamps and results remain unchanged; this prospective timing change does not repair them.",
   "limitations": "Predictions are experimental. Later cancellations or schedule/source changes require eligibility-drift review. External outages can still cause gaps. Overnight timing differs from the historical post-service collection contract; report its results separately.",
-  "record_sha256": "e4ba350f630df9a73a0f7089b83ffebcb53a449ac7852dde0e33fe1227bc9dc4"
+  "record_sha256": "29fb22ab9884595dd83173b362b882c8b868b76cfa3a4529381ceee62d8f0570",
+  "amendment": "precollection_extension_to_october30_v1",
+  "supersedes_protocol_sha256": "7224062bf8a41110769aa4d2b6d951aec4ccb562d00d6a5631301c4a3684a4d3",
+  "authorization": "Owner selected finish by 30 November; collect through 30 October, before collection started."
 }
