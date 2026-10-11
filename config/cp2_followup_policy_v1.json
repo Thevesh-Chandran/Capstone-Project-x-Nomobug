@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "declared_at_utc": "2026-10-11T04:41:50.208303+00:00",
+  "cohort_start": "2026-10-12",
+  "cohort_end": "2026-10-30",
+  "earliest_evaluation": "2026-11-30",
+  "rules": {
+    "review_fraction": 0.2,
+    "batch": "previous_local_day_all_eligible_services",
+    "decision_time": "08:00 Asia/Kuala_Lumpur next day",
+    "history_score": "prior_property_warranty_claims",
+    "missing_history": "rank_last_report_missing_count",
+    "tie_break": "sha256_json_canonical_population_sale_anchor_key",
+    "model_score": "challenger_all_history"
+  },
+  "collection_sha256": "1e951e5a112e6c6cd7ef8f3ce3050e5aae151e714c92762cce7b0454396e89a9",
+  "bundle_sha256": "6ace4314b4a5e170ea1bd6feee40dadbdd14eb3c986db9223d888b3c3ee302e0",
+  "code_sha256": "299fa1d7823e84699763c5540a07673f1bb67bc3eabab8e44194db50f4d8b3b9",
+  "ranking_code_sha256": "060a094f91e9f540af63721e784026f59947a47b109ce96c43e26b9604be231b",
+  "interpretation": "Predeclared supplementary policy simulation using prospective receipts; no staff actions or savings measured",
+  "acceptance": "Original full-cohort evaluation must pass; no missing, late or altered receipts; complete outcomes; one evaluation only",
+  "record_sha256": "44e3bbc7c7c31bb437523bbd46aae278cb47c11818ac3f2f5b9be0b7e27c7207"
+}
