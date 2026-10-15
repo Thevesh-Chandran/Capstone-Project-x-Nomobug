@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "name": "cp2_recovery_20261016",
+  "declared_at_utc": "2026-10-15T15:05:05.358740+00:00",
+  "cohort_start": "2026-10-16",
+  "cohort_end": "2026-10-30",
+  "earliest_final_evaluation_date": "2026-11-30",
+  "bundle_sha256": "6ace4314b4a5e170ea1bd6feee40dadbdd14eb3c986db9223d888b3c3ee302e0",
+  "target": "recorded_corrective_calendar_callback_within_30d",
+  "date_authority": "Calendar",
+  "parent_collection_protocol_sha256": "1e951e5a112e6c6cd7ef8f3ce3050e5aae151e714c92762cce7b0454396e89a9",
+  "timing_policy": "post_end_or_overnight_2345_v1",
+  "eligibility": "Every eligible service in the unchanged frozen predictor population with Calendar start date 16–30 October, including all districts and packages allowed by the frozen population. No selection by score or outcome.",
+  "acceptance": "Complete Calendar outcomes, unchanged eligibility, exact immutable source-bound timely receipt for every eligible service, pinned model and protocol hashes, one final evaluation. Reject missing or late predictions; never backfill.",
+  "prior_cohorts": "Original October 10 cohort and earlier cohorts remain visible and incomplete. This separate predeclared date interval does not repair their misses.",
+  "reason": "Source header deployment drift repaired and full cloud pipeline verified on 15 October; first complete local day after recovery is 16 October.",
+  "limitations": "Same frozen experimental model; a smaller future cohort may still have too few positive outcomes. Completion does not guarantee useful accuracy.",
+  "record_sha256": "22b0c6f7868c0a376f29f2560e1b263a66adf3c9ece1ca85c0f59eead268264b"
+}
