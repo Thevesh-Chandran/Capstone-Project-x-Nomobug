@@ -28,6 +28,7 @@ verification/
 /tmp/
 /outputs/
 /secrets/
+/infra/metabase/oracle/.runtime/
 
 # Local-only CP1 documents and authoring utilities
 /docs/
