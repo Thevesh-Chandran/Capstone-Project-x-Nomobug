@@ -188,6 +188,8 @@ Explain: of 100 later historical service windows, five had recorded callbacks; r
 
 Show the small-positive-sample uncertainty and first-service weakness prominently. The model's 93 predictors cover service/package stage, history, pests/premise/method, prior weather, terrain/water proximity and location uncertainty. Satellite/report flood and land-cover fractions were investigated but are not included in the selected frozen model. Neither chart filters nor DBSCAN radius recalculate model performance.
 
+Add a dated limitations text box: **“1 October follow-up: a separate 28–31 August retrospective check included 13 services and one callback; reviewing the top three found none. The sample is too small for dependable performance estimates. A 37-contract model comparison found no replacement that improved both development ranking quality and callback capture at the same review budget.”** Link [the broad model review](CP2_BROAD_MODEL_REVIEW.md). This later-period check uses a different historical fitting cutoff and is not a new metric in the existing `dashboard_ml_evaluation` view. Keep the 100/5 charts intact, label the follow-up separately, and do not pool the two cohorts or describe it as October prospective accuracy.
+
 Use a dated text statement for October prospective status only after checking the private audit. This Gold view does not contain live prediction counts or misses. Future accuracy remains pending until complete outcomes, no earlier than 27 November. Keep individual scores private. [Full explanation](CP2_MODEL_EXPLAINED.md).
 
 Action: decide whether further validation is worthwhile. No automatic warranty, customer-treatment or staff-assessment decision is supported.

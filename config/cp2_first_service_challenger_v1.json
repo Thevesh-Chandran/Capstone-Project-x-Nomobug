@@ -1,0 +1,31 @@
+{
+  "experiment": "cp2_first_service_challenger_v1",
+  "status": "development_and_previously_inspected_diagnostic_only",
+  "target": "recorded_corrective_calendar_callback_within_30d",
+  "frozen_bundle_sha256": "6ace4314b4a5e170ea1bd6feee40dadbdd14eb3c986db9223d888b3c3ee302e0",
+  "source_sha256": "eb5f0a85c207ab802b3ba99b2cb58b012980e93dc608d7fd9f1c6bbdb5ffdd24",
+  "source_relative_path": "outputs/cp2-v2/source_refresh_20260927/refreshed/dataset_input.json",
+  "forbidden_anchor_start": "2026-08-15",
+  "development_end_exclusive": "2026-01-01",
+  "development_folds": ["2025_q2", "2025_q3", "2025_q4"],
+  "model_contracts": {
+    "v5_control": {"first_positive_weight": 1, "features": "v5_targeted"},
+    "first_weight4": {"first_positive_weight": 4, "features": "v5_targeted"},
+    "first_weight8": {"first_positive_weight": 8, "features": "v5_targeted"},
+    "stage_reduced": {"first_positive_weight": 1, "features": "remove_package_stage_and_package_history"}
+  },
+  "classifier": "existing_et10_leaf5_300_trees_seed42_two_threads",
+  "review_fraction": 0.2,
+  "first_service_reserved_review_fractions": [0.0, 0.1, 0.25],
+  "review_budget_rule": "exact ceil(20% of services); ties resolved by canonical key order; reserve first-service slots then fill remaining slots globally",
+  "selection_rule": "mean development AP and mean total review recall at least control; maximize mean first-service recall, then total recall, AP; retain control if no strict first-service improvement",
+  "calibration": "monotonic Platt fit on development OOF only; calibrated development error is not independent evidence",
+  "diagnostic": "2026 before 15 August only; all such results exploratory; save selection before diagnostic scoring",
+  "limits": [
+    "Development folds have already been used in prior model selection.",
+    "Feature ideas are motivated by previously inspected first-service errors.",
+    "No August held-out result or October future-test outcome may select this challenger.",
+    "Frozen source retains documented historical cancellation-classification limitations.",
+    "Do not deploy or replace the frozen October model based on this experiment."
+  ]
+}
