@@ -3755,3 +3755,15 @@ body[data-route="models"] .page-header {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Business questions lead; evidence stays available on request. */
+.model-decision {border-left:4px solid #3984d7;margin-bottom:20px;min-width:0}
+.model-decision:nth-of-type(3) {border-left-color:#d79a32}
+.model-decision:nth-of-type(4) {border-left-color:#239888}
+.decision-question {font-size:20px;font-weight:600;line-height:1.5;margin:10px 0 20px}
+.decision-section {padding:12px 0;border-top:1px solid #e8edf3;max-width:900px}
+.decision-section h3 {font-size:13px;color:#52657b;margin:0 0 6px}
+.decision-section p {font-size:15px;line-height:1.65;margin:0;color:#26384c}
+.model-evidence {margin:24px 0;padding:18px;border:1px solid #dce5ef;border-radius:10px;background:#f5f8fc}
+.model-evidence>summary {cursor:pointer;font-weight:600}
+.model-evidence>div {padding-top:20px}

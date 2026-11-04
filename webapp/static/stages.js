@@ -499,8 +499,11 @@
           'row-sub',
         ),
       );
+      const history = link('Open customer history', '#customers', 'block-more');
+      history.addEventListener('click', () => sessionStorage.setItem('cp2_map_sale', c.sale_id));
+      main.append(history);
       const side = mk('div', undefined, 'row-side');
-      side.append(mk('span', pct(c.chance) + ' chance', 'row-value'));
+      side.append(mk('span', pct(c.chance) + ' estimated return risk', 'row-value'));
       if (c.outcome)
         side.append(mk('span', c.outcome.label, 'chip ' + (c.outcome.status === 'no_answer' ? '' : 'dark')));
       else
@@ -630,7 +633,7 @@
     return (
       pl.trim() +
       (pl ? ' ' : '') +
-      `${p.open_windows} services are inside their 30-day window. About ${nf.format(p.expected_returns_open)} return visits are expected from them; these ${p.check_ins.length} calls reach about ${nf.format(p.expected_returns_reached)} of them (${pct(p.share_reached)}). Scores use services recorded up to ${day(p.predictors_through)}.`
+      `${p.check_ins.length} eligible services are listed for review. Open a customer history, contact the customer, then save the result below. Risk estimates use service records through ${day(p.predictors_through)}; they are not confirmed return visits.`
     );
   }
 
@@ -1051,7 +1054,7 @@
     ['gap_missing', 'No earlier service recorded'],
     ['first_service', 'First service of a programme'],
   ];
-  function renderReturns(root) {
+  function renderReturnsEvidence(root) {
     const R = data.return_risk || {};
     root.replaceChildren();
     if (!R.evaluation) {
@@ -1125,9 +1128,8 @@
       stats.replaceChildren();
       if (p && p.status === 'live') {
         [
-          [nf.format(p.expected_returns_reached), 'estimated return cases in this list'],
-          [pct(p.share_reached), 'share of model estimates'],
-          [nf.format(p.check_ins.length), 'planned check-ins'],
+          [nf.format(p.check_ins.length), 'services ready to review'],
+          [nf.format((p.done || []).length), 'contacts already completed'],
         ].forEach(([v, l]) => {
           const d = mk('div');
           d.append(mk('strong', v), mk('span', l));
@@ -1335,6 +1337,56 @@
     return c;
   }
   function renderModels(root) {
+    root.replaceChildren();
+    const intro = block('Predictions: choose what you need help with');
+    intro.append(mk('p', 'Start with a business question. Open the matching tool to see current estimates and take the next step.', 'side-text'));
+    root.append(intro);
+    const E = (data.return_risk || {}).evaluation;
+    const forecasts = data.predictive.forecasts || [];
+    const add = (title, question, result, reliability, action, href, steps) => {
+      const card = block(title, { cls: 'model-decision' });
+      card.append(mk('p', question, 'decision-question'));
+      for (const [label, text] of [['What you get', result], ['How reliable is it?', reliability], ['What to do next', steps]]) {
+        const section = mk('div', undefined, 'decision-section');
+        section.append(mk('h3', label), mk('p', text)); card.append(section);
+      }
+      card.append(link(action, href, 'btn primary')); root.append(card);
+    };
+    add('1. Which customers may need another visit?',
+      'After a paid service, could this customer need a pest-related return visit within 30 days?',
+      'A risk estimate beside each recent service in Service follow-up. For example, 20% means an estimated chance, not a confirmed problem or warranty entitlement.',
+      E ? `Historical assessment: ${nf.format(E.services)} services, including ${nf.format(E.returns)} recorded returns. This is a ranking model, so it has no single yes/no accuracy percentage. Its historical ranking score was ${E.compare["Return-risk score (chosen)"].auc.toFixed(2)} out of 1; this is not a percentage of correctly predicted customers. Reliability on future services is still being checked.` : 'Assessment unavailable for this release.',
+      'Open customer follow-up', '#returns',
+      'Review the service history, contact the customer using normal company practice, record the response, and open the booking calendar if another visit is needed. Everyone remains available for follow-up; the score is supporting context.');
+    for (const [id, title, question, unit, action] of [
+      ['booking_entries_h2', '2. How busy might the next two weeks be?', 'How many appointment bookings are expected over the next two weeks?', 'bookings', 'Open workload planning'],
+      ['booked_hours_h1', '3. How many appointment hours should we plan for?', 'How many appointment hours are expected next week?', 'hours', 'Compare workload and team capacity']]) {
+      const f = forecasts.find(x => x.id === id); if (!f) continue;
+      add(title, question, `Latest saved estimate: about ${nf.format(f.prediction)} ${unit}. Open planning to check its forecast dates and source freshness before using it.`,
+        `In historical tests, the forecast missed by ${nf.format(f.mae)} ${unit} on average, compared with ${nf.format(f.baseline_mae)} for a simple average. Lower error is better. This is not a guaranteed range or a classification accuracy percentage.`,
+        'Open booking calendar', '#plan', 'Choose the Weekly workload tab. Compare the forecast with bookings already in the calendar and the capacity staff have confirmed. Use that comparison to discuss cover; no roster or booking is changed automatically.');
+    }
+    const evidence = mk('details', undefined, 'model-evidence');
+    evidence.append(mk('summary', 'See test results, older experiments and monthly checks'));
+    const body = mk('div'); renderModelsEvidence(body); evidence.append(body); root.append(evidence);
+  }
+
+  function renderReturns(root) {
+    renderReturnsEvidence(root);
+    if (!(data.return_risk || {}).evaluation) return;
+    const heading = block('Customer follow-up: review, contact, record');
+    heading.append(mk('p', 'The list below contains current service records and estimated chances of a pest-related return within 30 days. It does not confirm that a customer has a problem.', 'side-text'));
+    heading.append(link('Understand this model and its reliability', '#models', 'block-more'));
+    root.firstElementChild.replaceWith(heading);
+    const extra = Array.from(root.children).slice(2);
+    if (extra.length) {
+      const details = mk('details', undefined, 'model-evidence');
+      details.append(mk('summary', 'Historical test charts and explanation'));
+      extra.forEach(node => details.append(node)); root.append(details);
+    }
+  }
+
+  function renderModelsEvidence(root) {
     root.replaceChildren();
     const R = data.return_risk || {},
       E = R.evaluation;
