@@ -28,6 +28,17 @@ ROOT = Path(__file__).resolve().parents[1]
 PROJECT = "profound-keel-500007-s4"
 LOCATION = "asia-southeast1"
 LIMIT = 100 * 1024 * 1024
+MANAGEMENT_GOLD_VIEWS = frozenset({
+    "sales_monthly_recorded", "payments_monthly_recorded", "prospect_reply_monthly_recorded",
+    "dashboard_service_monthly", "dashboard_scheduling_capacity", "dashboard_recurrence_monthly",
+    "dashboard_spatial_area", "dashboard_spatial_cluster_summary", "dashboard_weather_monthly",
+    "dashboard_package_fit_matrix", "dashboard_payment_link_monthly", "dashboard_refund_monthly",
+    "dashboard_source_freshness", "dashboard_data_quality", "dashboard_ml_evaluation",
+    "dashboard_recurring_payment_quality", "dashboard_recurring_reminder_schedule",
+    "dashboard_model_review", "dashboard_feature_comparison",
+    "dashboard_followup_baselines", "dashboard_attention",
+    "dashboard_upcoming_appointments",
+})
 COLLECTOR_PRINCIPAL = f"cp2-prospective-job@{PROJECT}.iam.gserviceaccount.com"
 SNAPSHOT_LIMIT = 64  # Bounded through October with existing history; stop for review.
 BASELINE_CALENDAR = "calendar_events_78147d417f3d97d3c1d9ef0be59638fd7850e4195108e1fc7b879483c7f35b66"
@@ -266,6 +277,26 @@ def verify_live_warranty_reviews(client: bigquery.Client, stage_prefix: str) -> 
     rows = list(client.query(query, job_config=settings, location=LOCATION).result(timeout=120))
     if len(rows) != 1 or rows[0]["mismatches"]:
         raise ValueError("Stable warranty review overrides differ from candidate seed")
+
+
+def verify_management_privacy(client: bigquery.Client, inventory: list[tuple[str, str, str]]) -> None:
+    """Reject identity/contact fields in the explicitly approved management sources.
+
+    Other Gold objects are restricted intermediates, not dashboard sources.
+    This schema gate does not certify viewer permissions or value-level privacy.
+    """
+    forbidden = re.compile(
+        r"(^|_)(?:phone|email|customer_name|client_name|sales_record_id|event_id|"
+        r"calendar_event_row|address_hash|property_group_key|address|bank|account_number|"
+        r"description|individual_risk|risk_probability)(_|$)", re.IGNORECASE)
+    def inspect(fields):
+        for field in fields:
+            if forbidden.search(field.name):
+                raise ValueError("Private field in management source: " + field.name)
+            inspect(field.fields)
+    for schema, name, candidate in inventory:
+        if schema == "gold" and name in MANAGEMENT_GOLD_VIEWS:
+            inspect(client.get_table(f"{PROJECT}.{candidate}.{name}").schema)
 
 
 def promote(client: bigquery.Client, inventory: list[tuple[str, str, str]], run_dir: Path) -> None:
