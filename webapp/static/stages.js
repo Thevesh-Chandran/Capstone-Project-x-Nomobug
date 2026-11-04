@@ -653,11 +653,11 @@
       o = live ? rplan.outcomes : null;
     const intro = mk('section', undefined, 'solution-intro');
     intro.append(
-      mk('span', 'SERVICE FOLLOW-UP', 'solution-kicker'),
-      mk('h1', 'A clear next step after each service'),
+      mk('span', 'NOMOBUG', 'solution-kicker'),
+      mk('h1', 'Workspace'),
       mk(
         'p',
-        'Review the service record, use return-risk estimates as context, then record what the customer says.',
+        'Recent services, customer follow-up and booking plans.',
         'solution-lead',
       ),
     );
@@ -665,18 +665,6 @@
     actions.append(link('Open service follow-up', '#returns', 'btn btn-dark'));
     intro.append(actions);
     root.append(intro);
-    const flow = mk('ol', undefined, 'solution-flow');
-    [
-      ['01', 'Review', 'Bring the purchase and service history together.'],
-      ['02', 'Follow up', 'Check for problems and decide whether another visit is needed.'],
-      ['03', 'Record', 'Save the result so the team can see what happened.'],
-    ].forEach(([n, t, d]) => {
-      const li = mk('li');
-      li.append(mk('b', n), mk('div'));
-      li.lastChild.append(mk('strong', t), mk('span', d));
-      flow.append(li);
-    });
-    root.append(flow);
     const layout = mk('div', undefined, 'solution-grid');
     const main = mk('div'),
       side = mk('aside');
