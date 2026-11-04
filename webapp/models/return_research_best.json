@@ -1,0 +1,27 @@
+{
+  "candidate": {
+    "horizon": 60,
+    "target": "final_paid_service",
+    "population": "residential",
+    "features": "service",
+    "model": "lr_c1.0_plain",
+    "folds": 4,
+    "services": 937,
+    "positive_windows": 319,
+    "TP": 295,
+    "FP": 453,
+    "FN": 24,
+    "TN": 165,
+    "pooled_precision": 0.39438502673796794,
+    "pooled_recall": 0.9247648902821317,
+    "pooled_f1": 0.5529522024367385,
+    "pooled_accuracy": 0.49092849519743864,
+    "always_no_return_accuracy": 0.6595517609391676,
+    "mean_ap": 0.43345331563632267,
+    "mean_brier": 0.21313579517549297,
+    "mean_baseline_brier": 0.22732844118233214
+  },
+  "selection": "Highest pooled F1 among supported historical target-search candidates; not highest accuracy",
+  "source_sha256": "db50d80abd0e6fc66cfb5b6c5ad4f787ee55068134377e25587e055e363b1bd7",
+  "status": "Research only: current-source rebuild and a new future evaluation required before deployment"
+}

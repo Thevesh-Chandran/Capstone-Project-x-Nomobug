@@ -17,3 +17,6 @@ scripts/build_cp2_decision_support.py text eol=lf
 scripts/evaluate_cp2_followup_policy.py text eol=lf
 # This declaration was hashed with Windows newlines; preserve its exact bytes.
 config/cp2_followup_policy_v1.json -text
+
+# Preserve the declared pilot configuration bytes.
+webapp/models/checkin_pilot_v1.json -text

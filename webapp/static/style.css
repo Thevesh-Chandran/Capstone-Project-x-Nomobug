@@ -568,3 +568,31 @@ body:has(#login:not([hidden])) .main{margin:0;padding:0}
 .side-nav a[aria-current=page]{font-weight:600}
 .table-wrap{overflow-x:auto}.block-more{flex-shrink:0}
 .booking-tabs{display:flex!important;gap:8px;margin-bottom:16px}
+.factors{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.factors li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 12px;border-radius:10px;font-size:13px;background:var(--tint)}
+.factors li.up{background:var(--sky-wash)}
+.factors li b{font-variant-numeric:tabular-nums;font-weight:600;padding:2px 9px;border-radius:999px;background:#fff;border:1px solid var(--line)}
+.factors li.up b{background:var(--ink);color:var(--sky-2);border-color:var(--ink)}
+.idea-title{display:block;font-weight:600}
+body[data-route=returns] .page-header{display:none}
+.plan-ctl{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;margin:4px 0 12px;padding:14px 16px;border-radius:12px;background:var(--sky-wash);border:1px solid var(--sky-soft)}
+.plan-calls{display:flex;align-items:center;gap:12px;font-size:13px;font-weight:600;color:var(--ink);margin:0}
+.plan-calls input{width:220px}
+.plan-calls output{min-width:28px;text-align:center;font-variant-numeric:tabular-nums;font-weight:700;padding:3px 8px;border-radius:999px;background:var(--ink);color:var(--sky-2)}
+.plan-stats{display:flex;gap:22px;flex-wrap:wrap}
+.plan-stats div{display:flex;flex-direction:column}
+.plan-stats strong{font-size:20px;font-weight:600;font-variant-numeric:tabular-nums}
+.plan-stats span{font-size:12px;color:var(--muted)}
+/* check-in results: the implementation log for the return-visit plan */
+.crow{padding:12px 20px}
+.crow-top{display:flex;align-items:center;gap:12px}
+.crow-top .row-main{flex:1;min-width:0}
+.crow-form{display:grid;grid-template-columns:minmax(150px,210px) 1fr 76px auto;gap:8px;align-items:center;margin:10px 0 0 48px}
+.crow-form input,.crow-form select{min-height:32px;padding:5px 10px}
+.crow-msg{grid-column:1/-1;font-size:12px;color:var(--muted);min-height:0}
+.crow-msg:empty{display:none}
+.crow.is-done{background:var(--sky-wash)}
+.checkin-log{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.checkin-log .sub-head{font-size:13px;font-weight:600;margin:0 0 10px}
+@media (max-width:640px){.crow-form{grid-template-columns:1fr;margin-left:0}}
+.crow-divider{padding:10px 20px 6px;font-size:12px;font-weight:600;color:var(--muted);border-top:1px solid var(--line);background:var(--sky-wash)}
