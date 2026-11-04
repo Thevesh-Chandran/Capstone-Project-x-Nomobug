@@ -192,3 +192,45 @@ def test_live_freshness_uses_source_capture_on_quiet_service_days(tmp_path):
     (tmp_path / rr.PREDICTORS).write_text(json.dumps(export))
     assert rr.live(tmp_path, {}, date(2026, 11, 12))['status'] == 'live'
     assert rr.live(tmp_path, {}, date(2026, 11, 16))['status'] == 'stale'
+
+
+def test_dashboard_link_defaults_to_looker_and_accepts_only_https(monkeypatch):
+    from webapp import server
+    monkeypatch.delenv('CP2_DASHBOARD_URL', raising=False)
+    assert server.dashboard_url() == server.REPORT
+    monkeypatch.setenv('CP2_DASHBOARD_URL', 'https://metabase.example.org/dashboard/1')
+    assert server.dashboard_url() == 'https://metabase.example.org/dashboard/1'
+    monkeypatch.setenv('CP2_DASHBOARD_URL', 'javascript:alert(1)')
+    assert server.dashboard_url() == server.REPORT
+
+
+def test_monitor_uses_only_complete_months_and_flags_drift():
+    rows = []
+    for month, n_ret in (('2026-07', 4), ('2026-08', 4), ('2026-09', 4), ('2026-10', 4)):
+        for i in range(40):
+            first = i % 2 == 0
+            rows.append(_row(f'{month}-{i}', f'{month}-15', service=1 if first else 3, premise='COMMERCIAL' if first else 'RESIDENTIAL',
+                             warranty_signal_within_30d=1 if (not first and i < 2 * n_ret) else 0))
+    out = rr.monitor(rows, date(2026, 11, 4))
+    assert [m['month'] for m in out['months']] == ['2026-07', '2026-08', '2026-09']   # October not complete
+    assert out['recent']['returns'] == 12 and out['recent']['auc'] > 0.7
+    assert out['status'] in ('ok', 'check')
+    assert abs(out['recent']['count_factor'] - 12 / out['recent']['expected']) < 0.01
+    rr.validate_monitor(out)
+    with pytest.raises(ValueError):
+        rr.validate_monitor({'model_version': 'other'})
+
+
+def test_auc_counts_ties_as_half():
+    assert rr._auc([1, 0], [0.9, 0.1]) == 1.0
+    assert rr._auc([1, 0], [0.5, 0.5]) == 0.5
+    assert rr._auc([0, 0], [0.1, 0.2]) is None
+
+
+def test_monitor_rejects_missing_labels_and_duplicate_services():
+    row = _row('synthetic', '2026-08-15', warranty_signal_within_30d=1)
+    with pytest.raises(ValueError, match='Duplicate'):
+        rr.monitor([row, row], date(2026, 11, 4))
+    row['warranty_signal_within_30d'] = None
+    with pytest.raises(ValueError, match='verified binary'):
+        rr.monitor([row], date(2026, 11, 4))
