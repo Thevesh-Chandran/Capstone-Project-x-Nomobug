@@ -40,7 +40,7 @@ MANAGEMENT_GOLD_VIEWS = frozenset({
     "dashboard_upcoming_appointments",
 })
 COLLECTOR_PRINCIPAL = f"cp2-prospective-job@{PROJECT}.iam.gserviceaccount.com"
-SNAPSHOT_LIMIT = 64  # Bounded through October with existing history; stop for review.
+SNAPSHOT_LIMIT = 96  # Reviewed 4 Nov: bounded daily retention through November; stop for review.
 BASELINE_CALENDAR = "calendar_events_78147d417f3d97d3c1d9ef0be59638fd7850e4195108e1fc7b879483c7f35b66"
 BASELINE_GEOCODES = "calendar_event_geocodes_all_v2"
 TAB_VARS = {"B2B FOLLOW UP": "b2b_snapshot_table", "SALES": "sales_snapshot_table",
@@ -163,7 +163,9 @@ def snapshot_preflight(client: bigquery.Client, items: list[dict]) -> None:
     existing = {table.table_id for table in client.list_tables(dataset)}
     for item in items:
         name = item["table_name"]
-        if name not in existing and sum(x.startswith(item["prefix"] + "_") for x in existing) >= SNAPSHOT_LIMIT:
+        snapshot_pattern = re.compile(re.escape(item["prefix"]) + r"_[0-9a-f]{64}")
+        snapshot_count = sum(snapshot_pattern.fullmatch(x) is not None for x in existing)
+        if name not in existing and snapshot_count >= SNAPSHOT_LIMIT:
             raise ValueError(f"Snapshot retention review required for {item['prefix']}")
 
 

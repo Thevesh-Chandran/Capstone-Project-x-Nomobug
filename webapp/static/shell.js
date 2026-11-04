@@ -17,7 +17,8 @@ const I={
  areas:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/>'};
 // Operational tools stay prominent; source browsing and research are secondary.
 const NAV=[
- {views:[['today','Today'],['returns','Return-visit risk'],['home','Follow-ups'],['plan','Booking calendar'],['/maps','Sales & return maps','maps'],['customers','Customer history']]},
+ {views:[['today','Workspace'],['returns','Service follow-up']]},
+ {label:'Supporting tools',views:[['home','Payment reminders'],['plan','Booking calendar'],['/maps','Sales & return maps','maps'],['customers','Customer history']]},
  {label:'Reporting',views:[['dashboard','Sales dashboard']]},
  {label:'Research',views:[['status','Forecasts & model evidence'],['risk','Warranty-risk research']]}
 ];
