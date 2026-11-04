@@ -596,3 +596,25 @@ body[data-route=returns] .page-header{display:none}
 .checkin-log .sub-head{font-size:13px;font-weight:600;margin:0 0 10px}
 @media (max-width:640px){.crow-form{grid-template-columns:1fr;margin-left:0}}
 .crow-divider{padding:10px 20px 6px;font-size:12px;font-weight:600;color:var(--muted);border-top:1px solid var(--line);background:var(--sky-wash)}
+
+/* Service follow-up workspace */
+.solution-intro{padding:8px 0 24px;border-bottom:1px solid var(--line-2);margin-bottom:20px}
+.solution-kicker{display:block;font-size:11px;letter-spacing:.09em;color:var(--blue);font-weight:650;margin-bottom:10px}
+.solution-intro h1{font-size:34px;letter-spacing:-.035em;max-width:760px}
+.solution-lead{max-width:720px;margin-top:12px;color:var(--muted);font-size:15px;line-height:1.65}
+.solution-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.solution-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));list-style:none;padding:0;margin:0 0 24px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.solution-flow li{display:flex;gap:14px;padding:20px;align-items:flex-start}
+.solution-flow li+li{border-left:1px solid var(--line)}
+.solution-flow li>b{font-size:12px;color:var(--blue);background:var(--sky-soft);border-radius:6px;padding:5px 8px}
+.solution-flow strong,.solution-flow span{display:block}.solution-flow strong{font-size:14px;margin-bottom:5px}.solution-flow span{font-size:12px;color:var(--muted)}
+.solution-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(260px,1fr);gap:22px;align-items:start}
+.solution-grid>div,.solution-grid>aside{min-width:0}
+.connection-state{margin:0 0 18px;padding:18px 20px;border-left:3px solid #cf982a;background:#fffbf0;border-radius:6px}
+.connection-state.connected{border-color:var(--blue);background:var(--sky-wash)}
+.connection-state strong{display:block;font-size:14px}.connection-state p{font-size:12px;color:var(--muted);margin-top:6px}
+.evidence-summary{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:12px;margin:4px 0 20px}
+.evidence-summary dt{font-size:25px;font-weight:650;color:var(--ink)}.evidence-summary dd{font-size:12px;color:var(--muted);margin:0}
+.plan-calls select{min-width:210px;max-width:100%}
+@media(max-width:1100px){.solution-grid{grid-template-columns:1fr}.solution-intro h1{font-size:29px}}
+@media(max-width:700px){.solution-flow{grid-template-columns:1fr}.solution-flow li+li{border-left:0;border-top:1px solid var(--line)}}

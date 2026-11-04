@@ -13,7 +13,7 @@ import hashlib
 import json
 import math
 import os
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 MODEL_FILE = Path(__file__).parent / 'models' / 'return_risk_v1.json'
@@ -218,7 +218,8 @@ def record(folder, sale_id, serviced, status, note, as_of: date, minutes=None) -
     else:
         minutes = None
     path = Path(folder) / PREDICTORS
-    rows = validate_predictors(json.loads(path.read_text(encoding='utf-8')))
+    export = json.loads(path.read_text(encoding='utf-8'))
+    rows = validate_predictors(export)
     row = next((r for r in rows if str(r.get('sales_record_id')) == str(sale_id)
                 and str(r.get('anchor_date'))[:10] == str(serviced)[:10]), None)
     if row is None:
@@ -261,13 +262,18 @@ def live(folder, value: dict, as_of: date, calls: int = DEFAULT_CALLS, log: dict
     if not path.exists():
         return {'status': 'not_connected',
                 'message': 'Live scoring needs the predictor export from the reporting job (return_risk_predictors.json).'}
-    rows = validate_predictors(json.loads(path.read_text(encoding='utf-8')))
+    export = json.loads(path.read_text(encoding='utf-8'))
+    rows = validate_predictors(export)
     latest = max((str(r.get('anchor_date'))[:10] for r in rows), default=None)
     pilot = load_pilot() if os.environ.get('CP2_CHECKIN_PILOT_APPROVED') == 'yes' else None
     result = plan(rows, as_of, calls, _names(value), log=log, pilot=pilot)
     result['pilot_approval_required'] = pilot is None
+    captured = export.get('captured_at')
+    freshness_date = datetime.fromisoformat(captured.replace('Z', '+00:00')).date() if captured else (date.fromisoformat(latest) if latest else None)
+    age = (as_of - freshness_date).days if freshness_date else None
     result.update({'status': 'live', 'predictors_through': latest,
-                   'stale': bool(latest) and (as_of - date.fromisoformat(latest)).days > 3})
+                   'captured_at': captured, 'source_release_id': export.get('source_release_id'),
+                   'stale': age is None or age < 0 or age > 3})
     if result['stale']:
         result.update(status='stale', message='Service predictors need refreshing before using a check-in plan.')
     return result

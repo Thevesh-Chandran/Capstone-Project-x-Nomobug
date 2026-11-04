@@ -195,7 +195,9 @@ def handler_for(portal):
                 loaded=self.business_data()
                 if loaded is None:return
                 from webapp import return_risk,predictions
-                try:calls=max(0,min(60,int(parse_qs(urlsplit(self.path).query).get('calls',[return_risk.DEFAULT_CALLS])[0])))
+                try:
+                    requested_calls=parse_qs(urlsplit(self.path).query).get('calls',['all'])[0]
+                    calls=10000 if requested_calls=='all' else max(0,min(60,int(requested_calls)))
                 except ValueError:return self.respond(400,{'error':'Calls must be a whole number from 0 to 60'})
                 try:log,generation=portal.action_store.load();available=True
                 except Exception:log,generation,available=None,None,False

@@ -183,3 +183,12 @@ def test_live_does_not_hide_comparison_customers_without_owner_agreement(tmp_pat
     result = rr.live(tmp_path, {}, date(2026, 11, 12), calls=40)
     assert result['pilot'] is None and result['pilot_approval_required']
     assert len(result['check_ins']) == 20
+
+
+def test_live_freshness_uses_source_capture_on_quiet_service_days(tmp_path):
+    rows = [_row('H1', '2026-11-02')]
+    export = {'columns': list(rows[0]), 'records': rows,
+              'captured_at': '2026-11-12T00:00:00+00:00', 'source_release_id': 'example'}
+    (tmp_path / rr.PREDICTORS).write_text(json.dumps(export))
+    assert rr.live(tmp_path, {}, date(2026, 11, 12))['status'] == 'live'
+    assert rr.live(tmp_path, {}, date(2026, 11, 16))['status'] == 'stale'

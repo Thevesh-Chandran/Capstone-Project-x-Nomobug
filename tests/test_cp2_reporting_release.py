@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from types import SimpleNamespace
 
 import pytest
 
@@ -139,3 +140,17 @@ def test_reporting_release_rejects_warranty_review_seed_drift(monkeypatch):
     client.mismatches = 1
     with pytest.raises(ValueError, match="differ"):
         release.verify_live_warranty_reviews(client, prefix)
+
+
+def test_snapshot_retention_counts_exact_source_not_payment_sidecars():
+    existing = [f"payments_{n:064x}" for n in range(32)]
+    existing += [f"payments_date_serials_{n:064x}" for n in range(32)]
+    client = SimpleNamespace(
+        get_dataset=lambda _: SimpleNamespace(location=release.LOCATION, default_table_expiration_ms=None),
+        list_tables=lambda _: [SimpleNamespace(table_id=name) for name in existing])
+    item = {"prefix": "payments", "table_name": "payments_" + "f" * 64}
+    release.snapshot_preflight(client, [item])
+    existing.extend(f"payments_{n:064x}" for n in range(32, release.SNAPSHOT_LIMIT))
+    with pytest.raises(ValueError, match="Snapshot retention review required for payments"):
+        release.snapshot_preflight(client, [item])
+    release.snapshot_preflight(client, [{"prefix": "payments", "table_name": existing[0]}])
