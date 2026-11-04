@@ -27,6 +27,27 @@ STATIC=Path(__file__).parent/'static'
 REPORT='https://datastudio.google.com/embed/reporting/590914e8-066b-4671-a130-7a62a3af435a/page/NCy8F'
 
 
+def dashboard_url():
+    """The business dashboard staff are sent to. Looker Studio by default; set
+    CP2_DASHBOARD_URL to another https address (for example Metabase) to switch."""
+    url=os.environ.get('CP2_DASHBOARD_URL','').strip()
+    return url if url.startswith('https://') else REPORT
+
+
+def google_calendar_url():
+    """Embed address for the teams' Google Calendars, or None when not configured.
+
+    CP2_GOOGLE_CALENDAR_IDS is a comma-separated list of calendar IDs. The embed only
+    shows events to a viewer whose own Google account already has access to them."""
+    import re
+    from urllib.parse import quote
+    ids=[i.strip() for i in os.environ.get('CP2_GOOGLE_CALENDAR_IDS','').split(',') if i.strip()]
+    ids=[i for i in ids if re.fullmatch(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+',i)][:10]
+    if not ids:return None
+    return ('https://calendar.google.com/calendar/embed?ctz=Asia%2FKuala_Lumpur&mode=WEEK&showPrint=0&showTitle=0'
+            +''.join('&src='+quote(i,safe='') for i in ids))
+
+
 def dashboard_asset_origin():
     origin=os.environ.get('CP2_DASHBOARD_ASSET_ORIGIN','https://cp2-dashboard-thevesh20-3384s-projects.vercel.app').rstrip('/')
     # This source can execute scripts in the authenticated page: never accept
@@ -100,7 +121,7 @@ class Portal:
         snapshot=data.load_snapshot(self.folder)
         registry=json.loads((ROOT/'config/cp2_model_current.json').read_text())
         return {'snapshot':snapshot,'totals':data.totals(snapshot),'areas':public_area(self.folder),
-            'model':registry,'dashboard_url':REPORT,'system':{
+            'model':registry,'dashboard_url':dashboard_url(),'dashboard_embed':dashboard_url()==REPORT,'google_calendar_url':google_calendar_url(),'system':{
                 'website':'running','auth_mode':os.environ.get('CP2_AUTH_MODE','staff_code'),'data_mode':os.environ.get('CP2_DATA_MODE','snapshot'),
                 'last_refresh_error':self.last_refresh_error,
                 'observed_at_utc':datetime.now(timezone.utc).isoformat(),
@@ -136,7 +157,7 @@ def handler_for(portal):
             self.send_header('Referrer-Policy','no-referrer')
             assets = dashboard_asset_origin() if urlsplit(self.path).path == '/reports' else ''
             extra = ' '+assets if assets else ''
-            self.send_header('Content-Security-Policy',f"default-src 'self'; script-src 'self'{extra}; style-src 'self'{extra}; img-src 'self' data:; connect-src 'self'; frame-src https://datastudio.google.com https://lookerstudio.google.com; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
+            self.send_header('Content-Security-Policy',f"default-src 'self'; script-src 'self'{extra}; style-src 'self'{extra}; img-src 'self' data:; connect-src 'self'; frame-src https://datastudio.google.com https://lookerstudio.google.com https://calendar.google.com; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
         def respond(self,status,body,ctype='application/json; charset=utf-8',cookie=None):
             raw=json.dumps(body,default=data.json_default,allow_nan=False).encode() if isinstance(body,(dict,list)) else body
             self.send_response(status);self.headers_secure();self.send_header('Content-Type',ctype)
@@ -418,8 +439,21 @@ def handler_for(portal):
                 search=search.casefold().strip()[:120]
                 customers=value['customers']
                 if search: customers=[c for c in customers if search in c['name'].casefold() or any(search in str(s['sale_id']).casefold() for s in c['sales'])]
-                customers=sorted(customers,key=lambda c:c['sales_rm'],reverse=True)
-                return self.respond(200,{'customers':customers[:50],'matching_groups':len(customers),'receipt':value['receipt']})
+                # Filter by relationship and choose the order; the summary describes every matching group.
+                kind=payload.get('relationship','all')
+                keep={'all':lambda c:True,'repeat':lambda c:bool(c.get('repeat_customer')),
+                      'single':lambda c:not c.get('repeat_customer') and c.get('identity_status')!='needs_review',
+                      'review':lambda c:c.get('identity_status')=='needs_review'}.get(kind)
+                if keep is None:return self.respond(400,{'error':'Choose a valid customer group'})
+                customers=[c for c in customers if keep(c)]
+                order={'sales':(lambda c:-c['sales_rm']),'programmes':(lambda c:(-c.get('purchase_count',0),-c['sales_rm'])),
+                       'name':(lambda c:c['name'].casefold())}.get(payload.get('sort','sales'))
+                if order is None:return self.respond(400,{'error':'Choose a valid order'})
+                customers=sorted(customers,key=order)
+                summary={'groups':len(customers),'sales_rm':round(sum(c['sales_rm'] for c in customers),2),
+                         'repeat':sum(1 for c in customers if c.get('repeat_customer')),
+                         'needs_review':sum(1 for c in customers if c.get('identity_status')=='needs_review')}
+                return self.respond(200,{'customers':customers[:50],'matching_groups':len(customers),'summary':summary,'receipt':value['receipt']})
             if path=='/api/assistant':return self.respond(410,{'error':'The AI assistant has been removed'})
             return self.respond(404,{'error':'Not found'})
     return Handler

@@ -90,8 +90,21 @@ def pull(uri,folder,session=None):
     except (OSError,ValueError,KeyError,__import__('requests').RequestException):
         pass  # Keep last-good predictors; the page shows their date.
 
+    # Monthly accuracy check of the return-visit model (small JSON, optional).
+    try:
+        name='return_risk_monitor.json';obj='/'.join(filter(None,[prefix,name]))
+        r=session.get(f'https://storage.googleapis.com/storage/v1/b/{quote(bucket,safe="")}/o/{quote(obj,safe="")}?alt=media',timeout=15)
+        if r.status_code!=404:
+            r.raise_for_status()
+            if len(r.content)>256*1024:raise ValueError('Return-risk monitor too large')
+            from webapp.return_risk import validate_monitor
+            validate_monitor(json.loads(r.content))
+            temp=folder/(name+'.next');temp.write_bytes(r.content);os.replace(temp,folder/name)
+    except (OSError,ValueError,KeyError,__import__('requests').RequestException):
+        pass  # Keep the last good check.
+
 def publish_business(uri,folder,session=None,name='business_snapshot.json'):
-    if name not in ('business_snapshot.json','business_tools_private.json','booking_schedule_private.json','return_risk_predictors.json'):raise ValueError('Unapproved runtime snapshot')
+    if name not in ('business_snapshot.json','business_tools_private.json','booking_schedule_private.json','return_risk_predictors.json','return_risk_monitor.json'):raise ValueError('Unapproved runtime snapshot')
     bucket,prefix=location(uri);session=session or authorized_session()
     filename=name
     name='/'.join(filter(None,[prefix,name]))

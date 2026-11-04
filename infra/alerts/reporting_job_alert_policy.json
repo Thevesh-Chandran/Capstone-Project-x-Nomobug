@@ -1,0 +1,45 @@
+{
+  "displayName": "CP2 daily reporting job failed or did not succeed for 26 hours",
+  "documentation": {
+    "content": "The daily reporting job (cp2-reporting-daily) failed or has not succeeded for 26 hours. The website keeps showing the last approved data and marks it as needing a refresh. Check the latest execution log, then the planning/ runbooks.",
+    "mimeType": "text/markdown"
+  },
+  "combiner": "OR",
+  "conditions": [
+    {
+      "displayName": "A reporting execution failed",
+      "conditionThreshold": {
+        "filter": "resource.type = \"cloud_run_job\" AND resource.labels.job_name = \"cp2-reporting-daily\" AND metric.type = \"run.googleapis.com/job/completed_execution_count\" AND metric.labels.result = \"failed\"",
+        "aggregations": [
+          {
+            "alignmentPeriod": "3600s",
+            "perSeriesAligner": "ALIGN_SUM"
+          }
+        ],
+        "comparison": "COMPARISON_GT",
+        "thresholdValue": 0,
+        "duration": "0s"
+      }
+    },
+    {
+      "displayName": "No successful reporting execution for 26 hours",
+      "conditionThreshold": {
+        "filter": "resource.type = \"cloud_run_job\" AND resource.labels.job_name = \"cp2-reporting-daily\" AND metric.type = \"run.googleapis.com/job/completed_execution_count\" AND metric.labels.result = \"succeeded\"",
+        "aggregations": [
+          {
+            "alignmentPeriod": "86400s",
+            "perSeriesAligner": "ALIGN_SUM"
+          }
+        ],
+        "comparison": "COMPARISON_LT",
+        "thresholdValue": 1,
+        "duration": "7200s",
+        "evaluationMissingData": "EVALUATION_MISSING_DATA_ACTIVE"
+      }
+    }
+  ],
+  "alertStrategy": {
+    "autoClose": "604800s"
+  },
+  "enabled": true
+}

@@ -18,6 +18,7 @@ from pathlib import Path
 
 MODEL_FILE = Path(__file__).parent / 'models' / 'return_risk_v1.json'
 PREDICTORS = 'return_risk_predictors.json'
+MONITOR = 'return_risk_monitor.json'  # monthly accuracy check, written by scripts/monitor_return_risk.py
 WINDOW_DAYS = 30
 CHECK_IN_DAY = 10          # most recorded return calls arrive in the third and fourth week
 DEFAULT_CALLS = 10         # weekly check-in capacity used until staff change it
@@ -257,7 +258,82 @@ def validate_predictors(raw: dict) -> list[dict]:
     return [dict(zip(cols, r)) if isinstance(r, list) else r for r in raw['records']]
 
 
+def _auc(labels: list[int], scores: list[float]) -> float | None:
+    """Area under the ROC curve: the chance a real return is ranked above a non-return (ties count half)."""
+    pos = [s for y, s in zip(labels, scores) if y]
+    neg = [s for y, s in zip(labels, scores) if not y]
+    if not pos or not neg:
+        return None
+    wins = sum((p > n) + 0.5 * (p == n) for p in pos for n in neg)
+    return wins / (len(pos) * len(neg))
+
+
+def monitor(rows: list[dict], as_of: date, model: dict | None = None) -> dict:
+    """Monthly check of the frozen model on services whose 30-day window has closed.
+
+    For each month: services, recorded returns, the model's expected returns and its ranking (AUC).
+    The last three complete months decide the status and a count correction: multiply the model's
+    expected totals by `count_factor` (ranking is unchanged)."""
+    m = model or load_model()
+    months: dict[str, dict] = {}
+    seen = set()
+    for r in rows:
+        served = date.fromisoformat(str(r.get('anchor_date'))[:10])
+        nxt = date(served.year + served.month // 12, served.month % 12 + 1, 1)
+        if (as_of - (nxt - timedelta(days=1))).days < WINDOW_DAYS:
+            continue  # month not complete: some of its services are still inside their 30 days
+        identity = (r.get('population'), r.get('sales_record_id'), served.isoformat())
+        if identity in seen:
+            raise ValueError('Duplicate monitoring service')
+        seen.add(identity)
+        if r.get('warranty_signal_within_30d') not in (0, 1, 0.0, 1.0, '0', '1'):
+            raise ValueError('Monitoring requires verified binary outcomes')
+        key = served.isoformat()[:7]
+        g = months.setdefault(key, {'labels': [], 'scores': []})
+        g['labels'].append(1 if int(float(r.get('warranty_signal_within_30d') or 0)) else 0)
+        g['scores'].append(score(r, m))
+    table = []
+    for key in sorted(months):
+        g = months[key]
+        auc = _auc(g['labels'], g['scores'])
+        table.append({'month': key, 'services': len(g['labels']), 'returns': sum(g['labels']),
+                      'expected': round(sum(g['scores']), 1), 'auc': round(auc, 3) if auc is not None else None})
+    recent = table[-3:]
+    labels = [y for k in sorted(months)[-3:] for y in months[k]['labels']]
+    scores = [s for k in sorted(months)[-3:] for s in months[k]['scores']]
+    actual, expected = sum(labels), sum(scores)
+    auc = _auc(labels, scores)
+    factor = round(actual / expected, 3) if expected else None
+    ok = auc is not None and auc >= 0.70 and factor is not None and 0.8 <= factor <= 1.25
+    return {'model_version': 'return_risk_v1', 'checked_on': as_of.isoformat(), 'evidence_type': 'historical_replay_not_prospective', 'correction_approved': False, 'months': table,
+            'recent': {'months': [r['month'] for r in recent], 'services': len(labels), 'returns': actual,
+                       'expected': round(expected, 1), 'auc': round(auc, 3) if auc is not None else None,
+                       'count_factor': factor},
+            'status': 'ok' if ok else 'check',
+            'rule': 'ok when the last three complete months have AUC at least 0.70 and recorded/expected returns between 0.8 and 1.25'}
+
+
+def validate_monitor(raw: dict) -> dict:
+    if raw.get('model_version') != 'return_risk_v1' or raw.get('status') not in ('ok', 'check') \
+            or not isinstance(raw.get('months'), list) or not isinstance(raw.get('recent'), dict):
+        raise ValueError('Invalid return-risk monitor')
+    return raw
+
+
+def _load_monitor(folder) -> dict | None:
+    try:
+        return validate_monitor(json.loads((Path(folder) / MONITOR).read_text(encoding='utf-8')))
+    except (FileNotFoundError, ValueError, AttributeError):
+        return None
+
+
 def live(folder, value: dict, as_of: date, calls: int = DEFAULT_CALLS, log: dict | None = None) -> dict:
+    result = _live(folder, value, as_of, calls, log)
+    result['monitor'] = _load_monitor(folder)
+    return result
+
+
+def _live(folder, value: dict, as_of: date, calls: int = DEFAULT_CALLS, log: dict | None = None) -> dict:
     path = Path(folder) / PREDICTORS
     if not path.exists():
         return {'status': 'not_connected',

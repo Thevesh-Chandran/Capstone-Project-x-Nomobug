@@ -9,6 +9,14 @@ import re
 import unicodedata
 
 
+
+def pest_group(raw):
+    """Standard pest category for a free-text Sales entry ('Lipas dan semut' -> 'Cockroach + Ant')."""
+    if not str(raw or '').strip():
+        return 'Unspecified'
+    from webapp.analytics import pest_labels
+    return ' + '.join(pest_labels(raw))
+
 def normalized(value):
     return ''.join(c for c in unicodedata.normalize('NFKC', str(value or '')).casefold() if c.isalnum())
 
@@ -81,7 +89,8 @@ def build(sales, events, memberships, district_lookup):
         item = {'sale_key': str(sid), 'sale_id': sale['sales_record_id'], 'customer_key': key,
                 'programme_id': programme, 'date': closed, 'district': district,
                 'sales_rm': float(amount) if amount is not None else None,
-                'pest': sale.get('pest_type_raw') or 'Unspecified',
+                # Free-text pest names (144 spellings) grouped into standard categories, e.g. 'Cockroach + Ant'.
+                'pest': pest_group(sale.get('pest_type_raw')),
                 'package': sale.get('package_type_raw') or 'Unspecified',
                 'premise': sale.get('premise_type') or 'Unspecified', 'location':sale.get('_location')}
         rows.append(item)
