@@ -1,0 +1,13 @@
+{
+  "id": "checkin_pilot_v1",
+  "declared": "2026-11-04",
+  "model_version": "return_risk_v1",
+  "calls_from": "2026-11-10",
+  "calls_to": "2026-11-23",
+  "served_from": "2026-10-26",
+  "served_to": "2026-11-13",
+  "threshold": 0.12,
+  "salt": "checkin_pilot_v1",
+  "arms": "int(sha256(salt + '|' + checkin_key)[:8], 16) % 2: 0 = call, 1 = comparison (not called)",
+  "protocol": "planning/CP2_CHECKIN_PILOT_PROTOCOL_20261104.md"
+}

@@ -1,0 +1,9 @@
+{
+  "rows": 100,
+  "positive_rows": 5,
+  "threshold_TP": 2,
+  "threshold_FN": 3,
+  "threshold_FP": 3,
+  "source_sha256": "3579a2cbd1646b31b8db08cbecf389a11e53b5ddbb851979a32236a805f43a74",
+  "notice": "Earlier held-out candidate test, 15\u201327 August 2026. Not a completed prospective evaluation of the later refitted model."
+}

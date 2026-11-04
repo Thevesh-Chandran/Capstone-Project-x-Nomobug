@@ -31,9 +31,9 @@ const width=host=>Math.max(280,Math.round(host.clientWidth||600));
 const later=fn=>requestAnimationFrame(()=>requestAnimationFrame(fn));
 
 /* ---------- line chart: soft area under the main series ---------- */
-function lineChart(host,{labels,series,height=240,format=nf.format,xLabel=l=>l,tipTitle=l=>l}){
+function lineChart(host,{labels,series,height=240,format=nf.format,xLabel=l=>l,tipTitle=l=>l,max:fixedMax}){
  host.replaceChildren();const w=width(host),h=height;const m={t:12,r:12,b:26,l:52};const iw=w-m.l-m.r,ih=h-m.t-m.b;
- const max=niceMax(Math.max(...series.flatMap(se=>se.values).filter(v=>v!=null),1)*1.05);
+ const max=fixedMax||niceMax(Math.max(...series.flatMap(se=>se.values).filter(v=>v!=null),1)*1.05);
  const x=i=>m.l+(labels.length<2?iw/2:i*iw/(labels.length-1)),y=v=>m.t+ih-(v/max)*ih;
  const svg=s('svg',{viewBox:`0 0 ${w} ${h}`,width:w,height:h,class:'chart',role:'img','aria-label':series.map(se=>se.label).join(', ')});const defs=s('defs');svg.append(defs);
  for(let i=0;i<=4;i++){const v=max*i/4,yy=y(v);svg.append(s('line',{x1:m.l,x2:m.l+iw,y1:yy,y2:yy,class:i?'c-grid':'c-base'}),s('text',{x:m.l-8,y:yy+4,class:'c-axis','text-anchor':'end'},format(v)));}
@@ -75,6 +75,33 @@ const bar=(share,cls='')=>{const b=mk('span',undefined,'mbar '+cls);const f=mk('
 const greet=()=>{const hr=Number(new Date().toLocaleString('en-GB',{timeZone:'Asia/Kuala_Lumpur',hour:'numeric',hour12:false}));return hr<12?'Good morning':hr<18?'Good afternoon':'Good evening';};
 const daysUntil=d=>Math.round((toDate(d)-toDate(new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Kuala_Lumpur'})))/864e5);
 
+
+/* ---------- live check-in plan (prescriptive step) ---------- */
+let rplan=null,rcalls=10;
+async function loadPlan(calls){const r=await fetch('/api/return-risk?calls='+calls);const v=await r.json();if(!r.ok)throw new Error(v.error||'Unavailable');rplan=v;rcalls=calls;return v;}
+function checkInRows(list){return rowList(list.map(c=>{const due=daysUntil(c.call_on);return {name:title(c.name),sub:`${c.sale_id}, service ${c.service}, serviced ${day(c.serviced)}${c.why.length?', '+c.why.join(', '):''}`,value:pct(c.chance)+' chance',href:'#customers',mark:ring(Math.min(1,c.chance/0.4),pct(c.chance),{size:38,stroke:4}),chip:[due<=0?'Call today':'Call '+weekday(c.call_on),due<=0?'dark':'']};}),'No open service windows to check this week.');}
+function checkInManage(p,after){
+ if(!p.check_ins.length&&!(p.done||[]).length)return mk('p','No open service windows to check this week.','block-empty');
+ const ul=mk('ul',undefined,'rows checkins');const choices=p.choices||{};
+ const row=(c,done)=>{const li=mk('li',undefined,'lrow crow'+(done?' is-done':''));const due=daysUntil(c.call_on);
+  const top=mk('div',undefined,'crow-top');const av=mk('span',initials(title(c.name)),'avatar');const main=mk('div',undefined,'row-main');main.append(mk('span',title(c.name)+(c.pilot_arm==='call'&&p.pilot&&p.pilot.active?'  ·  pilot':''),'row-name'),mk('span',`${c.sale_id}, service ${c.service}, serviced ${day(c.serviced)}${c.why.length?', '+c.why.join(', '):''}`,'row-sub'));
+  const side=mk('div',undefined,'row-side');side.append(mk('span',pct(c.chance)+' chance','row-value'));
+  if(c.outcome)side.append(mk('span',c.outcome.label,'chip '+(c.outcome.status==='no_answer'?'':'dark')));else side.append(mk('span',due<=0?'Call today':'Call '+weekday(c.call_on),'chip '+(due<=0?'dark':'')));
+  top.append(av,main,ring(Math.min(1,c.chance/0.4),pct(c.chance),{size:38,stroke:4}),side);li.append(top);
+  if(!p.log_available){ul.append(li);return;}
+  const f=mk('form',undefined,'crow-form');const sel=mk('select');sel.setAttribute('aria-label','Check-in result for '+title(c.name));sel.append(new Option('Record result',''));Object.entries(choices).forEach(([k,l])=>sel.append(new Option(l,k)));if(c.outcome)sel.value=c.outcome.status;
+  const nt=mk('input');nt.type='text';nt.maxLength=400;nt.placeholder='Note (optional)';nt.setAttribute('aria-label','Note');if(c.outcome)nt.value=c.outcome.note||'';
+  const mn=mk('input');mn.type='number';mn.min=0;mn.max=120;mn.step=1;mn.placeholder='Min';mn.className='crow-min';mn.setAttribute('aria-label','Call minutes');if(c.outcome&&c.outcome.minutes!=null)mn.value=c.outcome.minutes;
+  const bt=mk('button','Save','btn btn-dark btn-sm');bt.type='submit';const msg=mk('span','','crow-msg');f.append(sel,nt,mn,bt,msg);
+  f.addEventListener('submit',async e=>{e.preventDefault();if(!sel.value){msg.textContent='Choose a result first';return;}bt.disabled=true;msg.textContent='Saving';
+   try{const r=await fetch('/api/return-risk/outcome',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({sale_id:c.sale_id,serviced:c.serviced,status:sel.value,note:nt.value,minutes:mn.value,revision:p.revision})});const v=await r.json();if(!r.ok)throw new Error(v.error||'Could not save');msg.textContent='Saved';after&&after();}
+   catch(err){msg.textContent=err.message;bt.disabled=false;}});
+  li.append(f);ul.append(li);};
+ p.check_ins.forEach(c=>row(c,false));if((p.done||[]).length){ul.append(mk('li',`Already reached (${p.done.length}), not called again`,'crow-divider'));p.done.forEach(c=>row(c,true));}return ul;}
+function outcomeStats(o){const d=mk('div',undefined,'plan-stats outcome-stats');if(!o||!o.recorded){d.append(mk('p','No check-ins recorded yet. Results saved here become the pilot log used to judge whether early calls reduce return visits.','block-note'));return d;}
+ [[nf.format(o.recorded),'check-ins recorded'],[nf.format(o.reached),'customers reached'],[o.issue_share==null?'-':pct(o.issue_share),'of reached had an issue'],[nf.format(o.counts.visit_booked),'return visits booked early'],[o.mean_minutes==null?'-':nf.format(o.mean_minutes)+' min','average call']].forEach(([v,l])=>{const x=mk('div');x.append(mk('strong',v),mk('span',l));d.append(x);});return d;}
+function planNote(p){if(!p||p.status!=='live')return (p&&p.message)||'Live scores are not connected yet.';const pl=p.pilot&&p.pilot.active?` Check-in pilot until ${day(p.pilot.calls_to)}: ${p.pilot.held_back} higher-risk customers are held back as the comparison group; please do not call them.`:'';return pl.trim()+(pl?' ':'')+`${p.open_windows} services are inside their 30-day window. About ${nf.format(p.expected_returns_open)} return visits are expected from them; these ${p.check_ins.length} calls reach about ${nf.format(p.expected_returns_reached)} of them (${pct(p.share_reached)}). Scores use services recorded up to ${day(p.predictors_through)}.`;}
+
 /* =========================== Today =========================== */
 // Experimental model scores are kept in research; Today lists only source-backed work.
 function tile(title,text,href){const a=mk('a',undefined,'tile');a.href=href;a.append(mk('strong',title),mk('span',text));return a;}
@@ -92,6 +119,7 @@ function renderToday(root){root.replaceChildren();
  const due=tasks.filter(t=>t.review_kind==='upcoming').sort((a,b)=>String(a.next_scheduled_reminder_date).localeCompare(String(b.next_scheduled_reminder_date)));
  const b1=block('Payment reminders due this week',{more:['All follow-ups','#home'],note:`${due.length} reminder${due.length===1?'':'s'}, ${rm(due.reduce((a,t)=>a+(t.sales_remaining_balance_rm||0),0))} recorded contract balance`});
  b1.append(rowList(due.map(t=>{const n=daysUntil(t.next_scheduled_reminder_date);return {name:title(t.name),sub:t.sales_record_id,value:rm(t.sales_remaining_balance_rm),href:'#home',chip:[n<=0?'Due today':n===1?'Due tomorrow':'Due '+weekday(t.next_scheduled_reminder_date),n<=1?'dark':'']};}),'No reminders fall due in the next seven days.'));main.append(b1);
+ if(rplan&&rplan.status==='live'){const bc=block('Check in this week',{more:['Plan check-ins','#returns'],note:'Customers most likely to need a return visit, from the return-visit risk score. A short call or WhatsApp around day 10.'});if(rplan.stale||data.source_stale)bc.append(mk('p','Records need refreshing; confirm the latest Calendar before calling.','side-text'));bc.append(checkInRows(rplan.check_ins.slice(0,5)));main.append(bc);}
  const tools=block('Choose the next step');const grid=mk('div',undefined,'tiles');
  grid.append(tile('Booking calendar','Compare team schedules and find a suitable slot','#plan'),tile('Sales & return maps','See where sales and return visits cluster','/maps'),tile('Customer history','Look up purchases, programmes and visits','#customers'));
  tools.append(grid);main.append(tools);
@@ -155,13 +183,50 @@ function renderRisk(root){const W=data.warranty_risk||{};root.replaceChildren();
  root.append(d);
 }
 
+/* =========================== Return-visit risk =========================== */
+const FACTORS=[['final_residential','Final service of a residential programme'],['residential','Residential customer'],['three_service_programme','3-service programme'],['property_claims_90d','Each return at this address in the last 90 days'],['programme_past_claims','Each earlier return in the same programme'],['final_service','Final service of any programme'],['cockroach_only','Cockroach-only treatment'],['log_sale_rm','Higher package price (per step up)'],['includes_rodent','Programme includes rodents'],['gap_missing','No earlier service recorded'],['first_service','First service of a programme']];
+function renderReturns(root){const R=data.return_risk||{};root.replaceChildren();
+ if(!R.evaluation){root.append(mk('p','The return-visit risk evidence is not available for this release.','block-empty'));return;}
+ const E=R.evaluation,cmp=E.compare,me=cmp['Return-risk score (chosen)'],rule=cmp['Rule: final residential service'],rnd=cmp['Random order'],pb=R.problem||{};
+ root.append(hero('Return-visit risk',`Around 1 in ${pb.return_share_12m?Math.round(1/pb.return_share_12m):6} appointments is a return visit for a job already done. This score ranks every paid service by its chance of a return within 30 days, so the team can act before the customer calls.`,[
+  {label:'Return visits a month',value:pb.return_visits_per_month!=null?nf.format(pb.return_visits_per_month):'-',note:`${pct(pb.return_share_12m)} of appointments, last 12 months`},
+  {label:'Returns caught',value:pct(me.capture_20),note:'by checking the top 20% of services',mark:ring(me.capture_20,pct(me.capture_20))},
+  {label:'Simple rule catches',value:pct(rule.capture_20),note:'same effort, final residential services'},
+  {label:'Ranking score (AUC)',value:me.auc.toFixed(2),note:`95% range ${E.auc_ci[0].toFixed(2)} to ${E.auc_ci[1].toFixed(2)}`}]));
+ const pl=block('This week\'s check-in plan',{note:'Choose how many calls the team can make. The plan picks the services with the highest chance of a return, still early enough to help.'});
+ const ctl=mk('div',undefined,'plan-ctl');const lab=mk('label',undefined,'plan-calls');lab.append(mk('span','Calls this week'));const inp=mk('input');inp.type='range';inp.min=0;inp.max=40;inp.step=1;inp.value=rcalls;const out=mk('output',String(rcalls));lab.append(inp,out);ctl.append(lab);
+ const stats=mk('div',undefined,'plan-stats');ctl.append(stats);pl.append(ctl);const note=mk('p','','block-note');const listHost=mk('div');const logHost=mk('div',undefined,'checkin-log');pl.append(note,listHost,logHost);root.append(pl);
+ const paint=p=>{stats.replaceChildren();if(p&&p.status==='live'){[[nf.format(p.expected_returns_reached),'returns reached'],[pct(p.share_reached),'of expected returns'],[nf.format(p.check_ins.length),'planned check-ins']].forEach(([v,l])=>{const d=mk('div');d.append(mk('strong',v),mk('span',l));stats.append(d);});}note.textContent=planNote(p);listHost.replaceChildren(p&&p.status==='live'?checkInManage(p,async()=>{try{paint(await loadPlan(rcalls));}catch(e){}}):mk('p','','block-empty'));logHost.replaceChildren();if(p&&p.status==='live'){logHost.append(mk('h3','Check-in log','sub-head'),outcomeStats(p.outcomes));if(!p.log_available)logHost.append(mk('p','Progress storage is unavailable, so results cannot be saved right now.','side-text'));}};
+ paint(rplan);let t;inp.addEventListener('input',()=>{out.textContent=inp.value;clearTimeout(t);t=setTimeout(async()=>{try{paint(await loadPlan(Number(inp.value)));}catch(e){note.textContent=e.message;}},250);});
+ const b1=block('How many returns each approach finds',{note:`Tested on ${nf.format(E.services)} services from ${E.period} (${E.returns} returns), after the model was frozen. Read across: if staff check this share of services, this share of returns is caught.`});
+ b1.append(legend([['Return-risk score',C.blue],['Rule: final residential service',C.ink,true],['Random order',C.grey]]));const h1=mk('div',undefined,'chart-host');b1.append(h1);root.append(b1);
+ const two=mk('div',undefined,'cols');root.append(two);
+ const b2=block('What raises or lowers the risk',{note:'How much each factor multiplies the odds of a return, other things equal'});
+ const fl=mk('ul',undefined,'factors');const u=R.per_unit_log_odds||{};FACTORS.filter(([k])=>u[k]!=null).map(([k,l])=>[l,Math.exp(u[k])]).sort((a,b)=>b[1]-a[1]).forEach(([l,x])=>{const li=mk('li',undefined,x>=1?'up':'down');li.append(mk('span',l),mk('b',(x>=1?'×':'×')+x.toFixed(1)));fl.append(li);});b2.append(fl);
+ const b3=block('How the team uses it');const ol=mk('ol',undefined,'ideas');[
+  ['Before the visit','High-risk jobs on tomorrow\'s schedule get a note for the technician: allow extra time, check harbourage areas, leave clear aftercare advice.'],
+  ['Day 10 check-in','A short call or WhatsApp to the highest-risk customers around day 10, before most return calls arrive.'],
+  ['Plan return capacity','Adding up the chances gives the expected number of return visits, so the schedule keeps room for them.']].forEach(([t,d])=>{const li=mk('li');li.append(mk('strong',t,'idea-title'),mk('span',d,'idea-desc'));ol.append(li);});b3.append(ol);
+ two.append(b2,b3);
+ const exp=E.monthly.reduce((a,r)=>a+r.expected,0),act=E.monthly.reduce((a,r)=>a+r.actual,0);
+ const b4=block('Expected and actual returns by month of service',{note:`The score expected ${nf.format(exp)} returns and ${nf.format(act)} were recorded, so it runs about ${pct(1-exp/act)} low. Plan capacity with that buffer.`});b4.append(legend([['Expected by the score',C.blue],['Recorded',C.grey]]));const h4=mk('div',undefined,'chart-host');b4.append(h4);root.append(b4);
+ const d=mk('details',undefined,'explain');d.append(mk('summary','How it was built and tested'));const dl=mk('dl',undefined,'facts');[
+  ['Data',`${nf.format(R.model.fit_rows)} sale-linked paid services from March 2024 to March 2026 (${R.model.fit_positives} returns). The label is a recorded corrective Calendar visit for the same sale within 30 days.`],
+  ['Model',`Logistic regression on ${R.model.features.length} inputs known before the visit: programme position, premise, package price, earlier returns, gap since the last service and pest group. Weather and area inputs were tried and did not improve validation results.`],
+  ['Choices',`Inputs and settings were chosen on November 2025 to March 2026 only. The final model was frozen before the test months were scored, with 30-day gaps and no sale appearing in two partitions.`],
+  ['Compared with',`A random forest on all 90+ inputs: ranking score ${cmp['Complex model (random forest, all inputs)'].auc.toFixed(2)}. The simple rule: ${rule.auc.toFixed(2)}. Random order: ${rnd.auc.toFixed(2)}.`],
+  ['Limits','A recorded return visit is not proof the pests came back. Some of the test months were looked at in earlier studies of other models. The score ranks risk; whether early check-ins reduce returns still needs a trial.']].forEach(([a,b])=>dl.append(mk('dt',a),mk('dd',b)));d.append(dl);root.append(d);
+ later(()=>{const cc=E.capture_curve;const lab=cc.review_share_pct.map(v=>v+'%');lineChart(h1,{labels:lab,series:[{label:'Return-risk score',values:cc['Return-risk score (chosen)'].map(v=>v*100),color:C.blue,area:true},{label:'Rule',values:cc['Rule: final residential service'].map(v=>v*100),color:C.ink,dashed:true},{label:'Random order',values:cc['Random order'].map(v=>v*100),color:C.grey,dashed:true}],format:v=>Math.round(v)+'%',tipTitle:l=>'Checking '+l+' of services',height:260,max:100});
+  const ms=E.monthly.filter(r=>r.services>50);columns(h4,{labels:ms.map(r=>r.m),series:[{label:'Expected',values:ms.map(r=>r.expected),color:C.blue},{label:'Recorded',values:ms.map(r=>r.actual),color:C.grey}],xLabel:month,tipTitle:monthYear,format:v=>nf.format(v)});});
+}
+
 /* =========================== loader =========================== */
-const RENDER={today:renderToday,performance:renderPerformance,risk:renderRisk};
+const RENDER={today:renderToday,performance:renderPerformance,risk:renderRisk,returns:renderReturns};
 function draw(route){const root=g('view-'+route);if(!root||!data)return;try{RENDER[route](root);}catch(e){console.error(e);root.replaceChildren(mk('p','This page could not be drawn from the current data.','block-empty'));}}
 async function getJSON(url){const r=await fetch(url);const v=await r.json();if(r.status===401&&typeof load==='function')load();if(!r.ok)throw new Error(v.error||'Unavailable');return v;}
 window.loadStage=async function(route){if(!RENDER[route])return;current=route;if(data&&(route!=='today'||work)){draw(route);return;}if(loading)return loading;
- loading=(async()=>{try{const [a,w]=await Promise.all([data?data:getJSON('/api/analytics'),getJSON('/api/workspace').catch(()=>null)]);data=a;work=w;draw(current);}
+ loading=(async()=>{try{const [a,w]=await Promise.all([data?data:getJSON('/api/analytics'),getJSON('/api/workspace').catch(()=>null),rplan?rplan:loadPlan(rcalls).catch(()=>null)]);data=a;work=w;draw(current);}
  catch(e){const root=g('view-'+current);const box=mk('div',undefined,'block-empty');box.append(mk('p','The figures could not be loaded: '+e.message));const b=mk('button','Try again','btn btn-ghost btn-sm');b.type='button';b.addEventListener('click',()=>{loading=null;window.loadStage(current);});box.append(b);root.replaceChildren(box);}
  finally{loading=null;}})();return loading;};
-let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(data&&current==='performance'&&!g('view-'+current).hidden)draw(current);},200);});
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(data&&(current==='performance'||current==='returns')&&!g('view-'+current).hidden)draw(current);},200);});
 })();

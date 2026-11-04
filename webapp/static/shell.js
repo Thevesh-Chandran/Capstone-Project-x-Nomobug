@@ -13,10 +13,11 @@ const I={
  business:'<path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/>',
  maps:'<path d="M19 10c0 5-7 11-7 11s-7-6-7-11a7 7 0 1 1 14 0Z"/><circle cx="12" cy="10" r="2.5"/>',
  status:'<path d="M4 19l5-6 4 3 7-9"/><path d="M15 7h5v5"/>',
+ returns:'<path d="M3 17l5-5 4 3 8-8"/><path d="M14 7h6v6"/><circle cx="5" cy="20" r=".6"/>',
  areas:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/>'};
 // Operational tools stay prominent; source browsing and research are secondary.
 const NAV=[
- {views:[['today','Today'],['home','Follow-ups'],['plan','Booking calendar'],['/maps','Sales & return maps','maps'],['customers','Customer history']]},
+ {views:[['today','Today'],['returns','Return-visit risk'],['home','Follow-ups'],['plan','Booking calendar'],['/maps','Sales & return maps','maps'],['customers','Customer history']]},
  {label:'Reporting',views:[['dashboard','Sales dashboard']]},
  {label:'Research',views:[['status','Forecasts & model evidence'],['risk','Warranty-risk research']]}
 ];

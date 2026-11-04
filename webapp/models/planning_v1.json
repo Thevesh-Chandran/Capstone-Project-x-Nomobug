@@ -1,0 +1,197 @@
+{
+  "version": "planning_v1",
+  "status": "research_candidate",
+  "protocol_sha256": "40452b490325bfef55d4a262a05ee4b3b99701c056106a61540cd9bfd2ea9d58",
+  "first_origin": "2026-10-26",
+  "models": [
+    {
+      "id": "booking_entries_h2",
+      "title": "Bookings \u00b7 next two weeks",
+      "unit": "bookings",
+      "algorithm": "extra_trees",
+      "inputs": 36,
+      "mae": 12.756896427985302,
+      "baseline_mae": 20.73076923076923,
+      "wape": 0.09017925696781344,
+      "test_windows": 13,
+      "history": [
+        {
+          "origin": "2026-07-06",
+          "actual": 162.0,
+          "selected": 158.32217093432882,
+          "baseline": 145.5
+        },
+        {
+          "origin": "2026-07-13",
+          "actual": 167.0,
+          "selected": 161.57370348223395,
+          "baseline": 153.0
+        },
+        {
+          "origin": "2026-07-20",
+          "actual": 159.0,
+          "selected": 161.52812257009057,
+          "baseline": 153.0
+        },
+        {
+          "origin": "2026-07-27",
+          "actual": 162.0,
+          "selected": 161.41821611624033,
+          "baseline": 153.5
+        },
+        {
+          "origin": "2026-08-03",
+          "actual": 150.0,
+          "selected": 163.96834132411382,
+          "baseline": 161.5
+        },
+        {
+          "origin": "2026-08-10",
+          "actual": 144.0,
+          "selected": 151.95679826021637,
+          "baseline": 163.5
+        },
+        {
+          "origin": "2026-08-17",
+          "actual": 134.0,
+          "selected": 137.69475438793245,
+          "baseline": 154.5
+        },
+        {
+          "origin": "2026-08-24",
+          "actual": 100.0,
+          "selected": 123.15288887187803,
+          "baseline": 150.5
+        },
+        {
+          "origin": "2026-08-31",
+          "actual": 119.0,
+          "selected": 108.23558309711449,
+          "baseline": 128.5
+        },
+        {
+          "origin": "2026-09-07",
+          "actual": 149.0,
+          "selected": 149.9590709425441,
+          "baseline": 155.5
+        },
+        {
+          "origin": "2026-09-14",
+          "actual": 132.0,
+          "selected": 147.04483484514023,
+          "baseline": 158.0
+        },
+        {
+          "origin": "2026-09-21",
+          "actual": 127.0,
+          "selected": 170.0498044276577,
+          "baseline": 173.0
+        },
+        {
+          "origin": "2026-09-28",
+          "actual": 134.0,
+          "selected": 169.03471156415327,
+          "baseline": 168.5
+        }
+      ]
+    },
+    {
+      "id": "booked_hours_h1",
+      "title": "Appointment hours \u00b7 next week",
+      "unit": "hours",
+      "algorithm": "ridge_100",
+      "inputs": 32,
+      "mae": 8.972132979172784,
+      "baseline_mae": 11.767857142857142,
+      "wape": 0.10761178985514583,
+      "test_windows": 14,
+      "history": [
+        {
+          "origin": "2026-07-06",
+          "actual": 81.5,
+          "selected": 79.81630359011726,
+          "baseline": 72.75
+        },
+        {
+          "origin": "2026-07-13",
+          "actual": 107.0,
+          "selected": 90.68687364461692,
+          "baseline": 88.75
+        },
+        {
+          "origin": "2026-07-20",
+          "actual": 86.0,
+          "selected": 87.90462352833472,
+          "baseline": 83.25
+        },
+        {
+          "origin": "2026-07-27",
+          "actual": 99.5,
+          "selected": 87.50796145747682,
+          "baseline": 83.75
+        },
+        {
+          "origin": "2026-08-03",
+          "actual": 87.5,
+          "selected": 96.55069453427804,
+          "baseline": 98.5
+        },
+        {
+          "origin": "2026-08-10",
+          "actual": 86.0,
+          "selected": 97.65087671307852,
+          "baseline": 101.5
+        },
+        {
+          "origin": "2026-08-17",
+          "actual": 83.5,
+          "selected": 84.0060554476749,
+          "baseline": 89.5
+        },
+        {
+          "origin": "2026-08-24",
+          "actual": 78.5,
+          "selected": 93.05111867513624,
+          "baseline": 102.0
+        },
+        {
+          "origin": "2026-08-31",
+          "actual": 43.5,
+          "selected": 50.06669412786352,
+          "baseline": 62.0
+        },
+        {
+          "origin": "2026-09-07",
+          "actual": 96.5,
+          "selected": 85.64044103999717,
+          "baseline": 92.5
+        },
+        {
+          "origin": "2026-09-14",
+          "actual": 80.0,
+          "selected": 77.64157217341597,
+          "baseline": 86.5
+        },
+        {
+          "origin": "2026-09-21",
+          "actual": 79.0,
+          "selected": 89.6241969540153,
+          "baseline": 91.75
+        },
+        {
+          "origin": "2026-09-28",
+          "actual": 71.0,
+          "selected": 85.03734375277729,
+          "baseline": 83.75
+        },
+        {
+          "origin": "2026-10-05",
+          "actual": 87.75,
+          "selected": 101.26140988088456,
+          "baseline": 96.5
+        }
+      ]
+    }
+  ],
+  "notice": "Historical research, not proven live accuracy. Saved Calendar records cannot recreate every old version. WAPE is error, not classification accuracy."
+}
