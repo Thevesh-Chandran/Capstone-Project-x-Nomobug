@@ -5,12 +5,80 @@ import importlib.util
 from pathlib import Path
 
 import pytest
+from types import SimpleNamespace
 
 
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location("business_kpis", ROOT / "scripts/validate_business_kpis.py")
 kpi = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(kpi)
+
+
+def test_release_manifest_keeps_reporting_and_payment_sidecar_together(tmp_path, monkeypatch):
+    import json
+    release={'run_id':'202610152200214c6271','project':'test-project','location':'asia-southeast1',
+             'snapshot_tables':{'payments_date_serials':'payments_date_serials_current'}}
+    path=tmp_path/'release.json';path.write_text(json.dumps({'manifest':release}))
+    captured={}
+    def validate(*args,**kwargs):
+        captured.update(kwargs)
+        return {'status':'pass_with_business_caveats','checks':{},'query_count':0,'bytes_processed':0}
+    monkeypatch.setattr(kpi,'validate',validate)
+    assert kpi.main(['--release-manifest',str(path),'--output-dir',str(tmp_path/'result')])==0
+    assert captured['gold_schema']=='cp2r_202610152200214c6271_gold'
+    assert captured['silver_schema']=='cp2r_202610152200214c6271_silver'
+    assert captured['serials_table']=='payments_date_serials_current'
+
+
+def test_kpi_source_follows_only_same_model_release_wrapper():
+    project = "test-project"
+    run_id = "2026100322002159290c"
+    snapshot = "sales_" + "a" * 64
+    tables = {
+        f"{project}.silver.sales": SimpleNamespace(table_type="VIEW",
+            view_query=f"SELECT * FROM `{project}.cp2r_{run_id}_silver.sales`"),
+        f"{project}.cp2r_{run_id}_silver.sales": SimpleNamespace(table_type="VIEW",
+            view_query=f"select * from `{project}.bronze.{snapshot}`")}
+    reader = kpi.Reader(SimpleNamespace(get_table=tables.__getitem__), project)
+    reader.snapshot = lambda name: f"{project}.bronze.{name}"
+    assert reader.source("sales", "sales") == f"{project}.bronze.{snapshot}"
+    tables[f"{project}.silver.sales"].view_query = (
+        f"SELECT * FROM `{project}.cp2r_{run_id}_silver.payments`")
+    with pytest.raises(ValueError, match="Ambiguous"):
+        reader.source("sales", "sales")
+
+
+def test_published_payment_sidecar_binds_to_same_release():
+    project, run_id = "test-project", "2026100322002159290c"
+    payment, serial = "payments_" + "b" * 64, "payments_date_serials_" + "c" * 64
+    manifest = {"run_id": run_id, "snapshot_tables": {
+        "PAYMENTS": payment, "payments_date_serials": serial}}
+    import json
+    job = SimpleNamespace(job_id="test", total_bytes_processed=0, total_bytes_billed=0,
+        result=lambda **kwargs: [{"run_id": run_id, "manifest_json": json.dumps(manifest)}])
+    report = SimpleNamespace(table_type="VIEW", view_query=(
+        f"SELECT * FROM `{project}.cp2r_{run_id}_gold.payments_monthly_recorded`"))
+    client = SimpleNamespace(query=lambda *args, **kwargs: job, get_table=lambda name: report)
+    reader = kpi.Reader(client, project)
+    assert reader.published_serial_snapshot(f"{project}.bronze.{payment}") == serial
+    assert reader.published_gold_schema == f"cp2r_{run_id}_gold"
+    with pytest.raises(ValueError, match="differs"):
+        reader.published_serial_snapshot(f"{project}.bronze.payments_" + "d" * 64)
+
+
+def test_stable_materialized_facts_read_approved_release_facts():
+    project = "test-project"
+    queried = []
+    job = SimpleNamespace(job_id="test", total_bytes_processed=0, total_bytes_billed=0,
+                         result=lambda: [])
+    def query(sql, **kwargs):
+        queried.append(sql)
+        return job
+    client = SimpleNamespace(query=query, get_table=lambda name: SimpleNamespace(table_type="TABLE"))
+    reader = kpi.Reader(client, project)
+    reader.published_gold_schema = "cp2r_2026100322002159290c_gold"
+    reader.read(f"{project}.gold.sales_package_facts", ["source_sheet_row"])
+    assert "cp2r_2026100322002159290c_gold.sales_package_facts" in queried[0]
 
 
 def test_join_expansion_fails_instead_of_hiding_duplicate_payment():
