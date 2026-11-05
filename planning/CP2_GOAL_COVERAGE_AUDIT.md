@@ -6,7 +6,15 @@ the current `planning/CP2_SCOPE_AND_DELIVERABLES.md`, and the deployed dbt/Pytho
 owner-confirmed operating rules take precedence. Current updates were reviewed
 on 28 September 2026; old dated evidence below remains historical context.
 
-## Objective coverage
+## Current checkpoint - 4 October 2026
+
+The [4 October project review](CP2_PROJECT_REVIEW_20261004.md) supersedes the older implementation-status claims below. Cloud reporting and two-minute collection are deployed; the Windows collector is disabled. Daily release `2026100322002159290c` succeeded at about 06:07 MYT. Fresh independent reconciliation passed all 14 checks against that release. The prospect source changed 31 selected input rows afterwards; the other six compared KPI source inputs had no drift.
+
+The October cloud cohort is now incomplete: 20 October predictions were indexed, with one missed overnight service window and 30 cumulative raw misses at the 11:30 MYT checkpoint. Do not promise a full-cohort November accuracy result. The frozen model and original coverage rules remain unchanged. Historical model results remain available for the October submission, with their small sample and first-service limitations.
+
+Recurring-payment models/page instructions are prepared locally, not published to stable Gold or the hosted image. An approved management-source privacy schema check and repaired stable-release KPI lineage are locally verified, not yet deployed. Final Looker layout/permissions, current costs, effective upgraded-package treatment, and source bookkeeping exceptions remain separate requirements.
+
+## Historical objective coverage (15-28 September)
 
 | CP1 objective | Current evidence | Status | Remaining work |
 |---|---|---|---|
@@ -41,7 +49,7 @@ on 28 September 2026; old dated evidence below remains historical context.
   cluster or heatmap is not a pest-spread radius or a claim that every event was
   completed.
 
-## Planned in the proposal but not silently claimed as complete
+## Historical gaps recorded in September (see current checkpoint above)
 
 1. **Recurrence windows:** a provisional package/property-aware interval view now
    uses the proposal buckets (0–7, 8–14, 15–30, 31–60, 61+ days). Planned

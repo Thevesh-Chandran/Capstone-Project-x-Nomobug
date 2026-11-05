@@ -30,3 +30,29 @@ Validation: 498 Python tests passed, including last-day collection and rejection
 of 31 October anchors. Frozen replay reproduced 5,695 rows with maximum probability
 difference 3.61e-16. Cloud deployment and automatic tick evidence is recorded in
 `outputs/project_audit/20261009_extension/`.
+
+Live verification completed 9 October: revision `cp2-prospective-collector-00022-pif`
+serves 100% of collector traffic. Full source-to-model smoke
+`20261009T025046Z_6092f1e3` succeeded. A genuine automatic Scheduler request at
+10:54 Malaysia time returned HTTP 200, and its durable tick advanced. Both the
+collection and 30 November evaluation schedules are enabled. All 35 prior raw
+missed-window timestamps remain unchanged. The superseded 27 November task for
+this cohort was replaced; older cohorts' separate tasks remain unchanged.
+The temporary smoke-test job and deployment tag were removed.
+# Recovery update — 15 October 2026
+
+The original October 10 cohort remains incomplete. A separately declared **16–30 October** recovery cohort uses the same frozen model and existing cloud collection timing. Its one-time evaluation is scheduled for **30 November at 15:00 Malaysia time**, conditional on complete timely predictions and outcomes. See [the protocol and verification record](CP2_COLLECTION_AND_AI_RESOLUTION_20261015.md). Earlier cohort dates and evidence below remain historical; no missed prediction was backfilled.
+
+
+## After the results: pause the one-time schedules (added 5 November)
+
+Cloud Scheduler repeats these every year. After each has run and its result is saved, pause it so it does not run again in 2027:
+
+```
+gcloud scheduler jobs pause cp2-prospective-final-20261127 --location=asia-southeast1
+gcloud scheduler jobs pause cp2-prospective-october5-final-20261127 --location=asia-southeast1
+gcloud scheduler jobs pause cp2-prospective-october10-final-20261130 --location=asia-southeast1
+gcloud scheduler jobs pause cp2-recovery-final-20261130 --location=asia-southeast1
+```
+
+`cp2-prospective-every2m` was paused on 5 November (collection ended 30 October). Keep `cp2-reporting-daily-trigger`, `cp2-planning-weekly-trigger` and `cp2-return-risk-monthly-check`: they run the live dashboard and model checks.

@@ -110,9 +110,9 @@ The discovery output records spreadsheet titles, tab names, tab grid settings, C
 
 For a simple Google Colab-style experience in local Jupyter or VS Code, open these notebooks and run each cell from top to bottom:
 
-- `notebooks/01_prospects_2026_b2b_profile.ipynb`
-- `notebooks/02_sales_payments_profile.ipynb`
-- `notebooks/03_calendar_events_profile.ipynb`
+- `notebooks/source_profiles/01_prospects_2026_b2b_profile.ipynb`
+- `notebooks/source_profiles/02_sales_payments_profile.ipynb`
+- `notebooks/source_profiles/03_calendar_events_profile.ipynb`
 
 They use ordinary pandas DataFrames and load every populated source row. Only small previews are displayed so the notebook remains responsive. Before committing after a local run, clear all notebook outputs because previews can contain private company data.
 
