@@ -272,6 +272,6 @@ Before accepting new text, check:
 - Does the evidence support the claim, and is the limitation stated at the correct level?
 - If two tools or methods are compared, does the text explain what was kept consistent?
 
-## Instruction for Future Codex Tasks
+## Instruction for Future the development workspace Tasks
 
 Use this file as the writing-style authority for Nomobug work. Preserve my formal but personal student voice. Ground writing in the experience, actions, constraints, data, and decisions I provide. Do not invent first-hand experience or project results. Avoid formulaic academic paragraph structures, inflated vocabulary, citation dumping, and blanket rewrites. When information from me is missing, ask for it or clearly mark the point as unconfirmed. Technical accuracy, citation integrity, and my actual meaning remain more important than any detector result.

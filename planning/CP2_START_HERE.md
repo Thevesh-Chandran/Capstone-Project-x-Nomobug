@@ -1,10 +1,18 @@
 # CP2: current model
 
+**Latest checkpoint:** [11 October implementation and remaining work](CP2_IMPLEMENTATION_STATUS_20261011.md). Dashboard wording is **Recorded warranty visits**; “callback” remains a technical field alias. The current original test covers 10–30 October, with earliest full evaluation on 30 November. Older cohort dates below are historical.
+
+For the latest source, reporting and cloud fixes, read [the 4 October repair status](CP2_REPAIR_STATUS_20261004.md). Use [the project navigation guide](../START_HERE.md) for the dashboard and current tracker. The [unknown source facts](CP2_UNRESOLVED_SOURCE_FACTS.md) and experimental model limitations remain explicit.
+
 Start with **corrected v5 ExtraTrees, depth 10**. [Full results](CP2_CORRECTED_MODEL_CANDIDATES_V5.md) and [current model pointer](../config/cp2_model_current.json).
 
 The question is: **will a recorded corrective Calendar callback occur within 30 days after this paid service?** The target is binary; the output is a numerical risk probability. It measures recorded callback work. Warranty entitlement is separate and follows [your confirmed rules](WARRANTY_POLICY_RULES.md).
 
 The model uses service/package stage, prior callback history, normalized pests and premise type, past weather, waterway proximity and local environment. Future-created history is excluded. A warranty-eligibility feature was also tested in a secondary candidate; it never forces commercial callback probability to zero.
+
+## Current audit checkpoint - 4 October
+
+[The latest repair record](CP2_REPAIR_STATUS_20261004.md) confirms model replay and fresh reporting reconciliation pass. The earlier 1 October cohort has one missed overnight window, which cannot be backfilled. The separate [5–27 October test](CP2_OCTOBER5_TEST.md) was declared and its cloud schedule verified on 4 October. Historical results below remain available with their limitations. Recurring-payment aggregate sources are published in the current reporting release. The owner builds the dashboard from the [complete guide and mockups](../outputs/dashboard_design/20261004_complete_guide/index.html).
 
 ## Performance to understand
 

@@ -1,221 +1,247 @@
-# CP2 management dashboard: detailed build guide
+# Nomobug dashboard — build guide
 
-Prepared 1 October 2026 from the deployed Gold schemas and current dbt SQL. Audience: company owner, sales manager and operations manager. Use it in a weekly workload review and a monthly business review. The owner builds the existing Looker Studio report; this guide does not certify its current charts or viewer permissions.
+Updated 15 October 2026. This replaces the earlier build instructions in this file. Build in the existing Looker Studio report, using the approved Data Bloo-inspired mockup as the layout reference. Mockup numbers are illustrative; live charts must use BigQuery.
 
-Start with [the finance/customer metric dictionary](CP2_METRIC_DICTIONARY.md), [operations/weather dictionary](CP2_OPERATIONS_METRIC_DICTIONARY.md), [model explained](CP2_MODEL_EXPLAINED.md), and [the exact field/type reference](CP2_DASHBOARD_FIELD_REFERENCE.md).
+- Live report: https://datastudio.google.com/reporting/590914e8-066b-4671-a130-7a62a3af435a
+- Complete mockup: ../outputs/dashboard_design/20261014_complete_system/index.html
+- Exact field reference: CP2_DASHBOARD_FIELD_REFERENCE.md
+- Recurring-payment definitions: CP2_RECURRING_PAYMENTS_DASHBOARD_GUIDE.md
 
-## What the dashboard should help management do
+## 1. What goes where
 
-1. Understand recorded sales demand, payment activity and service workload.
-2. Identify groups with substantial recorded return work and decide where to investigate.
-3. Plan future appointments using the scheduled workload distribution.
-4. Judge whether environmental comparisons and model results have enough evidence to use.
-5. Assign correction of missing/ambiguous source information before acting on a misleading total.
+**Dashboard:** sales, customer groups, enquiries, booked visits, warranty visits, pests/packages, district sales, weather comparisons, recurring-payment summaries, reminders and data checks.
 
-The report's recommendations should be tied to visible evidence. Examples: review unmatched Calendar links, clarify missing payment references, investigate short-interval return records, or inspect workload concentration. The current records do not establish a profitable pest segment, insufficient staffing, treatment failure, or a rain-caused infestation. Set business targets with management after agreeing on definitions and baselines.
+**Private website:** customer search/history, individual payment follow-up records, AI questions, area exploration, model evidence, weekly booking estimates, repeat-purchase review list and system status. Keep customer names, phone numbers, emails, exact addresses and individual experimental scores out of the unlisted dashboard.
 
-## Common setup in Looker Studio
+Keep seven main navigation entries: Overview; Sales & customers; Enquiries; Services & warranty; Pests & packages; Areas & weather; Payments. Sales/Customers, Services/Warranty, and Areas/Weather are subpages. Data checks is supporting navigation. Keep model evidence pages hidden from ordinary navigation; do not delete their historical results.
 
-Preserve useful existing charts. Add the stable BigQuery `profound-keel-500007-s4.gold` views needed for each page. Never connect to dated `cp2r_...` datasets: the daily job publishes through stable names. Do not connect this aggregate management report to raw Bronze/Silver, contact details, exact service locations or individual predictions.
+## 2. Start with the design
 
-For each chart: add the chosen chart type; select its data source; choose the dimension and measure below; explicitly set aggregation; select its date-range dimension where one exists; add chart filters; then format and test it. Dates are dates, RM fields are currency, counts are whole numbers, probabilities/shares are percentages, rainfall is mm. `Record Count` counts summary rows, not services/packages: use the supplied count fields with SUM.
+Use the mockup for composition and the updated Overview for a working example. Build one page completely before copying its styles.
 
-Use page-scoped controls. Set a date range dimension explicitly for every date-driven chart. Monthly views support whole-month comparisons, not equal-elapsed-day comparisons. Start with a verified complete reporting month and compare it with the preceding complete month; show current-month activity separately as partial. The first October daily refresh is scheduled at 06:00 MYT. Its completion must be checked before claiming it includes the full September endpoint.
+1. Open the report and click **Edit**.
+2. Open **Theme and layout → Layout**. Use a desktop canvas around **1400 px wide**. Choose enough height for the page, normally 900–1100 px. This project targets laptops and PCs.
+3. Use a pale blue-grey background, for example **#EEF3F8**, and white chart panels. Avoid large dark explanation blocks, background images and animation.
+4. Use Arial or another single clean font throughout: page title 30–34 px; chart title 18–20 px; labels/table body 14–16 px; card values 36–44 px. Increase chart height before shrinking labels.
+5. Use navy **#25384F** for headings, blue **#208FE5** for primary series, orange **#FF8354** for a second series, and purple/cyan for additional categories. Use the same colour for the same measure across pages. Avoid colouring every chart green.
+6. Keep about 40 px outer padding and 24 px gaps. Align chart edges and panel heights. Use modest corners, around 12 px, and no heavy shadows.
+7. Put the title at the upper left and relevant controls at the upper right. Follow with 3–4 important cards, then the main comparison charts. Put detail tables underneath.
+8. Keep explanations in chart descriptions/tooltips where supported. Keep a short visible qualifier when it changes interpretation, such as **current records**, **assigned locations**, or **October incomplete**.
 
-Pest, package and Calendar/team controls affect only sources that actually contain those dimensions. A shared date field name does not make unrelated categorical controls work across sources. Test each affected chart after a filter selection. Pages 6 and 7 use fixed 2026 views without dates; page 9 is a fixed historical evaluation. Do not put the management date control on these pages.
+Suggested Overview geometry, in canvas pixels:
 
-For rates, divide summed counts and return null when the denominator is zero. A null means unavailable. Never average percentages from unequal groups. For example, warranty-signal share is `SUM(warranty_claim_event_rows) / SUM(scheduled_service_event_rows)`. Looker Studio supports explicit aggregate formulas; use a CASE guard for a zero denominator. [Calculated fields](https://docs.cloud.google.com/looker/docs/studio/about-calculated-fields), [date ranges](https://docs.cloud.google.com/looker/docs/studio/set-report-date-ranges), [controls](https://docs.cloud.google.com/looker/docs/studio/about-controls).
+| Element | X | Y | Width | Height |
+|---|---:|---:|---:|---:|
+| Title | 40 | 30 | 600 | 55 |
+| Date control | 1000 | 30 | 360 | 50 |
+| Four cards | 40 / 376 / 712 / 1048 | 110 | 312 | 120 |
+| Monthly combo | 40 | 300 | 850 | 310 |
+| District bars | 914 | 300 | 446 | 310 |
+| Package bars | 40 | 690 | 640 | 250 |
+| Payment follow-up table | 704 | 690 | 656 | 250 |
 
-Keep the layout consistent: page title and period, relevant controls, a few main cards, charts explaining the pattern, then a small evidence/review table. Start with about 1,200 px width and check narrow rendering before sharing. Use neutral colours for workload; use an attention colour for supported exceptions. A higher warranty count alone is not a bad-performance verdict. Show sample sizes beside shares.
+Place each chart heading about 35 px above its chart. Do not let oversized text boxes overlap chart headers. If a heading is hard to select, double-click the blank upper part of its text box rather than the chart header beneath it.
 
-## Page 1 — Business overview
+## 3. Connect the correct data
 
-Question: **What changed in recorded business activity, and what should we review first?**
+Use **Resource → Manage added data sources** to reuse existing connectors. Add a new connector only when the view is absent.
 
-| Component | Source and setup | Management use |
-|---|---|---|
-| Sales value card | `sales_monthly_recorded`; SUM `recorded_package_face_value_rm`; date `closed_month` | Track recorded package value |
-| Packages sold card | Same source; SUM `countable_package_rows` | Track sold package rows; an upgrade may create another row |
-| Payments recorded card | `payments_monthly_recorded`; SUM `recorded_payment_entry_amount_rm`; date `payment_month` | Track dated sheet payment-entry amounts |
-| Scheduled visits card | `dashboard_service_monthly`; SUM `scheduled_service_event_rows`; date `service_month` | Track Calendar workload |
-| Warranty-signal visits card | Same source; SUM `warranty_claim_event_rows` | Track recorded return workload |
-| Two separate monthly lines | Sales value by `closed_month`; payments by `payment_month` | Compare trajectories while preserving different accounting meanings |
-| Monthly workload chart | Service month; normal, warranty and other categories below | Explain total Calendar activity |
-| Source freshness table | `dashboard_source_freshness`; `source_name`, `extracted_at_utc`, `hours_since_extraction`; MAX age | Tell management which source snapshot they are viewing |
+For a new connection: **Add data → BigQuery → CP Google Sheet Nomobug → gold → approved view → Add**. The project ID is `profound-keel-500007-s4`.
 
-Safe service stack: normal = `normal_package_service_event_rows`; warranty = `warranty_claim_event_rows`; other = `scheduled_service_event_rows - normal_package_service_event_rows - warranty_claim_event_rows`. Current normal and warranty categories are exclusive. Do not add a broad extra-visit count as another exclusive category.
+Use stable **gold** views. Dated `cp2r_...` datasets are release snapshots and should not be connected as live reporting sources. If the dataset picker shows many snapshots, use **Show more items** until the stable `gold` entry appears.
 
-Add a small, dated review panel only after inspecting the supporting page: e.g. missing references or unmatched services with their actual count and source. Do not invent red/green thresholds, an empty zero queue, or recommendations from the chart alone. The overview should link to the detailed pages rather than repeat their tables.
+If a published field is missing in Looker: edit the data source, click **Refresh fields**, inspect the proposed changes, and apply only the expected fields. This was needed for `month_start` in **Sales by area**.
 
-## Page 2 — Enquiries and customer information
+Use **SUM** for the supplied count and amount fields. Do not use **Record Count** as a count of customers, purchases or visits: it counts aggregate source rows. Use RM for money, integers for counts, % for shares, mm for rainfall, and hours for freshness.
 
-Question: **How much enquiry activity is recorded, and how complete is its outcome information?**
+A monthly date field supports month-level reporting. Selecting a few days does not turn a monthly source into daily sales. Use whole-month ranges on sales pages. Do not compare partial October with a complete September as if they were equal periods.
 
-Source `prospect_reply_monthly_recorded`; date `first_reply_month`. This is the first staff reply month, not necessarily the enquiry arrival month.
+## 4. Overview
 
-| Component | Setup |
+Management question: **How is the business doing, and what needs a closer look?**
+
+| Visual | Source | Dimension / metric | Settings |
+|---|---|---|---|
+| Sales card | `sales_monthly_recorded` | SUM `recorded_package_face_value_rm` | Label **Sales (RM)**; date `closed_month` |
+| Packages sold card | Same | SUM `countable_package_rows` | Date `closed_month` |
+| Booked visits card | `dashboard_service_monthly` | SUM `scheduled_service_event_rows` | Date `service_month` |
+| Warranty visits card | Same | SUM `warranty_claim_event_rows` | Calendar signals, not a formal-claims count |
+| Large monthly combo | `sales_monthly_recorded` | X `closed_month` at Year Month; SUM sales and SUM `countable_package_rows` | Sales bars, left axis; packages line, right axis; month ascending; legend visible |
+| District sales bars | **Sales by area** (`dashboard_business_sales`) | `district`; SUM `sales_rm` | Horizontal; date `month_start`; assigned districts only; top five + Others |
+| Package bars | **Sales by area** | `package`; SUM `sale_rows` | Horizontal; date `month_start`; descending count; keep Unspecified; top five + Others |
+| Current payment follow-up table | `dashboard_recurring_payment_quality` | `billing_arrangement`; SUM `sales_total_recorded_paid_rm`, `contracts_with_scheduled_reminders_next_7_days`, `contracts_without_source_schedule` | Labels **Payment arrangement**, **Paid so far (RM)**, **Reminders · 7 days**, **Missing dates**; current snapshot |
+
+For the district chart, use the existing **2026 sales — assigned districts** filter for the 2026 default. It excludes Unassigned only from this comparison, not from the overall Sales card. If you expand reporting to another year, replace the fixed-year restriction deliberately. Never allocate unknown addresses to a district just to make the totals match.
+
+For readable district labels, the chart-local field is `REGEXP_REPLACE(district, "^.* / ", "")`. Retain the underlying source district for inspection. Drag the plot's inner left boundary rightwards to give names enough room; resizing the outer chart alone does not solve a cramped axis.
+
+**Already implemented and rendered:** the combo, district and package bars, and payment follow-up table. Their current arrangement is a usable reference, not certification that every report page is finished.
+
+## 5. Sales & customers
+
+Use two subpages so all-history customer groups are not confused with selected-period sales.
+
+### Sales
+
+Top: Sales, packages sold, and number of records missing sales amounts if the selected source supports it. Main left: monthly sales bars/line. Main right: sales by package. Bottom: sales by pest and residential/commercial premise breakdown.
+
+- Monthly source: `sales_monthly_recorded`; date `closed_month`; SUM `recorded_package_face_value_rm` and `countable_package_rows`.
+- Breakdown source: **Sales by area**; date `month_start`; dimensions `package`, `pest`, `premise`; SUM `sales_rm` or `sale_rows`.
+- Use one measure per ordinary bar chart. Do not stack sales amounts and purchase counts on one monetary scale.
+- Use **Sales**, not profit. Package prices are not bank-confirmed cash receipts.
+- Do not use the unreliable PAYMENTS tab for payment tracking.
+
+### Customers
+
+Source: **Customer summary** (`dashboard_business_customers`). This is **all-history customer grouping** and has no business-date dimension.
+
+- Cards: SUM `customer_groups`; repeat groups filtered to the verified repeat segment; identity-review groups separately.
+- Left: horizontal bars by `segment`, SUM `customer_groups`.
+- Right: sales by `segment`, SUM `sales_rm`.
+- Bottom: `segment`, customer groups, `programmes`, sales.
+
+Inspect actual segment values before creating filters. A customer group can have several programmes; these are not interchangeable counts. Do not use a period selector on this source. Named customer rankings and search remain on the private website.
+
+## 6. Enquiries
+
+Management question: **How much enquiry activity is recorded, and how complete are its outcomes?**
+
+Source: `prospect_reply_monthly_recorded`; date `first_reply_month`.
+
+- Cards: SUM `prospect_candidate_rows`, `recorded_open_rows`, `recorded_closed_rows`, `exact_won_remark_rows`.
+- Large chart: first reply month vs enquiry rows.
+- Comparison chart: open and closed recorded statuses by month. Keep the WON remark as separate context because it can overlap the statuses.
+- Small quality table: `undated_first_reply_rows`, `future_first_reply_rows`, `acquisition_review_rows` in an all-source view, so unknown dates are not hidden by a date filter.
+- Optional payment-link context: `dashboard_payment_link_monthly`, date `payment_link_month`; SUM `payment_link_source_rows`, `recorded_won_rows`, `missing_status_rows`, `date_review_rows`.
+
+Use **First staff reply month** in the description. These sources do not establish a verified enquiry-to-sale conversion rate or a live lead queue. Do not add unsupported marketing-channel or staff-conversion rankings.
+
+## 7. Services & warranty
+
+### Services
+
+Top: Booked visits, package visits, warranty visits. Middle: a wide team/weekday heatmap plus team bars. Bottom: bookings over time and next-14-days table.
+
+**Heatmap:** `dashboard_scheduling_capacity`; rows `calendar_name`; columns `day_of_week_number` or the existing Weekday field; SUM `scheduled_event_rows`. Use the heatmap appearance, readable cell labels, and enough row height for all six Calendars. Do not classify all Sunday appointments as placeholders: historical Sunday work is valid.
+
+**Team bars:** same source; `calendar_name`, SUM `scheduled_event_rows`. Use short display aliases for the full Calendar names without changing grouping. These are team Calendars, not independently verified technician productivity.
+
+**Month/week/day trend:** `dashboard_team_workload`; metric SUM `bookings`; date-range dimension `service_date`.
+
+1. Select the time series, open **Setup**, enable **Drill down**.
+2. Use `month_start`, `week_start`, `service_date` as the meaningful time levels. Looker may also create broader Year/Year Month levels automatically.
+3. On the chart-local month field, choose **Data type → Date & Time → Year Month**, label **Month**.
+4. On the chart-local week field, choose **ISO Year Week**, label **Week**. The source week starts on Monday.
+5. Keep service date as Date. Set the default drill level to Month.
+6. Use chart header arrows to move Month → Week → Day and back. Set the header visible if staff cannot discover the arrows.
+7. Keep missing/future dates as gaps, not zero completed jobs. Do not leave a daily-grain month-start chart that draws needles between artificial zero days.
+
+**Implemented and tested:** month, ISO week and day rendering; the original weekday/team heatmap stayed intact. An attempted separate dimension selector was removed after it affected other charts. Use the native chart drill-down.
+
+**Upcoming table:** `dashboard_upcoming_appointments`; retain its verified visit-date/count fields and fixed next-14-days scope. It must not disappear when a historical date range is selected. Bookings are not completed treatments, staff hours or available slots.
+
+### Warranty
+
+- Monthly warranty visits and share from `dashboard_service_monthly`.
+- Share: `SUM(warranty_claim_event_rows) / SUM(scheduled_service_event_rows)`, with a zero-denominator guard.
+- Return-interval bars from `dashboard_recurrence_monthly`: `recurrence_bucket`, SUM `recorded_warranty_signal_rows`; date `service_month`.
+- Order the known intervals chronologically and keep unknown/review groups visible.
+
+Use **Warranty visits** with a tooltip explaining Calendar labels; do not rename the count **Formal warranty claims**. A scheduled paid follow-up, a Calendar warranty marker and a formal claim-sheet entry are different records.
+
+Warranty policy: commercial clients and standalone residential 1x have no warranty. Residential 3x has 30 days after the actual third service; delays/rescheduling do not automatically remove entitlement. Residential 4x/6x/12x is covered throughout the service period and 30 days after the final service. Any pest is covered within the eligible package. Reconciled 1x + Upsell 2x is one three-service programme.
+
+## 8. Pests & packages
+
+Main left: sales by pest. Main right: purchases by package. Bottom: pest × package heatmap and a small comparison table.
+
+For date-filterable sales and purchase charts, use **Sales by area** with date `month_start`, dimensions `pest` / `package`, metrics SUM `sales_rm` / `sale_rows`.
+
+For the package-fit matrix, use `dashboard_package_fit_matrix`: rows `pest_type`, columns `package_type`, SUM `package_rows`; optional `contract_type` dropdown. This source is a **fixed 2026 snapshot**, so isolate it from a historical date control and label its scope. Do not imply it follows the sales-chart date range.
+
+Keep mixed-pest labels together and preserve Unspecified categories. Splitting a combined pest label into several rows must not multiply sales. Payment-link evidence is not proof of full payment; omit that metric from the main page unless its limitation is explained.
+
+## 9. Areas & weather
+
+### Areas
+
+Top: selected-period Sales and purchases, plus location coverage. Main: district sales bars and a district table. A map is secondary and requires verified geographic fields.
+
+- Source **Sales by area**: `district`, SUM `sales_rm`, SUM `sale_rows`; date `month_start`.
+- Keep **Unassigned** in a coverage table. The assigned-district ranking does not represent all sales.
+- Use counts/amounts, not a district ranking of model accuracy from a handful of cases.
+- Optional spatial view: `dashboard_spatial_area`, aggregate centroids and service/return counts. These area cells are analytical bins, not official districts or customer points.
+- Optional cluster sensitivity: `dashboard_spatial_cluster_summary`; single-select `radius_km` 1/2/5, default 2. Never sum across radii. Radius changes cluster grouping, not model accuracy.
+
+Keep a crowded map out of the main path. Detailed area exploration already belongs on the website.
+
+### Weather
+
+Source `dashboard_weather_monthly`; date `service_month`; split by `event_group`.
+
+- Left: prior-14-day rainfall comparison in mm.
+- Right: prior-seven-day humidity comparison in %.
+- Bottom: weather-covered visits, total visits and coverage for each month/group.
+
+For period summaries, weight the existing means by `complete_prior_14d_weather_rows`; do not average monthly means equally. For example, create row-level `weighted_rain = avg_prior_14d_precipitation_mm * complete_prior_14d_weather_rows`, then use `SUM(weighted_rain) / SUM(complete_prior_14d_weather_rows)` with a zero-denominator guard. Apply the same verified denominator to the published humidity means.
+
+Prior rainfall describes each appointment's earlier weather window, not total company rainfall. The current aggregate has no district/pest/flood dimensions, so those filters cannot be added to it. Weather associations do not prove that rain caused a return visit.
+
+## 10. Payments
+
+Management question: **What is recorded as paid, what remains, and which reminder dates need attention?**
+
+This is a current snapshot. Do not apply the general historical sales-date filter to its financial totals.
+
+Source `dashboard_recurring_payment_quality`:
+
+| Display label | SUM field |
 |---|---|
-| Cards | SUM `prospect_candidate_rows`, `recorded_open_rows`, `recorded_closed_rows`, `exact_won_remark_rows` |
-| Monthly activity line | Dimension `first_reply_month`; SUM `prospect_candidate_rows` |
-| Outcome annotation table | Month; open, closed, exact-WON counts side by side. WON is a separate remark indicator and can overlap statuses, so do not stack all three |
-| Source exceptions table | SUM `undated_first_reply_rows`, `future_first_reply_rows`, `acquisition_review_rows`; keep a separate all-source view so null dates are visible |
-| Payment-link context table | `dashboard_payment_link_monthly`; date `payment_link_month`; SUM `payment_link_source_rows`, `recorded_won_rows`, `missing_status_rows`, `date_review_rows` |
+| Contract sales (RM) | `recorded_contract_value_rm` |
+| Paid so far (RM) | `sales_total_recorded_paid_rm` |
+| Remaining balance (RM) | `positive_recorded_remaining_balance_rm` |
+| Reminders · next 7 days | `contracts_with_scheduled_reminders_next_7_days` |
+| Missing reminder dates | `contracts_without_source_schedule` |
 
-Useful action: review enquiry status and acquisition documentation. OPEN/CLOSED are source conversation annotations, not a current live lead queue. The source-row denominator for payment links includes retained unqualified rows; do not calculate a conversion funnel by dividing WON or sales by that total.
+**Current chart:** horizontal stacked bars, dimension `billing_arrangement`, SUM paid and positive remaining balance. Legend **Paid (RM)** / **Remaining (RM)**. Give the left axis enough room for arrangement names. Configuration is saved; confirm its renderer loads before declaring the page complete.
 
-The current aggregate does **not** support unique customers, repeated-conversation counts, B2B inspection bookings, marketing channel performance, customer retention, or new-versus-returning rates. B2B is extracted but has no approved management booking/funnel aggregate. Record these as missing measurements, rather than zero results. Customer/site history needs a separately reviewed identity model and restricted source; do not connect private detail to fill the page.
+**Reminder workload:** `dashboard_recurring_reminder_schedule`; date `reminder_date`; SUM `scheduled_reminder_date_rows`; optional breakdown `billing_arrangement`. Use a daily column chart and a date/arrangement/count table. Default today through the next 30 days. The view's arrangement-level seven-day card and daily reminder counts have different grains; do not call summed daily counts unique contracts.
 
-## Page 3 — Sales and payments
+**Missing schedules:** quality source by arrangement; SUM `contracts_without_source_schedule`. Keep other quality flags separate because they overlap. A row of zero review flags is not itself an action item.
 
-Question: **How are recorded package value and payments changing, and which finance records need review?**
+The owner's reminder dates are already dates to contact clients; do not subtract another seven days. Green means the date passed, not paid, reminded or overdue. SALES deposit plus cumulative Balance Paid establishes the recorded paid amount. PAYMENTS is excluded. Do not infer instalment amounts or repeat the whole balance against every future reminder date. Paid plus positive remaining can differ from contract value when source records need review; do not force the figures to balance by hiding rows.
 
-Use sales and payment monthly sources separately. Cards: recorded package face value, packages sold, recorded payment amount and dated payment entries (`dated_nonfuture_rows`). Add two monthly charts and two compact finance exception tables. Sales exceptions: missing totals, inferred close years, undated sales, excluded dispositions. Payment exceptions: missing amounts, text dates, undated entries, combined references, references needing review.
+### Refunds
 
-Date controls use `closed_month` for sales and `payment_month` for payments. Explain this beside the charts: payment entries recorded later can refer to earlier packages. A null-month row belongs in an exceptions table outside the selected-period chart. In the table, display an Unknown date label and its retained counts.
+Add a compact all-records refund section, separate from recurring balances:
 
-Use SUM for monetary values and count fields. Do not subtract payments from sales as outstanding balance, sum joined payment amounts per package, or call the result profit/net revenue. Combined-reference payments are counted once in the payment source; their amounts are not allocated across sales. Mean package price requires a priced-package denominator not currently published; omit AOV for now.
+- Source `dashboard_refund_monthly`; SUM `recorded_refund_amount_rm` and `refund_source_rows`.
+- Label **Recorded refunds (known amounts)** and show `amount_review_rows` / `date_review_rows` alongside.
+- The 15 October checked snapshot had 56 undated records, RM24,672.30 in known amounts and one amount-review record. Treat these as a dated check, not hard-coded dashboard values.
+- Do not draw a monthly refund trend while all dates are missing. Do not let a date control hide these records and produce a misleading zero.
+- Do not subtract unallocated refunds from sales or label the result net revenue/profit. A recorded status is not bank-transfer verification.
 
-Action: review malformed amounts and references in the source; ask finance to verify settlement or outstanding balance through the appropriate records when those decisions are required.
+## 11. Supporting Data checks
 
-## Page 4 — Services and teams
+Use `dashboard_source_freshness`: source, extraction timestamp and MAX `hours_since_extraction`. Show the timezone. Use `dashboard_data_quality`: source, issue code, affected rows and source denominator. Do not sum overlapping issue counts into one total or repeat denominators across issue codes.
 
-Question: **Where is scheduled workload concentrated, and are appointments linked to the right package?**
+Show matching, weather and location coverage with summed numerators/denominators from `dashboard_service_monthly`. A failed refresh can leave older approved data visible; a working chart alone does not prove today's refresh succeeded.
 
-Source `dashboard_scheduling_capacity`; date `service_date`; dropdown `calendar_name`. Calendar names represent the source team/Calendar label, not a verified individual technician assignment.
+Only show source-backed actions: missing schedules, missing/ambiguous links, unassigned locations, stale sources. Do not create warnings about treatment failure, overdue debt or staffing shortages from these aggregates alone.
 
-| Component | Setup |
-|---|---|
-| Cards | SUM `scheduled_event_rows`, `warranty_claim_event_rows`; matching share = SUM `matched_sales_event_rows` / SUM `scheduled_event_rows` |
-| Daily workload line | `service_date`; SUM `scheduled_event_rows`; optional breakdown `calendar_name` |
-| Team workload bars | `calendar_name`; SUM `scheduled_event_rows`; include counts in labels |
-| Weekday/team heat table | Rows `calendar_name`, columns `day_of_week_number`, SUM `scheduled_event_rows`; 1=Sunday through 7=Saturday |
-| Daily review table | Date, Calendar, scheduled count, warranty count, unmatched count, ambiguous count |
+## 12. Final checks — do these before calling it finished
 
-Use a selected historical period for activity review and a separate clearly labelled next-14-days section for upcoming scheduling. Give future charts their own explicit relative date range and isolate them from the historical date control; test that changing the historical period does not change the upcoming period. A future recorded appointment is workload on the calendar, not a completed job. Current sources do not provide capacity hours, completion rates, travel efficiency or staff success rankings.
+1. Every page has a clear purpose and the requested charts. Remove empty decorative panels and duplicate explanations.
+2. Compare cards with the same source and period; do not compare customer all-history groups with a monthly purchase count.
+3. Test a populated date/segment filter, then reset. Check every affected chart; isolate fixed-snapshot and upcoming sections.
+4. Test Services Month → Week → Day and back. Confirm the heatmap and future table stay valid.
+5. Check recurring totals and seven-day reminders against the same published snapshot; preserve unknown amounts/dates.
+6. Show Unspecified/Unassigned coverage. Keep October labelled partial while it is incomplete.
+7. Check fonts at normal desktop zoom, table widths, chart label margins, all team rows, and chart legends.
+8. Check no customer contacts, exact addresses or individual risk scores appear. Existing link-sharing permission is unchanged by this guide.
+9. Refresh once using **More report actions → Refresh data**. If a chart stays blank, verify its source, fields, filters and rendering; do not mark it complete just because settings saved.
+10. Keep a screenshot of each finished page. Model predictions/results belong to the separate validation process; this dashboard does not make the experimental model reliable.
 
-Action: inspect concentrated future days and manually check whether redistribution is appropriate; resolve unmatched/ambiguous package links before interpreting breakdowns. The aggregate table cannot identify an individual appointment to change; that requires a separate restricted operational view or Calendar review.
+## Current handoff
 
-## Page 5 — Warranty signals, returns and refunds
-
-Question: **How much return work is recorded, how soon does it occur, and what refund records need follow-up?**
-
-| Component | Setup |
-|---|---|
-| Return workload cards | Monthly service source; SUM warranty signals; weighted warranty share |
-| Recorded returns by interval | `dashboard_recurrence_monthly`; `recurrence_bucket`; SUM `recorded_warranty_signal_rows`; order 0–7, 8–14, 15–30, 31–60, 61+ days, then unknown/review buckets |
-| Monthly return distribution | Same source; date `service_month`, breakdown `recurrence_bucket` |
-| Refund cards/trend | `dashboard_refund_monthly`; date `refund_month`; SUM `refund_source_rows`, `recorded_refund_amount_rm` |
-| Refund exception table | Linked/unmatched rows, status/amount/date review counts, recorded-complete count; preserve undated rows |
-
-An interval is from a warranty-signal entry to the immediately preceding matched service-like entry at the same sale and exact normalized address text. That preceding visit can itself be a warranty visit. This is not uniformly days after the last paid treatment. Keep `no_previous_event` and property-review categories visible; missing intervals do not become zero days.
-
-Formal claim-sheet entries, Calendar warranty signals and model-positive service windows are three different counts. Do not add them into one claims total. Formal claims currently need an approved aggregate source before a dashboard card is added. Recorded refund amount/status is source evidence; COMPLETE is not bank-transfer confirmation.
-
-Show the owner's policy as a short definition: commercial and residential 1x have no warranty; residential 3x can claim within 30 days after the third service; residential 4x/6x/12x can claim throughout the service period and through 30 days after the final service, for any pest. Linked 1x plus Upsell 2x must be interpreted as the reconciled episode. A return signal does not by itself decide entitlement.
-
-Action: inspect substantial short-interval return workload and unresolved refund records. Treatment failure and pest reinfestation require further evidence.
-
-## Page 6 — Pests and packages
-
-Question: **Which recorded pest/package combinations drive business value and review workload?**
-
-This page is explicitly **2026 snapshot context**. It has no month control because its current sources have no date field.
-
-Use `dashboard_package_fit_matrix`. Dropdowns: `pest_type`, `package_type`, `contract_type`; test each against this source. Keep original raw labels, including mixed-pest bundles. Display null/unrecorded labels as Unknown, without guessing a pest or package.
-
-| Component | Setup |
-|---|---|
-| Package mix bars | `pest_type` or `package_type`; SUM `package_rows` |
-| Recorded value by pest/package | SUM `recorded_package_face_value_rm`; RM |
-| Package matrix | Rows `pest_type`, columns `package_type`; SUM `package_rows` |
-| Context table | Pest, package, contract; package rows, packages with payment evidence, scheduled entries, warranty signals |
-| Payment evidence share | SUM `packages_with_payment_evidence` / SUM `package_rows` |
-| Warranty workload share | SUM `warranty_claim_event_rows` / SUM `scheduled_event_rows`; show both counts |
-
-Payment evidence means at least one linked entry, not paid in full. The view combines packages closed in 2026 and their 2026 Calendar activity, including recorded future dates. Its package-row and face-value totals are therefore not interchangeable with the overview's dated nonfuture sales metrics. Do not duplicate sales value by splitting mixed pests into several rows.
-
-Add a service-review table from `dashboard_treatment_difficulty`: area, Calendar, pest, package, scheduled events, warranty events, non-warranty extra visits, package-linked refund context. Filter `sufficient_volume_for_comparison = true`; this retains source groups with at least five entries, so label the filtered scope. Recompute shares from SUM counts when grouping rows. Omit the null composite difficulty score. Refund context can repeat across visits for a package; it is not a count of distinct refunds or a verdict about a team.
-
-Action: choose substantial groups for manual source/service review and discuss package demand. These descriptive metrics do not prove package suitability, profitability or causal team differences.
-
-## Page 7 — Locations and hotspots
-
-Question: **Where are recorded service and return workloads concentrated, and how sensitive are clusters to the distance setting?**
-
-This is another **2026 snapshot** page without month, pest or team controls.
-
-Area source `dashboard_spatial_area`: use a bubble map at aggregate area centroids; size by SUM `scheduled_service_event_rows`, colour by SUM `repeat_signal_event_rows` / SUM `scheduled_service_event_rows`. Tooltip/table: `area_cell`, scheduled entries, return signals and share. Areas are geohash-5 bins of several kilometres with at least five entries. They are not customer property points. Display area IDs as analytical area codes until a verified locality-name lookup exists.
-
-If the chart needs one geo field, create a text latitude/longitude pair from the aggregate centroid fields and set its geographic type to Latitude, Longitude. Use the centroid fields, never restricted property coordinates. Follow the [Google Maps reference](https://docs.cloud.google.com/looker/docs/studio/google-maps-reference) and verify that plotted locations fall within the expected Malaysia service area.
-
-Cluster source `dashboard_spatial_cluster_summary`: use a single-select `radius_km` control with 1, 2 and 5 km; default 2 km. Show a cluster-centroid map and table with `cluster_id`, `distinct_service_properties` and `recorded_warranty_signal_rows`. Use one radius at a time, because cluster IDs are meaningful only within that scenario. Do not sum counts across the three radii. Cluster creation requires at least three distinct properties; unclustered noise is omitted.
-
-Show location coverage from the monthly service source in a separate labelled coverage panel for the same 2026 scope. Distinct package counts across areas/properties are not globally additive. The radius changes the clustering scenario; it does not retrain the callback model or change its held-out accuracy.
-
-Action: identify areas to investigate and discuss routing/service demand. A hotspot is a pattern in recorded service data, not an outbreak declaration or pest travel distance.
-
-## Page 8 — Weather and seasonal patterns
-
-Question: **Do recorded return visits and other appointments have different prior-weather context, and is coverage sufficient to compare?**
-
-Source `dashboard_weather_monthly`; date `service_month`; breakdown `event_group` into recorded warranty signal and other scheduled service entry. Show two-series monthly prior-14-day rain comparison, a humidity comparison, and a coverage table containing scheduled rows, complete-weather rows and coverage share for each group/month. Soil moisture can be a secondary chart if management finds it useful. Keep rainfall and humidity on separate unit scales.
-
-Monthly mean rain fields (`avg_prior_3d_precipitation_mm`, `avg_prior_7d_precipitation_mm`, `avg_prior_14d_precipitation_mm`) describe cumulative prior-window rainfall per event, then averaged across covered events. They are not total rainfall across the company. Humidity is a prior-seven-day mean percentage; soil moisture is a prior-seven-day shallow-layer mean. Service day is excluded from prior windows.
-
-For each mean, create row-level `weighted_rain_14d = avg_prior_14d_precipitation_mm * complete_prior_14d_weather_rows`, then plot `SUM(weighted_rain_14d) / SUM(complete_prior_14d_weather_rows)`, with a zero-denominator guard. Repeat the weighting for humidity/other weather fields. Coverage = SUM complete rows / SUM scheduled rows. An unweighted AVG of monthly means gives small months the same influence as large ones.
-
-Use only complete prior-14-day windows for these published means. Data are roughly 9 km Open-Meteo reanalysis estimates, not a weather sensor at the property. Future scheduled entries can have missing weather. A fresh source release alone does not prove complete weather coverage. Current weather aggregates have no pest/area dimensions and no flood fields, so those controls/charts need new approved views.
-
-Action: investigate weather-associated patterns and discuss seasonal preparation when coverage supports the comparison. Rainfall, flooding and nearby water cannot be declared causes from these comparisons.
-
-## Page 9 — Callback model: evidence and validation
-
-Question: **Could the model help prioritize a manageable number of reviews, and how much confidence should management have?**
-
-Source `dashboard_ml_evaluation`. Keep this page on its fixed historical cohort, without a management date/pest/location filter.
-
-| Component | Setup |
-|---|---|
-| Sample-size cards | MAX `holdout_rows` = 100; MAX `holdout_positive_rows` = 5 |
-| Callbacks found card | Filter `model_role = selected_ap`, `metric_name = review20_positive_windows_found`; MAX `metric_value` = 4 |
-| Review precision card | Selected role, `metric_name = review20_precision`; MAX value = 20% |
-| Equal-budget comparison bars | Filter `metric_name = review20_positive_windows_found`; dimension `model_name`, MAX `metric_value`; selected 4 vs reference 3 |
-| Metric comparison pivot | Rows `metric_name`, columns `model_name`, MAX `metric_value`; set appropriate per-metric formats or use separate tables for ratios and counts |
-
-The view has 16 rows: two models × eight metrics. SUM of repeated sample-size fields would multiply the sample. Filter each performance card to one model and one metric before using MAX.
-
-Explain: of 100 later historical service windows, five had recorded callbacks; reviewing the top 20 scores found four of them, while 16 reviewed services had no recorded callback in that window. AUC 0.8905 is ranking performance, not 89.05% accuracy. Threshold accuracy is 94%, while predicting no callbacks for everyone gives 95% because positives are rare. The frozen top-20 review policy and the fixed probability threshold are different evaluations.
-
-Show the small-positive-sample uncertainty and first-service weakness prominently. The model's 93 predictors cover service/package stage, history, pests/premise/method, prior weather, terrain/water proximity and location uncertainty. Satellite/report flood and land-cover fractions were investigated but are not included in the selected frozen model. Neither chart filters nor DBSCAN radius recalculate model performance.
-
-Add a dated limitations text box: **“1 October follow-up: a separate 28–31 August retrospective check included 13 services and one callback; reviewing the top three found none. The sample is too small for dependable performance estimates. A 37-contract model comparison found no replacement that improved both development ranking quality and callback capture at the same review budget.”** Link [the broad model review](CP2_BROAD_MODEL_REVIEW.md). This later-period check uses a different historical fitting cutoff and is not a new metric in the existing `dashboard_ml_evaluation` view. Keep the 100/5 charts intact, label the follow-up separately, and do not pool the two cohorts or describe it as October prospective accuracy.
-
-Use a dated text statement for October prospective status only after checking the private audit. This Gold view does not contain live prediction counts or misses. Future accuracy remains pending until complete outcomes, no earlier than 27 November. Keep individual scores private. [Full explanation](CP2_MODEL_EXPLAINED.md).
-
-Action: decide whether further validation is worthwhile. No automatic warranty, customer-treatment or staff-assessment decision is supported.
-
-## Page 10 — Data quality and refresh status
-
-Question: **Which inputs need correction, and how current is the last approved report?**
-
-Freshness and issue counts describe the current published whole-source snapshot. They have no business reporting-date dimension. Scope any date control only to the dated service-coverage charts and label their selected period separately.
-
-| Component | Setup |
-|---|---|
-| Source snapshot table | `dashboard_source_freshness`; source, extraction time, release run ID, age hours |
-| Oldest snapshot card | MAX `hours_since_extraction`; hours, no SUM |
-| Issue review table | `dashboard_data_quality`; source and issue code, affected rows, source rows, issue share |
-| Matching/location coverage | `dashboard_service_monthly`; summed matched/eligible counts divided by total scheduled entries |
-| Warranty weather coverage | Same source; SUM complete-weather warranty rows / SUM warranty rows |
-
-For a source/issue row, use MAX or SUM as appropriate to its unique row; when regrouping issue rows, do not sum denominators or total affected counts across codes. The same record can have several issues. A combined payment reference or text date may be a handled category, rather than an error. `reviewed_date` is the view's query date, not source extraction time.
-
-Show extraction timestamps with an explicit timezone. If displaying Malaysia local time, use a verified UTC+8 conversion rather than merely changing the label. A failed refresh preserves the previous approved views; it must not be presented as current just because a chart loads. Do not infer last-run success from freshness alone; the private audit supplies that operational evidence.
-
-Action: assign source fixes, check stale inputs and repeat reconciliation after changes. Privacy and reconciliation are acceptance gates before sharing the report.
-
-## Build sequence and acceptance
-
-Build pages 1, 3 and 4 first; then 5 and 6; then 2, 7 and 8; finish model and quality. This gets the main business decisions visible early while keeping all required areas covered. Customer histories, validated B2B funnel/unique prospects, settled cash/outstanding balance, completed work, and formal-claim aggregates are explicit evidence gaps; do not silently present substitute metrics.
-
-For every chart, verify the source, date scope, aggregation, numerator/denominator, filter behaviour and displayed label. Compare a selected-period total and a reset-to-All total to Gold. Preserve null/review categories, test a populated filter, and inspect desktop/narrow layout. Check every source and page for private fields and approved viewer permissions. The reviewed source definitions do not certify a report until its actual rendered charts and permissions are checked.
+Overview has been refined and visually checked. Services' original heatmap is restored; its month/week/day trend has been implemented and exercised in viewer mode. The current payment chart is configured as horizontal stacked bars. Other pages still need the design and acceptance checks above. The report as a whole is not yet certified finished.
