@@ -1,6 +1,7 @@
 from datetime import datetime,timedelta,timezone
 import json
 from types import SimpleNamespace
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
@@ -39,6 +40,79 @@ def manifest_fixture():
     return {'frozen_at_utc':'2026-09-27T09:00:00+00:00',
       'cohort_start':'2026-09-28','cohort_end':'2026-10-27',
       'models':{'model':{'features':['anchor_is_first','anchor_is_mixed_pest']}}}
+
+
+def test_recovery_evaluation_is_complete_once_and_preserves_original(tmp_path,monkeypatch):
+    bundle=tmp_path/'outputs/bundle';bundle.mkdir(parents=True)
+    manifest=manifest_fixture()|{'version':'prospective_callback_v2_corrected',
+        'target':'recorded_corrective_calendar_callback_within_30d',
+        'earliest_final_evaluation_date':'2026-11-27','review_fraction':.2}
+    manifest['models']={n:{'features':['anchor_is_first','anchor_is_mixed_pest']} for n in ['reference','challenger']}
+    (bundle/'bundle.json').write_text(json.dumps(manifest))
+    original_bundle=(bundle/'bundle.json').read_bytes()
+    class Pipeline:
+        def predict_proba(self,frame):return np.tile([.75,.25],(len(frame),1))
+    models={n:{'features':m['features'],'pipeline':Pipeline(),'calibrator':None,'threshold':.5}
+        for n,m in manifest['models'].items()}
+    monkeypatch.setattr(p,'load_bundle',lambda output:(manifest,models))
+    source=Path(__file__).resolve().parents[1]/'config'
+    config=tmp_path/'config';config.mkdir()
+    parent=json.loads((source/'cp2_october10_cohort.json').read_text(encoding='utf-8'))
+    parent['bundle_sha256']=p.digest(bundle/'bundle.json');parent['record_sha256']=p.record_digest(parent)
+    parent_path=config/'cp2_october10_cohort.json';parent_path.write_text(json.dumps(parent))
+    recovery=json.loads((source/'cp2_recovery_cohort.json').read_text(encoding='utf-8'))
+    recovery.update(bundle_sha256=parent['bundle_sha256'],parent_collection_protocol_sha256=p.digest(parent_path))
+    recovery['record_sha256']=p.record_digest(recovery)
+    protocol=config/'cp2_recovery_cohort.json';protocol.write_text(json.dumps(recovery))
+    (config/'cp2_model_current.json').write_text(json.dumps({'bundle_sha256':parent['bundle_sha256'],
+        'october10_cohort_protocol_sha256':p.digest(parent_path),'recovery_cohort_protocol_sha256':p.digest(protocol)}))
+    contract=p.cohort_contract(bundle,manifest,protocol)
+    assert contract['receipt_collection_protocol_sha256']==p.digest(parent_path)
+    assert contract['protocol_sha256']!=contract['receipt_collection_protocol_sha256']
+    clock=[p.timestamp('2026-10-16T11:02:00+08:00')]
+    monkeypatch.setattr(p,'datetime',SimpleNamespace(now=lambda tz:clock[0],fromisoformat=datetime.fromisoformat))
+    raw=raw_fixture().drop(columns=[b.TARGET])
+    for col in ['anchor_date','prediction_at','feature_snapshot_at','service_start_at','service_end_at']:
+        raw[col]=raw[col].str.replace('2026-09-28','2026-10-16',regex=False)
+    raw['outcome_end_date']='2026-11-15'
+    input_path=tmp_path/'input.json';input_path.write_text(raw.to_json(orient='records'))
+    receipt=source_receipt(input_path)
+    for col in ['extracted_at_utc','prediction_generated_at_utc']:
+        receipt[col]=receipt[col].replace('2026-09-28','2026-10-16')
+    receipt.update(collection_protocol_sha256=p.digest(parent_path),collection_timing_policy=parent['timing_policy'])
+    logs=tmp_path/'outputs/logs'
+    assert p.score(bundle,input_path,logs,source_receipt=receipt,protocol_path=parent_path)['logged_rows']==1
+    clock[0]=p.timestamp('2026-11-30T12:00:00+08:00')
+    truth_path=tmp_path/'truth.json';raw.assign(**{b.TARGET:True}).to_json(truth_path,orient='records')
+    outcome={'source':p.SOURCE_NAME,'extracted_at_utc':'2026-11-30T11:00:00+08:00',
+        'snapshot_sha256':'a'*64,'feature_input_sha256':p.digest(truth_path),
+        'complete_calendar_inventory':True,'calendar_coverage_start':'2000-01-01','complete_outcomes_through':'2026-11-29'}
+    labels=tmp_path/'outputs/recovery_labels.json'
+    with pytest.raises(ValueError,match='completed-day'):
+        p.prepare_labels(bundle,truth_path,outcome|{'complete_outcomes_through':'2026-11-28'},labels,protocol_path=protocol)
+    p.prepare_labels(bundle,truth_path,outcome,labels,protocol_path=protocol)
+    logged=next(logs.glob('*.json'));original_log=logged.read_bytes();logged.unlink()
+    with pytest.raises(ValueError,match='No prospectively'):
+        p.evaluate(bundle,labels,logs,protocol_path=protocol)
+    entry=json.loads(original_log);entry['logged_at_utc']='2026-10-16T11:07:00+08:00'
+    entry['record_sha256']=p.record_digest(entry);logged.write_text(json.dumps(entry))
+    with pytest.raises(ValueError,match='backfill|five minutes'):
+        p.evaluate(bundle,labels,logs,protocol_path=protocol)
+    logged.write_bytes(original_log)
+    original_protocol=protocol.read_bytes();protocol.write_bytes(original_protocol+b' ')
+    with pytest.raises(ValueError,match='immutable hash'):
+        p.evaluate(bundle,labels,logs,protocol_path=protocol)
+    protocol.write_bytes(original_protocol)
+    (bundle/'bundle.json').write_bytes(original_bundle+b' ')
+    with pytest.raises(ValueError,match='protocol|contract'):
+        p.evaluate(bundle,labels,logs,protocol_path=protocol)
+    (bundle/'bundle.json').write_bytes(original_bundle)
+    prior=bundle/'prospective_october10_evaluation.json';prior.write_text('{"status":"incomplete"}')
+    prior_bytes=prior.read_bytes()
+    assert p.evaluate(bundle,labels,logs,protocol_path=protocol)['rows']==1
+    assert prior.read_bytes()==prior_bytes
+    with pytest.raises(ValueError,match='already recorded'):
+        p.evaluate(bundle,labels,logs,protocol_path=protocol)
 
 
 def source_receipt(input_path):
@@ -88,6 +162,85 @@ def test_freeze_does_not_overwrite_existing_bundle(tmp_path):
     (tmp_path/'bundle.json').write_text('{}')
     with pytest.raises(ValueError,match='already exists'):
         p.freeze(tmp_path)
+
+
+@pytest.mark.parametrize('cross_gate', [False, True])
+def test_new_overnight_score_is_protocol_bound_and_checks_actual_commit(tmp_path,monkeypatch,cross_gate):
+    raw=raw_fixture().drop(columns=[b.TARGET]).assign(anchor_date='2026-10-10',
+        service_start_at='2026-10-10T23:55:00+08:00',service_end_at='2026-10-11T01:00:00+08:00',
+        prediction_at='2026-10-10T23:46:00+08:00',feature_snapshot_at='2026-10-10T23:44:00+08:00',
+        outcome_end_date='2026-11-09')
+    input_path=tmp_path/'input.json';input_path.write_text(raw.to_json(orient='records'))
+    manifest=manifest_fixture()|{'target':'recorded_corrective_calendar_callback_within_30d',
+        'earliest_final_evaluation_date':'2026-11-27','version':'prospective_callback_v2_corrected',
+        'review_fraction':.2,'models':{name:{'features':['anchor_is_first']} for name in ['reference','challenger']}}
+    (tmp_path/'bundle.json').write_text(json.dumps(manifest))
+    protocol={'schema_version':1,'name':'cp2_october10_2026','date_authority':'Calendar',
+        'declared_at_utc':'2026-10-09T01:00:00+00:00','cohort_start':'2026-10-10',
+        'cohort_end':'2026-10-27','earliest_final_evaluation_date':'2026-11-27',
+        'target':manifest['target'],'bundle_sha256':p.digest(tmp_path/'bundle.json'),
+        'timing_policy':'post_end_or_overnight_2345_v1'}
+    protocol['record_sha256']=p.record_digest(protocol)
+    config=tmp_path/'config';config.mkdir()
+    path=config/'cp2_october10_cohort.json';path.write_text(json.dumps(protocol))
+    (config/'cp2_model_current.json').write_text(json.dumps({'bundle_sha256':protocol['bundle_sha256'],
+        'october10_cohort_protocol_sha256':p.digest(path)}))
+    models={name:{'features':['anchor_is_first'],'calibrator':None,'threshold':.5} for name in ['reference','challenger']}
+    monkeypatch.setattr(p,'load_bundle',lambda output:(manifest,models))
+    clock=[p.timestamp('2026-10-10T23:47:00+08:00')]
+    monkeypatch.setattr(p,'datetime',SimpleNamespace(now=lambda tz:clock[0],fromisoformat=datetime.fromisoformat))
+    def inference(artifact,frame):
+        assert b.TARGET not in frame
+        if cross_gate:clock[0]=p.timestamp('2026-10-10T23:51:00+08:00')
+        return np.full(len(frame),.25)
+    monkeypatch.setattr(p,'artifact_probability',inference)
+    receipt={'source':p.SOURCE_NAME,'extracted_at_utc':'2026-10-10T23:43:00+08:00',
+        'prediction_generated_at_utc':'2026-10-10T23:46:00+08:00','run_id':'fixture',
+        'snapshot_sha256':'a'*64,'feature_input_sha256':p.digest(input_path),
+        'collection_protocol_sha256':p.digest(path),'collection_timing_policy':protocol['timing_policy']}
+    logs=tmp_path/'outputs/logs'
+    if cross_gate:
+        with pytest.raises(ValueError,match='five minutes'):
+            p.score(tmp_path,input_path,logs,source_receipt=receipt,protocol_path=path)
+        assert not list(logs.glob('*.json'))
+    else:
+        assert p.score(tmp_path,input_path,logs,source_receipt=receipt,protocol_path=path)['logged_rows']==1
+        entry=json.loads(next(logs.glob('*.json')).read_text())
+        assert entry['source_receipt']['collection_protocol_sha256']==p.digest(path)
+        assert b.TARGET not in entry['row']
+        assert p.timestamp(entry['logged_at_utc'])<p.timestamp(entry['row']['service_start_at'])
+        with pytest.raises(ValueError,match='bind'):
+            p.score(tmp_path,input_path,logs,source_receipt=receipt|{'collection_protocol_sha256':'0'*64},protocol_path=path)
+        clock[0]=p.timestamp('2026-11-27T14:00:00+08:00')
+        evaluation_bundle=tmp_path/'outputs'
+        (evaluation_bundle/'bundle.json').write_bytes((tmp_path/'bundle.json').read_bytes())
+        truth=tmp_path/'truth.json';raw.assign(**{b.TARGET:True}).to_json(truth,orient='records')
+        outcome_receipt={'source':p.SOURCE_NAME,'extracted_at_utc':'2026-11-27T13:00:00+08:00',
+            'snapshot_sha256':'a'*64,'feature_input_sha256':p.digest(truth),
+            'complete_calendar_inventory':True,'calendar_coverage_start':'2000-01-01',
+            'complete_outcomes_through':'2026-11-26'}
+        labels=tmp_path/'outputs/labels.json'
+        with pytest.raises(ValueError,match='completed-day'):
+            p.prepare_labels(tmp_path,truth,outcome_receipt|{'complete_outcomes_through':'2026-11-25'},labels,protocol_path=path)
+        p.prepare_labels(tmp_path,truth,outcome_receipt,labels,protocol_path=path)
+        log_path=next(logs.glob('*.json'));original=log_path.read_bytes()
+        log_path.unlink()
+        with pytest.raises(ValueError,match='No prospectively'):
+            p.evaluate(evaluation_bundle,labels,logs,protocol_path=path)
+        changed=json.loads(original);changed['logged_at_utc']='2026-10-10T23:51:00+08:00'
+        changed['record_sha256']=p.record_digest(changed);log_path.write_text(json.dumps(changed))
+        with pytest.raises(ValueError,match='five minutes'):
+            p.evaluate(evaluation_bundle,labels,logs,protocol_path=path)
+        log_path.write_bytes(original)
+        bundle_bytes=(evaluation_bundle/'bundle.json').read_bytes()
+        (evaluation_bundle/'bundle.json').write_bytes(bundle_bytes+b' ')
+        with pytest.raises(ValueError,match='protocol'):
+            p.evaluate(evaluation_bundle,labels,logs,protocol_path=path)
+        (evaluation_bundle/'bundle.json').write_bytes(bundle_bytes)
+        result=p.evaluate(evaluation_bundle,labels,logs,protocol_path=path)
+        assert result['rows']==1 and (evaluation_bundle/'prospective_october10_evaluation.json').exists()
+        with pytest.raises(ValueError,match='already recorded'):
+            p.evaluate(evaluation_bundle,labels,logs,protocol_path=path)
 
 
 def test_real_scoring_logs_unknown_outcome_and_retries_preserve_first_commit(tmp_path,monkeypatch):
@@ -440,3 +593,24 @@ def test_registered_cloud_protocol_is_separate_and_immutable(tmp_path):
     path.write_text(json.dumps(protocol))
     with pytest.raises(ValueError,match='immutable hash'):
         p.cohort_contract(bundle,manifest,path)
+
+
+def test_october5_protocol_has_separate_result_and_rejects_tampering(tmp_path,monkeypatch):
+    monkeypatch.setattr(p.b,'ROOT',tmp_path)
+    bundle=tmp_path/'outputs/bundle';bundle.mkdir(parents=True)
+    manifest=manifest_fixture()|{'target':'recorded_corrective_calendar_callback_within_30d',
+        'earliest_final_evaluation_date':'2026-11-27'}
+    (bundle/'bundle.json').write_text(json.dumps(manifest))
+    protocol={'schema_version':1,'name':'cp2_october5_2026','declared_at_utc':'2026-10-04T13:00:00Z',
+        'cohort_start':'2026-10-05','cohort_end':'2026-10-27',
+        'earliest_final_evaluation_date':'2026-11-27','bundle_sha256':p.digest(bundle/'bundle.json'),
+        'target':manifest['target'],'date_authority':'Calendar'}
+    protocol['record_sha256']=p.record_digest(protocol)
+    config=tmp_path/'config';config.mkdir();path=config/'cp2_october5_cohort.json'
+    path.write_text(json.dumps(protocol))
+    (config/'cp2_model_current.json').write_text(json.dumps({'october5_cohort_protocol_sha256':p.digest(path)}))
+    contract=p.cohort_contract(bundle,manifest,path)
+    assert contract['result_path'].name=='prospective_october5_evaluation.json'
+    protocol['cohort_start']='2026-10-03';protocol['record_sha256']=p.record_digest(protocol)
+    path.write_text(json.dumps(protocol))
+    with pytest.raises(ValueError,match='immutable hash'): p.cohort_contract(bundle,manifest,path)

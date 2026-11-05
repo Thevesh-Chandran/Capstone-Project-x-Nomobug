@@ -9,6 +9,41 @@ import pytest
 from scripts import cp2_reporting_release as release
 
 
+def test_snapshot_retention_counts_exact_source_not_payment_sidecars():
+    existing = [f"payments_{n:064x}" for n in range(32)]
+    existing += [f"payments_date_serials_{n:064x}" for n in range(32)]
+    client = SimpleNamespace(
+        get_dataset=lambda _: SimpleNamespace(location=release.LOCATION, default_table_expiration_ms=None),
+        list_tables=lambda _: [SimpleNamespace(table_id=name) for name in existing])
+    item = {"prefix": "payments", "table_name": "payments_" + "f" * 64}
+    release.snapshot_preflight(client, [item])
+    existing.extend(f"payments_{n:064x}" for n in range(32, release.SNAPSHOT_LIMIT))
+    with pytest.raises(ValueError, match="Snapshot retention review required for payments"):
+        release.snapshot_preflight(client, [item])
+    release.snapshot_preflight(client, [{"prefix": "payments", "table_name": existing[0]}])
+
+
+def test_management_privacy_gate_accepts_aggregates_and_rejects_nested_contacts():
+    from google.cloud import bigquery
+    fields = [bigquery.SchemaField("billing_arrangement", "STRING"),
+              bigquery.SchemaField("positive_recorded_remaining_balance_rm", "NUMERIC")]
+    client = SimpleNamespace(get_table=lambda name: SimpleNamespace(schema=fields))
+    inventory = [("gold", "dashboard_recurring_payment_quality", "candidate_gold")]
+    release.verify_management_privacy(client, inventory)
+    fields.append(bigquery.SchemaField("detail", "RECORD", fields=[
+        bigquery.SchemaField("customer_email", "STRING")]))
+    with pytest.raises(ValueError, match="Private field"):
+        release.verify_management_privacy(client, inventory)
+
+
+def test_management_privacy_gate_rejects_individual_sale_identifiers():
+    from google.cloud import bigquery
+    client = SimpleNamespace(get_table=lambda name: SimpleNamespace(schema=[
+        bigquery.SchemaField("sales_record_id", "STRING")]))
+    with pytest.raises(ValueError, match="Private field"):
+        release.verify_management_privacy(client, [("gold", "dashboard_service_monthly", "candidate_gold")])
+
+
 def test_manifest_pins_every_approved_source_and_payment_sidecar():
     sheets = {tab: {"table_name": f"{tab.lower().replace(' ', '_')}_{'a' * 64}",
                      "metadata": {"extracted_at": "2026-09-28T00:00:00+00:00"}}
@@ -26,6 +61,24 @@ def test_manifest_pins_every_approved_source_and_payment_sidecar():
     del sheets["WARRANTY CLAIM"]
     with pytest.raises(ValueError, match="Incomplete"):
         release.public_manifest("20260928000000abcdef", sheets, calendar, serials)
+
+
+def test_future_bookings_use_separate_snapshot_without_changing_outcome_window(monkeypatch):
+    from scripts import load_calendar_bronze as calendar
+    observed = {}
+    targets = [{"id": str(n), "summary": f"Team {n}"} for n in range(6)]
+    monkeypatch.setattr(calendar, "_targets", lambda path: targets)
+    def fetch(approved, start, end):
+        observed.update(start=start, end=end, targets=approved)
+        return []
+    monkeypatch.setattr(calendar, "_fetch", fetch)
+    item = release.upcoming_snapshot()
+    assert (observed["end"] - observed["start"]).days == 29
+    assert observed["targets"] == targets
+    assert item["table_name"].startswith("planned_calendar_")
+    assert item["prefix"] == "planned_calendar"
+    assert item["metadata"]["purpose"] == "reporting_future_bookings_not_model_outcomes"
+    assert "complete_outcomes_through" not in item["metadata"]
 
 
 @dataclass
@@ -142,15 +195,18 @@ def test_reporting_release_rejects_warranty_review_seed_drift(monkeypatch):
         release.verify_live_warranty_reviews(client, prefix)
 
 
-def test_snapshot_retention_counts_exact_source_not_payment_sidecars():
-    existing = [f"payments_{n:064x}" for n in range(32)]
-    existing += [f"payments_date_serials_{n:064x}" for n in range(32)]
-    client = SimpleNamespace(
-        get_dataset=lambda _: SimpleNamespace(location=release.LOCATION, default_table_expiration_ms=None),
-        list_tables=lambda _: [SimpleNamespace(table_id=name) for name in existing])
-    item = {"prefix": "payments", "table_name": "payments_" + "f" * 64}
-    release.snapshot_preflight(client, [item])
-    existing.extend(f"payments_{n:064x}" for n in range(32, release.SNAPSHOT_LIMIT))
-    with pytest.raises(ValueError, match="Snapshot retention review required for payments"):
-        release.snapshot_preflight(client, [item])
-    release.snapshot_preflight(client, [{"prefix": "payments", "table_name": existing[0]}])
+def test_failed_release_retains_diagnostics_without_compiled_sql(tmp_path, monkeypatch):
+    import json
+    monkeypatch.setattr(release, 'ROOT', tmp_path)
+    path = tmp_path/'outputs/reporting_release/case/dbt_target/run_results.json'
+    path.parent.mkdir(parents=True)
+    path.write_text(json.dumps({'results': [
+        {'status': 'error', 'unique_id': 'test.case', 'message': 'invalid query',
+         'compiled_code': 'PRIVATE_SOURCE_SQL', 'adapter_response': {'job_id': 'job'}},
+        {'status': 'pass', 'unique_id': 'test.passed'}]}))
+    summary = release.dbt_failure_summary('case')
+    assert summary['failed_checks'] == 1
+    assert summary['checks'][0]['job_id'] == 'job'
+    assert 'PRIVATE_SOURCE_SQL' not in json.dumps(summary)
+    path.write_text('{broken')
+    assert release.dbt_failure_summary('case')['status'] == 'results_unreadable'

@@ -1,0 +1,11 @@
+numpy==2.5.2
+pandas==3.0.5
+scikit-learn==1.9.0
+joblib==1.6.0
+threadpoolctl==3.6.0
+requests==2.34.2
+google-auth==2.57.0
+google-api-python-client==2.200.0
+google-cloud-bigquery==3.44.0
+python-dotenv==1.2.3
+tzdata==2026.3
