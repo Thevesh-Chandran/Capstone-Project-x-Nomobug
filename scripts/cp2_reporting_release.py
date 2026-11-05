@@ -7,7 +7,8 @@ pre-promotion check never touches the stable views.
 from __future__ import annotations
 
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+from zoneinfo import ZoneInfo
 import json
 import os
 from pathlib import Path
@@ -85,6 +86,7 @@ def dbt_variables(manifest: dict) -> dict:
     tables = manifest["snapshot_tables"]
     variables = {key: tables[tab] for tab, key in TAB_VARS.items()}
     variables.update({"calendar_snapshot_table": tables["calendar"],
+        "b2b_call_columns_v2": manifest.get("b2b_call_columns_v2", False),
         "payments_date_serials_snapshot_table": tables["payments_date_serials"],
         "prospects_snapshot_id": tables["2026"].rsplit("_", 1)[1],
         "prospects_snapshot_extracted_at": manifest["extracted_at"]["2026"],
@@ -96,12 +98,53 @@ def dbt_variables(manifest: dict) -> dict:
     variables["release_extracted_at_calendar"] = manifest["extracted_at"]["calendar"]
     variables["release_extracted_at_payments_date_serials"] = manifest["extracted_at"]["payments_date_serials"]
     variables["calendar_geocodes_table"] = manifest["derived_quality_tables"]["calendar_geocodes"]
+    # Future bookings are reporting-only; never extend historical outcome coverage.
+    if "upcoming_calendar" in tables:
+        variables["upcoming_calendar_snapshot_table"] = tables["upcoming_calendar"]
+        variables["upcoming_calendar_extracted_at"] = manifest["extracted_at"]["upcoming_calendar"]
     return variables
+
+
+def upcoming_snapshot():
+    """Read the next 30 local days independently of the frozen model feed."""
+    from scripts import load_calendar_bronze as calendar
+    start = datetime.now(ZoneInfo("Asia/Kuala_Lumpur")).date()
+    end = start + timedelta(days=29)
+    targets = calendar._targets(calendar._local_path(os.getenv("NOMOBUG_GOOGLE_METADATA"),
+        "data/profiles/google_source_metadata.json"))
+    item = calendar._snapshot(calendar._fetch(targets, start, end), targets, start, end)
+    item["table_name"] = "planned_calendar_" + item["metadata"]["snapshot_id"]
+    item["prefix"] = "planned_calendar"
+    item["metadata"]["purpose"] = "reporting_future_bookings_not_model_outcomes"
+    return item
+
+
+def dbt_failure_summary(run_id: str) -> dict:
+    """Keep bounded diagnostics in the private audit dataset, never cloud logs."""
+    path = ROOT / 'outputs' / 'reporting_release' / run_id / 'dbt_target' / 'run_results.json'
+    if not path.exists():
+        return {'status': 'results_unavailable'}
+    try:
+        if path.stat().st_size > 16 * 1024 * 1024:
+            return {'status': 'results_exceed_read_bound'}
+        results = json.loads(path.read_text(encoding='utf-8'))['results']
+        failed = [row for row in results if row['status'] in ('error', 'fail')]
+        return {'status': 'recorded', 'failed_checks': len(failed),
+                'omitted_checks': max(0, len(failed) - 20),
+                'checks': [{'node': row['unique_id'], 'status': row['status'],
+                    'failures': row.get('failures'),
+                    'message': str(row.get('message', ''))[:4000],
+                    'job_id': row.get('adapter_response', {}).get('job_id')}
+                    for row in failed[:20]]}
+    except (ValueError, KeyError, TypeError):
+        return {'status': 'results_unreadable'}
 
 
 def audit(client: bigquery.Client, run_id: str, status: str, manifest: dict | None = None,
           error: BaseException | None = None) -> None:
     table = f"{PROJECT}.audit.release_runs"
+    if status == 'FAILED':
+        manifest = {**(manifest or {}), 'validation_failure_summary': dbt_failure_summary(run_id)}
     row = {"run_id": run_id, "event_at": datetime.now(timezone.utc).isoformat(),
         "status": status, "manifest_json": json.dumps(manifest, sort_keys=True) if manifest else None,
         "error_type": type(error).__name__ if error else None}
@@ -237,6 +280,26 @@ def view_inventory(client: bigquery.Client, stage_prefix: str) -> list[tuple[str
     return inventory
 
 
+def verify_management_privacy(client: bigquery.Client, inventory: list[tuple[str, str, str]]) -> None:
+    """Reject identity/contact fields in the explicitly approved management sources.
+
+    Other Gold objects are restricted intermediates, not dashboard sources.
+    This schema gate does not certify viewer permissions or value-level privacy.
+    """
+    forbidden = re.compile(
+        r"(^|_)(?:phone|email|customer_name|client_name|sales_record_id|event_id|"
+        r"calendar_event_row|address_hash|property_group_key|address|bank|account_number|"
+        r"description|individual_risk|risk_probability)(_|$)", re.IGNORECASE)
+    def inspect(fields):
+        for field in fields:
+            if forbidden.search(field.name):
+                raise ValueError("Private field in management source: " + field.name)
+            inspect(field.fields)
+    for schema, name, candidate in inventory:
+        if schema == "gold" and name in MANAGEMENT_GOLD_VIEWS:
+            inspect(client.get_table(f"{PROJECT}.{candidate}.{name}").schema)
+
+
 def grant_collector_candidate_reader(client: bigquery.Client, stage_prefix: str) -> None:
     """Grant the private collector read access before stable views point here."""
     if not re.fullmatch(r"cp2r_[0-9]{14}[0-9a-f]{6}_", stage_prefix):
@@ -279,26 +342,6 @@ def verify_live_warranty_reviews(client: bigquery.Client, stage_prefix: str) -> 
     rows = list(client.query(query, job_config=settings, location=LOCATION).result(timeout=120))
     if len(rows) != 1 or rows[0]["mismatches"]:
         raise ValueError("Stable warranty review overrides differ from candidate seed")
-
-
-def verify_management_privacy(client: bigquery.Client, inventory: list[tuple[str, str, str]]) -> None:
-    """Reject identity/contact fields in the explicitly approved management sources.
-
-    Other Gold objects are restricted intermediates, not dashboard sources.
-    This schema gate does not certify viewer permissions or value-level privacy.
-    """
-    forbidden = re.compile(
-        r"(^|_)(?:phone|email|customer_name|client_name|sales_record_id|event_id|"
-        r"calendar_event_row|address_hash|property_group_key|address|bank|account_number|"
-        r"description|individual_risk|risk_probability)(_|$)", re.IGNORECASE)
-    def inspect(fields):
-        for field in fields:
-            if forbidden.search(field.name):
-                raise ValueError("Private field in management source: " + field.name)
-            inspect(field.fields)
-    for schema, name, candidate in inventory:
-        if schema == "gold" and name in MANAGEMENT_GOLD_VIEWS:
-            inspect(client.get_table(f"{PROJECT}.{candidate}.{name}").schema)
 
 
 def promote(client: bigquery.Client, inventory: list[tuple[str, str, str]], run_dir: Path) -> None:
@@ -368,18 +411,66 @@ def finish_release(client: bigquery.Client, run_dir: Path, manifest: dict) -> di
     if validation["status"] != "pass_with_business_caveats":
         raise ValueError("Candidate KPI reconciliation failed")
     verify_live_warranty_reviews(client, stage_prefix)
-    audit(client, run_id, "VALIDATED", manifest)
     inventory = view_inventory(client, stage_prefix)
+    verify_management_privacy(client, inventory)
+    audit(client, run_id, "VALIDATED", manifest)
     promote(client, inventory, run_dir)
     audit(client, run_id, "PUBLISHED", manifest)
     safe_json(run_dir / "result.json", {"status": "PUBLISHED", "run_id": run_id,
         "view_count": len(inventory), "manifest": manifest})
+    # Optional website delivery is downstream of the approved release. A failed
+    # website export must never roll back published Gold or touch the collector.
+    portal_uri = os.getenv("CP2_PORTAL_GCS_URI")
+    if portal_uri:
+        try:
+            from webapp import data as portal_data, storage as portal_storage
+            portal_folder = run_dir / "portal_aggregate"
+            from scripts.release_business_analytics import run as release_business
+            release_business(portal_folder, publish=True)
+            portal_data.refresh(portal_folder, client=client)
+            portal_storage.publish_business(portal_uri, portal_folder)
+            portal_storage.publish_business(portal_uri,portal_folder,name='business_tools_private.json')
+            safe_json(run_dir / "portal_export.json", {"status": "PUBLISHED", "run_id": run_id})
+        except Exception as exc:
+            safe_json(run_dir / "portal_export.json", {"status": "FAILED", "error_type": type(exc).__name__})
+            try:
+                audit(client, run_id, "PORTAL_EXPORT_FAILED", manifest, error=exc)
+            except Exception:
+                # Gold was already published; preserve the actual release outcome.
+                safe_json(run_dir / "portal_export_audit_failure.json", {"status":"AUDIT_WRITE_FAILED"})
+    # Live return-visit risk scores (return_risk_v1). Off until the image carries the
+    # frozen feature SQL inputs; a failure never affects the published release.
+    if portal_uri and os.getenv("CP2_RETURN_RISK_PREDICTORS") == "yes":
+        try:
+            from scripts.publish_return_risk_predictors import from_release
+            predictor_receipt = from_release(run_dir, portal_uri, client=client)
+            safe_json(run_dir / "return_risk_export.json", predictor_receipt)
+            audit(client, run_id, "RETURN_RISK_PUBLISHED", predictor_receipt)
+        except Exception as exc:
+            safe_json(run_dir / "return_risk_export.json", {"status": "FAILED", "error_type": type(exc).__name__})
+            audit(client, run_id, "RETURN_RISK_EXPORT_FAILED", manifest, error=exc)
+    # Copy the models' current answers into the `predictions` dataset for Looker Studio.
+    # Runs after the scores above are published; a failure never affects the release.
+    if portal_uri and os.getenv("CP2_PREDICTION_TABLES") == "yes":
+        try:
+            from scripts.publish_prediction_tables import from_uri
+            tables_receipt = from_uri(portal_uri, client=client)
+            safe_json(run_dir / "prediction_tables.json", tables_receipt)
+        except Exception as exc:
+            safe_json(run_dir / "prediction_tables.json", {"status": "FAILED", "error_type": type(exc).__name__})
+            try:
+                audit(client, run_id, "PREDICTION_TABLES_FAILED", manifest, error=exc)
+            except Exception:
+                pass
     return {"status": "PUBLISHED", "run_id": run_id, "view_count": len(inventory)}
 
 
 def run() -> dict:
     if os.getenv("NOMOBUG_BQ_UPLOAD_APPROVED") != "yes":
         raise ValueError("NOMOBUG_BQ_UPLOAD_APPROVED=yes required")
+    geocoding_mode=os.getenv('CP2_GEOCODING_ENABLED','no')
+    if geocoding_mode not in ('yes','no'):
+        raise ValueError('CP2_GEOCODING_ENABLED must be exactly yes or no')
     run_id = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S") + uuid.uuid4().hex[:6]
     run_dir = ROOT / "outputs" / "reporting_release" / run_id
     run_dir.mkdir(parents=True)
@@ -403,12 +494,33 @@ def run() -> dict:
             raise ValueError("Calendar snapshot identity changed before upload")
         calendar["schema"] = regenerated["schema"]
         calendar["prefix"] = "calendar_events"
-        all_items = list(sheets.values()) + [calendar]
+        upcoming = upcoming_snapshot()
+        all_items = list(sheets.values()) + [calendar, upcoming]
         snapshot_preflight(client, all_items)
         for item in sheets.values():
             operational_bronze_core.load_and_verify(client, PROJECT, LOCATION, item)
         load_calendar_bronze._verify_load(client, PROJECT, LOCATION, calendar)
+        load_calendar_bronze._verify_load(client, PROJECT, LOCATION, upcoming)
+        # Calendar-fit tool is independent of financial/programme reconciliation.
+        # Publish only the complete verified six-Calendar extraction; its own
+        # capture time and source hash gate availability in the private website.
+        if os.getenv('CP2_PORTAL_GCS_URI'):
+            try:
+                from webapp import booking, storage as schedule_storage
+                from scripts.calendar_appointment_policy import load_policy, is_confirmed_placeholder
+                schedule=booking.export_snapshot(upcoming,load_policy(),is_confirmed_placeholder)
+                schedule_folder=run_dir/'booking_private';schedule_folder.mkdir(exist_ok=True)
+                safe_json(schedule_folder/'booking_schedule_private.json',schedule)
+                schedule_storage.publish_business(os.environ['CP2_PORTAL_GCS_URI'],schedule_folder,name='booking_schedule_private.json')
+                audit(client,run_id,'BOOKING_SCHEDULE_PUBLISHED',{'source_snapshot_id':schedule['source_snapshot_id'],'captured_at':schedule['captured_at'],'events':len(schedule['events'])})
+            except Exception as schedule_error:
+                safe_json(run_dir/'booking_export_failure.json',{'error_type':type(schedule_error).__name__})
         geocodes = remap_geocodes(client, calendar["table_name"])
+        if geocoding_mode == 'yes':
+            from scripts.cp2_geocoding import refresh as refresh_geocoding
+            geocodes = refresh_geocoding(client,calendar,sheets['SALES'],geocodes)
+            safe_json(run_dir/'geocoding_receipt.json',geocodes['daily_geocoding'])
+            audit(client,run_id,'GEOCODING_COMPLETED',{'daily_geocoding':geocodes['daily_geocoding']})
         receipt_path = run_dir / "serials_private.json"
         command = [sys.executable, str(ROOT / "scripts/load_payment_date_serials.py"), "--upload",
             "--source-table", sheets["PAYMENTS"]["table_name"], "--receipt-json", str(receipt_path)]
@@ -419,9 +531,14 @@ def run() -> dict:
             raise RuntimeError("Payment date sidecar failed; see private serials.log")
         serials = cp2_pipeline.read(receipt_path)
         manifest = public_manifest(run_id, sheets, calendar, serials)
+        manifest['b2b_call_columns_v2'] = 'b2b_call_columns_v2' in sheets['B2B FOLLOW UP']['metadata'].get('nonsemantic_header_variations', [])
+        manifest["snapshot_tables"]["upcoming_calendar"] = upcoming["table_name"]
+        manifest["extracted_at"]["upcoming_calendar"] = upcoming["metadata"]["extracted_at"]
         manifest["derived_quality_tables"] = {"calendar_geocodes": geocodes["table_name"]}
         manifest["quality_coverage"] = {"reused_calendar_geocodes": geocodes["rows"],
             "calendar_rows": len(calendar["records"]), "reuse_rule": geocodes["reuse_rule"]}
+        if geocodes.get('daily_geocoding'):
+            manifest['quality_coverage']['daily_geocoding']=geocodes['daily_geocoding']
         safe_json(run_dir / "release_manifest.json", manifest)
         audit(client, run_id, "BRONZE_VERIFIED", manifest)
         return finish_release(client, run_dir, manifest)
