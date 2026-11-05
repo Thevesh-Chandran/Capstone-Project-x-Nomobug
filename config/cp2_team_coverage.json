@@ -1,0 +1,140 @@
+{
+  "version": 1,
+  "recorded_date_local": "2026-10-30",
+  "authority": "User confirmation in CP2 chat",
+  "purpose": "Booking and rescheduling team preferences; not proof of availability or service qualification",
+  "interpretations": [
+    "User's dashboard is interpreted as Team Dash, matching the existing Calendar inventory.",
+    "Charlie normally covers Selangor; named examples confirmed clearly are Shah Alam and Subang.",
+    "No formal territory boundaries were supplied. Do not infer a boundary from a district centroid."
+  ],
+  "rules": {
+    "territories_are_preferences": true,
+    "cross_area_cover_allowed": true,
+    "check_time_conflicts_and_travel_before_recommending": true,
+    "unknown_availability_is_not_free": true,
+    "existing_bookings_remain_fixed_unless_staff_explicitly_change_them": true,
+    "working_hours_and_service_restrictions_require_confirmation": true
+  },
+  "teams": [
+    {
+      "id": "ace",
+      "calendar_name": "TEAM ACE (Izzat)",
+      "active": true,
+      "visit_type": "treatment",
+      "normal_region": "Kuala Lumpur",
+      "normal_areas": [],
+      "role": "regular_team",
+      "cross_area_cover": true
+    },
+    {
+      "id": "charlie",
+      "calendar_name": "TEAM CHARLIE (Aliff)",
+      "active": true,
+      "visit_type": "treatment",
+      "normal_region": "Selangor",
+      "normal_areas": [
+        "Shah Alam",
+        "Subang"
+      ],
+      "role": "regular_team",
+      "cross_area_cover": true
+    },
+    {
+      "id": "dash",
+      "calendar_name": "TEAM DASH (Faris)",
+      "active": true,
+      "visit_type": "treatment",
+      "normal_region": null,
+      "normal_areas": [
+        "Dengkil",
+        "Cyberjaya",
+        "Putrajaya"
+      ],
+      "role": "regular_team",
+      "cross_area_cover": true,
+      "note": "Farther areas are examples, not a complete boundary or distance threshold."
+    },
+    {
+      "id": "sales",
+      "calendar_name": "SALES TEAM",
+      "active": true,
+      "visit_type": "consultation",
+      "normal_region": null,
+      "normal_areas": [],
+      "role": "consultation_only",
+      "cross_area_cover": true,
+      "note": "Covers any area for consultation only; never assign treatment."
+    },
+    {
+      "id": "beast",
+      "calendar_name": "TEAM BEAST (HAFIZ)",
+      "active": false,
+      "visit_type": "treatment",
+      "normal_region": null,
+      "normal_areas": [],
+      "role": "inactive",
+      "cross_area_cover": false,
+      "note": "No one currently working. Preserve historical records; exclude from new recommendations."
+    },
+    {
+      "id": "replacement",
+      "calendar_name": "REPLACEMENT TECHNICIAN",
+      "active": true,
+      "visit_type": "treatment",
+      "normal_region": null,
+      "normal_areas": [],
+      "role": "backup",
+      "allowed_regions": [
+        "Kuala Lumpur",
+        "Selangor"
+      ],
+      "cross_area_cover": true,
+      "note": "Backup coverage confirmed for KL and Selangor; availability still needs checking."
+    }
+  ],
+  "booking_areas": [
+    {
+      "id": "kl",
+      "name": "Kuala Lumpur",
+      "region": "Kuala Lumpur",
+      "usual": "ace"
+    },
+    {
+      "id": "shah_alam",
+      "name": "Shah Alam",
+      "region": "Selangor",
+      "usual": "charlie"
+    },
+    {
+      "id": "subang",
+      "name": "Subang",
+      "region": "Selangor",
+      "usual": "charlie"
+    },
+    {
+      "id": "dengkil",
+      "name": "Dengkil",
+      "region": "Selangor",
+      "usual": "dash"
+    },
+    {
+      "id": "cyberjaya",
+      "name": "Cyberjaya",
+      "region": "Selangor",
+      "usual": "dash"
+    },
+    {
+      "id": "putrajaya",
+      "name": "Putrajaya",
+      "region": "Putrajaya",
+      "usual": "dash"
+    },
+    {
+      "id": "other_selangor",
+      "name": "Other Selangor area",
+      "region": "Selangor",
+      "usual": "charlie"
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "declared_at_utc": "2026-10-16T16:03:53.938557+00:00",
+  "inputs": {
+    "features": {
+      "path": "outputs/model_validation/20261016_target_research_3x/dataset_input.json",
+      "sha256": "c613459976b3589bede6d32a3532bfe66a5ebfee6a1a847a28543d687abdbd48"
+    },
+    "facts": {
+      "path": "outputs/model_validation/20261016_target_research/archived_facts_private.json",
+      "sha256": "ce14ef3c327f11c8656c249c2aab68cf8904743da26873660bce2ff911a3ce24"
+    },
+    "observation": {
+      "path": "outputs/model_validation/20261016_target_research/observation_receipt.json",
+      "sha256": "9fc938ed7dcfde96cdaf48f99db6e420d81488012259a350a56b5d976b377ede"
+    },
+    "anchor_keys": {
+      "path": "outputs/model_validation/20261016_target_research/anchor_keys_private.json",
+      "sha256": "413b929e487aaf3049f5a10a055adc7e27aef1d3fb83de6a22a5d15910a29a24"
+    }
+  },
+  "code_sha256": "a37c572187bea4d9a75a75c522df4d9c3a5b3971a85b8ac34169c318f19aa59a",
+  "complete_through": "2026-09-13",
+  "horizons": [
+    7,
+    14,
+    30,
+    60
+  ],
+  "targets": [
+    "final_paid_service"
+  ],
+  "populations": [
+    "residential"
+  ],
+  "models": [
+    "lr_c1.0_plain",
+    "et10_leaf5",
+    "rf_depth6",
+    "hist_depth3"
+  ],
+  "features": [
+    "service",
+    "history",
+    "weather",
+    "environment"
+  ],
+  "folds": [
+    [
+      "2025_q3",
+      "2025-07-01",
+      "2025-10-01"
+    ],
+    [
+      "2025_q4",
+      "2025-10-01",
+      "2026-01-01"
+    ],
+    [
+      "2026_q1",
+      "2026-01-01",
+      "2026-04-01"
+    ],
+    [
+      "2026_q2_summer",
+      "2026-04-01",
+      "2026-08-15"
+    ]
+  ],
+  "minimum_test_services": 50,
+  "minimum_test_positives": 5,
+  "threshold_rule": "Earlier chronological group-purged calibration only; maximum calibration F1; higher cutoff breaks ties",
+  "minimum_comparable_folds": 3,
+  "limits": [
+    "Previously inspected historical data; new comparisons are adaptive research, never fresh final accuracy.",
+    "Archived source rules and linked programme records may differ from current corrected sources.",
+    "Source identities and 30-day labels must reconcile before any alternate horizon.",
+    "All horizons require their full outcome window through the recorded source observation date.",
+    "Final-service target requires recorded complete unique stages 1..N, not independently confirmed treatment completion.",
+    "Positive windows can overlap and do not equal unique callback visit counts.",
+    "Compare horizons by business meaning and support; a higher accuracy on a rarer target does not establish better prediction.",
+    "No automatic production replacement, source modification, or prospective backfill.",
+    "30-day horizon matches the stated 3x claim period; other horizons are sensitivity analyses, not changed warranty entitlement."
+  ],
+  "pre_fit_amendment": "Original feature export omits source row keys. Added exact archived population/sale/date mapping before any model fit. Candidate pool and evaluation rules unchanged.",
+  "user_requested_supplement": "Residential 3x programmes after actual third paid service; Calendar return/warranty signals, not formal claim sheet submissions",
+  "original_full_source": {
+    "path": "outputs/cp2-v2/model_callback_normalized_pest/dataset_input.json",
+    "sha256": "464bb51386c1bcce9744f74f61b4d0b4265be4a4631c1ede97063b62346914d9"
+  },
+  "supplement_runner_sha256": "f712259bc70358bcbc81b0c6f3f4978fe702f70f490a06be9ee10e67c1d40d3b"
+}

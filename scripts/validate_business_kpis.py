@@ -18,6 +18,8 @@ from pathlib import Path
 import re
 from typing import Any
 from zoneinfo import ZoneInfo
+from scripts.calendar_appointment_policy import is_confirmed_placeholder
+from scripts.service_programme_policy import programme_calendar
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -221,6 +223,8 @@ def expected_calendar(raw: list[dict], reviews: list[dict]) -> list[dict]:
         raise ValueError("Duplicate Calendar review identity")
     output = []
     for row in raw:
+        if is_confirmed_placeholder(row):
+            continue
         identity = hashlib.sha256(f"{row['calendar_id']}|{row['event_id']}".encode()).hexdigest()
         label = overrides.get(identity)
         category = calendar_category(row["summary"], row["status"], label)
@@ -285,6 +289,17 @@ class Reader:
             raise ValueError("Invalid table identifier")
         if any(not re.fullmatch(r"[a-z0-9_]+", column) for column in columns):
             raise ValueError("Invalid column identifier")
+        # Only views are promoted. Private materialized facts in stable Gold
+        # may predate daily releases; reconcile the approved candidate facts.
+        if getattr(self, "published_gold_schema", None) and table.startswith(f"{self.project}.gold."):
+            name = table.rsplit(".", 1)[1]
+            current = self.client.get_table(table)
+            candidate = f"{self.project}.{self.published_gold_schema}.{name}"
+            if current.table_type == "VIEW":
+                if (current.view_query or "").strip() != f"SELECT * FROM `{candidate}`":
+                    raise ValueError("Gold view differs from published release")
+            else:
+                table = candidate
         sql = f"SELECT {', '.join(columns)} FROM `{table}`"
         settings = bigquery.QueryJobConfig(maximum_bytes_billed=MAXIMUM_BYTES_BILLED, use_query_cache=False)
         job = self.client.query(sql, job_config=settings)
@@ -295,6 +310,13 @@ class Reader:
 
     def source(self, silver_view: str, prefix: str) -> str:
         view = self.client.get_table(f"{self.project}.{self.silver_schema}.{silver_view}")
+        # Published stable views point at the approved release's Silver views.
+        # Follow only the exact same-model wrapper, never arbitrary SQL links.
+        wrapper = re.fullmatch(
+            rf"\s*SELECT\s+\*\s+FROM\s+`({re.escape(self.project)}\.(cp2r_[0-9]{{14}}[0-9a-f]{{6}}_silver)\.{re.escape(silver_view)})`\s*;?\s*",
+            view.view_query or "", re.IGNORECASE)
+        if wrapper and view.table_type == "VIEW":
+            view = self.client.get_table(wrapper.group(1))
         if view.table_type != "VIEW":
             raise ValueError("Source lineage requires a deployed Silver view")
         matches = set(re.findall(rf"\b{prefix}_[0-9a-f]{{64}}\b", view.view_query or ""))
@@ -302,6 +324,34 @@ class Reader:
             raise ValueError(f"Ambiguous {silver_view} snapshot lineage")
         name = matches.pop()
         return self.snapshot(name)
+
+    def published_serial_snapshot(self, payments_source: str) -> str:
+        """Resolve the sidecar from the same published release, not old YAML pins."""
+        from google.cloud import bigquery
+        sql = (f"SELECT run_id, manifest_json FROM `{self.project}.audit.release_runs` "
+               "WHERE status = 'PUBLISHED' ORDER BY event_at DESC LIMIT 1")
+        job = self.client.query(sql, job_config=bigquery.QueryJobConfig(
+            maximum_bytes_billed=MAXIMUM_BYTES_BILLED, use_query_cache=False))
+        rows = list(job.result(timeout=120))
+        self.jobs.append({"table": f"{self.project}.audit.release_runs", "job_id": job.job_id,
+                          "bytes_processed": job.total_bytes_processed, "bytes_billed": job.total_bytes_billed})
+        if len(rows) != 1:
+            raise ValueError("No published release for payment serial lineage")
+        manifest = json.loads(rows[0]["manifest_json"])
+        run_id = rows[0]["run_id"]
+        if not re.fullmatch(r"[0-9]{14}[0-9a-f]{6}", run_id) or manifest.get("run_id") != run_id:
+            raise ValueError("Invalid published release identity")
+        if payments_source != f"{self.project}.bronze.{manifest['snapshot_tables']['PAYMENTS']}":
+            raise ValueError("Published payment snapshot differs from stable Silver")
+        expected = f"SELECT * FROM `{self.project}.cp2r_{run_id}_gold.payments_monthly_recorded`"
+        facts = self.client.get_table(f"{self.project}.{self.gold_schema}.payments_monthly_recorded")
+        if facts.table_type != "VIEW" or (facts.view_query or "").strip() != expected:
+            raise ValueError("Payment report differs from published release")
+        self.published_gold_schema = f"cp2r_{run_id}_gold"
+        name = manifest['snapshot_tables']['payments_date_serials']
+        if not re.fullmatch(r"payments_date_serials_[0-9a-f]{64}", name):
+            raise ValueError("Invalid published payment serial snapshot")
+        return name
 
     def snapshot(self, name: str) -> str:
         table = self.client.get_table(f"{self.project}.bronze.{name}")
@@ -329,7 +379,10 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
     default_match = re.search(r"payments_date_serials_[0-9a-f]{64}", configured)
     if default_match is None:
         raise ValueError("No default payment serial snapshot")
-    identifier = reader.serials_table or default_match.group()
+    identifier = reader.serials_table
+    if identifier is None:
+        identifier = (reader.published_serial_snapshot(source_names["payments"])
+                      if reader.silver_schema == "silver" else default_match.group())
     source_names["serials"] = reader.snapshot(identifier)
     raw = {}
     selections = {
@@ -338,7 +391,7 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
     }
     for source, positions in selections.items():
         raw[source] = reader.read(source_names[source], ["source_sheet_row"] + [f"source_column_{p:03}" for p in positions])
-    raw["calendar"] = reader.read(source_names["calendar"], ["calendar_event_row", "calendar_id", "event_id", "status", "summary", "start_raw"])
+    raw["calendar"] = reader.read(source_names["calendar"], ["calendar_event_row", "calendar_id", "event_id", "status", "summary", "start_raw", "end_raw"])
     raw["serials"] = reader.read(source_names["serials"], ["source_sheet_row", "payment_date_display_raw", "unformatted_value", "unformatted_type"])
     with (ROOT / "dbt/seeds/sale_disposition_overrides.csv").open(encoding="utf-8", newline="") as stream:
         cancellations = {r["sales_record_id"] for r in csv.DictReader(stream)}
@@ -409,8 +462,26 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
         monthly = reader.read(f"{reader.project}.{reader.gold_schema}.{table}", [date_column] + names)
         actual[f"{name}_monthly"] = [{"month": month(r[date_column]), **{n: r[n] for n in names}} for r in monthly]
         checks[f"{name}_monthly_from_bronze"] = compare_rows(expected[f"{name}_monthly"], actual[f"{name}_monthly"], "month", names, name)
+    expected["programme_calendar"] = programme_calendar(raw["calendar"], expected["calendar"], as_of=today)
+    actual["programme_calendar"] = reader.read(
+        f"{reader.project}.{reader.gold_schema}.calendar_programme_service_facts",
+        ["calendar_event_row", "event_date_local", "event_category", "warranty_claim_candidate"])
+    checks["programme_calendar_source_to_reporting_rows"] = compare_rows(
+        expected["programme_calendar"], actual["programme_calendar"], "calendar_event_row",
+        ["event_date_local", "event_category", "warranty_claim_candidate"], "programme_calendar")
+    programme = reader.read(f"{reader.project}.{reader.gold_schema}.service_programme_warranty_windows",
+        ["programme_id", "source_sales_rows", "effective_paid_sessions", "recorded_programme_value_rm",
+         "reviewed_paid_stages", "recorded_paid_visit_rows", "warranty_policy_eligible",
+         "recorded_warranty_start_date", "recorded_warranty_end_date"])
+    upgraded = [r for r in programme if r["programme_id"] == "UPGRADE_0001"]
+    expected_upgrade = [{"programme_id": "UPGRADE_0001", "source_sales_rows": 2,
+        "effective_paid_sessions": 3, "recorded_programme_value_rm": Decimal(640),
+        "reviewed_paid_stages": 3, "recorded_paid_visit_rows": 3, "warranty_policy_eligible": True,
+        "recorded_warranty_start_date": date(2026,4,4), "recorded_warranty_end_date": date(2026,5,4)}]
+    checks["owner_upgraded_programme_paid_stages_and_warranty"] = compare_rows(expected_upgrade,
+        upgraded, "programme_id", list(expected_upgrade[0])[1:], "upgraded_programme")
     calendar_monthly = defaultdict(Counter)
-    for row in expected["calendar"]:
+    for row in expected["programme_calendar"]:
         when = row["event_date_local"]
         if when is not None and when.year == 2026:
             group = calendar_monthly[month(when)]
@@ -630,9 +701,19 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--silver-schema", default="silver")
     parser.add_argument("--gold-schema", default="gold")
     parser.add_argument("--serials-table")
+    parser.add_argument("--release-manifest", type=Path, help="Use one recorded release's Silver/Gold schemas and matching payment-date sidecar")
     parser.add_argument("--fresh-source-json", type=Path, help="Optional private Sheets artifact for source freshness comparison")
     parser.add_argument("--output-dir", type=Path, default=ROOT / "outputs/kpi_validation" / datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ"))
     args = parser.parse_args(argv)
+    if args.release_manifest:
+        release = json.loads(args.release_manifest.read_text(encoding="utf-8"))
+        release = release.get("manifest", release)
+        run_id = release["run_id"]
+        if not re.fullmatch(r"\d{14}[a-f0-9]{6}", run_id):
+            parser.error("Invalid reporting release identifier")
+        args.project, args.location = release["project"], release["location"]
+        args.silver_schema, args.gold_schema = "cp2r_"+run_id+"_silver", "cp2r_"+run_id+"_gold"
+        args.serials_table = release["snapshot_tables"]["payments_date_serials"]
     summary = validate(args.output_dir, args.fresh_source_json, project=args.project, location=args.location,
         silver_schema=args.silver_schema, gold_schema=args.gold_schema, serials_table=args.serials_table)
     print(json.dumps({"status": summary["status"], "checks": {name: result["status"] for name, result in summary["checks"].items()},
