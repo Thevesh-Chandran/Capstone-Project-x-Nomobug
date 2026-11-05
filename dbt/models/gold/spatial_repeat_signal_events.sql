@@ -5,7 +5,7 @@
 -- review, not pest spread.
 with signals as (
     select *
-    from {{ ref('calendar_service_event_facts') }}
+    from {{ ref('calendar_programme_service_facts') }}
     where warranty_claim_candidate
       and heatmap_eligible
       and location_precision_tier in ('precise_candidate', 'street_candidate')

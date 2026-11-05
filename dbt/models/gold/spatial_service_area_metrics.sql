@@ -11,7 +11,7 @@ with eligible as (
         sequence_over_package,
         warranty_claim_candidate,
         event_category
-    from {{ ref('calendar_service_event_facts') }}
+    from {{ ref('calendar_programme_service_facts') }}
     where heatmap_eligible
       and event_date_local between date '2026-01-01' and date '2026-12-31'
 ), metrics as (

@@ -1,0 +1,30 @@
+version: 2
+models:
+  - name: dashboard_model_review
+    description: Fixed historical 20-review comparison; random row is an expectation.
+    columns:
+      - name: review_rule
+        tests: [not_null, unique]
+  - name: dashboard_feature_comparison
+    description: Exploratory means from three chronological development folds.
+    columns:
+      - name: input_set
+        tests: [not_null, unique]
+  - name: dashboard_followup_baselines
+    description: Development-only exact-capacity model and history-rule comparison.
+    columns:
+      - name: fold
+        tests: [not_null]
+      - name: review_rule
+        tests: [not_null]
+  - name: dashboard_attention
+    description: Source-backed aggregate review actions with per-source freshness.
+    columns:
+      - name: category
+        tests: [not_null]
+      - name: action_date
+        tests: [not_null]
+      - name: next_action
+        tests: [not_null]
+      - name: source_view
+        tests: [not_null]

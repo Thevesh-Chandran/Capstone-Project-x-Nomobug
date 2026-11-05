@@ -9,7 +9,7 @@ with event_rows as (
         s.pest_type_raw,
         s.package_type_raw,
         coalesce(r.linked_refund_signal, false) as linked_refund_signal
-    from {{ ref('calendar_service_event_facts') }} f
+    from {{ ref('calendar_programme_service_facts') }} f
     left join {{ ref('sales_package_facts') }} s using (sales_record_id)
     left join (
         select sales_record_id, true as linked_refund_signal

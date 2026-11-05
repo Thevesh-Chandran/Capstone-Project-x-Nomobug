@@ -1,0 +1,2 @@
+event_identity_hash,appointment_state,expected_start_at_utc,expected_end_at_utc,reviewed_at_utc,reason_code
+909fc7a8f5af88eb89db3f8de0a906d36e8deb692975366523253da5335463d7,awaiting_client_date,2026-10-04T07:00:00+00:00,2026-10-04T08:00:00+00:00,2026-10-04T04:13:29+00:00,owner_confirmed_temporary_slot

@@ -15,6 +15,6 @@ select
     countif(sales_record_id is null) as unmatched_sales_event_rows,
     countif(match_status = 'ambiguous_sales') as ambiguous_sales_event_rows,
     'scheduled_calendar_workload_not_completed_treatment_or_capacity_hours' as denominator_evidence
-from {{ ref('calendar_service_event_facts') }}
+from {{ ref('calendar_programme_service_facts') }}
 where event_date_local between date '2026-01-01' and date '2026-12-31'
 group by service_date, calendar_name, day_of_week_number

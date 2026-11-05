@@ -1,5 +1,14 @@
 # Gold recorded-activity foundation
 
+The `recurring_tracking` models add a restricted SALES-based contract candidate
+register and owner-defined staff reminder-date list, preserving zero-balance
+history and custom-payment notes. The owner excluded PAYMENTS on 4 October;
+recorded paid amounts and balances now come only from SALES. Actual payment
+dates and paid-instalment attribution are unavailable. `dashboard_recurring_payment_quality` exposes
+only aggregate coverage/review counts. No reminder delivery, certified overdue
+balance or payment-to-instalment allocation is enabled. See
+[the current implementation and release status](../../../planning/CP2_RECURRING_PAYMENTS_REVIEW.md).
+
 Build with `python scripts/build_gold_foundation.py` from the repository root
 using the project virtual environment. The five fact views retain these grains:
 
@@ -110,3 +119,12 @@ against the fact views; `gold_refund_warranty_reconciliation` checks the two
 source-record grains and exception handling. These views are not final finance,
 warranty, refund or conversion KPIs until their business rules and
 duplicate/settlement evidence are validated.
+
+The owner-confirmed 1x plus Upsell 2x relationship now has separate private
+`service_programme_facts`, `calendar_programme_service_facts` and
+`service_programme_warranty_windows` models. Management service, package,
+scheduling and spatial summaries use the programme service facts. All three
+reviewed visits are paid; financial records remain two separate sales. The
+baseline `calendar_service_event_facts` stays reproducible for frozen model
+evidence and is not the corrected operational upgrade view. Programme dates
+remain recorded appointments rather than proof of treatment completion.

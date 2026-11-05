@@ -27,6 +27,6 @@ select
     ) as heatmap_warranty_claim_share,
     'scheduled_calendar_event_denominator_not_unique_customer_or_completed_treatment_count'
         as denominator_evidence
-from {{ ref('calendar_service_event_facts') }}
+from {{ ref('calendar_programme_service_facts') }}
 where event_date_local between date '2026-01-01' and date '2026-12-31'
 group by service_month
