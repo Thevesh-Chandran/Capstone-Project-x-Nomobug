@@ -1,0 +1,23 @@
+{{ config(tags=['operational']) }}
+select *,
+    '{{ source("operational_bronze", "recurring_payments").identifier }}' as snapshot_table,
+    concat('{{ source("operational_bronze", "recurring_payments").identifier }}', ':', cast(source_sheet_row as string)) as recurring_payment_record_id,
+    source_column_003 as closed_date_raw,
+    source_column_005 as customer_id_raw,
+    source_column_006 as acquisition_relationship_raw,
+    source_column_007 as customer_name_raw,
+    source_column_008 as phone_raw,
+    source_column_009 as email_raw,
+    source_column_010 as premise_type_raw,
+    source_column_011 as total_sessions_raw,
+    source_column_012 as balance_sessions_raw,
+    source_column_013 as first_session_date_raw,
+    source_column_014 as billing_arrangement_raw,
+    source_column_015 as pest_type_raw,
+    source_column_016 as package_raw,
+    source_column_017 as contract_type_raw,
+    source_column_018 as sale_total_raw,
+    source_column_019 as deposit_paid_raw,
+    source_column_020 as payment_type_raw,
+    source_column_021 as balance_paid_raw
+from {{ source('operational_bronze', 'recurring_payments') }}

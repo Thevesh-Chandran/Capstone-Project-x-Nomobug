@@ -70,7 +70,7 @@
   } catch {}
   enabled.checked = awake;
   const current = () =>
-    location.pathname.replace(/\/$/, '') === '/maps' ? 'business' : location.hash.slice(1) || 'home';
+    location.pathname.replace(/\/$/, '') === '/maps' ? 'business' : (window.cp2Page ? window.cp2Page() : location.hash.slice(1)) || 'home';
   function pageHelp() {
     const value = pages[current()] || pages.home;
     root.querySelector('.guide-head small').textContent = value[0];

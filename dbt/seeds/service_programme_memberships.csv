@@ -1,0 +1,5 @@
+programme_id,sales_record_id,expected_source_sheet_row,expected_sessions,session_offset,expected_sale_total_rm,reason_code,expected_premise_type
+UPGRADE_0001,CUST1848,1852,1,0,440,owner_confirmed_1x_plus_upsell_2x,RESIDENTIAL
+UPGRADE_0001,CUST1929,1933,2,1,200,owner_confirmed_1x_plus_upsell_2x,RESIDENTIAL
+CONTRACT_0002,CUST1412,1416,4,0,590,owner_confirmed_4x_plus_20x,COMMERCIAL
+CONTRACT_0002,CUST1569,1573,20,4,3370,owner_confirmed_4x_plus_20x,COMMERCIAL

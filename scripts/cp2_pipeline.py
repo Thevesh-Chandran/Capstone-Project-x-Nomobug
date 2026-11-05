@@ -118,6 +118,13 @@ def source_stage(run_dir):
         # value privately; every other positional header remains strict.
         headers = list(headers)
         header_variations = []
+        if tab == 'B2B FOLLOW UP':
+            # Reviewed 14 Oct: two explicit call columns inserted before durations.
+            expanded = headers[:20] + ['Call 1', 'Call 2'] + headers[20:]
+            actual_headers = [' '.join(v.split()) for v in source['header_maps'][tab].values()]
+            if actual_headers == expanded:
+                headers = expanded
+                header_variations.append('b2b_call_columns_v2')
         if tab == 'SALES':
             actual = ' '.join(source['header_maps'][tab]['source_column_001'].split())
             if actual != headers[0]:
@@ -185,9 +192,11 @@ def feature_stage(run_dir):
         from scripts.callback_live_features import derive
     except ModuleNotFoundError:
         from callback_live_features import derive
+    deadline_path=run_dir/'collection_deadline.json'
+    deadline=read(deadline_path)['feature_deadline_utc'] if deadline_path.exists() else None
     result = derive(read(run_dir/'calendar_private.json'),
         read(run_dir/'sheets_private.json')['snapshots'], run_dir/'features',
-        weather_records=read(run_dir/'weather_private.json'), now=utcnow())
+        weather_records=read(run_dir/'weather_private.json'), now=utcnow(),deadline=deadline)
     atomic_json(run_dir/'feature_receipt.json', result)
     return result
 
@@ -299,6 +308,8 @@ def prospective_stage(run_dir):
         atomic_json(run_dir/'prospective_receipt.json', result)
         return result
     frame = prospective.b.load_dataset_input(run_dir/'features/predictors/dataset_input.json')
+    from scripts import cp2_collection_policy as collection
+    collection_protocol = collection.load(ROOT)
     now = utcnow()
     receipt = read(run_dir/'source_receipt.json')
     if (now-prospective.timestamp(receipt['extracted_at_utc'])).total_seconds() > MAX_SOURCE_AGE_SECONDS:
@@ -311,9 +322,12 @@ def prospective_stage(run_dir):
         start = pd.to_datetime(frame['service_start_at'], utc=True)
         finish = pd.to_datetime(frame['service_end_at'], utc=True)
         anchors = pd.to_datetime(frame['anchor_date']).dt.normalize()
-        cohort = anchors.between(pd.Timestamp(manifest['cohort_start']), pd.Timestamp(manifest['cohort_end']))
+        cohort_end = max(manifest['cohort_end'], collection_protocol['cohort_end']) if collection_protocol else manifest['cohort_end']
+        cohort = anchors.between(pd.Timestamp(manifest['cohort_start']), pd.Timestamp(cohort_end))
         target_start = (anchors+pd.Timedelta(days=1)).dt.tz_localize(LOCAL).dt.tz_convert('UTC')
-        eligible = cohort & finish.le(now) & finish.ge(now-timedelta(seconds=240)) & start.le(finish) & target_start.gt(now)
+        capture = pd.Series([collection.capture_at(s.to_pydatetime(), e.to_pydatetime(), collection_protocol)
+            for s,e in zip(start,finish)], index=frame.index, dtype='datetime64[ns, UTC]')
+        eligible = cohort & capture.le(now) & capture.ge(now-timedelta(seconds=240)) & start.le(finish) & target_start.gt(now)
         result.update(cohort_anchors_in_refresh=int(cohort.sum()), eligible_now=int(eligible.sum()),
             past_cohort_anchors_outside_logging_gate=int((cohort & finish.le(now) & ~eligible).sum()))
         selected = frame.loc[eligible].copy()
@@ -353,10 +367,39 @@ def prospective_stage(run_dir):
                     pd.Timestamp(row['anchor_date']).strftime('%Y-%m-%dT00:00:00.000')]):
                 event_key_by_row[int(row['anchor_event_row'])] for _,row in selected.iterrows()}
             atomic_json(run_dir/'prospective_source_receipt.json', evidence)
-            result.update(prospective.score(bundle, input_path, BASE/'prospective_logs', source_receipt=evidence))
+            new_policy_rows = selected.service_start_at.map(lambda value: collection.active(collection_protocol, value))
+            if new_policy_rows.any() and not new_policy_rows.all():
+                raise ValueError('One scoring batch cannot mix collection timing protocols')
+            protocol_path = ROOT/'config/cp2_october10_cohort.json' if new_policy_rows.all() else None
+            if protocol_path:
+                evidence['collection_protocol_sha256'] = collection_protocol['protocol_sha256']
+                evidence['collection_timing_policy'] = collection.TIMING
+                # Retain the legacy recheck key for receipt compatibility, but
+                # explicitly identify the pre-end check for overnight services.
+                evidence['calendar_recheck_phase'] = ('pre_end_overnight' if
+                    (pd.to_datetime(selected.service_end_at,utc=True)>now).any() else 'post_end')
+                atomic_json(run_dir/'prospective_source_receipt.json', evidence)
+            result.update(prospective.score(bundle, input_path, BASE/'prospective_logs',
+                source_receipt=evidence, protocol_path=protocol_path))
         else:
             result['reason'] = 'no_service_inside_frozen_prospective_time_gate'
         result['logged_event_keys'] = keys_for_selected
+    result['eligible_anchor_event_keys'] = event_keys_for_anchors(run_dir, frame)
+    audit_path = run_dir/'features/collection_candidates_private.json'
+    if audit_path.exists():
+        diagnostics = pd.DataFrame(read(audit_path))
+        if not diagnostics.empty:
+            dates = pd.to_datetime(diagnostics.event_date_local).dt.date
+            diagnostics = diagnostics.loc[dates >= now.astimezone(LOCAL).date()-timedelta(days=3)].copy()
+            diagnostics['anchor_event_row'] = diagnostics.calendar_event_row
+            mapping = event_keys_for_anchors(run_dir, diagnostics, mapping=True)
+            eligible_keys = set(result['eligible_anchor_event_keys'])
+            result['event_decisions'] = {mapping[int(row['anchor_event_row'])]:
+                'eligible_anchor' if mapping[int(row['anchor_event_row'])] in eligible_keys
+                else row['population_reason'] if row['population_reason'] != 'candidate'
+                else 'not_in_frozen_predictor_population' for row in diagnostics.to_dict('records')}
+            from collections import Counter
+            result['population_reason_counts'] = dict(Counter(result['event_decisions'].values()))
     atomic_json(run_dir/'prospective_receipt.json', result)
     return result
 
@@ -421,6 +464,10 @@ def run(*, resume=None, callbacks=None, base=None, wait_until=None):
                     target = datetime.fromisoformat(str(wait_until).replace('Z', '+00:00'))
                     if target.tzinfo is None or (target-utcnow()).total_seconds() > 180:
                         raise ValueError('Expected service end must be within three minutes')
+                    # Reserve 45 seconds for scoring and durable commitment inside
+                    # the existing five-minute gate. Never extend it after a stall.
+                    atomic_json(run_dir/'collection_deadline.json',{
+                        'feature_deadline_utc':(target+timedelta(minutes=4,seconds=15)).isoformat()})
                     while (target-utcnow()).total_seconds() > 0:
                         time.sleep(min(10, max(.05, (target-utcnow()).total_seconds())))
                 result = callbacks[current](run_dir)
@@ -467,19 +514,26 @@ def status(base=None):
     return result
 
 
-def final_evaluation(*, repaired=False, cloud=False):
+def final_evaluation(*, repaired=False, cloud=False, october5=False, october10=False, recovery=False, refresh_callbacks=None):
     """After full cohort maturity, refresh source-derived labels and score once."""
     try:
         from scripts import cp2_model as model
         from scripts import freeze_callback_prospective as prospective
+        from scripts import audit_callback_evidence as eligibility_audit
+        from scripts.calendar_appointment_policy import policy_sha256
     except ModuleNotFoundError:
         import cp2_model as model
         import freeze_callback_prospective as prospective
+        import audit_callback_evidence as eligibility_audit
+        from calendar_appointment_policy import policy_sha256
     _, bundle = model.current_bundle()
     manifest, _ = prospective.load_bundle(bundle)
-    if repaired and cloud:
+    if sum(bool(value) for value in (repaired,cloud,october5,october10,recovery)) > 1:
         raise ValueError('Select only one prospective cohort')
-    protocol_path = (ROOT/'config/cp2_cloud_cohort.json' if cloud else
+    protocol_path = (ROOT/'config/cp2_recovery_cohort.json' if recovery else
+        ROOT/'config/cp2_october10_cohort.json' if october10 else
+        ROOT/'config/cp2_october5_cohort.json' if october5 else
+        ROOT/'config/cp2_cloud_cohort.json' if cloud else
         ROOT/'config/cp2_repaired_cohort.json' if repaired else None)
     contract = prospective.cohort_contract(bundle, manifest, protocol_path)
     if utcnow().astimezone(LOCAL).date() < datetime.fromisoformat(
@@ -487,7 +541,11 @@ def final_evaluation(*, repaired=False, cloud=False):
         raise ValueError('Future cohort 30-day outcomes are not complete yet')
     if contract['result_path'].exists():
         raise ValueError('One-time final future evaluation already recorded')
-    state = run()
+    # Hosted callers provide their durable stage callbacks. The same local run
+    # state/recovery mechanism still owns refresh execution and its journal.
+    state = run(callbacks=refresh_callbacks)
+    if state.get('status') != 'succeeded':
+        raise ValueError('Final evaluation requires a successful fresh source run')
     run_dir = BASE/'runs'/state['run_id']
     mature_input = run_dir/'features/mature_labels/dataset_input.json'
     source = read(run_dir/'source_receipt.json')
@@ -497,6 +555,73 @@ def final_evaluation(*, repaired=False, cloud=False):
     evidence = dict(source, feature_input_sha256=digest(mature_input),
         source_extraction_min_at_utc=source['earliest_extraction_at_utc'],
         source_extraction_max_at_utc=source['extracted_at_utc'])
+    audit_path = run_dir/'eligibility_drift_private.json'
+    audit_record = {'schema_version':1, 'checked_at_utc':utcnow().isoformat(),
+        'source_run_id':state['run_id'], 'bundle_sha256':digest(bundle/'bundle.json'),
+        'protocol_sha256':contract.get('protocol_sha256'),
+        'mature_input_sha256':digest(mature_input),
+        'calendar_snapshot_sha256':digest(run_dir/'calendar_private.json'),
+        'appointment_review_policy_sha256':policy_sha256(),
+        'accuracy_claim_ready':False}
+    try:
+        # Eligibility is audited against immutable receipts before creating
+        # one-time label/evaluation files. New source exclusions cannot silently
+        # redefine the already scored experiment population.
+        required_artifacts = ['calendar_private.json',
+            'features/mature_labels/dataset_input.json',
+            'source_receipt.json', 'feature_receipt.json']
+        artifact_hashes = {}
+        for stored_path, stored_hash in state.get('artifact_hashes', {}).items():
+            normalized = stored_path.replace('\\', '/')
+            if normalized in artifact_hashes:
+                raise ValueError('Duplicate normalized refresh artifact path')
+            artifact_hashes[normalized] = stored_hash
+        for relative in required_artifacts:
+            if artifact_hashes.get(relative) != digest(run_dir/relative):
+                raise ValueError('Final evaluation refresh artifact changed')
+        entries = []
+        ignored_other_bundle = 0
+        for log_path in sorted((BASE/'prospective_logs').glob('*.json')):
+            entry = read(log_path)
+            if entry.get('record_sha256') != prospective.record_digest(entry):
+                raise ValueError('Immutable prediction receipt changed')
+            if entry.get('bundle_sha256') != audit_record['bundle_sha256']:
+                ignored_other_bundle += 1
+                continue
+            collection_hash = entry.get('source_receipt', {}).get('collection_protocol_sha256')
+            if (((october10 or recovery) and collection_hash != contract['receipt_collection_protocol_sha256'])
+                    or (not (october10 or recovery) and collection_hash is not None)):
+                continue
+            if (entry.get('schema_version') != 2
+                    or entry.get('source_receipt', {}).get('source') != prospective.SOURCE_NAME
+                    or prospective.b.TARGET in entry.get('row', {})):
+                raise ValueError('Source-linked predictor-only receipt required')
+            import pandas as pd
+            one = pd.DataFrame([entry['row']])
+            one.anchor_date = pd.to_datetime(one.anchor_date)
+            prospective.validate_prediction_times(one, manifest, entry['logged_at_utc'],
+                collection_protocol=contract.get('collection_protocol'))
+            entries.append(entry)
+        calendar_inventory = read(run_dir/'calendar_private.json')
+        current_events = calendar_inventory.get('records')
+        if not isinstance(current_events, list):
+            raise ValueError('Fresh Calendar inventory required for eligibility audit')
+        candidates = prospective.b.load_dataset_input(mature_input).to_dict('records')
+        drift = eligibility_audit.eligibility_drift(entries, candidates,
+            bundle_sha256=audit_record['bundle_sha256'],
+            cohort_start=contract['cohort_start'], cohort_end=contract['cohort_end'],
+            current_events=current_events)
+        audit_record.update(drift, ignored_other_bundle_receipts=ignored_other_bundle,
+            status='rejected_eligibility_drift' if drift['changed_services'] else 'passed_eligibility_audit')
+    except Exception as error:
+        audit_record.update(status='rejected_invalid_evidence', error_type=type(error).__name__)
+        audit_record['record_sha256'] = prospective.record_digest(audit_record)
+        prospective.atomic_create_json(audit_path, audit_record)
+        raise
+    audit_record['record_sha256'] = prospective.record_digest(audit_record)
+    prospective.atomic_create_json(audit_path, audit_record)
+    if audit_record['changed_services']:
+        raise ValueError('Prospective eligibility changed; inspect private drift audit before evaluation')
     path = run_dir/'prospective_labels_private.json'
     prepared = prospective.prepare_labels(bundle, mature_input, evidence, path,
         protocol_path=protocol_path)
@@ -504,6 +629,9 @@ def final_evaluation(*, repaired=False, cloud=False):
         protocol_path=protocol_path)
     return {'cohort_anchors': prepared['complete_cohort_anchors'],
         'source_run_id': state['run_id'], 'evaluation_rows': evaluated['rows'],
+        'eligibility_drift_services':audit_record['changed_services'],
+        'eligibility_audit_sha256':digest(audit_path),
+        'labels_path': str(path),
         'result_path': str(contract['result_path'])}
 
 

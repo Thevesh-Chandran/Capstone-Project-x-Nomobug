@@ -1,0 +1,24 @@
+{
+  "scope": "Partial matured receipt subset; not complete-cohort evaluation",
+  "complete_outcomes_through": "2026-10-31",
+  "valid_matched_receipts": 14,
+  "excluded_mature_receipts": 0,
+  "bundle_sha256": "6ace4314b4a5e170ea1bd6feee40dadbdd14eb3c986db9223d888b3c3ee302e0",
+  "source_sha256": "229b89bf8ede86e1e2e6e777fd27b67ba07fdabd3c9870873ece07575362eaad",
+  "label_input_sha256": "4feaac784c3fb0703bf82aab21c5c2dcd893707ba208a6fc062efc31cbf52dc8",
+  "final_evaluation_run": false,
+  "backfill": false,
+  "metrics": {
+    "rows": 14,
+    "positives": 1,
+    "accuracy": 0.9285714285714286,
+    "precision": null,
+    "recall": 0.0,
+    "always_no_return_accuracy": 0.9285714285714286,
+    "true_positive": 0,
+    "false_positive": 0,
+    "false_negative": 1,
+    "true_negative": 13,
+    "frozen_threshold": 0.19
+  }
+}

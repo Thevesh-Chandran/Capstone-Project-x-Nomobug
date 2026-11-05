@@ -1,0 +1,33 @@
+{
+  "recorded_local_date": "2026-10-17",
+  "authority": "Direct owner clarification in CP2 chat",
+  "scope": "Business facts only; not a frozen-model override or a rewritten historical receipt",
+  "facts": [
+    {
+      "case": "Client M",
+      "confirmed_fact": "Same client. The 16 October appointment is simply her second service; there is no restarted service.",
+      "do_not_infer": "A new paid contract, its price or its sale identifier",
+      "service_date_local": "2026-10-16",
+      "confirmed_service_stage": 2,
+      "remaining_implementation": "Business identity confirmed. Preserve original frozen duplicate-stage exclusion and original missed timestamp; do not infer a new sale or silently change prospective eligibility.",
+      "funding_sale_confirmed_local_date": "2026-10-18",
+      "owner_confirmed_funding_sales_record_id": "CUST1148",
+      "owner_confirmed_funding_sale_date": "2025-06-29",
+      "covered_service_dates": [
+        "2026-07-16",
+        "2026-10-16"
+      ]
+    },
+    {
+      "case": "Hotel client H",
+      "calendar_title": "GPC 1/1 Hotel client H",
+      "service_date_local": "2026-10-16",
+      "service_time_local": "11:00–12:00",
+      "confirmed_fact": "Free service; no Sales entry was made for this reason.",
+      "do_not_infer": "A paid sale, commercial warranty claim or timely historical prediction",
+      "operational_interpretation": "Free service booking; do not require a paid sale match. Exact-event operational override and cohort disposition require separate validation.",
+      "event_key": "a7bb228ecd1ccb76b83d90e3244d4abbb38957d34d0913c3cb61a69b81395bb6",
+      "evidence_snapshot": "outputs/project_audit/20261016_final/second_candidate_private.json"
+    }
+  ]
+}

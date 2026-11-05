@@ -1,0 +1,79 @@
+{
+  "experiment": "validated_historical_forward_comparison_20261016",
+  "declared_at_utc": "2026-10-16T15:43:39.165964+00:00",
+  "inputs": {
+    "features": {
+      "path": "outputs/cp2-v2/source_refresh_20260927/refreshed/dataset_input.json",
+      "sha256": "eb5f0a85c207ab802b3ba99b2cb58b012980e93dc608d7fd9f1c6bbdb5ffdd24"
+    },
+    "old_calendar": {
+      "path": "outputs/cp2-v2/source_refresh_20260927/old_calendar_private.json",
+      "sha256": "61303848049cef83c4716134201b22cdeae85bdd258500d4f75a62e4921b03dd"
+    },
+    "calendar": {
+      "path": "outputs/cp2-v2/source_refresh_20260927/calendar_private.json",
+      "sha256": "48b6b3ab06325afd57cd061548ab18c07be0031a21c897b7ea8af85f903edf44"
+    },
+    "status_review_calendar": {
+      "path": "outputs/cp2-v2/broad_challenger_v1_fresh_sources/calendar_private.json",
+      "sha256": "f17d1b7c252950d3cfe525e4334d1f375f0841c792d38fe2d4998970ffef8b19"
+    }
+  },
+  "code_sha256": "54d21cff08cbbc7d10b907afb4702baecfe35d6b5d0139f0ddd0b9ef835a05b4",
+  "frozen_bundle_path": "outputs/cp2-v2/prospective_callback_v2",
+  "complete_outcomes_through": "2026-09-26",
+  "development_end_exclusive": "2026-08-15",
+  "folds": [
+    [
+      "2025_q2",
+      "2025-04-01",
+      "2025-07-01"
+    ],
+    [
+      "2025_q3",
+      "2025-07-01",
+      "2025-10-01"
+    ],
+    [
+      "2025_q4",
+      "2025-10-01",
+      "2026-01-01"
+    ],
+    [
+      "2026_q1",
+      "2026-01-01",
+      "2026-04-01"
+    ],
+    [
+      "2026_q2",
+      "2026-04-01",
+      "2026-07-01"
+    ],
+    [
+      "2026_jul_aug",
+      "2026-07-01",
+      "2026-08-15"
+    ]
+  ],
+  "selection_folds": [
+    "2025_q2",
+    "2025_q3",
+    "2025_q4"
+  ],
+  "models": [
+    "et10_leaf5",
+    "rf_depth6",
+    "lr_c1.0_plain"
+  ],
+  "seed": 42,
+  "threads": 2,
+  "review_fraction": 0.2,
+  "selection_rule": "Improve mean 2025 AP while preserving mean 2025 recall at exact 20% review capacity; otherwise retain control. 2026 diagnostic scores never select a model.",
+  "limits": [
+    "Historical periods already inspected; this is exploratory development, not fresh final accuracy.",
+    "Fixed 0.5 raw-score accuracy is recorded for completeness, not used to compare calibrated operational alerts.",
+    "Feature/label histories cannot be fully reconstructed at every historical timestamp.",
+    "Exclude unresolved source identities, changed dates, and confirmed cancellation anchors; do not relabel guessed cases.",
+    "No automatic production replacement or retrospective prediction backfill."
+  ]
+}

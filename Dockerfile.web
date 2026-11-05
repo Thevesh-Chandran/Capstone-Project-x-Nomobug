@@ -1,0 +1,14 @@
+FROM python:3.12-slim
+WORKDIR /app
+COPY requirements-web.txt ./
+RUN pip install --no-cache-dir -r requirements-web.txt \
+    && useradd --uid 10003 --create-home --shell /usr/sbin/nologin portal \
+    && mkdir -p /var/lib/cp2-portal /app/config \
+    && chown -R portal:portal /var/lib/cp2-portal
+COPY --chown=portal:portal webapp /app/webapp
+COPY --chown=portal:portal config/cp2_model_current.json config/cp2_team_coverage.json /app/config/
+ENV CP2_HOST=0.0.0.0 PORT=8080 CP2_PORTAL_DATA=/var/lib/cp2-portal PYTHONDONTWRITEBYTECODE=1
+USER 10003:10003
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=5s CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/healthz',timeout=3)"
+CMD ["python", "-m", "webapp.server"]

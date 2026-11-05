@@ -50,3 +50,9 @@ Before 10 November the owner agrees that (a) staff will call the pilot customers
 ## Unchanged
 
 The frozen pest-return experiment, its collector, ledger and 30 November evaluation, and the return_risk_v1 model.
+
+## Decision, 5 November 2026: pilot not run
+
+The owner declined the pilot before any pilot call. No comparison group is kept and `CP2_CHECKIN_PILOT_APPROVED` stays unset, so the portal shows the normal weekly check-in plan to everyone (highest chance first) and no customer is held back. The configuration file and its hash are unchanged and unused.
+
+Report it as: a randomised check-in pilot was designed and declared, but not run at the owner's request, so there is no evidence on whether calls reduce returns. Check-ins that staff record in normal use can still be counted as process measures (calls made, issues found, visits booked) with `scripts/evaluate_checkin_pilot.py`, labelled as routine use, not a pilot.

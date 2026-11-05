@@ -1,0 +1,92 @@
+[
+  {
+    "name": "Original 30-day pest-return model",
+    "status": "Frozen collector configuration",
+    "question": "Will a matched service have a recorded corrective return within 30 days?",
+    "inputs": "93 inputs: service/package, pest, previous visits and returns, location and environmental features. Extra Trees, 300 trees.",
+    "result": "100-service historical test: 5 positives; 94% accuracy, 40% precision, 40% recall. Always-no-return: 95%.",
+    "meaning": "The later frozen refit trained on 5,695 services. Training rows are not a test. Configuration is verified; current cloud health was not checked for this guide.",
+    "source": "../../config/cp2_model_current.json"
+  },
+  {
+    "name": "Larger historical reference",
+    "status": "Research reference",
+    "question": "Same 30-day question, evaluated on a larger historical population.",
+    "inputs": "93 inputs; same Extra Trees settings. Separate training 1,506, validation 1,177, assessment 2,075.",
+    "result": "184 positives; 77.7% accuracy, 23.0% precision, 64.7% recall. Existing calibrated Brier 0.0735.",
+    "meaning": "Different fit, records and threshold from the 100-service result. This reference supports the new probability experiment; it does not replace the frozen collector.",
+    "source": "../../outputs/model_validation/20261017_larger_frozen_test/results.json"
+  },
+  {
+    "name": "30-day probability comparison",
+    "status": "New experiment; not promoted",
+    "question": "How likely is a recorded return within 30 days?",
+    "inputs": "Same fixed 93-input classifier; raw scores, sigmoid, logit, beta and isotonic calibration.",
+    "result": "Validation chose isotonic. Assessment Brier 0.0740 vs existing 0.0735; constant risk 0.0808.",
+    "meaning": "Lower is better. The new candidate beats constant risk but does not beat existing calibration. Keep existing method; no deployment or probability guarantee.",
+    "source": "../../outputs/model_validation/20261102_return_probability/results.json"
+  },
+  {
+    "name": "Claude\u2019s property warranty risk",
+    "status": "Local candidate; needs revision",
+    "question": "After a non-warranty appointment, will the same rounded-coordinate group have a warranty signal within 30 days?",
+    "inputs": "8 visit-history inputs; 200 Extra Trees plus Platt calibration.",
+    "result": "1,104 historical windows, 107 positives; AUC 0.767. At 20% threshold: 81.4% accuracy, 24.7% precision, 44.9% recall.",
+    "meaning": "Not comparable directly with the original test. Timing corrections retain ranking; exact property identity and paid-service labels are not established. Its saved forward test starts before prediction creation and is not valid as claimed.",
+    "source": "../../outputs/model_validation/20261102_claude_independent_review/Review.md"
+  },
+  {
+    "name": "Pest-specific specialists",
+    "status": "Research; not promoted",
+    "question": "Does a separate pest-group model predict returns better?",
+    "inputs": "Original 93 inputs and unchanged Extra Trees pipeline, fitted separately for supported pest groups.",
+    "result": "Cockroach-only: 1,428 assessment services; 74.4% accuracy, 24.9% precision, 68.2% recall. General reference on same group: 72.6%, 23.8%, 70.1%.",
+    "meaning": "Ranking barely changes. Other individual pests have too few positive training cases. Anchor pest is known; outcome is not necessarily the same pest.",
+    "source": "../../outputs/model_validation/20261102_pest_specialists/Results_Explained.md"
+  },
+  {
+    "name": "Bookings \u2014 next two weeks",
+    "status": "Packaged planning candidate",
+    "question": "Bookings \u00b7 next two weeks",
+    "inputs": "36 inputs; extra_trees. Calendar/history and booking context; exact contract in linked model.",
+    "result": "Historical MAE 12.8 vs baseline 20.7; 13 test windows.",
+    "meaning": "MAE is average absolute prediction error, in bookings or appointment hours. These are not pest-recurrence models. Packaged does not prove current cloud operation.",
+    "source": "../../webapp/models/planning_v1.json"
+  },
+  {
+    "name": "Appointment hours \u2014 next week",
+    "status": "Packaged planning candidate",
+    "question": "Appointment hours \u00b7 next week",
+    "inputs": "32 inputs; ridge_100. Calendar/history and booking context; exact contract in linked model.",
+    "result": "Historical MAE 9.0 vs baseline 11.8; 14 test windows.",
+    "meaning": "MAE is average absolute prediction error, in bookings or appointment hours. These are not pest-recurrence models. Packaged does not prove current cloud operation.",
+    "source": "../../webapp/models/planning_v1.json"
+  },
+  {
+    "name": "Repeat purchase within 90 days",
+    "status": "Packaged experimental ranking",
+    "question": "Which first-time customers might buy another programme?",
+    "inputs": "Initial sale, purchase season and saved customer/package context; exact input list in the model.",
+    "result": "557 customers, 19 positives; AUC 0.761, AP 0.094.",
+    "meaning": "Predicts another purchase, not pest recurrence. Scores are explicitly marked uncalibrated. It does not prove marketing causes additional purchases.",
+    "source": "../../webapp/models/repeat90_v1.json"
+  },
+  {
+    "name": "60-day return after final service",
+    "status": "Research evidence only",
+    "question": "Will a residential programme have a recorded return within 60 days after its final paid service?",
+    "inputs": "Service inputs; logistic regression; multiple historical folds.",
+    "result": "937 windows, 319 positives; 49.1% accuracy, 39.4% precision, 92.5% recall.",
+    "meaning": "92.5% is recall, not accuracy. Different question and population from the 30-day model. Current-source rebuild and a new future evaluation are required.",
+    "source": "../../webapp/models/return_research_best.json"
+  },
+  {
+    "name": "Quote, renewal and other targets",
+    "status": "Historical studies",
+    "question": "Commercial quotation, repeat-purchase timing, programme-end purchases, weekly sales and operational forecasts.",
+    "inputs": "Each study has its own data, target, inputs, partition and baseline.",
+    "result": "See study files and the searchable result index; there is no meaningful single accuracy across these questions.",
+    "meaning": "Small property-size coverage limits quotation work. Some newer weekly-count searches did not beat a moving average. A saved result is not an operational model.",
+    "source": "../../planning/CP2_OPERATIONAL_MODEL_SEARCH_20261102.md"
+  }
+]

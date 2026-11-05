@@ -17,16 +17,20 @@ try:
     from scripts import load_calendar_bronze as calendar
     from scripts import cp2_model
     from scripts.freeze_callback_prospective import record_digest, timestamp
+    from scripts.calendar_appointment_policy import is_confirmed_placeholder
 except ModuleNotFoundError:
     import cp2_pipeline as pipeline
     import load_calendar_bronze as calendar
     import cp2_model
     from freeze_callback_prospective import record_digest, timestamp
+    from calendar_appointment_policy import is_confirmed_placeholder
 
 
 def service_window(event):
     """Return a Calendar service window without treating no-warranty as a claim."""
     if (event.get('status') or '').upper() != 'CONFIRMED' or event.get('is_all_day'):
+        return None
+    if is_confirmed_placeholder(event):
         return None
     title = (event.get('summary') or '').upper()
     if re.search(r'^\s*CANCEL(?:L)?ED\b', title):
@@ -50,11 +54,13 @@ def service_window(event):
     return (start, finish) if start <= finish else None
 
 
-def timed_service(event, now):
+def timed_service(event, now, protocol=None):
     window = service_window(event)
     if window is None:
         return False
-    _, finish = window
+    from scripts.cp2_collection_policy import capture_at
+    start, end = window
+    finish = capture_at(start, end, protocol)
     offset = (now-finish).total_seconds()
     # Start source/weather preparation shortly before the scheduled end.
     # The full pipeline waits until end before deriving/scoring predictors.
@@ -98,10 +104,14 @@ def poll(now=None, *, fetch=None, run=None, base=None):
     base = pipeline.private(base or pipeline.BASE)
     now = timestamp(now or datetime.now(timezone.utc))
     registry, bundle = cp2_model.current_bundle()
+    from scripts import cp2_collection_policy as collection
+    protocol = collection.load(pipeline.ROOT) if (pipeline.ROOT/'config/cp2_model_current.json').exists() else None
     manifest = json.loads((bundle/'bundle.json').read_text(encoding='utf-8'))
     local_day = now.astimezone(pipeline.LOCAL).date()
     cohort_start = datetime.fromisoformat(manifest['cohort_start']).date()
     cohort_end = datetime.fromisoformat(manifest['cohort_end']).date()
+    if protocol:
+        cohort_end = max(cohort_end, datetime.fromisoformat(protocol['cohort_end']).date())
     if local_day < cohort_start:
         result = {'checked_at_utc': now.isoformat(), 'status': 'outside_prospective_cohort',
             'calendar_events_checked': 0, 'due_events': 0, 'full_refresh_started': False}
@@ -125,6 +135,9 @@ def poll(now=None, *, fetch=None, run=None, base=None):
     unresolved_anchor_dates = dict(history.get('unresolved_anchor_dates', {}))
     missed = dict(history.get('missed', {}))
     missed_anchor_dates = dict(history.get('missed_anchor_dates', {}))
+    decisions = dict(history.get('event_decisions', {}))
+    capture_times = dict(history.get('capture_times', {}))
+    service_ends = dict(history.get('service_ends', {}))
     missed_before = set(missed)
     committed = committed_event_keys(base, bundle)
     processed.update(committed)
@@ -139,9 +152,12 @@ def poll(now=None, *, fetch=None, run=None, base=None):
         if window is None:
             continue
         start, finish = window
+        capture = collection.capture_at(start, finish, protocol)
         if not cohort_start <= start.astimezone(pipeline.LOCAL).date() <= cohort_end:
             continue
         key = event_key(row)
+        capture_times[key] = capture.isoformat()
+        service_ends[key] = finish.isoformat()
         if key in committed:
             processed.add(key)
             unresolved.pop(key, None)
@@ -149,13 +165,13 @@ def poll(now=None, *, fetch=None, run=None, base=None):
             missed.pop(key, None)
             missed_anchor_dates.pop(key, None)
             continue
-        if (now-finish).total_seconds() > 300 and key not in processed:
+        if (now-capture).total_seconds() > 300 and key not in processed:
             missed.setdefault(key, finish.isoformat())
             missed_anchor_dates.setdefault(key, start.astimezone(pipeline.LOCAL).date().isoformat())
             unresolved.pop(key, None)
             unresolved_anchor_dates.pop(key, None)
-        elif timed_service(row, now):
-            due[key] = finish
+        elif timed_service(row, now, protocol):
+            due[key] = capture
     for key, end in due.items():
         if key not in processed:
             unresolved.setdefault(key, end.isoformat())
@@ -165,7 +181,7 @@ def poll(now=None, *, fetch=None, run=None, base=None):
                     pipeline.LOCAL).date().isoformat())
     for key, ended_at in list(unresolved.items()):
         if now-timestamp(ended_at) > timedelta(minutes=5):
-            missed[key] = ended_at
+            missed[key] = service_ends.get(key, ended_at)
             anchor = unresolved_anchor_dates.get(key)
             if anchor is not None:
                 missed_anchor_dates.setdefault(key, anchor)
@@ -190,6 +206,16 @@ def poll(now=None, *, fetch=None, run=None, base=None):
         result['cloud_cohort_missed_event_windows'] = cloud_missed
         result['cloud_cohort_coverage_status'] = (
             'incomplete' if cloud_missed else 'complete_so_far')
+    fresh_cohort = registry.get('october5_cohort')
+    if isinstance(fresh_cohort, list) and len(fresh_cohort) == 2:
+        fresh_start, fresh_end = (datetime.fromisoformat(value).date() for value in fresh_cohort)
+        fresh_missed = sum(fresh_start <= datetime.fromisoformat(
+            missed_anchor_dates.get(key) or timestamp(ended_at).astimezone(
+                pipeline.LOCAL).date().isoformat()).date() <= fresh_end
+            for key, ended_at in missed.items())
+        result['october5_cohort_missed_event_windows'] = fresh_missed
+        result['october5_cohort_coverage_status'] = ('not_started' if local_day < fresh_start
+            else 'incomplete' if fresh_missed else 'complete_so_far')
     if pending:
         try:
             # Never hold an already-ended service behind a later appointment.
@@ -201,6 +227,9 @@ def poll(now=None, *, fetch=None, run=None, base=None):
         else:
             receipt = state['stages']['prospective']['receipt']
             acknowledged = pending & set(receipt.get('logged_event_keys', []))
+            decisions.update(receipt.get('event_decisions', {}))
+            for key in receipt.get('eligible_anchor_event_keys', []):
+                decisions[key] = 'eligible_anchor'
             result.update(status='refresh_succeeded', run_id=state['run_id'],
                 prospective_logged_rows=receipt.get('logged_rows', 0),
                 already_logged_rows=receipt.get('already_logged_rows', 0))
@@ -210,11 +239,43 @@ def poll(now=None, *, fetch=None, run=None, base=None):
                 unresolved_anchor_dates.pop(key, None)
             result['acknowledged_event_keys'] = len(acknowledged)
             if len(acknowledged) < len(pending):
-                result['status'] = 'refresh_without_complete_prospective_logging'
+                absent = pending - acknowledged
+                result['status'] = ('refresh_completed_with_source_exclusions' if all(
+                    decisions.get(key) not in (None, 'eligible_anchor', 'not_in_frozen_predictor_population')
+                    for key in absent) else 'refresh_without_complete_prospective_logging')
+    # Raw missed candidates remain immutable historical evidence. Never erase
+    # them merely because a later snapshot now excludes or cannot match them.
+    from collections import Counter
+    result['missed_candidate_reason_counts'] = dict(Counter(decisions.get(key, 'not_yet_classified') for key in missed))
+    if protocol:
+        cohort_keys = [key for key in missed if protocol['cohort_start'] <= missed_anchor_dates.get(key, '') <= protocol['cohort_end']]
+        eligible_misses = sum(decisions.get(key) == 'eligible_anchor' for key in cohort_keys)
+        unresolved_matches = sum(decisions.get(key) in (None, 'unmatched_or_ambiguous_sale',
+            'not_in_frozen_predictor_population', 'missing_sale_date', 'calendar_before_sale_date',
+            'package_sequence_mismatch', 'uncertain_package', 'duplicate_paid_session') for key in cohort_keys)
+        result.update(october10_cohort_missed_candidate_windows=len(cohort_keys),
+            october10_cohort_missed_eligible_windows=eligible_misses,
+            october10_cohort_unresolved_candidate_windows=unresolved_matches,
+            october10_cohort_coverage_status='not_started' if local_day.isoformat() < protocol['cohort_start'] else
+                'incomplete' if eligible_misses else 'requires_source_review' if unresolved_matches else 'complete_so_far')
     pipeline.atomic_json(seen_path, {'processed': sorted(processed), 'unresolved': unresolved,
         'unresolved_anchor_dates': unresolved_anchor_dates,
         'missed': missed, 'missed_anchor_dates': missed_anchor_dates,
+        'event_decisions': decisions, 'capture_times':capture_times, 'service_ends':service_ends,
         'last_poll_at_utc': now.isoformat()})
+    if registry.get('recovery_cohort_protocol_sha256'):
+        from scripts.freeze_callback_prospective import cohort_contract
+        recovery=cohort_contract(bundle,manifest,pipeline.ROOT/'config/cp2_recovery_cohort.json')
+        keys=[key for key in missed if recovery['cohort_start']<=missed_anchor_dates.get(key,'')<=recovery['cohort_end']]
+        eligible=sum(decisions.get(key)=='eligible_anchor' for key in keys)
+        unresolved_count=sum(decisions.get(key) in (None,'unmatched_or_ambiguous_sale',
+            'not_in_frozen_predictor_population','missing_sale_date','calendar_before_sale_date',
+            'package_sequence_mismatch','uncertain_package','duplicate_paid_session') for key in keys)
+        result.update(recovery_cohort_missed_candidate_windows=len(keys),
+            recovery_cohort_missed_eligible_windows=eligible,
+            recovery_cohort_unresolved_candidate_windows=unresolved_count,
+            recovery_cohort_coverage_status='not_started' if local_day.isoformat()<recovery['cohort_start']
+                else 'incomplete' if eligible else 'requires_source_review' if unresolved_count else 'complete_so_far')
     pipeline.atomic_json(base/'last_tick.json', result)
     return result
 

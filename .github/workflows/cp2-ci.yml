@@ -43,3 +43,7 @@ jobs:
         run: docker build -f Dockerfile.collector --tag cp2-collector:ci .
       - name: Check prospective collector import without Google access
         run: docker run --rm --entrypoint python cp2-collector:ci -c 'from scripts import cp2_cloud_collector; assert cp2_cloud_collector.PROJECT'
+      - name: Build staff website image
+        run: docker build -f Dockerfile.web --tag cp2-portal:ci .
+      - name: Check website imports without Google access
+        run: docker run --rm --entrypoint python cp2-portal:ci -c 'from webapp.server import Portal; from webapp import storage'

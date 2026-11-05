@@ -45,6 +45,11 @@ models:
         data_tests: [not_null]
   - name: sales_monthly_recorded
     description: "Monthly SALES package rows and recorded package face value, not earned revenue. Null month retains undated rows."
+  - name: dashboard_sales_pest_groups
+    description: "Sales by close month and standard pest group (free-text pest names grouped, e.g. 'Cockroach + Ant'). Package face value, not earned revenue."
+    columns:
+      - name: pest_group
+        data_tests: [not_null]
   - name: payments_monthly_recorded
     description: "Monthly PAYMENTS entries and recorded entry amounts, not confirmed cash. Null month retains undated rows."
   - name: prospect_reply_monthly_recorded

@@ -1,6 +1,6 @@
 {{ config(schema='gold', tags=['gold', 'dashboard', 'recurrence']) }}
 -- One row per matched 2026 Calendar service-like event. The previous event is
--- partitioned by SALES package and exact normalized address text. Map cells
+-- partitioned by service programme and exact normalized address text. Map cells
 -- are not property identifiers. Missing addresses stay isolated per event.
 -- Planned package sessions are retained but are not labelled recurrence unless
 -- the later event has a warranty signal. Generic extra visits need review.
@@ -21,7 +21,7 @@ with descriptions as (
         else concat('UNRESOLVED_EVENT_', cast(f.calendar_event_row as string))
         end as property_group_key,
         nullif(trim(a.address_text), '') is not null as property_text_available
-    from {{ ref('calendar_service_event_facts') }} f
+    from {{ ref('calendar_programme_service_facts') }} f
     left join addresses a using (calendar_event_row)
     where f.sales_record_id is not null
       and f.event_date_local <= current_date('Asia/Kuala_Lumpur')
@@ -29,15 +29,15 @@ with descriptions as (
     select
         e.*,
         lag(e.calendar_event_row) over (
-            partition by e.sales_record_id, e.property_group_key
+            partition by e.programme_id, e.property_group_key
             order by e.event_date_local, e.event_start_ts, e.calendar_event_row
         ) as previous_calendar_event_row,
         lag(e.event_date_local) over (
-            partition by e.sales_record_id, e.property_group_key
+            partition by e.programme_id, e.property_group_key
             order by e.event_date_local, e.event_start_ts, e.calendar_event_row
         ) as previous_service_date,
         lag(e.event_category) over (
-            partition by e.sales_record_id, e.property_group_key
+            partition by e.programme_id, e.property_group_key
             order by e.event_date_local, e.event_start_ts, e.calendar_event_row
         ) as previous_event_category
     from eligible e

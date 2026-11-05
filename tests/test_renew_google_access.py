@@ -2,6 +2,7 @@
 
 import json
 import runpy
+import sys
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -18,6 +19,7 @@ def setup_renewal(tmp_path, monkeypatch):
     scripts.mkdir()
     script = scripts / "renew_google_access.py"
     script.write_text(SOURCE.read_text(encoding="utf-8"), encoding="utf-8")
+    monkeypatch.setattr(sys,'argv',[str(script)])
     secrets = tmp_path / "secrets"
     secrets.mkdir()
     token = secrets / "google_token.json"

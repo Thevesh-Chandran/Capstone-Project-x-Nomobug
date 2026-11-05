@@ -1,0 +1,580 @@
+{
+  "purpose": "Exploratory paired new-data test, no promotion",
+  "validation_choice": "plus_hies2022",
+  "results": [
+    {
+      "candidate": "baseline",
+      "input_count": 93,
+      "hies_known": null,
+      "cpi_known": null,
+      "rows": 2075,
+      "positives": 184,
+      "prevalence": 0.08867469879518072,
+      "roc_auc": 0.7855085875888075,
+      "average_precision": 0.23996743587985436,
+      "brier_score": 0.07354281205448061,
+      "accuracy": 0.776867469879518,
+      "balanced_accuracy": 0.7181342399926425,
+      "precision": 0.23017408123791103,
+      "recall": 0.6467391304347826,
+      "f1": 0.33951497860199714,
+      "alert_rows": 517,
+      "threshold": 0.13999999999999999,
+      "majority_class_accuracy": 0.9113253012048192,
+      "ap_lift_over_prevalence": 2.7061545078842273,
+      "tp": 119,
+      "fp": 398,
+      "fn": 65,
+      "tn": 1493
+    },
+    {
+      "candidate": "plus_hies2022",
+      "input_count": 97,
+      "hies_known": 921,
+      "cpi_known": null,
+      "rows": 2075,
+      "positives": 184,
+      "prevalence": 0.08867469879518072,
+      "roc_auc": 0.7874686731198123,
+      "average_precision": 0.24027603818674104,
+      "brier_score": 0.07361841312099596,
+      "accuracy": 0.7971084337349398,
+      "balanced_accuracy": 0.7194275515600211,
+      "precision": 0.2462526766595289,
+      "recall": 0.625,
+      "f1": 0.3533026113671275,
+      "alert_rows": 467,
+      "threshold": 0.15,
+      "majority_class_accuracy": 0.9113253012048192,
+      "ap_lift_over_prevalence": 2.709634669768955,
+      "tp": 115,
+      "fp": 352,
+      "fn": 69,
+      "tn": 1539
+    },
+    {
+      "candidate": "plus_lag2_cpi",
+      "input_count": 95,
+      "hies_known": null,
+      "cpi_known": 2075,
+      "rows": 2075,
+      "positives": 184,
+      "prevalence": 0.08867469879518072,
+      "roc_auc": 0.7862759524521188,
+      "average_precision": 0.2284982060789922,
+      "brier_score": 0.07415655562435133,
+      "accuracy": 0.8616867469879518,
+      "balanced_accuracy": 0.6027737222081714,
+      "precision": 0.2535885167464115,
+      "recall": 0.28804347826086957,
+      "f1": 0.2697201017811705,
+      "alert_rows": 209,
+      "threshold": 0.31,
+      "majority_class_accuracy": 0.9113253012048192,
+      "ap_lift_over_prevalence": 2.576814008771244,
+      "tp": 53,
+      "fp": 156,
+      "fn": 131,
+      "tn": 1735
+    },
+    {
+      "candidate": "plus_both",
+      "input_count": 99,
+      "hies_known": 921,
+      "cpi_known": 2075,
+      "rows": 2075,
+      "positives": 184,
+      "prevalence": 0.08867469879518072,
+      "roc_auc": 0.7875721380452027,
+      "average_precision": 0.232447163885429,
+      "brier_score": 0.07424331629059958,
+      "accuracy": 0.8139759036144578,
+      "balanced_accuracy": 0.7041521049364265,
+      "precision": 0.25485436893203883,
+      "recall": 0.5706521739130435,
+      "f1": 0.3523489932885906,
+      "alert_rows": 412,
+      "threshold": 0.19,
+      "majority_class_accuracy": 0.9113253012048192,
+      "ap_lift_over_prevalence": 2.621347092729702,
+      "tp": 105,
+      "fp": 307,
+      "fn": 79,
+      "tn": 1584
+    },
+    {
+      "candidate": "date_proxy_control",
+      "input_count": 94,
+      "hies_known": null,
+      "cpi_known": null,
+      "rows": 2075,
+      "positives": 184,
+      "prevalence": 0.08867469879518072,
+      "roc_auc": 0.7870433173154302,
+      "average_precision": 0.2392500097587636,
+      "brier_score": 0.07350828745534455,
+      "accuracy": 0.7773493975903615,
+      "balanced_accuracy": 0.7306635550548364,
+      "precision": 0.23574144486692014,
+      "recall": 0.6739130434782609,
+      "f1": 0.3492957746478873,
+      "alert_rows": 526,
+      "threshold": 0.13,
+      "majority_class_accuracy": 0.9113253012048192,
+      "ap_lift_over_prevalence": 2.6980639687469266,
+      "tp": 124,
+      "fp": 402,
+      "fn": 60,
+      "tn": 1489
+    }
+  ],
+  "coverage": {
+    "geography": {
+      "location_source_sha256": "b9d5a5d327eb817ff7fdde449920b04af96f00574e17e394f6b85c459a7d949e",
+      "trusted_tier_metadata_sha256": "dd8b90e7bbb180ac9ffe2861daa33b0da0affb57a0fa5f2e90c9febfdb9dc57b",
+      "boundaries_sha256": "3edb1022b2de371bba6b7afb9802b6fc6d747c86dbcc40abf2374a9134f3c561",
+      "district2022_rows": 160,
+      "reference_years_in_download": [
+        "2022-01-01",
+        "2024-01-01"
+      ],
+      "used_year": 2022,
+      "assignment_reasons": {
+        "assigned": 2471,
+        "untrusted_precision_tier": 1030,
+        "boundary_uncertainty_or_outside": 2192,
+        "no_unique_coordinate_or_uncertainty": 2
+      },
+      "unmatched_public_district_labels": [],
+      "districts_matched": 12,
+      "assigned_row_precision_tiers": {
+        "street_candidate": 2106,
+        "precise_candidate": 167,
+        "postcode_area_candidate": 113,
+        "manual_verified": 85
+      },
+      "boundary_rule": "Districtboundarydistance > originaluncertaintyradius +100m; exactcoordinateandhashagreement withtrustedmetadata.",
+      "source_precision_tier_missing_in_frozen_frame": true
+    },
+    "cpi": {
+      "monthly_references": [
+        [
+          "2024-01-01",
+          "2024-02-23"
+        ],
+        [
+          "2024-02-01",
+          "2024-03-25"
+        ],
+        [
+          "2024-03-01",
+          "2024-04-25"
+        ],
+        [
+          "2024-04-01",
+          "2024-05-24"
+        ],
+        [
+          "2024-05-01",
+          "2024-06-25"
+        ],
+        [
+          "2024-06-01",
+          "2024-07-24"
+        ],
+        [
+          "2024-07-01",
+          "2024-08-22"
+        ],
+        [
+          "2024-08-01",
+          "2024-09-23"
+        ],
+        [
+          "2024-09-01",
+          "2024-10-24"
+        ],
+        [
+          "2024-10-01",
+          "2024-11-22"
+        ],
+        [
+          "2024-11-01",
+          "2024-12-20"
+        ],
+        [
+          "2024-12-01",
+          "2025-01-22"
+        ],
+        [
+          "2025-01-01",
+          "2025-02-21"
+        ],
+        [
+          "2025-02-01",
+          "2025-03-21"
+        ],
+        [
+          "2025-03-01",
+          "2025-04-23"
+        ],
+        [
+          "2025-04-01",
+          "2025-05-22"
+        ],
+        [
+          "2025-05-01",
+          "2025-06-24"
+        ],
+        [
+          "2025-06-01",
+          "2025-07-22"
+        ],
+        [
+          "2025-07-01",
+          "2025-08-22"
+        ],
+        [
+          "2025-08-01",
+          "2025-09-23"
+        ],
+        [
+          "2025-09-01",
+          "2025-10-22"
+        ],
+        [
+          "2025-10-01",
+          "2025-11-21"
+        ],
+        [
+          "2025-11-01",
+          "2025-12-22"
+        ],
+        [
+          "2025-12-01",
+          "2026-01-20"
+        ],
+        [
+          "2026-01-01",
+          "2026-02-19"
+        ],
+        [
+          "2026-02-01",
+          "2026-03-19"
+        ],
+        [
+          "2026-03-01",
+          "2026-04-17"
+        ],
+        [
+          "2026-04-01",
+          "2026-05-19"
+        ],
+        [
+          "2026-05-01",
+          "2026-06-19"
+        ],
+        [
+          "2026-06-01",
+          "2026-07-17"
+        ]
+      ],
+      "coverage": 5695,
+      "minimum_lag_months": 2,
+      "release_before_every_anchor": true,
+      "latest_raw_reference": "2026-09-01",
+      "latest_used_reference": "2026-06-01",
+      "current_vintage_revision_risk": true
+    },
+    "partitions": {
+      "train": {
+        "n": 1506,
+        "returns": 118,
+        "hies_known": 652,
+        "cpi_known": 1506
+      },
+      "validation": {
+        "n": 1177,
+        "returns": 152,
+        "hies_known": 539,
+        "cpi_known": 1177
+      },
+      "assessment": {
+        "n": 2075,
+        "returns": 184,
+        "hies_known": 921,
+        "cpi_known": 2075
+      }
+    }
+  },
+  "source_receipts": [
+    {
+      "url": "https://storage.dosm.gov.my/hies/hies_district.csv",
+      "path": "outputs\\model_validation\\20261021_dosm_inputs\\hies_district.csv",
+      "sha256": "7a2a6ec4cc0f107a6e8c8fec2affa4e06cff515c0c396de5f9ae209b4ee53e5b",
+      "downloaded_at_utc": "2026-10-21T02:31:17.731151+00:00",
+      "bytes": 17245,
+      "rows": 322,
+      "columns": [
+        "date",
+        "state",
+        "district",
+        "income_mean",
+        "income_median",
+        "expenditure_mean",
+        "gini",
+        "poverty"
+      ],
+      "dates": [
+        "2022-01-01",
+        "2024-01-01",
+        "2022-01-01",
+        "2024-01-01"
+      ]
+    },
+    {
+      "url": "https://storage.dosm.gov.my/cpi/cpi_2d.csv",
+      "path": "outputs\\model_validation\\20261021_dosm_inputs\\cpi_2d.csv",
+      "sha256": "9f5f33b4e6209c6bfbb9320260a2591bd9e38666c908dee85047bf63880649ae",
+      "downloaded_at_utc": "2026-10-21T02:31:18.714935+00:00",
+      "bytes": 148988,
+      "rows": 7854,
+      "columns": [
+        "date",
+        "division",
+        "index"
+      ],
+      "dates": [
+        "1980-01-01",
+        "1980-02-01",
+        "1980-03-01",
+        "1980-04-01",
+        "1980-05-01",
+        "1980-06-01",
+        "1980-07-01",
+        "1980-08-01",
+        "1980-09-01",
+        "1980-10-01",
+        "2026-05-01",
+        "2026-06-01",
+        "2026-07-01",
+        "2026-08-01",
+        "2026-09-01"
+      ]
+    }
+  ],
+  "publication_evidence": {
+    "web_verified_on": "2026-10-21",
+    "urls": [
+      {
+        "title": "HIES catalogue",
+        "url": "https://data.gov.my/data-catalogue/hies_district"
+      },
+      {
+        "title": "HIES2022 release",
+        "url": "https://www.dosm.gov.my/portal-main/release-content/household-income-survey-report--malaysia--states"
+      },
+      {
+        "title": "District2022 release archive",
+        "url": "https://www.dosm.gov.my/portal-main/release-archive/my-local-stats-malaysia-negeri--daerah-pentadbiran-2024"
+      },
+      {
+        "title": "CPI catalogue",
+        "url": "https://data.gov.my/data-catalogue/cpi_headline"
+      },
+      {
+        "title": "CPI actual publication dates",
+        "url": "https://www.dosm.gov.my/portal-main/release-archive/b34785b8-80e5-11ed-80ec-0cc47a9b694a"
+      }
+    ],
+    "publication_dates": {
+      "HIES2022_Malaysia_states": "2023-07-28",
+      "District_MyLocalStats2022": "2023-11-27"
+    },
+    "HIES_conservative_available_from": "2023-11-28",
+    "CPI_actual_dates": "cpi_release_dates_parsed.json",
+    "local_pages": {
+      "cpi_release_archive.html": {
+        "sha256": "c897f9343d7374d2c9875416332fe46067b12aa1a66b2da496d598eecac33695",
+        "bytes": 117467
+      },
+      "hies_catalogue.html": {
+        "sha256": "c5f6e94f44273532a030f68b9772098a35c67b01b4613d41c384c40a92df549c",
+        "bytes": 149234
+      }
+    },
+    "download_limit": "Attempt to save all publication pages encountered a45s readtimeout onDOSM; pagepublicationfacts separately verified using web tool. CPIreleasearchive and CSV data were successfully saved. No failedpage download was counted as successful.",
+    "vintage_limit": "Downloaded2026CSV contains2022HIES values and current revised CPI history. Reference-date/publication timing checked; exactoriginal2023/2024filevintages not recovered. Exploratory retrospective association only."
+  },
+  "original_baseline_reproduced_1e12": true,
+  "protected_unchanged": true,
+  "classifier_fits_final": 5,
+  "classifier_fits_total_including_invalid_initial": 10,
+  "input_meanings": {
+    "HIES2022": [
+      "District median household income RM/month",
+      "District mean household expenditure RM/month",
+      "District poverty rate percent",
+      "District context unknown indicator"
+    ],
+    "CPI": [
+      "National headline CPI index from two reference months earlier",
+      "Headline inflation YoY percent calculated from that released month and preceding-year reference"
+    ],
+    "date_proxy_control": [
+      "Ordinal months since January2024"
+    ]
+  },
+  "limitations": [
+    "2022districtcontext is not individual wealth",
+    "Currentvintage CSV, originalas-issued revisions unverified",
+    "Sparse trusted geography; roughlyhalfunknown",
+    "Previouslyexamined historical assessment",
+    "InitialHIESfitinvalidtrustedtiergate; preserveDO_NOT_USE receipt"
+  ],
+  "baselines": {
+    "baseline_train_prevalence": 0.07835325365205843,
+    "assessment_prevalence": 0.08867469879518072,
+    "constant_training_prevalence_brier": 0.08091802881860717,
+    "always_no": {
+      "rows": 2075,
+      "positives": 184,
+      "prevalence": 0.08867469879518072,
+      "roc_auc": 0.5,
+      "average_precision": 0.08867469879518072,
+      "brier_score": 0.08867469879518072,
+      "accuracy": 0.9113253012048192,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "alert_rows": 0,
+      "threshold": 0.5,
+      "majority_class_accuracy": 0.9113253012048192,
+      "ap_lift_over_prevalence": 1.0
+    }
+  },
+  "paired_uncertainty": {
+    "plus_hies2022": {
+      "method": "1000pairedbootstrapreplicates bysameproperty/packagevalidationgroup;conditionalonfit,doesnotaccountforpriorresearchselection",
+      "deltas": {
+        "precision": {
+          "point": 0.01607859542161788,
+          "low": 0.005791458167596418,
+          "high": 0.026255495500922
+        },
+        "recall": {
+          "point": -0.021739130434782594,
+          "low": -0.048804756704283504,
+          "high": 0.00010917030567675686
+        },
+        "f1": {
+          "point": 0.013787632765130342,
+          "low": -0.00020598739637597832,
+          "high": 0.027369298284884255
+        },
+        "average_precision": {
+          "point": 0.0003086023068866739,
+          "low": -0.017777308942782497,
+          "high": 0.018801311431551962
+        },
+        "brier_score": {
+          "point": 7.560106651534337e-05,
+          "low": -0.0007745019366641795,
+          "high": 0.0008673995493626486
+        }
+      }
+    },
+    "plus_lag2_cpi": {
+      "method": "1000pairedbootstrapreplicates bysameproperty/packagevalidationgroup;conditionalonfit,doesnotaccountforpriorresearchselection",
+      "deltas": {
+        "precision": {
+          "point": 0.023414435508500447,
+          "low": -0.01723695803927474,
+          "high": 0.06796750621750242
+        },
+        "recall": {
+          "point": -0.358695652173913,
+          "low": -0.4228724489795918,
+          "high": -0.2950799180327869
+        },
+        "f1": {
+          "point": -0.06979487682082663,
+          "low": -0.11417616918095727,
+          "high": -0.0252447893421881
+        },
+        "average_precision": {
+          "point": -0.011469229800862152,
+          "low": -0.029331134431744232,
+          "high": 0.002223626804956618
+        },
+        "brier_score": {
+          "point": 0.00061374356987072,
+          "low": -0.00017959472864755783,
+          "high": 0.0012690439325926987
+        }
+      }
+    },
+    "plus_both": {
+      "method": "1000pairedbootstrapreplicates bysameproperty/packagevalidationgroup;conditionalonfit,doesnotaccountforpriorresearchselection",
+      "deltas": {
+        "precision": {
+          "point": 0.024680287694127806,
+          "low": 0.008981632321736193,
+          "high": 0.04005793125120835
+        },
+        "recall": {
+          "point": -0.07608695652173914,
+          "low": -0.11627906976744184,
+          "high": -0.04300500258754525
+        },
+        "f1": {
+          "point": 0.012834014686593453,
+          "low": -0.008702103913754627,
+          "high": 0.032302628644499655
+        },
+        "average_precision": {
+          "point": -0.00752027199442537,
+          "low": -0.03250779536201096,
+          "high": 0.012539955412191278
+        },
+        "brier_score": {
+          "point": 0.0007005042361189484,
+          "low": -0.0002591247679550889,
+          "high": 0.001598946037695454
+        }
+      }
+    },
+    "date_proxy_control": {
+      "method": "1000pairedbootstrapreplicates bysameproperty/packagevalidationgroup;conditionalonfit,doesnotaccountforpriorresearchselection",
+      "deltas": {
+        "precision": {
+          "point": 0.005567363629009114,
+          "low": -0.004677306820557832,
+          "high": 0.015565439878025389
+        },
+        "recall": {
+          "point": 0.02717391304347827,
+          "low": -0.005683450888192318,
+          "high": 0.05882352941176461
+        },
+        "f1": {
+          "point": 0.009780796045890161,
+          "low": -0.00495829403616406,
+          "high": 0.024769750185940895
+        },
+        "average_precision": {
+          "point": -0.0007174261210907695,
+          "low": -0.01321579983938793,
+          "high": 0.012076017027490725
+        },
+        "brier_score": {
+          "point": -3.45245991360682e-05,
+          "low": -0.00041912429926061216,
+          "high": 0.0003557181027798516
+        }
+      }
+    }
+  },
+  "baseline_model_replay": "2075 probabilities reproduced to1e-12"
+}

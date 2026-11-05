@@ -1,0 +1,19 @@
+{
+  "commercial_rows": 418,
+  "source_name_address_package": {
+    "area_sqft": 0,
+    "lot_count": 2,
+    "storeys": 0
+  },
+  "remarks_only": {
+    "area_sqft": 0,
+    "lot_count": 0,
+    "storeys": 0
+  },
+  "year_counts": {
+    "2024": 18,
+    "": 2,
+    "2025": 167,
+    "2026": 231
+  }
+}

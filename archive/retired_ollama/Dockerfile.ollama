@@ -1,0 +1,11 @@
+FROM ollama/ollama:latest
+ARG MODEL=llama3.2:3b
+ENV OLLAMA_HOST=0.0.0.0:8080 OLLAMA_MODELS=/models OLLAMA_MAX_LOADED_MODELS=1 OLLAMA_NUM_PARALLEL=1
+# Only public model weights are embedded, never business data or credentials.
+RUN ollama serve & pid=$!; \
+    trap 'kill "$pid"' EXIT; \
+    until ollama list >/dev/null 2>&1; do sleep 1; done; \
+    ollama pull "$MODEL"
+EXPOSE 8080
+ENTRYPOINT ["/bin/ollama"]
+CMD ["serve"]

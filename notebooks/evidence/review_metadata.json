@@ -1,0 +1,50 @@
+{
+  "created_local": "2026-10-17",
+  "scope": "Archived frozen-refit source; not a fresh Calendar audit or new final evaluation",
+  "total_refit_services": 5695,
+  "total_refit_returns": 521,
+  "eda_services": 5333,
+  "eda_returns": 492,
+  "holdout_services": 100,
+  "holdout_returns": 5,
+  "maturity_gap_services": 262,
+  "shared_development_holdout_groups": 34,
+  "raw_predictors": 93,
+  "encoded_columns": 238,
+  "checks": {
+    "unresolved_labels": 0,
+    "duplicate_service_keys": 0,
+    "non_30_day_windows": 0,
+    "outcomes_after_observation": 0,
+    "weather_on_or_after_service": 0,
+    "weather_latest_date_missing": 2
+  },
+  "sources": {
+    "training_input": {
+      "path": "outputs/cp2-v2/source_refresh_20260927/refreshed/dataset_input.json",
+      "sha256": "eb5f0a85c207ab802b3ba99b2cb58b012980e93dc608d7fd9f1c6bbdb5ffdd24"
+    },
+    "bundle": {
+      "path": "outputs/cp2-v2/prospective_callback_v2/bundle.json",
+      "sha256": "6ace4314b4a5e170ea1bd6feee40dadbdd14eb3c986db9223d888b3c3ee302e0"
+    },
+    "artifact": {
+      "path": "outputs/cp2-v2/prospective_callback_v2/challenger_all_history.joblib",
+      "sha256": "b47d7dcc826ae2856c55899c3b6f4311bdb6489e08b63fb566b5fb8c9019e65f"
+    },
+    "earlier_holdout": {
+      "path": "config/warranty_new_holdout_v5.json",
+      "sha256": "3579a2cbd1646b31b8db08cbecf389a11e53b5ddbb851979a32236a805f43a74"
+    },
+    "research_candidate": {
+      "path": "webapp/models/return_research_best.json",
+      "sha256": "841c168bf9e13c28f01da632d3dfb51cbcc6f8ca30420a27375bbc8ab9ae610e"
+    },
+    "research60_folds": {
+      "path": "outputs/model_validation/20261016_target_research/fold_metrics.jsonl",
+      "sha256": "c0983f0613f2f242354c6470907294f590b155a8593ce9d1ac8da819bf4b1b03"
+    }
+  },
+  "building_age_available": false,
+  "correlation_scope": "Development rows with outcomes ending strictly before 15 August 2026; observed non-missing pairs; not independent causal effects"
+}

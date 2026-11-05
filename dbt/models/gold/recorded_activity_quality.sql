@@ -3,12 +3,15 @@
 -- other issues; never sum affected_rows across issue types.
 with sales as (
     select count(*) as n,
-        countif(not include_in_sale_count) as excluded,
-        countif(closed_date is null) as undated,
-        countif(include_in_sale_count and sale_total_rm is null) as missing_total,
-        countif(closed_date_year_source in
+        countif(not f.include_in_sale_count) as excluded,
+        countif(f.closed_date is null) as undated,
+        countif(f.include_in_sale_count and f.sale_total_rm is null) as missing_total,
+        countif(nullif(trim(s.deposit_paid_raw),'') is not null
+                and f.deposit_recorded_rm is null) as invalid_deposit,
+        countif(f.closed_date_year_source in
             ('early_sequence_inferred', 'adjacent_timestamps_inferred')) as inferred_year
-    from {{ ref('sales_package_facts') }}
+    from {{ ref('sales_package_facts') }} f
+    join {{ ref('sales') }} s using(sales_record_id)
 ), payments as (
     select count(*) as n,
         countif(payment_date is null) as undated,
@@ -23,7 +26,8 @@ with sales as (
     select count(*) as n,
         countif(first_reply_date is null) as undated,
         countif(acquisition_needs_review) as acquisition_review,
-        countif(status_needs_review) as status_review
+        countif(status_needs_review) as status_review,
+        countif(nullif(trim(source_column_002),'') is null) as missing_contact
     from {{ ref('prospects_2026') }}
     where row_class = 'prospect_candidate'
 )
@@ -32,6 +36,7 @@ from sales, unnest([
     struct('excluded_disposition' as issue_code, excluded as affected_rows),
     struct('undated_close' as issue_code, undated as affected_rows),
     struct('unparsed_or_blank_total' as issue_code, missing_total as affected_rows),
+    struct('non_numeric_recorded_deposit' as issue_code, invalid_deposit as affected_rows),
     struct('inferred_close_year' as issue_code, inferred_year as affected_rows)
 ])
 union all
@@ -49,5 +54,6 @@ select 'prospects_2026', issue_code, affected_rows, n
 from prospects, unnest([
     struct('undated_first_reply' as issue_code, undated as affected_rows),
     struct('acquisition_needs_review' as issue_code, acquisition_review as affected_rows),
-    struct('status_needs_review' as issue_code, status_review as affected_rows)
+    struct('status_needs_review' as issue_code, status_review as affected_rows),
+    struct('missing_contact_number' as issue_code, missing_contact as affected_rows)
 ])

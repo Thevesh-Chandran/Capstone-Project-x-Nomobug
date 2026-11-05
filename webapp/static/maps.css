@@ -3,16 +3,16 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
-  gap: 10px;
-  padding: 12px 14px;
-  margin: 0 0 16px;
-  background: #fff;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  margin: 0 0 var(--space-md);
+  background: var(--color-paper-3);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
 }
 .maps-page .tools label {
   display: grid;
-  gap: 5px;
+  gap: var(--space-2xs);
   font-size: 11.5px;
   font-weight: 600;
   color: var(--muted);
@@ -26,10 +26,10 @@
 .maps-page .maphead button,
 .maps-page .row button {
   min-height: 34px;
-  padding: 0 12px;
+  padding: 0 var(--space-sm);
   border: 1px solid var(--line-2);
   border-radius: var(--r);
-  background: #fff;
+  background: var(--color-paper-3);
   font-size: 12.5px;
   font-weight: 500;
   color: var(--ink);
@@ -47,20 +47,20 @@
 .maps-page #apply {
   background: var(--ink);
   border-color: var(--ink);
-  color: #fff;
+  color: var(--color-accent-ink);
 }
 .maps-page .metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
-  margin: 0 0 16px;
+  margin: 0 0 var(--space-md);
   border: 1px solid var(--line);
   border-radius: var(--r-lg);
   overflow: hidden;
 }
 .maps-page .metric {
-  padding: 12px 16px;
-  background: #fff;
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-paper-3);
   border-left: 1px solid var(--line);
   margin-left: -1px;
 }
@@ -73,13 +73,13 @@
   display: block;
   font-size: 20px;
   font-weight: 600;
-  margin-top: 6px;
+  margin-top: var(--space-xs);
   font-variant-numeric: tabular-nums;
 }
 .maps-page .layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 16px;
+  gap: var(--space-md);
   align-items: start;
 }
 .maps-page .layout > .panel {
@@ -92,22 +92,22 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
   flex-wrap: wrap;
-  margin-bottom: 10px;
+  margin-bottom: var(--space-sm);
 }
 .maps-page .maphead > div {
   display: flex;
-  gap: 6px;
+  gap: var(--space-xs);
   flex-wrap: wrap;
 }
 .maps-page .legend {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-xs);
   flex-wrap: wrap;
   min-height: 16px;
-  margin: 0 0 10px;
+  margin: 0 0 var(--space-sm);
   font-size: 12px;
   color: var(--muted);
 }
@@ -116,7 +116,7 @@
   width: 180px;
   height: 8px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #dbeafe, #93c5fd, #60a5fa, #2563eb, #1d4ed8, #172554);
+  background: linear-gradient(90deg, var(--color-sky), var(--color-sky-2), var(--color-sky-2), var(--color-accent), var(--color-accent), var(--color-ink));
 }
 .maps-page svg#map {
   display: block;
@@ -124,18 +124,18 @@
   height: clamp(420px, 58vh, 680px);
   border: 1px solid var(--line);
   border-radius: var(--r);
-  background: #f5f9fe;
+  background: var(--color-sky);
   touch-action: none;
 }
 .maps-page svg .land {
-  fill: #fff;
-  stroke: #d4d4d4;
+  fill: var(--color-paper-3);
+  stroke: var(--color-rule);
   stroke-width: 1;
 }
 .maps-page svg .cell,
 .maps-page svg .point {
   cursor: pointer;
-  stroke: #fff;
+  stroke: var(--color-paper-3);
   stroke-width: 1.5;
 }
 .maps-page svg .cell:hover {
@@ -148,7 +148,7 @@
 }
 .maps-page svg .heat-hit:hover,
 .maps-page svg .heat-hit:focus {
-  fill: #fff;
+  fill: var(--color-paper-3);
   fill-opacity: 0.15;
   stroke: var(--black);
   stroke-width: 2;
@@ -161,21 +161,21 @@
 .maps-page .map-guide {
   font-size: 12.5px;
   color: var(--muted);
-  margin: 10px 0 0;
+  margin: var(--space-sm) 0 0;
 }
 .maps-page details {
-  margin-top: 12px;
+  margin-top: var(--space-sm);
   font-size: 12.5px;
 }
 .maps-page details p {
-  margin-top: 8px;
+  margin-top: var(--space-xs);
 }
 .maps-page .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  padding: 11px 0;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
   border-bottom: 1px solid var(--line);
   font-size: 13px;
 }
@@ -184,16 +184,16 @@
   font-variant-numeric: tabular-nums;
 }
 .maps-page .ranking-block {
-  margin-top: 16px;
-  padding-top: 14px;
+  margin-top: var(--space-md);
+  padding-top: var(--space-md);
   border-top: 1px solid var(--line);
 }
 .maps-page .bar {
   height: 7px;
   border-radius: 999px;
-  background: #f0f0f0;
+  background: var(--color-paper-2);
   overflow: hidden;
-  margin-top: 8px;
+  margin-top: var(--space-xs);
 }
 .maps-page .bar i {
   display: block;
@@ -202,10 +202,10 @@
 }
 .maps-page .badge {
   height: auto;
-  padding: 4px 9px;
+  padding: var(--space-2xs) var(--space-xs);
 }
 .maps-page .instruction {
-  padding: 10px 12px;
+  padding: var(--space-sm) var(--space-sm);
   border-radius: var(--r);
   background: var(--blue-50);
   color: var(--blue-700);
@@ -214,15 +214,15 @@
 .maps-page .lower {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-top: 16px;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
 }
 .maps-page li {
-  margin: 8px 0;
+  margin: var(--space-xs) 0;
   color: var(--muted);
 }
 .maps-page .map-source {
-  margin-top: 16px;
+  margin-top: var(--space-md);
   font-size: 12px;
   color: var(--subtle);
 }

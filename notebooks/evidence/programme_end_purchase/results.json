@@ -1,0 +1,83 @@
+{
+  "selected": "Balanced logistic regression C=0.1 / core_and_weather",
+  "raw_inputs": [
+    "package_sessions",
+    "programme_sales_rm",
+    "programme_age_days",
+    "prior_programmes",
+    "days_as_customer",
+    "prior_purchase_average_rm",
+    "previous_return_visits",
+    "prior_paid_visits",
+    "average_paid_visit_gap_days",
+    "month_sin",
+    "month_cos",
+    "premise_type",
+    "pest_type",
+    "district",
+    "rain_last_7_days_mm",
+    "rain_last_14_days_mm",
+    "humidity_last_7_days_pct"
+  ],
+  "input_count": 17,
+  "encoded_columns": 33,
+  "training_rows": 751,
+  "validation_rows": 111,
+  "final_fit_rows": 862,
+  "threshold": 0.99,
+  "assessment": {
+    "rows": 346,
+    "positive_cases": 16,
+    "accuracy": 0.953757225433526,
+    "precision": 0.5,
+    "recall": 0.0625,
+    "f1": 0.1111111111111111,
+    "average_precision": 0.1967049403967285,
+    "brier": 0.08993443835596197,
+    "roc_auc": 0.6878787878787879,
+    "tn": 329,
+    "fp": 1,
+    "fn": 15,
+    "tp": 1
+  },
+  "baselines": {
+    "Always no additional purchase": {
+      "rows": 346,
+      "positive_cases": 16,
+      "accuracy": 0.953757225433526,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "average_precision": 0.046242774566473986,
+      "brier": 0.04440161363412672,
+      "roc_auc": 0.5,
+      "tn": 330,
+      "fp": 0,
+      "fn": 16,
+      "tp": 0
+    },
+    "Previous programme purchaser": {
+      "rows": 346,
+      "positive_cases": 16,
+      "accuracy": 0.8988439306358381,
+      "precision": 0.14814814814814814,
+      "recall": 0.25,
+      "f1": 0.18604651162790697,
+      "average_precision": 0.07171911796189252,
+      "brier": 0.10115606936416185,
+      "roc_auc": 0.5901515151515151,
+      "tn": 307,
+      "fp": 23,
+      "fn": 12,
+      "tp": 4
+    }
+  },
+  "passed_promotion_gate": false,
+  "deployed": false,
+  "limitations": [
+    "Only 4 positive validation cases and 16 assessment cases; high uncertainty.",
+    "Sales and Calendar are reconstructed from a later snapshot; historical corrections and source vintage are not fully recoverable.",
+    "Recorded next programme purchase is not proof of renewing the same contract, settled payment or verified treatment completion.",
+    "The historical periods have been inspected previously in other target studies."
+  ]
+}

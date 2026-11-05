@@ -1,0 +1,4 @@
+rule_order,review_rule,evidence_type,services,positive_windows,reviews,callbacks_found,reviews_without_callback,callbacks_missed,callback_capture,review_precision,cohort_start,cohort_end,limitation
+1,Current model,Observed historical ranking,100,5,20,4,16,1,0.8,0.2,2026-08-15,2026-08-27,"Only five positive service windows; batch ranking, not a tested daily queue"
+2,Earlier model,Observed historical ranking,100,5,20,3,17,2,0.6,0.15,2026-08-15,2026-08-27,"Only five positive service windows; batch ranking, not a tested daily queue"
+3,Random selection (expected),"Mathematical expectation, not observed staff performance",100,5,20,1,19,4,0.2,0.05,2026-08-15,2026-08-27,"Only five positive service windows; batch ranking, not a tested daily queue"

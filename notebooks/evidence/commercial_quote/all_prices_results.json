@@ -1,0 +1,129 @@
+{
+  "selected": "Extra Trees / requirements / RM",
+  "raw_inputs": [
+    "sessions",
+    "tbs_units",
+    "trbs_units",
+    "includes_car",
+    "misting",
+    "fogging",
+    "service_family",
+    "premise",
+    "pest",
+    "district"
+  ],
+  "input_count": 10,
+  "training_rows": 1404,
+  "validation_rows": 481,
+  "test_rows": 507,
+  "final_fit_rows": 1885,
+  "test": {
+    "rows": 507,
+    "mae_rm": 216.76650507570128,
+    "mse_rm_squared": 350872.725438796,
+    "rmse_rm": 592.345106706214,
+    "r_squared": 0.5608511382477966,
+    "wape": 0.28123686734441355,
+    "median_absolute_percentage_error": 0.15030728923081796,
+    "within_20_percent": 0.6252465483234714,
+    "median_absolute_error_rm": 87.62369354338165
+  },
+  "baseline": {
+    "rows": 507,
+    "mae_rm": 215.34418145956607,
+    "mse_rm_squared": 489727.98865877715,
+    "rmse_rm": 699.8056792130063,
+    "r_squared": 0.38706125271280956,
+    "wape": 0.27939151841464166,
+    "median_absolute_percentage_error": 0.06666666666666667,
+    "within_20_percent": 0.7140039447731755,
+    "median_absolute_error_rm": 60.0
+  },
+  "mae_reduction": -0.006604885288726825,
+  "bootstrap_MAE_improvement_rm_95": [
+    -30.16789159939721,
+    34.235080593897294
+  ],
+  "segments": {
+    "COMMERCIAL": {
+      "model": {
+        "rows": 155,
+        "mae_rm": 504.55066949753456,
+        "mse_rm_squared": 1043434.349125801,
+        "rmse_rm": 1021.4863430931424,
+        "r_squared": 0.4383884988197607,
+        "wape": 0.4225717499979352,
+        "median_absolute_percentage_error": 0.4558219992567821,
+        "within_20_percent": 0.23225806451612904,
+        "median_absolute_error_rm": 301.62799999999925
+      },
+      "baseline": {
+        "rows": 155,
+        "mae_rm": 470.86451612903227,
+        "mse_rm_squared": 1426051.0580645162,
+        "rmse_rm": 1194.1737972608996,
+        "r_squared": 0.23245130261403424,
+        "wape": 0.3943588912303453,
+        "median_absolute_percentage_error": 0.10909090909090909,
+        "within_20_percent": 0.6064516129032258,
+        "median_absolute_error_rm": 100.0
+      }
+    },
+    "RESIDENTIAL": {
+      "model": {
+        "rows": 348,
+        "mae_rm": 89.46171074003999,
+        "mse_rm_squared": 45807.72969667872,
+        "rmse_rm": 214.02740407872707,
+        "r_squared": 0.7920362304335828,
+        "wape": 0.1523020700027098,
+        "median_absolute_percentage_error": 0.05410988093184554,
+        "within_20_percent": 0.7988505747126436,
+        "median_absolute_error_rm": 27.000830584990922
+      },
+      "baseline": {
+        "rows": 348,
+        "mae_rm": 100.86063218390805,
+        "mse_rm_squared": 77092.41451149425,
+        "rmse_rm": 277.65520796753344,
+        "r_squared": 0.6500060310138109,
+        "wape": 0.17170790650346845,
+        "median_absolute_percentage_error": 0.018367346938775512,
+        "within_20_percent": 0.7672413793103449,
+        "median_absolute_error_rm": 9.0
+      }
+    },
+    "VEHICLE": {
+      "model": {
+        "rows": 4,
+        "mae_rm": 140.64724093218808,
+        "mse_rm_squared": 54764.43713155633,
+        "rmse_rm": 234.0180273644668,
+        "r_squared": -0.18722765200217517,
+        "wape": 0.4354403744030591,
+        "median_absolute_percentage_error": 0.16798943985448656,
+        "within_20_percent": 0.75,
+        "median_absolute_error_rm": 33.429898531042824
+      },
+      "baseline": {
+        "rows": 4,
+        "mae_rm": 274.0,
+        "mse_rm_squared": 106504.0,
+        "rmse_rm": 326.34950589820113,
+        "r_squared": -1.3088796392646547,
+        "wape": 0.848297213622291,
+        "median_absolute_percentage_error": 1.1106033765952064,
+        "within_20_percent": 0.25,
+        "median_absolute_error_rm": 300.0
+      }
+    }
+  },
+  "passed_research_gate": false,
+  "deployed": false,
+  "limitations": [
+    "Recorded sold price is a quotation benchmark, not a mandated price or profit estimate.",
+    "Exact building size, verified infestation severity and actual treatment cost are unavailable.",
+    "Package and customer fields come from a later snapshot; historical corrections cannot be fully reconstructed.",
+    "Historical periods were previously inspected; new future quotations are needed to confirm reliability."
+  ]
+}

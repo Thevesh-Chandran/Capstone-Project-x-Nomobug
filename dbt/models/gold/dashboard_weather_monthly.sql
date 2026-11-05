@@ -22,6 +22,6 @@ select
         as avg_prior_7d_soil_moisture,
     'open_meteo_reanalysis_association_not_property_measurement_or_causal_effect'
         as weather_evidence
-from {{ ref('calendar_service_event_facts') }}
+from {{ ref('calendar_programme_service_facts') }}
 where event_date_local between date '2026-01-01' and date '2026-12-31'
 group by service_month, event_group

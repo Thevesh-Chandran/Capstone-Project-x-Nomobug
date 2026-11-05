@@ -1,0 +1,39 @@
+{
+  "audit": {
+    "source_rows": 2539,
+    "missing_or_incomplete_date": 5,
+    "other_or_unknown_category": 15,
+    "eligible_rows": 2519
+  },
+  "split": {
+    "validation_start": "2025-11-26",
+    "test_start": "2026-04-23",
+    "rule": "Date-only 60th/80th percentile cuts, purged connected customer/name/address/property groups"
+  },
+  "samples": {
+    "training": {
+      "rows": 1357,
+      "groups": 1254,
+      "commercial": 106,
+      "residential": 1251,
+      "from": "2024-03-06",
+      "to": "2025-11-25"
+    },
+    "validation": {
+      "rows": 468,
+      "groups": 446,
+      "commercial": 86,
+      "residential": 382,
+      "from": "2025-11-26",
+      "to": "2026-04-22"
+    },
+    "test": {
+      "rows": 507,
+      "groups": 472,
+      "commercial": 159,
+      "residential": 348,
+      "from": "2026-04-23",
+      "to": "2026-10-27"
+    }
+  }
+}
