@@ -1,0 +1,122 @@
+{
+  "selected": "Ridge / Requirements size and business type",
+  "validation": [
+    {
+      "candidate": "Gradient boosting / Recorded requirements",
+      "inputs": 10,
+      "rows": 75,
+      "mae_rm": 412.613302623715,
+      "mse_rm_squared": 1772808.2822586754,
+      "rmse_rm": 1331.468468368168,
+      "r_squared": 0.40189261968989676,
+      "wape": 0.2875754827318895,
+      "median_absolute_percentage_error": 0.10909090899581253,
+      "within_20_percent": 0.7466666666666667,
+      "median_absolute_error_rm": 122.50000039553333
+    },
+    {
+      "candidate": "Ridge / Recorded requirements",
+      "inputs": 10,
+      "rows": 75,
+      "mae_rm": 419.26757906221565,
+      "mse_rm_squared": 1589271.1260293715,
+      "rmse_rm": 1260.662970832955,
+      "r_squared": 0.46381410821205926,
+      "wape": 0.2922132555493558,
+      "median_absolute_percentage_error": 0.19457316204147596,
+      "within_20_percent": 0.52,
+      "median_absolute_error_rm": 176.37551010078857
+    },
+    {
+      "candidate": "Extra Trees / Recorded requirements",
+      "inputs": 10,
+      "rows": 75,
+      "mae_rm": 899.6863110568962,
+      "mse_rm_squared": 2417769.0896275057,
+      "rmse_rm": 1554.9177115292969,
+      "r_squared": 0.18429671676091142,
+      "wape": 0.6270464950215334,
+      "median_absolute_percentage_error": 0.5267647912636101,
+      "within_20_percent": 0.21333333333333335,
+      "median_absolute_error_rm": 320.2559310202578
+    },
+    {
+      "candidate": "Gradient boosting / Requirements and size",
+      "inputs": 14,
+      "rows": 75,
+      "mae_rm": 412.613302623715,
+      "mse_rm_squared": 1772808.2822586754,
+      "rmse_rm": 1331.468468368168,
+      "r_squared": 0.40189261968989676,
+      "wape": 0.2875754827318895,
+      "median_absolute_percentage_error": 0.10909090899581253,
+      "within_20_percent": 0.7466666666666667,
+      "median_absolute_error_rm": 122.50000039553333
+    },
+    {
+      "candidate": "Ridge / Requirements and size",
+      "inputs": 14,
+      "rows": 75,
+      "mae_rm": 409.9404461668791,
+      "mse_rm_squared": 1582016.066164536,
+      "rmse_rm": 1257.7822014023477,
+      "r_squared": 0.46626180934995176,
+      "wape": 0.28571260535745685,
+      "median_absolute_percentage_error": 0.18431076399246712,
+      "within_20_percent": 0.5466666666666666,
+      "median_absolute_error_rm": 176.3226076990021
+    },
+    {
+      "candidate": "Extra Trees / Requirements and size",
+      "inputs": 14,
+      "rows": 75,
+      "mae_rm": 908.9878542930076,
+      "mse_rm_squared": 2445291.730332579,
+      "rmse_rm": 1563.742859402587,
+      "r_squared": 0.17501116981482268,
+      "wape": 0.6335293102125785,
+      "median_absolute_percentage_error": 0.5100189727553919,
+      "within_20_percent": 0.21333333333333335,
+      "median_absolute_error_rm": 318.28373572747364
+    },
+    {
+      "candidate": "Gradient boosting / Requirements size and business type",
+      "inputs": 15,
+      "rows": 75,
+      "mae_rm": 440.61256122195783,
+      "mse_rm_squared": 1699435.6442632817,
+      "rmse_rm": 1303.6240425303922,
+      "r_squared": 0.426646969461974,
+      "wape": 0.30708988097432244,
+      "median_absolute_percentage_error": 0.14219114231306085,
+      "within_20_percent": 0.7066666666666667,
+      "median_absolute_error_rm": 117.56530986417829
+    },
+    {
+      "candidate": "Ridge / Requirements size and business type",
+      "inputs": 15,
+      "rows": 75,
+      "mae_rm": 409.3347629343673,
+      "mse_rm_squared": 1553104.5465621115,
+      "rmse_rm": 1246.2361520041502,
+      "r_squared": 0.4760159341604241,
+      "wape": 0.2852904676152546,
+      "median_absolute_percentage_error": 0.18427705520545706,
+      "within_20_percent": 0.5466666666666666,
+      "median_absolute_error_rm": 179.95881126580707
+    },
+    {
+      "candidate": "Extra Trees / Requirements size and business type",
+      "inputs": 15,
+      "rows": 75,
+      "mae_rm": 448.90849624322516,
+      "mse_rm_squared": 1271367.4708417163,
+      "rmse_rm": 1127.5493208022947,
+      "r_squared": 0.5710679631822331,
+      "wape": 0.31287182620799076,
+      "median_absolute_percentage_error": 0.16891331844238602,
+      "within_20_percent": 0.56,
+      "median_absolute_error_rm": 122.61544089660129
+    }
+  ]
+}

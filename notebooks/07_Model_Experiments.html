@@ -1,0 +1,1616 @@
+<!doctype html><html><meta charset="utf-8"><title>Model Experiments</title><style>body{max-width:1120px;margin:45px auto;padding:0 28px;font:16px/1.7 Arial;color:#1e293b;background:#f8fafc}h1{font-size:34px;color:#0f172a}h2{margin-top:52px;padding-top:22px;border-top:3px solid #2563eb;color:#172554}h3{margin-top:28px}section{background:white;padding:16px 24px;margin:15px 0;border:1px solid #e2e8f0;border-radius:10px}table{border-collapse:collapse;font-size:12px;display:block;overflow:auto}td,th{padding:9px;border-bottom:1px solid #e2e8f0;text-align:left}th{background:#eff6ff}img{max-width:100%;height:auto}pre{font:12px/1.6 Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;background:#f1f5f9}details{margin:14px 0}summary{cursor:pointer;color:#2563eb}code{font-size:.88em}a{color:#1d4ed8}</style><body>
+<section>
+<h1>Model Experiments</h1>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>from pathlib import Path
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
+BASE = Path.cwd()
+if not (BASE / &quot;evidence&quot;).exists():
+    BASE = BASE / &quot;notebooks&quot; 
+assert (BASE / &quot;evidence&quot;).is_dir(), &quot;Open from the project root or notebooks.&quot;
+EVIDENCE = BASE / &quot;evidence&quot;
+def read_json(name):
+    return json.loads((EVIDENCE / name).read_text(encoding=&quot;utf-8-sig&quot;))
+pd.set_option(&quot;display.max_colwidth&quot;, 90)
+plt.rcParams.update({&quot;figure.figsize&quot;: (10, 4.5), &quot;axes.spines.top&quot;: False,
+                     &quot;axes.spines.right&quot;: False, &quot;font.size&quot;: 11})
+</pre></details>
+</section>
+<section>
+<h2>Historical studies</h2>
+<p>The following is the saved study summary as of 18 October. Results use different targets, periods, sample sizes and selection procedures. A higher accuracy in a different population is not automatically a better model for the original question. Full declared input lists are retained in <code>evidence/historical_input_lists.csv</code>.</p>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>studies=pd.read_csv(EVIDENCE/&quot;historical_studies.csv&quot;)
+for section, group in studies.groupby(&quot;Section&quot;, sort=False):
+    print(section)
+    display(group.drop(columns=[&quot;Source&quot;]).reset_index(drop=True))</pre></details>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Original 100-service comparison</td>
+      <td>Recorded pest-related return within 30 days</td>
+      <td>Extra Trees: Original baseline</td>
+      <td>Original 93 inputs</td>
+      <td>100</td>
+      <td>94.0</td>
+      <td>40.000000</td>
+      <td>40.0</td>
+      <td>Same records within this section; historical comparison</td>
+    </tr>
+    <tr>
+      <td>Original 100-service comparison</td>
+      <td>Recorded pest-related return within 30 days</td>
+      <td>Extra Trees: Add age</td>
+      <td>93 + 2 neighbourhood-age inputs</td>
+      <td>100</td>
+      <td>93.0</td>
+      <td>33.333333</td>
+      <td>40.0</td>
+      <td>Same records within this section; historical comparison</td>
+    </tr>
+    <tr>
+      <td>Original 100-service comparison</td>
+      <td>Recorded pest-related return within 30 days</td>
+      <td>Extra Trees: Add rainfall</td>
+      <td>93 + 6 rainfall inputs</td>
+      <td>100</td>
+      <td>94.0</td>
+      <td>40.000000</td>
+      <td>40.0</td>
+      <td>Same records within this section; historical comparison</td>
+    </tr>
+    <tr>
+      <td>Original 100-service comparison</td>
+      <td>Recorded pest-related return within 30 days</td>
+      <td>Extra Trees: Add both</td>
+      <td>93 + 2 age + 6 rain</td>
+      <td>100</td>
+      <td>93.0</td>
+      <td>33.333333</td>
+      <td>40.0</td>
+      <td>Same records within this section; historical comparison</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Larger same-partition comparison</td>
+      <td>Recorded pest-related return within 30 days</td>
+      <td>Extra Trees: baseline</td>
+      <td>Original 93 inputs</td>
+      <td>2075</td>
+      <td>77.686747</td>
+      <td>23.017408</td>
+      <td>64.673913</td>
+      <td>Same records within this section; historical comparison</td>
+    </tr>
+    <tr>
+      <td>Larger same-partition comparison</td>
+      <td>Recorded pest-related return within 30 days</td>
+      <td>Extra Trees: age</td>
+      <td>93 + 2 neighbourhood-age inputs</td>
+      <td>2075</td>
+      <td>76.337349</td>
+      <td>22.141561</td>
+      <td>66.304348</td>
+      <td>Same records within this section; historical comparison</td>
+    </tr>
+    <tr>
+      <td>Larger same-partition comparison</td>
+      <td>Recorded pest-related return within 30 days</td>
+      <td>Extra Trees: rain</td>
+      <td>93 + 6 rainfall inputs</td>
+      <td>2075</td>
+      <td>78.313253</td>
+      <td>23.293173</td>
+      <td>63.043478</td>
+      <td>Same records within this section; historical comparison</td>
+    </tr>
+    <tr>
+      <td>Larger same-partition comparison</td>
+      <td>Recorded pest-related return within 30 days</td>
+      <td>Extra Trees: age_and_rain</td>
+      <td>93 + 2 age + 6 rain</td>
+      <td>2075</td>
+      <td>78.216867</td>
+      <td>22.764228</td>
+      <td>60.869565</td>
+      <td>Same records within this section; historical comparison</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Larger Random Forest shortlist</td>
+      <td>Recorded return within 30 days</td>
+      <td>Original 93-input baseline</td>
+      <td>93 fixed inputs</td>
+      <td>2075</td>
+      <td>77.686747</td>
+      <td>23.017408</td>
+      <td>64.673913</td>
+      <td>Selected on validation</td>
+    </tr>
+    <tr>
+      <td>Larger Random Forest shortlist</td>
+      <td>Recorded return within 30 days</td>
+      <td>Random Forest 28</td>
+      <td>28 fixed inputs</td>
+      <td>2075</td>
+      <td>82.746988</td>
+      <td>26.358696</td>
+      <td>52.717391</td>
+      <td>Trade-off; no replacement promoted</td>
+    </tr>
+    <tr>
+      <td>Larger Random Forest shortlist</td>
+      <td>Recorded return within 30 days</td>
+      <td>Random Forest notes 39</td>
+      <td>39 fixed inputs</td>
+      <td>2075</td>
+      <td>82.650602</td>
+      <td>26.344086</td>
+      <td>53.260870</td>
+      <td>Trade-off; no replacement promoted</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Compact history + notes + rainfall</td>
+      <td>Recorded return within 30 days</td>
+      <td>Extra Trees / Service + pest + history</td>
+      <td>28 inputs; see fixed candidate definitions</td>
+      <td>100</td>
+      <td>79.0</td>
+      <td>16.666667</td>
+      <td>80.0</td>
+      <td>Diagnostic candidate; not validation-selected</td>
+    </tr>
+    <tr>
+      <td>Compact history + notes + rainfall</td>
+      <td>Recorded return within 30 days</td>
+      <td>Extra Trees / Add notes</td>
+      <td>39 inputs; see fixed candidate definitions</td>
+      <td>100</td>
+      <td>95.0</td>
+      <td>50.000000</td>
+      <td>20.0</td>
+      <td>Diagnostic candidate; not validation-selected</td>
+    </tr>
+    <tr>
+      <td>Compact history + notes + rainfall</td>
+      <td>Recorded return within 30 days</td>
+      <td>Extra Trees / Add rainfall</td>
+      <td>46 inputs; see fixed candidate definitions</td>
+      <td>100</td>
+      <td>76.0</td>
+      <td>17.241379</td>
+      <td>100.0</td>
+      <td>Diagnostic candidate; not validation-selected</td>
+    </tr>
+    <tr>
+      <td>Compact history + notes + rainfall</td>
+      <td>Recorded return within 30 days</td>
+      <td>Extra Trees / Add notes and rainfall</td>
+      <td>57 inputs; see fixed candidate definitions</td>
+      <td>100</td>
+      <td>82.0</td>
+      <td>15.789474</td>
+      <td>60.0</td>
+      <td>Diagnostic candidate; not validation-selected</td>
+    </tr>
+    <tr>
+      <td>Compact history + notes + rainfall</td>
+      <td>Recorded return within 30 days</td>
+      <td>Random Forest / Service + pest + history</td>
+      <td>28 inputs; see fixed candidate definitions</td>
+      <td>100</td>
+      <td>93.0</td>
+      <td>40.000000</td>
+      <td>80.0</td>
+      <td>Diagnostic candidate; not validation-selected</td>
+    </tr>
+    <tr>
+      <td>Compact history + notes + rainfall</td>
+      <td>Recorded return within 30 days</td>
+      <td>Random Forest / Add notes</td>
+      <td>39 inputs; see fixed candidate definitions</td>
+      <td>100</td>
+      <td>93.0</td>
+      <td>37.500000</td>
+      <td>60.0</td>
+      <td>Selected on validation</td>
+    </tr>
+    <tr>
+      <td>Compact history + notes + rainfall</td>
+      <td>Recorded return within 30 days</td>
+      <td>Random Forest / Add rainfall</td>
+      <td>46 inputs; see fixed candidate definitions</td>
+      <td>100</td>
+      <td>72.0</td>
+      <td>12.903226</td>
+      <td>80.0</td>
+      <td>Diagnostic candidate; not validation-selected</td>
+    </tr>
+    <tr>
+      <td>Compact history + notes + rainfall</td>
+      <td>Recorded return within 30 days</td>
+      <td>Random Forest / Add notes and rainfall</td>
+      <td>57 inputs; see fixed candidate definitions</td>
+      <td>100</td>
+      <td>73.0</td>
+      <td>15.625000</td>
+      <td>100.0</td>
+      <td>Diagnostic candidate; not validation-selected</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Calendar notes</td>
+      <td>Recorded pest-related return within 30 days</td>
+      <td>Extra Trees</td>
+      <td>Existing inputs</td>
+      <td>2172</td>
+      <td>81.0</td>
+      <td>23.9</td>
+      <td>46.1</td>
+      <td>Pooled three earlier periods; notes are mentions, not confirmed treatment</td>
+    </tr>
+    <tr>
+      <td>Calendar notes</td>
+      <td>Recorded pest-related return within 30 days</td>
+      <td>Extra Trees</td>
+      <td>Pest condition notes</td>
+      <td>2172</td>
+      <td>79.7</td>
+      <td>22.1</td>
+      <td>45.1</td>
+      <td>Pooled three earlier periods; notes are mentions, not confirmed treatment</td>
+    </tr>
+    <tr>
+      <td>Calendar notes</td>
+      <td>Recorded pest-related return within 30 days</td>
+      <td>Extra Trees</td>
+      <td>Treatment and site notes</td>
+      <td>2172</td>
+      <td>81.4</td>
+      <td>24.9</td>
+      <td>48.1</td>
+      <td>Pooled three earlier periods; notes are mentions, not confirmed treatment</td>
+    </tr>
+    <tr>
+      <td>Calendar notes</td>
+      <td>Recorded pest-related return within 30 days</td>
+      <td>Extra Trees</td>
+      <td>All note inputs</td>
+      <td>2172</td>
+      <td>83.3</td>
+      <td>26.6</td>
+      <td>43.2</td>
+      <td>Pooled three earlier periods; notes are mentions, not confirmed treatment</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Weather between visits</td>
+      <td>Return within 30 days after third residential 3x visit</td>
+      <td>rf_depth6</td>
+      <td>between_service_weather</td>
+      <td>864</td>
+      <td>36.689815</td>
+      <td>28.146143</td>
+      <td>92.857143</td>
+      <td>Highest inspected F1 in this study; not independent winner</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Weather before first visit</td>
+      <td>Return within 30 days after third residential 3x visit</td>
+      <td>et10_leaf5</td>
+      <td>add_before_first_7d_rain_total_mm</td>
+      <td>864</td>
+      <td>37.384259</td>
+      <td>27.769986</td>
+      <td>88.392857</td>
+      <td>Highest inspected F1 in this study; not independent winner</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Alternative pest-return targets</td>
+      <td>all: return within 14 days after each_paid_service</td>
+      <td>et10_leaf5</td>
+      <td>service</td>
+      <td>2698</td>
+      <td>95.033358</td>
+      <td>10.476190</td>
+      <td>21.568627</td>
+      <td>Highest inspected historical F1 for this question; targets differ</td>
+    </tr>
+    <tr>
+      <td>Alternative pest-return targets</td>
+      <td>residential: return within 14 days after each_paid_service</td>
+      <td>rf_depth6</td>
+      <td>service</td>
+      <td>2176</td>
+      <td>93.704044</td>
+      <td>10.000000</td>
+      <td>22.448980</td>
+      <td>Highest inspected historical F1 for this question; targets differ</td>
+    </tr>
+    <tr>
+      <td>Alternative pest-return targets</td>
+      <td>all: return within 14 days after final_paid_service</td>
+      <td>rf_depth6</td>
+      <td>service</td>
+      <td>870</td>
+      <td>83.908046</td>
+      <td>9.756098</td>
+      <td>29.268293</td>
+      <td>Highest inspected historical F1 for this question; targets differ</td>
+    </tr>
+    <tr>
+      <td>Alternative pest-return targets</td>
+      <td>residential: return within 14 days after final_paid_service</td>
+      <td>et10_leaf5</td>
+      <td>history</td>
+      <td>720</td>
+      <td>70.555556</td>
+      <td>11.261261</td>
+      <td>62.500000</td>
+      <td>Highest inspected historical F1 for this question; targets differ</td>
+    </tr>
+    <tr>
+      <td>Alternative pest-return targets</td>
+      <td>all: return within 30 days after each_paid_service</td>
+      <td>et10_leaf5</td>
+      <td>environment</td>
+      <td>3578</td>
+      <td>79.960872</td>
+      <td>26.344828</td>
+      <td>51.069519</td>
+      <td>Highest inspected historical F1 for this question; targets differ</td>
+    </tr>
+    <tr>
+      <td>Alternative pest-return targets</td>
+      <td>residential: return within 30 days after each_paid_service</td>
+      <td>et10_leaf5</td>
+      <td>environment</td>
+      <td>2963</td>
+      <td>77.691529</td>
+      <td>28.489209</td>
+      <td>54.696133</td>
+      <td>Highest inspected historical F1 for this question; targets differ</td>
+    </tr>
+    <tr>
+      <td>Alternative pest-return targets</td>
+      <td>all: return within 30 days after final_paid_service</td>
+      <td>et10_leaf5</td>
+      <td>environment</td>
+      <td>1171</td>
+      <td>56.276687</td>
+      <td>28.726708</td>
+      <td>77.731092</td>
+      <td>Highest inspected historical F1 for this question; targets differ</td>
+    </tr>
+    <tr>
+      <td>Alternative pest-return targets</td>
+      <td>residential: return within 30 days after final_paid_service</td>
+      <td>et10_leaf5</td>
+      <td>weather</td>
+      <td>995</td>
+      <td>44.623116</td>
+      <td>28.038674</td>
+      <td>87.124464</td>
+      <td>Highest inspected historical F1 for this question; targets differ</td>
+    </tr>
+    <tr>
+      <td>Alternative pest-return targets</td>
+      <td>all: return within 60 days after each_paid_service</td>
+      <td>rf_depth6</td>
+      <td>environment</td>
+      <td>3316</td>
+      <td>47.949337</td>
+      <td>32.127839</td>
+      <td>87.214612</td>
+      <td>Highest inspected historical F1 for this question; targets differ</td>
+    </tr>
+    <tr>
+      <td>Alternative pest-return targets</td>
+      <td>residential: return within 60 days after each_paid_service</td>
+      <td>hist_depth3</td>
+      <td>weather</td>
+      <td>2795</td>
+      <td>40.751342</td>
+      <td>33.022071</td>
+      <td>90.887850</td>
+      <td>Highest inspected historical F1 for this question; targets differ</td>
+    </tr>
+    <tr>
+      <td>Alternative pest-return targets</td>
+      <td>all: return within 60 days after final_paid_service</td>
+      <td>lr_c1.0_plain</td>
+      <td>service</td>
+      <td>1097</td>
+      <td>53.418414</td>
+      <td>38.137755</td>
+      <td>92.000000</td>
+      <td>Highest inspected historical F1 for this question; targets differ</td>
+    </tr>
+    <tr>
+      <td>Alternative pest-return targets</td>
+      <td>residential: return within 60 days after final_paid_service</td>
+      <td>lr_c1.0_plain</td>
+      <td>service</td>
+      <td>937</td>
+      <td>49.092850</td>
+      <td>39.438503</td>
+      <td>92.476489</td>
+      <td>Highest inspected historical F1 for this question; targets differ</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Repeat purchases</td>
+      <td>Will a customer buy another distinct programme within 30 days of their first recorded purchase?</td>
+      <td>random_forest</td>
+      <td>log_initial_sales, missing_amount, month_sin, month_cos, package, pest, premise, district, initial_sale_rows, rain_7, rain_28, temperature_28, humidity_28</td>
+      <td>320</td>
+      <td>55.000000</td>
+      <td>4.000000</td>
+      <td>100.000000</td>
+      <td>First recorded purchase; chronological assessment</td>
+    </tr>
+    <tr>
+      <td>Repeat purchases</td>
+      <td>Will a customer buy another distinct programme within 60 days of their first recorded purchase?</td>
+      <td>random_forest</td>
+      <td>log_initial_sales, missing_amount, month_sin, month_cos, package, pest, premise</td>
+      <td>320</td>
+      <td>30.937500</td>
+      <td>3.508772</td>
+      <td>88.888889</td>
+      <td>First recorded purchase; chronological assessment</td>
+    </tr>
+    <tr>
+      <td>Repeat purchases</td>
+      <td>Will a customer buy another distinct programme within 90 days of their first recorded purchase?</td>
+      <td>random_forest</td>
+      <td>log_initial_sales, missing_amount, month_sin, month_cos, package, pest, premise, district, initial_sale_rows, rain_7, rain_28, temperature_28, humidity_28</td>
+      <td>320</td>
+      <td>34.062500</td>
+      <td>4.109589</td>
+      <td>90.000000</td>
+      <td>First recorded purchase; chronological assessment</td>
+    </tr>
+    <tr>
+      <td>Repeat purchases</td>
+      <td>Will a customer buy another distinct programme within 180 days of their first recorded purchase?</td>
+      <td>random_forest</td>
+      <td>log_initial_sales, missing_amount, month_sin, month_cos, package, pest, premise</td>
+      <td>320</td>
+      <td>81.250000</td>
+      <td>7.272727</td>
+      <td>30.769231</td>
+      <td>First recorded purchase; chronological assessment</td>
+    </tr>
+    <tr>
+      <td>Repeat purchases</td>
+      <td>Another distinct programme within 30 days after any purchase</td>
+      <td>random_forest</td>
+      <td>log_initial_sales, missing_amount, month_sin, month_cos, package, pest, premise, district, initial_sale_rows, previous_programmes, days_since_first_purchase, days_since_last_purchase, past_average_sale, purchases_last_90_days, purchases_last_365_days</td>
+      <td>356</td>
+      <td>51.404494</td>
+      <td>4.419890</td>
+      <td>100.000000</td>
+      <td>Allows past purchases by same customer; grouped uncertainty</td>
+    </tr>
+    <tr>
+      <td>Repeat purchases</td>
+      <td>Another distinct programme within 90 days after any purchase</td>
+      <td>boosting</td>
+      <td>log_initial_sales, missing_amount, month_sin, month_cos, package, pest, premise, district, initial_sale_rows, previous_programmes, days_since_first_purchase, days_since_last_purchase, past_average_sale, purchases_last_90_days, purchases_last_365_days, rain_7, rain_28, temperature_28, humidity_28</td>
+      <td>356</td>
+      <td>90.730337</td>
+      <td>23.529412</td>
+      <td>53.333333</td>
+      <td>Allows past purchases by same customer; grouped uncertainty</td>
+    </tr>
+    <tr>
+      <td>Repeat purchases</td>
+      <td>Another distinct programme within 180 days after any purchase</td>
+      <td>catboost</td>
+      <td>log_initial_sales, missing_amount, month_sin, month_cos, package, pest, premise, district, initial_sale_rows, previous_programmes, days_since_first_purchase, days_since_last_purchase, past_average_sale, purchases_last_90_days, purchases_last_365_days</td>
+      <td>356</td>
+      <td>78.089888</td>
+      <td>13.924051</td>
+      <td>52.380952</td>
+      <td>Allows past purchases by same customer; grouped uncertainty</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Variable selection</td>
+      <td>Return after third residential 3x visit</td>
+      <td>Forward selection</td>
+      <td>2 inputs: pest category and rodent indicator at final visit</td>
+      <td>424</td>
+      <td>32.311321</td>
+      <td>25.613079</td>
+      <td>87.037037</td>
+      <td>F1 below always-yes comparator</td>
+    </tr>
+    <tr>
+      <td>Variable selection</td>
+      <td>Return after third residential 3x visit</td>
+      <td>Stepwise selection</td>
+      <td>2 inputs: pest category and rodent indicator at final visit</td>
+      <td>424</td>
+      <td>32.311321</td>
+      <td>25.613079</td>
+      <td>87.037037</td>
+      <td>F1 below always-yes comparator</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>21 October: return targets</td>
+      <td>each_service_30 / f1</td>
+      <td>logistic</td>
+      <td>28 fixed inputs</td>
+      <td>976</td>
+      <td>89.856557</td>
+      <td>20.000000</td>
+      <td>1.041667</td>
+      <td>Globally group-separated selection; corrected adaptive historical research; no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: return targets</td>
+      <td>each_service_30 / precision</td>
+      <td>extra_trees</td>
+      <td>110 fixed inputs</td>
+      <td>976</td>
+      <td>80.430328</td>
+      <td>26.130653</td>
+      <td>54.166667</td>
+      <td>Globally group-separated selection; corrected adaptive historical research; no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: return targets</td>
+      <td>each_service_30 / balanced</td>
+      <td>extra_trees</td>
+      <td>28 fixed inputs</td>
+      <td>976</td>
+      <td>54.508197</td>
+      <td>16.538462</td>
+      <td>89.583333</td>
+      <td>Globally group-separated selection; corrected adaptive historical research; no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: return targets</td>
+      <td>residential_3x_final_30 / f1</td>
+      <td>random_forest</td>
+      <td>28 fixed inputs</td>
+      <td>225</td>
+      <td>36.888889</td>
+      <td>27.604167</td>
+      <td>94.642857</td>
+      <td>Globally group-separated selection; corrected adaptive historical research; no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: return targets</td>
+      <td>residential_3x_final_30 / precision</td>
+      <td>random_forest</td>
+      <td>110 fixed inputs</td>
+      <td>225</td>
+      <td>75.111111</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>Globally group-separated selection; corrected adaptive historical research; no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: return targets</td>
+      <td>residential_3x_final_30 / balanced</td>
+      <td>boosting</td>
+      <td>28 fixed inputs</td>
+      <td>225</td>
+      <td>33.333333</td>
+      <td>25.263158</td>
+      <td>85.714286</td>
+      <td>Globally group-separated selection; corrected adaptive historical research; no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: return targets</td>
+      <td>residential_final_60 / f1</td>
+      <td>catboost</td>
+      <td>39 fixed inputs</td>
+      <td>270</td>
+      <td>48.888889</td>
+      <td>37.563452</td>
+      <td>83.146067</td>
+      <td>Globally group-separated selection; corrected adaptive historical research; no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: return targets</td>
+      <td>residential_final_60 / precision</td>
+      <td>random_forest</td>
+      <td>28 fixed inputs</td>
+      <td>270</td>
+      <td>63.703704</td>
+      <td>41.176471</td>
+      <td>23.595506</td>
+      <td>Globally group-separated selection; corrected adaptive historical research; no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: return targets</td>
+      <td>residential_final_60 / balanced</td>
+      <td>catboost</td>
+      <td>39 fixed inputs</td>
+      <td>270</td>
+      <td>48.888889</td>
+      <td>37.563452</td>
+      <td>83.146067</td>
+      <td>Globally group-separated selection; corrected adaptive historical research; no promotion</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>21 October: customer-month repurchase</td>
+      <td>recent_365_days: purchase within 30 days</td>
+      <td>extra_trees</td>
+      <td>19 past-only inputs</td>
+      <td>4412</td>
+      <td>81.187670</td>
+      <td>2.163462</td>
+      <td>52.941176</td>
+      <td>Overlapping customer-months, small positive customer support; no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: customer-month repurchase</td>
+      <td>repeat_customer_730_days: purchase within 30 days</td>
+      <td>catboost</td>
+      <td>23 past-only inputs</td>
+      <td>404</td>
+      <td>96.782178</td>
+      <td>28.571429</td>
+      <td>57.142857</td>
+      <td>Overlapping customer-months, small positive customer support; no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: customer-month repurchase</td>
+      <td>recent_365_days: purchase within 90 days</td>
+      <td>catboost</td>
+      <td>19 past-only inputs</td>
+      <td>4412</td>
+      <td>74.796011</td>
+      <td>4.244032</td>
+      <td>62.337662</td>
+      <td>Overlapping customer-months, small positive customer support; no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: customer-month repurchase</td>
+      <td>repeat_customer_730_days: purchase within 90 days</td>
+      <td>random_forest</td>
+      <td>19 past-only inputs</td>
+      <td>404</td>
+      <td>88.861386</td>
+      <td>24.000000</td>
+      <td>63.157895</td>
+      <td>Overlapping customer-months, small positive customer support; no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: customer-month repurchase</td>
+      <td>recent_365_days: purchase within 180 days</td>
+      <td>catboost</td>
+      <td>19 past-only inputs</td>
+      <td>4412</td>
+      <td>90.117860</td>
+      <td>11.979167</td>
+      <td>31.944444</td>
+      <td>Overlapping customer-months, small positive customer support; no promotion</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>21 October: enquiries</td>
+      <td>After a first recorded staff reply, will the same reviewed contact have a matching recorded included sale in days1–30? / f1</td>
+      <td>random_forest</td>
+      <td>7 initial-reply fields</td>
+      <td>1021</td>
+      <td>95.592556</td>
+      <td>5.882353</td>
+      <td>3.333333</td>
+      <td>Recorded-sale linkage proxy; no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: enquiries</td>
+      <td>After a first recorded staff reply, will the same reviewed contact have a matching recorded included sale in days1–30? / precision</td>
+      <td>balanced_logistic</td>
+      <td>7 initial-reply fields</td>
+      <td>1021</td>
+      <td>95.004897</td>
+      <td>8.000000</td>
+      <td>6.666667</td>
+      <td>Recorded-sale linkage proxy; no promotion</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>21 October: new DOSM data</td>
+      <td>Recorded return within 30 days</td>
+      <td>Extra Trees: baseline</td>
+      <td>93 inputs</td>
+      <td>2075</td>
+      <td>77.686747</td>
+      <td>23.017408</td>
+      <td>64.673913</td>
+      <td>Same larger partition; trusted district2022 context/CPI; small trade-off, no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: new DOSM data</td>
+      <td>Recorded return within 30 days</td>
+      <td>Extra Trees: plus_hies2022</td>
+      <td>97 inputs</td>
+      <td>2075</td>
+      <td>79.710843</td>
+      <td>24.625268</td>
+      <td>62.500000</td>
+      <td>Same larger partition; trusted district2022 context/CPI; small trade-off, no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: new DOSM data</td>
+      <td>Recorded return within 30 days</td>
+      <td>Extra Trees: plus_lag2_cpi</td>
+      <td>95 inputs</td>
+      <td>2075</td>
+      <td>86.168675</td>
+      <td>25.358852</td>
+      <td>28.804348</td>
+      <td>Same larger partition; trusted district2022 context/CPI; small trade-off, no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: new DOSM data</td>
+      <td>Recorded return within 30 days</td>
+      <td>Extra Trees: plus_both</td>
+      <td>99 inputs</td>
+      <td>2075</td>
+      <td>81.397590</td>
+      <td>25.485437</td>
+      <td>57.065217</td>
+      <td>Same larger partition; trusted district2022 context/CPI; small trade-off, no promotion</td>
+    </tr>
+    <tr>
+      <td>21 October: new DOSM data</td>
+      <td>Recorded return within 30 days</td>
+      <td>Extra Trees: date_proxy_control</td>
+      <td>94 inputs</td>
+      <td>2075</td>
+      <td>77.734940</td>
+      <td>23.574144</td>
+      <td>67.391304</td>
+      <td>Same larger partition; trusted district2022 context/CPI; small trade-off, no promotion</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Section</th>
+      <th>Prediction question</th>
+      <th>Algorithm</th>
+      <th>Inputs</th>
+      <th>Test size</th>
+      <th>Accuracy %</th>
+      <th>Precision %</th>
+      <th>Recall %</th>
+      <th>Interpretation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>21 October: booking planning</td>
+      <td>booking_entries: next 1 weeks</td>
+      <td>boosting</td>
+      <td>36 fields</td>
+      <td>14</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>MAE 9.96 vs baseline 10.57; research gate False. Timestamp-filtered surviving records; not proven live.</td>
+    </tr>
+    <tr>
+      <td>21 October: booking planning</td>
+      <td>booking_entries: next 2 weeks</td>
+      <td>extra_trees</td>
+      <td>36 fields</td>
+      <td>13</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>MAE 12.76 vs baseline 20.73; research gate True. Timestamp-filtered surviving records; not proven live.</td>
+    </tr>
+    <tr>
+      <td>21 October: booking planning</td>
+      <td>booked_hours: next 1 weeks</td>
+      <td>ridge_100</td>
+      <td>32 fields</td>
+      <td>14</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>MAE 8.97 vs baseline 11.77; research gate True. Timestamp-filtered surviving records; not proven live.</td>
+    </tr>
+    <tr>
+      <td>21 October: booking planning</td>
+      <td>booked_hours: next 2 weeks</td>
+      <td>extra_trees</td>
+      <td>32 fields</td>
+      <td>13</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>MAE 17.38 vs baseline 18.29; research gate False. Timestamp-filtered surviving records; not proven live.</td>
+    </tr>
+  </tbody>
+</table>
+<pre>Original 100-service comparison
+Larger same-partition comparison
+Larger Random Forest shortlist
+Compact history + notes + rainfall
+Calendar notes
+Weather between visits
+Weather before first visit
+Alternative pest-return targets
+Repeat purchases
+Variable selection
+21 October: return targets
+21 October: customer-month repurchase
+21 October: enquiries
+21 October: new DOSM data
+21 October: booking planning
+</pre>
+</section>
+<section>
+<h2>Expanded management search · 21 October</h2>
+<p>This later search includes return, repurchase and enquiry targets as well as weekly planning. It is separate from the earlier study table. New classifiers did not qualify for replacement; the two planning candidates met exploratory historical gates only.</p>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>classification=pd.read_csv(EVIDENCE/&quot;classification_results.csv&quot;)
+display(classification)
+display(pd.read_csv(EVIDENCE/&quot;dosm_results.csv&quot;))</pre></details>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>study</th>
+      <th>question</th>
+      <th>policy</th>
+      <th>model</th>
+      <th>inputs</th>
+      <th>rows</th>
+      <th>positives</th>
+      <th>precision</th>
+      <th>recall</th>
+      <th>accuracy</th>
+      <th>f1</th>
+      <th>threshold</th>
+      <th>TP</th>
+      <th>FP</th>
+      <th>FN</th>
+      <th>TN</th>
+      <th>always_no_accuracy</th>
+      <th>passed</th>
+      <th>unique_positive_customers</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Pest-related returns</td>
+      <td>After each paid service: return within 30 days</td>
+      <td>f1</td>
+      <td>logistic</td>
+      <td>28</td>
+      <td>976</td>
+      <td>96</td>
+      <td>0.200000</td>
+      <td>0.010417</td>
+      <td>0.898566</td>
+      <td>0.019802</td>
+      <td>0.25</td>
+      <td>1</td>
+      <td>4</td>
+      <td>95</td>
+      <td>876</td>
+      <td>0.901639</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Pest-related returns</td>
+      <td>After each paid service: return within 30 days</td>
+      <td>precision</td>
+      <td>extra_trees</td>
+      <td>110</td>
+      <td>976</td>
+      <td>96</td>
+      <td>0.261307</td>
+      <td>0.541667</td>
+      <td>0.804303</td>
+      <td>0.352542</td>
+      <td>0.20</td>
+      <td>52</td>
+      <td>147</td>
+      <td>44</td>
+      <td>733</td>
+      <td>0.901639</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Pest-related returns</td>
+      <td>After each paid service: return within 30 days</td>
+      <td>balanced</td>
+      <td>extra_trees</td>
+      <td>28</td>
+      <td>976</td>
+      <td>96</td>
+      <td>0.165385</td>
+      <td>0.895833</td>
+      <td>0.545082</td>
+      <td>0.279221</td>
+      <td>0.05</td>
+      <td>86</td>
+      <td>434</td>
+      <td>10</td>
+      <td>446</td>
+      <td>0.901639</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Pest-related returns</td>
+      <td>After residential 3rd of 3 visits: return within 30 days</td>
+      <td>f1</td>
+      <td>random_forest</td>
+      <td>28</td>
+      <td>225</td>
+      <td>56</td>
+      <td>0.276042</td>
+      <td>0.946429</td>
+      <td>0.368889</td>
+      <td>0.427419</td>
+      <td>0.20</td>
+      <td>53</td>
+      <td>139</td>
+      <td>3</td>
+      <td>30</td>
+      <td>0.751111</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Pest-related returns</td>
+      <td>After residential 3rd of 3 visits: return within 30 days</td>
+      <td>precision</td>
+      <td>random_forest</td>
+      <td>110</td>
+      <td>225</td>
+      <td>56</td>
+      <td>0.000000</td>
+      <td>0.000000</td>
+      <td>0.751111</td>
+      <td>0.000000</td>
+      <td>0.50</td>
+      <td>0</td>
+      <td>0</td>
+      <td>56</td>
+      <td>169</td>
+      <td>0.751111</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Pest-related returns</td>
+      <td>After residential 3rd of 3 visits: return within 30 days</td>
+      <td>balanced</td>
+      <td>boosting</td>
+      <td>28</td>
+      <td>225</td>
+      <td>56</td>
+      <td>0.252632</td>
+      <td>0.857143</td>
+      <td>0.333333</td>
+      <td>0.390244</td>
+      <td>0.25</td>
+      <td>48</td>
+      <td>142</td>
+      <td>8</td>
+      <td>27</td>
+      <td>0.751111</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Pest-related returns</td>
+      <td>After final residential paid visit: return within 60 days</td>
+      <td>f1</td>
+      <td>catboost</td>
+      <td>39</td>
+      <td>270</td>
+      <td>89</td>
+      <td>0.375635</td>
+      <td>0.831461</td>
+      <td>0.488889</td>
+      <td>0.517483</td>
+      <td>0.25</td>
+      <td>74</td>
+      <td>123</td>
+      <td>15</td>
+      <td>58</td>
+      <td>0.670370</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Pest-related returns</td>
+      <td>After final residential paid visit: return within 60 days</td>
+      <td>precision</td>
+      <td>random_forest</td>
+      <td>28</td>
+      <td>270</td>
+      <td>89</td>
+      <td>0.411765</td>
+      <td>0.235955</td>
+      <td>0.637037</td>
+      <td>0.300000</td>
+      <td>0.40</td>
+      <td>21</td>
+      <td>30</td>
+      <td>68</td>
+      <td>151</td>
+      <td>0.670370</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Pest-related returns</td>
+      <td>After final residential paid visit: return within 60 days</td>
+      <td>balanced</td>
+      <td>catboost</td>
+      <td>39</td>
+      <td>270</td>
+      <td>89</td>
+      <td>0.375635</td>
+      <td>0.831461</td>
+      <td>0.488889</td>
+      <td>0.517483</td>
+      <td>0.25</td>
+      <td>74</td>
+      <td>123</td>
+      <td>15</td>
+      <td>58</td>
+      <td>0.670370</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Repurchase</td>
+      <td>Recent customers: purchase within 30 days</td>
+      <td>precision</td>
+      <td>extra_trees</td>
+      <td>19</td>
+      <td>4412</td>
+      <td>34</td>
+      <td>0.021635</td>
+      <td>0.529412</td>
+      <td>0.811877</td>
+      <td>0.041570</td>
+      <td>0.50</td>
+      <td>18</td>
+      <td>814</td>
+      <td>16</td>
+      <td>3564</td>
+      <td>0.992294</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Repurchase</td>
+      <td>Already-repeat customers: purchase within 30 days</td>
+      <td>precision</td>
+      <td>catboost</td>
+      <td>23</td>
+      <td>404</td>
+      <td>7</td>
+      <td>0.285714</td>
+      <td>0.571429</td>
+      <td>0.967822</td>
+      <td>0.380952</td>
+      <td>0.20</td>
+      <td>4</td>
+      <td>10</td>
+      <td>3</td>
+      <td>387</td>
+      <td>0.982673</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Repurchase</td>
+      <td>Recent customers: purchase within 90 days</td>
+      <td>precision</td>
+      <td>catboost</td>
+      <td>19</td>
+      <td>4412</td>
+      <td>77</td>
+      <td>0.042440</td>
+      <td>0.623377</td>
+      <td>0.747960</td>
+      <td>0.079470</td>
+      <td>0.02</td>
+      <td>48</td>
+      <td>1083</td>
+      <td>29</td>
+      <td>3252</td>
+      <td>0.982548</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Repurchase</td>
+      <td>Already-repeat customers: purchase within 90 days</td>
+      <td>precision</td>
+      <td>random_forest</td>
+      <td>19</td>
+      <td>404</td>
+      <td>19</td>
+      <td>0.240000</td>
+      <td>0.631579</td>
+      <td>0.888614</td>
+      <td>0.347826</td>
+      <td>0.50</td>
+      <td>12</td>
+      <td>38</td>
+      <td>7</td>
+      <td>347</td>
+      <td>0.952970</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Repurchase</td>
+      <td>Recent customers: purchase within 180 days</td>
+      <td>precision</td>
+      <td>catboost</td>
+      <td>19</td>
+      <td>4412</td>
+      <td>144</td>
+      <td>0.119792</td>
+      <td>0.319444</td>
+      <td>0.901179</td>
+      <td>0.174242</td>
+      <td>0.05</td>
+      <td>46</td>
+      <td>338</td>
+      <td>98</td>
+      <td>3930</td>
+      <td>0.967362</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Enquiries</td>
+      <td>First staff reply: matching recorded sale in days 1–30</td>
+      <td>f1</td>
+      <td>random_forest</td>
+      <td>7</td>
+      <td>1021</td>
+      <td>30</td>
+      <td>0.058824</td>
+      <td>0.033333</td>
+      <td>0.955926</td>
+      <td>0.042553</td>
+      <td>0.60</td>
+      <td>1</td>
+      <td>16</td>
+      <td>29</td>
+      <td>975</td>
+      <td>0.970617</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Enquiries</td>
+      <td>First staff reply: matching recorded sale in days 1–30</td>
+      <td>precision</td>
+      <td>balanced_logistic</td>
+      <td>7</td>
+      <td>1021</td>
+      <td>30</td>
+      <td>0.080000</td>
+      <td>0.066667</td>
+      <td>0.950049</td>
+      <td>0.072727</td>
+      <td>0.10</td>
+      <td>2</td>
+      <td>23</td>
+      <td>28</td>
+      <td>968</td>
+      <td>0.970617</td>
+      <td>False</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>candidate</th>
+      <th>input_count</th>
+      <th>hies_known</th>
+      <th>cpi_known</th>
+      <th>rows</th>
+      <th>positives</th>
+      <th>prevalence</th>
+      <th>roc_auc</th>
+      <th>average_precision</th>
+      <th>brier_score</th>
+      <th>accuracy</th>
+      <th>balanced_accuracy</th>
+      <th>precision</th>
+      <th>recall</th>
+      <th>f1</th>
+      <th>alert_rows</th>
+      <th>threshold</th>
+      <th>majority_class_accuracy</th>
+      <th>ap_lift_over_prevalence</th>
+      <th>tp</th>
+      <th>fp</th>
+      <th>fn</th>
+      <th>tn</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>baseline</td>
+      <td>93</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2075</td>
+      <td>184</td>
+      <td>0.088675</td>
+      <td>0.785509</td>
+      <td>0.239967</td>
+      <td>0.073543</td>
+      <td>0.776867</td>
+      <td>0.718134</td>
+      <td>0.230174</td>
+      <td>0.646739</td>
+      <td>0.339515</td>
+      <td>517</td>
+      <td>0.14</td>
+      <td>0.911325</td>
+      <td>2.706155</td>
+      <td>119</td>
+      <td>398</td>
+      <td>65</td>
+      <td>1493</td>
+    </tr>
+    <tr>
+      <td>plus_hies2022</td>
+      <td>97</td>
+      <td>921.0</td>
+      <td>NaN</td>
+      <td>2075</td>
+      <td>184</td>
+      <td>0.088675</td>
+      <td>0.787469</td>
+      <td>0.240276</td>
+      <td>0.073618</td>
+      <td>0.797108</td>
+      <td>0.719428</td>
+      <td>0.246253</td>
+      <td>0.625000</td>
+      <td>0.353303</td>
+      <td>467</td>
+      <td>0.15</td>
+      <td>0.911325</td>
+      <td>2.709635</td>
+      <td>115</td>
+      <td>352</td>
+      <td>69</td>
+      <td>1539</td>
+    </tr>
+    <tr>
+      <td>plus_lag2_cpi</td>
+      <td>95</td>
+      <td>NaN</td>
+      <td>2075.0</td>
+      <td>2075</td>
+      <td>184</td>
+      <td>0.088675</td>
+      <td>0.786276</td>
+      <td>0.228498</td>
+      <td>0.074157</td>
+      <td>0.861687</td>
+      <td>0.602774</td>
+      <td>0.253589</td>
+      <td>0.288043</td>
+      <td>0.269720</td>
+      <td>209</td>
+      <td>0.31</td>
+      <td>0.911325</td>
+      <td>2.576814</td>
+      <td>53</td>
+      <td>156</td>
+      <td>131</td>
+      <td>1735</td>
+    </tr>
+    <tr>
+      <td>plus_both</td>
+      <td>99</td>
+      <td>921.0</td>
+      <td>2075.0</td>
+      <td>2075</td>
+      <td>184</td>
+      <td>0.088675</td>
+      <td>0.787572</td>
+      <td>0.232447</td>
+      <td>0.074243</td>
+      <td>0.813976</td>
+      <td>0.704152</td>
+      <td>0.254854</td>
+      <td>0.570652</td>
+      <td>0.352349</td>
+      <td>412</td>
+      <td>0.19</td>
+      <td>0.911325</td>
+      <td>2.621347</td>
+      <td>105</td>
+      <td>307</td>
+      <td>79</td>
+      <td>1584</td>
+    </tr>
+    <tr>
+      <td>date_proxy_control</td>
+      <td>94</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>2075</td>
+      <td>184</td>
+      <td>0.088675</td>
+      <td>0.787043</td>
+      <td>0.239250</td>
+      <td>0.073508</td>
+      <td>0.777349</td>
+      <td>0.730664</td>
+      <td>0.235741</td>
+      <td>0.673913</td>
+      <td>0.349296</td>
+      <td>526</td>
+      <td>0.13</td>
+      <td>0.911325</td>
+      <td>2.698064</td>
+      <td>124</td>
+      <td>402</td>
+      <td>60</td>
+      <td>1489</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+<section>
+<h2>Traceability</h2>
+<p><code>source_manifest.json</code> records original file paths and hashes. Dates in folder names identify when a study was produced; they are not proof it is the active model. The active pest-model pointer is <code>config/cp2_model_current.json</code>; the planning protocol is <code>config/cp2_planning_v1.json</code>.</p>
+<p>Full per-candidate register: <code>outputs/model_validation/20261018_model_register/All_Saved_Results.csv</code>. Full study reports and their notebooks remain at the indexed original paths for reproducibility. Nothing in this chapter is a new independent final evaluation.</p>
+</section></body></html>

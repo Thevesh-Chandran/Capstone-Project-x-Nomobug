@@ -20,7 +20,7 @@ union all
 select 'scheduling_rows_do_not_reconcile' as failure
 from unnest([1])
 where (select sum(scheduled_event_rows) from {{ ref('dashboard_scheduling_capacity') }})
-    != (select count(*) from {{ ref('calendar_service_event_facts') }}
+    != (select count(*) from {{ ref('calendar_programme_service_facts') }}
         where event_date_local between date '2026-01-01' and date '2026-12-31')
 
 union all
@@ -33,7 +33,7 @@ union all
 select 'difficulty_join_expansion' as failure
 from unnest([1])
 where (select sum(scheduled_event_rows) from {{ ref('dashboard_treatment_difficulty') }})
-    != (select count(*) from {{ ref('calendar_service_event_facts') }}
+    != (select count(*) from {{ ref('calendar_programme_service_facts') }}
         where event_date_local between date '2026-01-01' and date '2026-12-31')
 union all
 select 'recurrence_without_property_or_signal' as failure

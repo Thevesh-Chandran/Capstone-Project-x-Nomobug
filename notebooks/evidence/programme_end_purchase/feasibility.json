@@ -1,0 +1,42 @@
+{
+  "audit": {
+    "programmes_seen": 2537,
+    "no_unique_customer_and_dated_sale": 140,
+    "missing_or_ambiguous_final_visit": 493,
+    "outcome_not_mature": 168,
+    "another_programme_already_recorded": 10,
+    "unknown_paid_session_count": 10,
+    "programme_not_fully_purchased_at_anchor": 5,
+    "eligible_programme_windows": 1711
+  },
+  "partition": {
+    "cutoff_rule": "60th/80th percentile anchor dates, before reading outcomes",
+    "validation_start": "2025-11-08",
+    "assessment_start": "2026-03-18",
+    "embargo": "Earlier labels must finish before the next partition begins",
+    "group_rule": "Test customers removed from all development; validation customers removed from training"
+  },
+  "samples": {
+    "train": {
+      "rows": 751,
+      "customers": 738,
+      "positives": 21,
+      "first_anchor": "2024-03-09",
+      "last_anchor": "2025-08-09"
+    },
+    "validation": {
+      "rows": 111,
+      "customers": 111,
+      "positives": 4,
+      "first_anchor": "2025-11-08",
+      "last_anchor": "2025-12-17"
+    },
+    "assessment": {
+      "rows": 346,
+      "customers": 343,
+      "positives": 16,
+      "first_anchor": "2026-03-18",
+      "last_anchor": "2026-07-29"
+    }
+  }
+}

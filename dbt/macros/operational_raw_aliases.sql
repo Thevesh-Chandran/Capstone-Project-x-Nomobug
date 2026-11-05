@@ -14,11 +14,21 @@
     source_column_018 as whatsapp_followup_2_raw,
     source_column_019 as whatsapp_followup_3_raw,
     source_column_020 as whatsapp_followup_4_raw,
+    {% if var('b2b_call_columns_v2', false) %}
+    source_column_021 as call_1_raw,
+    source_column_022 as call_2_raw,
+    source_column_023 as lead_to_appointment_raw,
+    source_column_024 as appointment_to_close_raw,
+    source_column_025 as unmapped_w_raw,
+    source_column_026 as unmapped_x_raw,
+    source_column_027 as unmapped_y_raw,
+    {% else %}
     source_column_021 as lead_to_appointment_raw,
     source_column_022 as appointment_to_close_raw,
     source_column_023 as unmapped_w_raw,
     source_column_024 as unmapped_x_raw,
     source_column_025 as unmapped_y_raw,
+    {% endif %}
 {% endmacro %}
 {% macro sales_remaining_raw_aliases() %}
     source_column_001 as unmapped_a_raw,

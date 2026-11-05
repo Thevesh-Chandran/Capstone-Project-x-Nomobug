@@ -84,7 +84,7 @@ function renderDesk(r) {
   });
   refresh.textContent = 'Refresh';
   const actions = el('div', undefined, 'desk-header-actions');
-  actions.append(refresh, deskLink('Book a visit', '#plan', 'secondary'));
+  actions.append(refresh, deskLink('Team calendars', '#plan', 'secondary'));
   deskRoot.replaceChildren(deskHeader('Customer follow-up', '', actions));
   const source = el('div', undefined, 'desk-source');
   source.append(
@@ -519,8 +519,8 @@ function renderWeekPlan(r) {
   const root = $('week-planner');
   root.replaceChildren(
     deskHeader(
-      'Booking calendar',
-      'Find a time for a visit, see the team calendars and check weekly workload.',
+      'Bookings & workload',
+      'How busy the coming weeks look, and the team Google Calendars.',
       deskButton('Refresh', async () => renderWeekPlan(await deskLoad(true))),
     ),
   );
@@ -593,8 +593,10 @@ function renderWeekPlan(r) {
             .reduce((a, v) => a + v.scheduled_event_rows, 0),
           td = el('td');
         const cell = el('span', String(count));
-        cell.style.background = count ? 'rgba(29,78,216,' + (0.1 + (0.7 * count) / max) + ')' : '#f5f5f5';
-        cell.style.color = count / max > 0.55 ? 'white' : '#262626';
+        cell.style.background = count
+          ? `color-mix(in srgb, var(--color-accent) ${Math.round((0.1 + (0.7 * count) / max) * 100)}%, var(--color-sky))`
+          : 'var(--color-paper)';
+        cell.style.color = count / max > 0.55 ? 'var(--color-accent-ink)' : 'var(--color-ink-2)';
         cell.title = team + ', ' + day + ', ' + count + ' bookings';
         td.append(cell);
         tr.append(td);
@@ -783,7 +785,7 @@ window.loadWorkspaceTools = async page => {
     deskError(page === 'plan' ? $('week-planner') : deskRoot, e);
   }
 };
-if (state && location.hash === '#home') window.loadWorkspaceTools('home');
+if (state && window.cp2Page() === 'home') window.loadWorkspaceTools('home');
 
 window.addEventListener('hashchange', () => {
   closeDeskDrawer();

@@ -1,0 +1,43 @@
+{
+  "calibration_training_services": 500,
+  "validation_services": 772,
+  "assessment_calibration_training_services": 1334,
+  "assessment_services": 410,
+  "selected_method": "logit",
+  "raw_reference": {
+    "services": 410,
+    "positive_windows": 81,
+    "TP": 46,
+    "FP": 100,
+    "FN": 35,
+    "TN": 229,
+    "threshold": 0.44999999999999996,
+    "accuracy": 0.6707317073170732,
+    "precision": 0.3150684931506849,
+    "recall": 0.5679012345679012,
+    "f1": 0.4052863436123348,
+    "brier": 0.1959378355761864,
+    "average_precision": 0.35835387751934744,
+    "roc_auc": 0.7116589740703215,
+    "always_no_accuracy": 0.802439024390244
+  },
+  "calibrated_candidate": {
+    "services": 410,
+    "positive_windows": 81,
+    "TP": 71,
+    "FP": 196,
+    "FN": 10,
+    "TN": 133,
+    "threshold": 0.03,
+    "accuracy": 0.4975609756097561,
+    "precision": 0.26591760299625467,
+    "recall": 0.8765432098765432,
+    "f1": 0.40804597701149425,
+    "brier": 0.16233733598728703,
+    "average_precision": 0.35835387751934744,
+    "roc_auc": 0.7116589740703215,
+    "always_no_accuracy": 0.802439024390244
+  },
+  "passed_exploratory_gate": false,
+  "deployed": false
+}

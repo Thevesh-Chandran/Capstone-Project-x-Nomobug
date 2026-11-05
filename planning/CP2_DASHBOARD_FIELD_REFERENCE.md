@@ -281,3 +281,8 @@ Package-grain internal context. The aggregate management build does not connect 
 | `evaluation_cohort` | STRING | NULLABLE |
 | `experiment_status` | STRING | NULLABLE |
 
+
+
+## Recurring payments page added - 4 October
+
+Use [Page 11: recurring payments and staff reminders](CP2_RECURRING_PAYMENTS_DASHBOARD_GUIDE.md) for exact sources, fields, charts, filters and acceptance checks. `dashboard_recurring_payment_quality` adds recorded arrangement value, paid amounts, positive remaining balances and upcoming arrangement counts. `dashboard_recurring_reminder_schedule` adds daily future reminder workload. These definitions are prepared locally; stable Gold publication and the hosted image update remain outstanding. The owner builds the Looker page. PAYMENTS is excluded, and green only means the reminder date has passed.

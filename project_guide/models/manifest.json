@@ -1,0 +1,10 @@
+{
+  "built_at_utc": "2026-11-02T04:18:37.984689+00:00",
+  "family_cards": 10,
+  "saved_metric_rows": 10793,
+  "source_files": 162,
+  "excluded_files": 30,
+  "current_pointer_sha256": "998231aea48e84393022bc8911f792bea0a143b999a65a441978af4c8c79a038",
+  "cloud_health_checked": false,
+  "new_candidate_deployed": false
+}

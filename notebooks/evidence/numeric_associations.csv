@@ -1,0 +1,88 @@
+feature,group,available_rows,missing_pct,pearson_r,spearman_rho
+anchor_is_final,"Service, package and premises",5333,0.0,0.21288140953212256,0.21288140953212242
+anchor_is_first,"Service, package and premises",5333,0.0,-0.18948653580177618,-0.18948653580177596
+anchor_is_mixed_pest,Pest category and indicators,5333,0.0,-0.06158928922718543,-0.06158928922718556
+anchor_is_single_service,"Service, package and premises",5333,0.0,-0.07551348004613115,-0.07551348004613122
+anchor_month_cos,"Service, package and premises",5333,0.0,0.07200967420493466,0.06402915658561886
+anchor_month_sin,"Service, package and premises",5333,0.0,-0.06973456062935979,-0.07079454722359256
+anchor_remaining_services,"Service, package and premises",5333,0.0,-0.09993311188312329,-0.22343799796281824
+anchor_service_progress,"Service, package and premises",5333,0.0,0.21952236255004576,0.2183882404054494
+days_sale_to_anchor,"Service, package and premises",5333,0.0,0.006647167743914269,0.10357161120791215
+days_since_last_rain_1mm_capped_30d,Weather before service,5333,0.0,-0.03365190248098263,-0.039187238073430816
+days_since_previous_service,"Service, package and premises",3352,37.14607162947684,-0.09572795839949821,-0.12694146261087683
+days_since_prior_property_claim,Past recorded pest/service history,152,97.14982186386649,-0.15823713903289552,-0.16239432661912015
+drainage_rain_interaction,Derived weather interactions,4340,18.61991374460904,0.00251677822049812,0.025947083909889493
+elevation_m,Geographic environment,4340,18.61991374460904,-0.023108109911129188,-0.020379677480904246
+final_pest_ant,Pest category and indicators,5333,0.0,0.005738583073483828,0.0057385830734837445
+final_pest_bed_bug,Pest category and indicators,5333,0.0,-0.008734180154640279,-0.00873418015464028
+final_pest_cockroach,Pest category and indicators,5333,0.0,0.213022217636115,0.2130222176361147
+final_pest_fly,Pest category and indicators,5333,0.0,-0.008734180154640277,-0.00873418015464028
+final_pest_mosquito,Pest category and indicators,5333,0.0,,
+final_pest_rodent,Pest category and indicators,5333,0.0,-0.020670079456175838,-0.020670079456175924
+final_pest_termite,Pest category and indicators,5333,0.0,0.056478464205357355,0.05647846420535729
+first_pest_ant,Pest category and indicators,5333,0.0,-0.06150835383481003,-0.06150835383480988
+first_pest_bed_bug,Pest category and indicators,5333,0.0,-0.008734180154640279,-0.00873418015464028
+first_pest_cockroach,Pest category and indicators,5333,0.0,-0.17322493957865595,-0.1732249395786559
+first_pest_fly,Pest category and indicators,5333,0.0,-0.010699150260566205,-0.010699150260566165
+first_pest_mosquito,Pest category and indicators,5333,0.0,,
+first_pest_rodent,Pest category and indicators,5333,0.0,-0.05253821893682629,-0.05253821893682625
+first_pest_termite,Pest category and indicators,5333,0.0,-0.020981264925202477,-0.02098126492520252
+first_service_no_property_history,Past recorded pest/service history,5333,0.0,-0.18053645789284456,-0.18053645789284434
+first_service_prior_property_return_rate,Past recorded pest/service history,5333,0.0,-0.18084787595455276,-0.1876588346628811
+first_service_rain_14d,Derived weather interactions,5333,0.0,-0.12800245727742776,-0.1786341719354907
+hotosm_nearest_drainage_m,Geographic environment,4340,18.61991374460904,0.0024667871080232603,-0.0044157008489768565
+hotosm_nearest_flowing_water_m,Geographic environment,4340,18.61991374460904,0.02280248796329583,0.04098597408745315
+hotosm_nearest_standing_water_m,Geographic environment,4340,18.61991374460904,-0.015533226417187396,-0.017398453436116804
+hotosm_nearest_waterway_m,Geographic environment,4340,18.61991374460904,0.005798810903046087,0.010319449755277372
+hotosm_water_features_1km,Geographic environment,4340,18.61991374460904,-0.011078598602776863,-0.007794416458168583
+hotosm_water_features_2km,Geographic environment,4340,18.61991374460904,-0.0065057601826614825,-0.013914369014306649
+hotosm_water_features_500m,Geographic environment,4340,18.61991374460904,-0.006477490819779541,0.0016657924572484784
+local_relief_500m_m,Geographic environment,4340,18.61991374460904,-0.03313013036540184,-0.020250838319579134
+location_uncertainty_radius_m,"Service, package and premises",5333,0.0,0.016592436580770357,0.017334560133677557
+log1p_waterway_distance,Geographic environment,4340,18.61991374460904,0.007727335438645738,0.010319449755277372
+mixed_pest_prior_property_return_rate,Past recorded pest/service history,5333,0.0,-0.043680507969489385,-0.06274411128082039
+mixed_pest_rain_14d,Derived weather interactions,5333,0.0,-0.04704606628837656,-0.06105429395846618
+nearest_mapped_forest_m,Geographic environment,799,85.01781361335084,0.007260516137582882,0.003656227393232859
+nearest_mapped_water_m,Geographic environment,3633,31.876992312019503,0.043241106200941445,0.04197258747779116
+package_sessions_recorded,"Service, package and premises",5333,0.0,-0.04500615584895339,-0.02128139211579906
+pest_distinct_known_types,Pest category and indicators,5333,0.0,-0.05921439620734065,-0.05930536503301935
+pest_has_ant,Pest category and indicators,5333,0.0,-0.060025730259437485,-0.06002573025943765
+pest_has_bed_bug,Pest category and indicators,5333,0.0,-0.013107420774636298,-0.013107420774636188
+pest_has_cockroach,Pest category and indicators,5333,0.0,0.044355462092288675,0.04435546209228867
+pest_has_fly,Pest category and indicators,5333,0.0,-0.013107420774636207,-0.013107420774636188
+pest_has_general_control,Pest category and indicators,5333,0.0,-6.253223591208821e-05,-6.253223591202097e-05
+pest_has_mosquito,Pest category and indicators,5333,0.0,,
+pest_has_other_terms,Pest category and indicators,5333,0.0,-0.01054106350374412,-0.01054106350374408
+pest_has_rodent,Pest category and indicators,5333,0.0,-0.06734019765540711,-0.06734019765540702
+pest_has_termite,Pest category and indicators,5333,0.0,-0.013994028038766253,-0.013994028038766336
+prior_14d_heavy_rain_days_10mm,Weather before service,5333,0.0,0.007887649133254139,0.013193755997078303
+prior_14d_max_daily_precipitation_mm,Weather before service,5333,0.0,0.004352201042647246,0.004881333220912361
+prior_14d_precipitation_mm,Weather before service,5333,0.0,0.01088257313722674,0.014291338866859996
+prior_14d_wet_days_1mm,Weather before service,5333,0.0,0.017302565826571487,0.011620523301659727
+prior_1d_precipitation_mm,Weather before service,5333,0.0,0.003742311113469941,0.02388136301583922
+prior_30d_precipitation_mm,Weather before service,5333,0.0,0.010212989834480955,0.008995060416742603
+prior_30d_relative_humidity_mean_pct,Weather before service,5333,0.0,0.006691328137276648,0.0028304958231631485
+prior_30d_soil_moisture_0_to_7cm_mean,Weather before service,5333,0.0,-0.0033155480599970544,-0.008563015216980005
+prior_30d_temperature_mean_c,Weather before service,5333,0.0,0.00227847740925212,0.0005747265534371971
+prior_30d_wet_days_1mm,Weather before service,5333,0.0,0.001532284556015376,-0.006055086605344392
+prior_3d_precipitation_mm,Weather before service,5333,0.0,0.0035615340749415125,0.019421877049740827
+prior_3d_vs_previous_11d_daily_rain_trend_mm,Weather before service,5333,0.0,-0.005918745319721005,0.005119921515675475
+prior_7d_precipitation_mm,Weather before service,5333,0.0,0.01064013416959059,0.02030377307235953
+prior_7d_relative_humidity_mean_pct,Weather before service,5333,0.0,0.01858220724041258,0.018282539560869837
+prior_7d_soil_moisture_0_to_7cm_mean,Weather before service,5333,0.0,0.004857057665765477,0.005358567561412675
+prior_7d_temperature_max_c,Weather before service,5333,0.0,-0.010309633130226677,-0.01252036256521223
+prior_7d_temperature_mean_c,Weather before service,5333,0.0,-0.00952046919178109,-0.013943608894137318
+prior_7d_wet_days_1mm,Weather before service,5333,0.0,0.030278734560814088,0.026386082768708942
+prior_area_claims_90d,Past recorded pest/service history,5333,0.0,0.030940857261219045,0.029660304547935973
+prior_area_services_90d,Past recorded pest/service history,5333,0.0,-0.011228680280093382,-0.01072061625697543
+prior_package_return_rate_smoothed,Past recorded pest/service history,5333,0.0,-0.06326485629524246,-0.2062168843056992
+prior_package_service_events,Past recorded pest/service history,5333,0.0,0.043302155476226414,0.21447252832227406
+prior_package_warranty_claims,Past recorded pest/service history,5333,0.0,0.029914529470648737,0.022158275358876437
+prior_property_claims_90d,Past recorded pest/service history,5333,0.0,0.021550108111360794,0.031042375850524103
+prior_property_return_rate_smoothed,Past recorded pest/service history,5333,0.0,-0.02854793594764245,-0.18092407548686107
+prior_property_service_events,Past recorded pest/service history,5333,0.0,0.013088517325864949,0.18301328639046183
+prior_property_warranty_claims,Past recorded pest/service history,5333,0.0,0.020591662917430583,0.004160003796799329
+rain_soil_interaction,Derived weather interactions,5333,0.0,0.010959034954266015,0.011433907871880753
+sale_total_rm,"Service, package and premises",5324,0.1687605475342191,-0.047330085713248,-0.022134785088600655
+service_number,"Service, package and premises",5333,0.0,0.04492263697439731,0.22026990473459146
+water_rain_interaction,Derived weather interactions,4340,18.61991374460904,0.013323634085037561,0.022529729378910738

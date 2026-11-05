@@ -144,9 +144,10 @@ def artifact_probability(artifact,frame):
     return b.apply_calibrator(artifact['calibrator'],raw)
 
 
-def validate_prediction_times(frame,manifest,now):
+def validate_prediction_times(frame,manifest,now,*,collection_protocol=None):
     now=timestamp(now); frozen=timestamp(manifest['frozen_at_utc'])
-    start=pd.Timestamp(manifest['cohort_start']);end=pd.Timestamp(manifest['cohort_end'])
+    bounds = collection_protocol if collection_protocol is not None else manifest
+    start=pd.Timestamp(bounds['cohort_start']);end=pd.Timestamp(bounds['cohort_end'])
     if not frame.anchor_date.between(start,end).all():
         raise ValueError('Anchors outside the predeclared prospective cohort')
     if now<frozen:
@@ -160,8 +161,11 @@ def validate_prediction_times(frame,manifest,now):
             raise ValueError('Prediction/snapshot timing violates prospective availability')
         if (now-prediction).total_seconds()>300:
             raise ValueError('Historical backfill cannot be presented as prospective scoring')
-        if (not service_start<=service_end<=prediction or (prediction-service_end).total_seconds()>300
-                or (now-service_end).total_seconds()>300):
+        if collection_protocol is not None:
+            from scripts.cp2_collection_policy import validate_times
+            validate_times(service_start,service_end,prediction,now,collection_protocol)
+        elif (not service_start<=service_end<=prediction or (prediction-service_end).total_seconds()>300
+              or (now-service_end).total_seconds()>300):
             raise ValueError('Score must be recorded within five minutes after Calendar service end')
         if service_start.astimezone(LOCAL).date()!=row['anchor_date'].date():
             raise ValueError('Calendar service start must match the local anchor date')
@@ -259,7 +263,16 @@ def cohort_contract(output, manifest, protocol_path=None):
              'prospective_repaired_evaluation.json'),
         (b.ROOT/'config/cp2_cloud_cohort.json').resolve():
             ('cloud_cohort_protocol_sha256','cp2_cloud_2026',
-             'prospective_cloud_evaluation.json')}
+             'prospective_cloud_evaluation.json'),
+        (b.ROOT/'config/cp2_october5_cohort.json').resolve():
+            ('october5_cohort_protocol_sha256','cp2_october5_2026',
+             'prospective_october5_evaluation.json'),
+        (b.ROOT/'config/cp2_october10_cohort.json').resolve():
+            ('october10_cohort_protocol_sha256','cp2_october10_2026',
+             'prospective_october10_evaluation.json'),
+        (b.ROOT/'config/cp2_recovery_cohort.json').resolve():
+            ('recovery_cohort_protocol_sha256','cp2_recovery_20261016',
+             'prospective_recovery_evaluation.json')}
     registry_key,name,result_name=registered.get(path.resolve(),
         (None,'cp2_repaired_2026','prospective_repaired_evaluation.json'))
     if registry_key:
@@ -269,19 +282,37 @@ def cohort_contract(output, manifest, protocol_path=None):
     protocol=json.loads(path.read_text(encoding='utf-8'))
     start=pd.Timestamp(protocol['cohort_start']);end=pd.Timestamp(protocol['cohort_end'])
     declared=timestamp(protocol['declared_at_utc'])
+    recovery = name == 'cp2_recovery_20261016'
+    collection_protocol = None
+    if name == 'cp2_october10_2026' or recovery:
+        from scripts.cp2_collection_policy import load
+        collection_protocol = load(b.ROOT)
+    extended = (name == 'cp2_october10_2026' and protocol.get('amendment') == 'precollection_extension_to_october30_v1')
+    dates_valid = (protocol['cohort_start'] == '2026-10-10' and protocol['cohort_end'] == '2026-10-30'
+        and protocol.get('earliest_final_evaluation_date') == '2026-11-30'
+        and protocol.get('supersedes_protocol_sha256') == '7224062bf8a41110769aa4d2b6d951aec4ccb562d00d6a5631301c4a3684a4d3') if extended else (
+        pd.Timestamp(manifest['cohort_start']) <= start <= end == pd.Timestamp(manifest['cohort_end'])
+        and protocol.get('earliest_final_evaluation_date') == manifest['earliest_final_evaluation_date'])
+    if recovery:
+        dates_valid = bool(collection_protocol and protocol['cohort_start']=='2026-10-16'
+            and protocol['cohort_end']==collection_protocol['cohort_end']=='2026-10-30'
+            and protocol.get('earliest_final_evaluation_date')=='2026-11-30'
+            and protocol.get('parent_collection_protocol_sha256')==collection_protocol['protocol_sha256']
+            and protocol.get('timing_policy')==collection_protocol['timing_policy'])
     if (protocol.get('schema_version')!=1 or protocol.get('name')!=name
             or protocol.get('record_sha256')!=record_digest(protocol)
             or protocol.get('bundle_sha256')!=digest(output/'bundle.json')
             or protocol.get('target')!=manifest['target']
             or protocol.get('date_authority')!='Calendar'
-            or not pd.Timestamp(manifest['cohort_start'])<=start<=end==pd.Timestamp(manifest['cohort_end'])
+            or not dates_valid
             or declared>=start.tz_localize(LOCAL).tz_convert('UTC').to_pydatetime()
-            or protocol.get('earliest_final_evaluation_date')!=manifest['earliest_final_evaluation_date']):
+            or pd.Timestamp(protocol['earliest_final_evaluation_date']) <= end + pd.Timedelta(days=30)):
         raise ValueError('Repaired cohort protocol or frozen model contract differs')
     return {'cohort_start':protocol['cohort_start'], 'cohort_end':protocol['cohort_end'],
         'earliest_final_evaluation_date':protocol['earliest_final_evaluation_date'],
         'result_path':output/result_name,
-        'protocol_sha256':digest(path)}
+        'protocol_sha256':digest(path), 'collection_protocol':collection_protocol,
+        'receipt_collection_protocol_sha256':collection_protocol['protocol_sha256'] if collection_protocol else None}
 
 
 def verify(output):
@@ -305,9 +336,14 @@ def verify(output):
     return {'rows':len(frame),'max_probability_difference':differences,'outcome_required_for_scoring':False}
 
 
-def score(output,input_path,log_dir,*,source_receipt=None):
+def score(output,input_path,log_dir,*,source_receipt=None,protocol_path=None):
     log_dir=private_path(log_dir)
     configure_contracts(False);manifest,models=load_bundle(output)
+    contract=cohort_contract(output,manifest,protocol_path) if protocol_path is not None else {}
+    collection_protocol=contract.get('collection_protocol')
+    if collection_protocol is not None and (not isinstance(source_receipt,dict) or source_receipt.get('collection_protocol_sha256') != contract['protocol_sha256']
+            or source_receipt.get('collection_timing_policy') != collection_protocol['timing_policy']):
+        raise ValueError('Prediction receipt must bind the declared collection timing protocol')
     frame=prepare_scoring_frame(b.load_dataset_input(input_path),manifest.get('preparation'))
     now=datetime.now(timezone.utc)
     extracted=validate_source_receipt(source_receipt,input_path,now)
@@ -344,11 +380,11 @@ def score(output,input_path,log_dir,*,source_receipt=None):
                 if any(prior.get(field)!=record.get(field) for field in fields):
                     raise ValueError('Prediction already logged with different immutable evidence')
                 earlier=pd.DataFrame([row]);earlier.anchor_date=pd.to_datetime(earlier.anchor_date)
-                validate_prediction_times(earlier,manifest,prior['logged_at_utc'])
+                validate_prediction_times(earlier,manifest,prior['logged_at_utc'],collection_protocol=collection_protocol)
                 existing_count+=1
                 continue
             one=pd.DataFrame([row]);one.anchor_date=pd.to_datetime(one.anchor_date)
-            validate_prediction_times(one,manifest,now)
+            validate_prediction_times(one,manifest,now,collection_protocol=collection_protocol)
             if now.astimezone(LOCAL).date()>one.anchor_date.iloc[0].date():
                 raise ValueError('Prediction commit must precede the first local outcome day')
             pending.append((path,record))
@@ -454,6 +490,13 @@ def evaluate(output,labels_path,log_dir,*,protocol_path=None):
             continue
         if entry.get('record_sha256')!=record_digest(entry) or b.TARGET in entry['row']:
             raise ValueError('Prospective prediction record changed or included an outcome')
+        collection_hash=entry.get('source_receipt',{}).get('collection_protocol_sha256')
+        collection_protocol=contract.get('collection_protocol')
+        if ((collection_protocol is not None and collection_hash != contract['receipt_collection_protocol_sha256'])
+                or (collection_protocol is None and collection_hash is not None)):
+            continue
+        if collection_protocol is not None and entry['source_receipt'].get('collection_timing_policy') != collection_protocol['timing_policy']:
+            raise ValueError('Prediction timing policy differs from declared evaluation')
         if manifest.get('version','').startswith('prospective_callback_v2'):
             receipt=entry.get('source_receipt',{})
             if entry.get('schema_version')!=2 or receipt.get('source')!=SOURCE_NAME:
@@ -466,7 +509,7 @@ def evaluate(output,labels_path,log_dir,*,protocol_path=None):
                     or timestamp(entry['logged_at_utc']).astimezone(LOCAL).date()>pd.Timestamp(entry['row']['anchor_date']).date()):
                 raise ValueError('Prospective source/prediction timing differs')
         one=pd.DataFrame([entry['row']]);one.anchor_date=pd.to_datetime(one.anchor_date)
-        validate_prediction_times(one,manifest,entry['logged_at_utc'])
+        validate_prediction_times(one,manifest,entry['logged_at_utc'],collection_protocol=collection_protocol)
         if one.anchor_date.between(pd.Timestamp(contract['cohort_start']),
                 pd.Timestamp(contract['cohort_end'])).all():
             records.append(entry['row'])

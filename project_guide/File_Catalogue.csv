@@ -1,0 +1,660 @@
+﻿Area,File,Purpose
+Analysis notebooks,notebooks/00_Project_Overview.html,00 Project Overview
+Analysis notebooks,notebooks/00_Project_Overview.ipynb,00 Project Overview
+Analysis notebooks,notebooks/01_Data_Sources.html,01 Data Sources
+Analysis notebooks,notebooks/01_Data_Sources.ipynb,01 Data Sources
+Analysis notebooks,notebooks/02_Data_Cleaning.html,02 Data Cleaning
+Analysis notebooks,notebooks/02_Data_Cleaning.ipynb,02 Data Cleaning
+Analysis notebooks,notebooks/03_Outcome_Labels_and_Partitions.html,03 Outcome Labels and Partitions
+Analysis notebooks,notebooks/03_Outcome_Labels_and_Partitions.ipynb,03 Outcome Labels and Partitions
+Analysis notebooks,notebooks/04_Predictors.html,04 Predictors
+Analysis notebooks,notebooks/04_Predictors.ipynb,04 Predictors
+Analysis notebooks,notebooks/05_Pest_Return_Model.html,05 Pest Return Model
+Analysis notebooks,notebooks/05_Pest_Return_Model.ipynb,05 Pest Return Model
+Analysis notebooks,notebooks/06_Weekly_Planning_Models.html,06 Weekly Planning Models
+Analysis notebooks,notebooks/06_Weekly_Planning_Models.ipynb,06 Weekly Planning Models
+Analysis notebooks,notebooks/07_Model_Experiments.html,07 Model Experiments
+Analysis notebooks,notebooks/07_Model_Experiments.ipynb,07 Model Experiments
+Analysis notebooks,notebooks/08_Probability_Calibration.html,08 Probability Calibration
+Analysis notebooks,notebooks/08_Probability_Calibration.ipynb,08 Probability Calibration
+Analysis notebooks,notebooks/09_Programme_End_Purchase.html,09 Programme End Purchase
+Analysis notebooks,notebooks/09_Programme_End_Purchase.ipynb,09 Programme End Purchase
+Analysis notebooks,notebooks/10_Commercial_Quote_Model.html,10 Commercial Quote Model
+Analysis notebooks,notebooks/10_Commercial_Quote_Model.ipynb,10 Commercial Quote Model
+Analysis notebooks,notebooks/README.md,Project notebooks
+Analysis notebooks,notebooks/source_profiles/01_prospects_2026_b2b_profile.ipynb,01 prospects 2026 b2b profile
+Analysis notebooks,notebooks/source_profiles/02_sales_payments_profile.ipynb,02 sales payments profile
+Analysis notebooks,notebooks/source_profiles/03_calendar_events_profile.ipynb,03 calendar events profile
+Processing and model code,scripts/adjudicate_outcome_sample.py,Apply already-confirmed owner numbering policy; preserve initial screen evidence.
+Processing and model code,scripts/analyze_callback_errors.py,Reconcile frozen callback errors and audit source evidence without relabeling.
+Processing and model code,scripts/analyze_warranty_label_review.py,Analyze the completed CP2 warranty-label review workbook.
+Processing and model code,scripts/annotate_geoapify_postcode_proximity.py,Add local postcode-reference distances to the versioned Geoapify cache.
+Processing and model code,scripts/audit_callback_evidence.py,Read-only historical source-epoch validation and prediction eligibility audit.
+Processing and model code,scripts/audit_individual_predictor_removal.py,Refit without every individual predictor on the declared development folds.
+Processing and model code,scripts/audit_model_outcome_sample.py,Read-only stratified Calendar evidence audit; never changes labels or scores.
+Processing and model code,scripts/audit_next_predictor_sources.py,"Read-only availability audit: aggregate counts, never customer-text exports."
+Processing and model code,scripts/audit_predictor_value.py,Development-only predictor ablation; never changes the frozen experiment.
+Processing and model code,scripts/benchmark_warranty_models.py,"Bounded, property-purged temporal benchmark of corrected warranty outcomes."
+Processing and model code,scripts/build_calendar_silver.py,Build and test the safe Calendar Silver view after Bronze verification.
+Processing and model code,scripts/build_calendar_warranty_review_seed.py,"Convert preserved review decisions into a deterministic, PII-free dbt seed."
+Processing and model code,scripts/build_cp2_decision_support.py,Reproducible aggregate evidence for follow-up decisions; never fit a model.
+Processing and model code,scripts/build_dashboard_mockups.py,"Render the Looker Studio design reference, without querying private data."
+Processing and model code,scripts/build_flood_experiment.py,Build only flood enrichment and its source/model invariants.
+Processing and model code,scripts/build_gold_foundation.py,"Build conservative Gold facts, monthly summaries and quality checks."
+Processing and model code,scripts/build_management_model_search_20261021.py,Portable aggregate notebook/report for the completed bounded model search.
+Processing and model code,scripts/build_ml_foundation.py,Build and test the bounded analytics-ML experiment datasets.
+Processing and model code,scripts/build_model_register.py,"Source-indexed model register; no fitting, retuning or private-record export."
+Processing and model code,scripts/build_operational_silver.py,"Metadata preflight + compile/read-only validation, or explicit --build deployment."
+Processing and model code,scripts/build_project_notebooks.py,Build the project notebook series and a non-destructive project file catalogue.
+Processing and model code,scripts/build_reporting_address_fix.py,Upload an explicit source allowlist and build the repaired reporting image.
+Processing and model code,scripts/build_supervisor_model_review.py,"Build an aggregate-only, executed supervisor notebook from pinned model sources."
+Processing and model code,scripts/build_warranty_experiment.py,Build reviewed labels and fixed-horizon datasets without dashboard work.
+Processing and model code,scripts/build_warranty_label_review_sample.py,"Create a privacy-reduced, stratified warranty-label review sample."
+Processing and model code,scripts/calendar_appointment_policy.py,Exact owner-confirmed temporary slots; weekday never determines eligibility.
+Processing and model code,scripts/callback_evaluation.py,Key-aligned paired evaluation for saved callback predictions.
+Processing and model code,scripts/callback_live_features.py,Read-only current callback features using the frozen dbt transformations.
+Processing and model code,scripts/callback_live_weather.py,Refresh prior-day IFS weather privately without changing warehouse pins.
+Processing and model code,scripts/catalog_bigquery.py,Label CP2 datasets and inventory dependencies without renaming live IDs.
+Processing and model code,scripts/check_age_proxy_controls.py,"Negative controls after initial age comparison; exploratory, not a new test."
+Processing and model code,scripts/check_bigquery_connection.py,"Read-only BigQuery setup check. No query jobs, uploads, or dataset creation."
+Processing and model code,scripts/check_bigquery_query_usage.py,Show recent BigQuery job usage without running a billable query.
+Processing and model code,scripts/check_building_date_coverage.py,Inspect construction-date tag availability; proximity is not a building match.
+Processing and model code,scripts/check_full_sheet_scope.py,"Read-only full approved-tab profile. No exports, uploads or source edits."
+Processing and model code,scripts/check_prospects_silver_batch.py,"Read-only, aggregate-only checkpoint after the dbt build. No customer values printed."
+Processing and model code,scripts/cleanup_bigquery_releases.py,Archive unreferenced release datasets; dry-run unless --apply. Metadata receipt required.
+Processing and model code,scripts/collect_candidate_environment_sources.py,Collect public OSM candidate context; never treat current mapping as past truth.
+Processing and model code,scripts/collect_food_outlet_coverage.py,Bounded coverage check using the existing approved Geoapify connection.
+Processing and model code,scripts/compare_2026_training.py,Exploratory early-2026 training comparison on a frozen later-2026 cohort.
+Processing and model code,scripts/compare_broad_callback_challengers.py,Fixed exploratory model search; preserve v5 and reserve later-period outcomes.
+Processing and model code,scripts/compare_callback_blind_spots.py,Bounded development-only selection of mixed-pest/first-service experiments.
+Processing and model code,scripts/compare_callback_candidates_v2.py,Bounded callback candidates selected only using purged pre-2026 folds.
+Processing and model code,scripts/compare_callback_description_features.py,"Exploratory, pre-2026-selected comparison of structured Problem-field features."
+Processing and model code,scripts/compare_first_service_challengers.py,Bounded first-service improvement experiment; never changes the live model.
+Processing and model code,scripts/compare_flood_models.py,Freeze one callback cohort and compare identical contracts with/without flood.
+Processing and model code,scripts/compare_shortlist_larger.py,Fixed RF shortlist vs reproduced 93-input baseline on larger historical split.
+Processing and model code,scripts/compare_validated_callback_splits.py,"Declared, source-checked historical development comparison; never deploys models."
+Processing and model code,scripts/cp2_cloud_collector.py,Private Cloud Run entry point for the frozen prospective collector.
+Processing and model code,scripts/cp2_collection_policy.py,"Versioned prospective timing, separate from frozen weights and old cohorts."
+Processing and model code,scripts/cp2_geocoding.py,"Bounded daily geocoding with an address-hash cache, separate from model training."
+Processing and model code,scripts/cp2_model.py,Single entry point for the current CP2 callback model and validation bundle.
+Processing and model code,scripts/cp2_pipeline.py,"Private, recoverable Google sources -> features -> fixed CP2 model workflow."
+Processing and model code,scripts/cp2_pipeline_tick.py,Cheap Calendar-only two-minute trigger for prospective CP2 scoring.
+Processing and model code,scripts/cp2_planning_job.py,Independent weekly planning forecast logger. Never touches the pest-return test.
+Processing and model code,scripts/cp2_reporting_release.py,"Stage, reconcile and publish an immutable CP2 reporting release."
+Processing and model code,scripts/dashboard_mockup_layouts.py,Eleven distinct native-Looker compositions for the CP2 design reference.
+Processing and model code,scripts/duplicate_original_age_rain.py,"Exact original 100-service comparison, new duplicate feature variants."
+Processing and model code,scripts/evaluate_broad_callback_challenger.py,One-time later-period check of challengers frozen before fresh source extraction.
+Processing and model code,scripts/evaluate_callback_holdout.py,One-time later-date comparison of models frozen before reading holdout labels.
+Processing and model code,scripts/evaluate_callback_yes_no.py,"Evaluate saved forward predictions for all services, with earlier-only calibration."
+Processing and model code,scripts/evaluate_cp2_followup_policy.py,One-time supplementary daily-budget comparison after the main future test.
+Processing and model code,scripts/evaluate_larger_frozen_model.py,Freeze a separate 93-input historical model before its larger later assessment.
+Processing and model code,scripts/evaluate_matured_cp2_subset.py,Read-only partial outcome assessment; never calls or writes final evaluation.
+Processing and model code,scripts/evaluate_warranty_coverage_episodes.py,Benchmark repeated warranty-coverage intervals and spatial sensitivity.
+Processing and model code,scripts/evaluate_warranty_environmental_factors.py,Evaluate static environmental context as a grouped model challenger.
+Processing and model code,scripts/extract_prospects_2026.py,"Live, read-only Sheets -> DataFrame check. No CSV input or database writes."
+Processing and model code,scripts/fetch_environmental_context.py,Fetch cached static environmental context for ML anchor locations.
+Processing and model code,scripts/fetch_flood_context.py,Enrich paid-service anchors with publication-gated Copernicus GFM exposure.
+Processing and model code,scripts/fetch_gdacs_flood_context.py,"Add conservative, reported regional flood context from public GDACS records."
+Processing and model code,scripts/fetch_open_meteo_weather.py,Fetch cached historical daily ECMWF IFS weather for service coordinates.
+Processing and model code,scripts/fetch_worldcover_context.py,"Bounded ESA WorldCover 2021 context from public, cached COG byte ranges."
+Processing and model code,scripts/forward_select_return_predictors.py,"Greedy one-variable-at-a-time selection, separated from later assessment."
+Processing and model code,scripts/freeze_age_rain_candidate.py,"Separate four-way frozen historical comparison, preserving original artifacts."
+Processing and model code,scripts/freeze_callback_prospective.py,Freeze all-mature-data callback models and append prospective feature/score logs.
+Processing and model code,scripts/freeze_corrected_callback.py,Refit fixed development selections on every corrected mature service.
+Processing and model code,scripts/generate_dashboard_ml_seed.py,Export frozen v5 holdout aggregates for the privacy-safe Looker view.
+Processing and model code,scripts/inspect_calendar_address_blocks.py,Read-only Calendar address-block coverage; never sends addresses externally.
+Processing and model code,scripts/inspect_weather_location_readiness.py,"Read-only, aggregate-only Calendar location coverage for weather planning."
+Processing and model code,scripts/install_cp2_local_runner.ps1,install cp2 local runner
+Processing and model code,scripts/inventory_google_sources.py,Create a metadata-only inventory of approved Google sources.
+Processing and model code,scripts/list_ambiguous_calendar_events.py,Print every ambiguous 2026 Calendar service event in the terminal.
+Processing and model code,scripts/load_calendar_bronze.py,Read and optionally load all six approved Nomobug Calendars as one Bronze snapshot.
+Processing and model code,scripts/load_calendar_geocodes_quality.py,Validate and load historical Calendar geocode candidates to BigQuery Quality.
+Processing and model code,scripts/load_hotosm_waterways.py,Load a pinned HOTOSM Malaysia waterways snapshot and derive location context.
+Processing and model code,scripts/load_open_meteo_weather_quality.py,Validate and load cached daily Open-Meteo ECMWF IFS data to BigQuery Quality.
+Processing and model code,scripts/load_operational_bronze.py,All eight operational source layouts checked before writes. Default is a live read-only plan.
+Processing and model code,scripts/load_payment_date_serials.py,Read-only preview by default; preserve the PAYMENTS date cell's underlying value.
+Processing and model code,scripts/load_prospects_2026_bigquery.py,LIVE Sheets -> BigQuery raw snapshot. Neon remains untouched.
+Processing and model code,scripts/neon/check_neon_storage.py,Read-only storage and Bronze snapshot check; no Google API calls.
+Processing and model code,scripts/neon/load_prospects_2026_bronze.py,"Read LIVE Sheets, then preserve a complete raw snapshot in Neon."
+Processing and model code,scripts/operational_bronze_core.py,"Small loader helpers, isolated so tests do not contact Google."
+Processing and model code,scripts/operational_source_contracts.py,"Observed positional headers; whitespace is cosmetic, positions are not."
+Processing and model code,scripts/organize_project.py,Remove regenerable caches and produce a path-preserving project inventory.
+Processing and model code,scripts/package_additional_research_candidates.py,Package reproducible research candidates; does not activate or deploy them.
+Processing and model code,scripts/package_current_submission.py,"Curated handover only: no credentials, raw sources or customer-linked exports."
+Processing and model code,scripts/pilot_geoapify_calendar.py,Plan or run private Geoapify geocoding for historical Calendar visit addresses.
+Processing and model code,scripts/planning_engine.py,Selected planning engine. Formulas ported from corrected research v2.
+Processing and model code,scripts/prepare_portal_areas.py,Prepare aggregate district evaluation from saved historical predictions.
+Processing and model code,scripts/prepare_service_observation_features.py,"Validate structured evidence and prepare private, as-of candidate features."
+Processing and model code,scripts/preview_payment_sales_links.py,Live read-only DataFrame preview. No warehouse writes or raw exports.
+Processing and model code,scripts/preview_prospects_2026_silver.py,Read-only Bronze -> pandas Silver preview. No Google calls or database writes.
+Processing and model code,scripts/preview_recurring_payment_tracker.py,Validate and export a private tracker from the latest published release.
+Processing and model code,scripts/profile_b2b_sales_payments.py,Read-only live API profiling; all returned rows retained in DataFrames.
+Processing and model code,scripts/prospects_source_contract.py,Small reusable guard: positional SQL must not run against rearranged headers.
+Processing and model code,scripts/read_prospects_2026_bigquery.py,Read newest stored BigQuery snapshot into the shared preview's DataFrames.
+Processing and model code,scripts/README.md,Executable code
+Processing and model code,scripts/reconcile_callback_evidence.py,Read-only claim-date reconciliation and structured Calendar text coverage audit.
+Processing and model code,scripts/reconcile_collection_candidates.py,Read-only review of missed windows against a declared current source snapshot.
+Processing and model code,scripts/recover_expanded_development_receipts.py,Recreate development-only receipts after interrupted export; no test access.
+Processing and model code,scripts/refine_unmapped_purchase_batch.py,"Bounded three-worker refinement, reusing audited selection and match guards."
+Processing and model code,scripts/refresh_callback_validation.py,Derive a private refreshed callback candidate using temporary BigQuery tables.
+Processing and model code,scripts/refresh_hotosm_context.py,Refresh location context from the already loaded pinned waterways snapshot.
+Processing and model code,scripts/refresh_project_file_guide.py,Refresh navigation and inventory without executing notebooks or changing evidence.
+Processing and model code,scripts/refresh_prospects_2026.py,Manual live API -> verified Bronze -> dbt Silver/tests -> aggregate checkpoint.
+Processing and model code,scripts/release_business_analytics.py,Build actual business analytics from one published immutable reporting release.
+Processing and model code,scripts/renew_google_access.py,Renew local read-only Google consent without downloading source records.
+Processing and model code,scripts/research_additional_models.py,"Bounded, reproducible additional forecasting research; never edits v5 or cloud."
+Processing and model code,scripts/research_calendar_quote_sizes.py,Test explicit Calendar premises measurements against commercial price estimates.
+Processing and model code,scripts/research_callback_targets.py,Bounded historical horizon/target/model experiment with nested time/group splits.
+Processing and model code,scripts/research_commercial_quote.py,Commercial-only price research after confirmation that home prices are fixed.
+Processing and model code,scripts/research_commercial_quote_refinement.py,Refine commercial price research using existing Calendar and Sales snapshots.
+Processing and model code,scripts/research_customer_history_targets.py,Separate exploratory repurchase study at each programme purchase.
+Processing and model code,scripts/research_enquiry_conversion_20261021.py,"Exploratory, source-backed enquiry-to-recorded-sale test. Read-only warehouse."
+Processing and model code,scripts/research_expanded_targets.py,"Exploratory target comparison; immutable copies, mature labels, past-only inputs."
+Processing and model code,scripts/research_management_forecasts_20261021_v2.py,"Bounded retrospective booking-flow research, with timestamp availability gates."
+Processing and model code,scripts/research_operational_models_20261102.py,"Operational model search, 2 November 2026."
+Processing and model code,scripts/research_precision_targets_v2_20261021.py,Bounded useful return-target search; validation-led precision/recall policies.
+Processing and model code,scripts/research_premise_classifier.py,Predict a staff-recorded premise category from name/address text only.
+Processing and model code,scripts/research_programme_end_purchase.py,Exploratory prediction of another programme purchase after the final recorded visit.
+Processing and model code,scripts/research_property_warranty_20261102.py,"Property-level warranty-call risk, 2 November 2026 (exploratory challenger)."
+Processing and model code,scripts/research_quote_estimate.py,Predict recorded package sales amounts from quote-time requirements.
+Processing and model code,scripts/research_repeat_purchase.py,Separate exploratory first-recorded-purchase study; no PII exported.
+Processing and model code,scripts/research_repeat_survival_20261102.py,"Repeat-purchase timing study (survival analysis), 2 November 2026."
+Processing and model code,scripts/resolve_geocode_review_by_peer_address.py,Resolve strong address-format duplicates from already trusted Calendar rows.
+Processing and model code,scripts/resolve_named_property_aliases.py,Resolve unit-level aliases using an existing exact Geoapify property result.
+Processing and model code,scripts/resolve_review_with_named_property_peers.py,Resolve review addresses from exact named-property Geoapify peers.
+Processing and model code,scripts/resolve_unmapped_purchase_batch.py,Resolve the private review queue using existing conservative geocoding methods.
+Processing and model code,scripts/restore_archived_bigquery_release.py,Restore one archived release from the 16 October cleanup receipt.
+Processing and model code,scripts/retry_geocodes_with_google_place_hints.py,Use transient Google place hints to retry Geoapify review candidates.
+Processing and model code,scripts/retry_remaining_with_full_google_place_address.py,Retry v9 review rows by sending Google's transient full place address to Geoapify.
+Processing and model code,scripts/retry_review_with_google_identification.py,Retry every v12 review address using transient Google place identification.
+Processing and model code,scripts/review_calendar_key_changes.py,"Bounded, read-only reconstruction of changed Calendar keys from Bronze."
+Processing and model code,scripts/review_portal_assistant.py,Bounded hosted assistant acceptance probe; only aggregate evidence is used.
+Processing and model code,scripts/sales_payment_rules.py,Conservative review helpers; no customer identity inference or payment splitting.
+Processing and model code,scripts/service_programme_policy.py,Source-qualified owner-reviewed programme links; never guess customer identity.
+Processing and model code,scripts/simplify_supervisor_review.py,"Publish a plain-language, complete predictor guide from audited aggregates."
+Processing and model code,scripts/stepwise_select_return_predictors.py,Bidirectional stepwise selection; shares only earlier selection fits with forward search.
+Processing and model code,scripts/summarize_cp2_usability.py,Summarize real observed usability responses; blank tasks remain untested.
+Processing and model code,scripts/summarize_geoapify_calendar.py,Aggregate-only quality report for the private Calendar geocode cache.
+Processing and model code,scripts/test_age_holiday_predictors.py,Paired predictor study using downloaded official source files.
+Processing and model code,scripts/test_before_first_weather.py,"Paired, declared weather additions before the first visit; frozen model untouched."
+Processing and model code,scripts/test_calendar_note_predictors.py,Free-text Calendar note screening and earlier-period paired validation.
+Processing and model code,scripts/test_compact_notes_rain.py,"Fixed 2x4 candidate study, same original 100-row evaluation and OOF folds."
+Processing and model code,scripts/test_holiday_forecasts.py,Validate holiday inputs on prior forecast development origins only.
+Processing and model code,scripts/test_interservice_weather.py,Paired historical 3x-final-service experiment. Does not modify any live model.
+Processing and model code,scripts/test_next_predictors.py,Earlier-period paired feature tests; preserve all frozen and final-test artifacts.
+Processing and model code,scripts/test_return_probability_calibration.py,Chronological calibration study for the main pest-return model; never deploys.
+Processing and model code,scripts/trace_claim_service_dates.py,Read-only exact identity/date trace for unresolved claim-service cases.
+Processing and model code,scripts/train_warranty_risk.py,Train and export the property warranty-risk model (warranty_risk_v1).
+Processing and model code,scripts/train_warranty_risk_baseline.py,Compare leakage-safe horizons and baselines for 3-session warranty risk.
+Processing and model code,scripts/tune_warranty_risk_model.py,Tune and calibrate the prediction-safe residential 3x 30-day model.
+Processing and model code,scripts/update_warehouse_catalogue.py,Apply readable BigQuery metadata and export an object guide without renaming IDs.
+Processing and model code,scripts/validate_business_kpis.py,Read-only KPI acceptance checks against the exact deployed source snapshots.
+Processing and model code,scripts/validate_dashboard_review.py,"Publish corrected views, then run one bounded reconciliation; stop on quota."
+Processing and model code,scripts/validate_google_geoapify_proximity.py,Validate Google-hinted Geoapify points against a transient 1 km threshold.
+Processing and model code,scripts/validate_warranty_risk_stability.py,"Walk-forward validation, error analysis, and model freeze evidence."
+Processing and model code,scripts/verify_flood_model_artifacts.py,Replay every local flood comparison model in a separate Python process.
+Processing and model code,scripts/verify_model_search_20261021.py,Independent arithmetic/source checks for the 21 October research artifacts.
+Processing and model code,scripts/verify_planning_rollout.py,Authenticated cloud smoke checks; never print or persist the access code.
+Processing and model code,scripts/verify_portal_workflows.py,Exercise authenticated website APIs against privately downloaded real data.
+Processing and model code,scripts/warranty_risk_prospective.py,Prospective (forward) test of warranty_risk_v1. Separate from the frozen pest-return experiment.
+Processing and model code,scripts/warranty_validation_splits.py,Time and group separation for retrospective warranty experiments.
+Warehouse SQL,dbt/.user.yml,.user
+Warehouse SQL,dbt/dbt_project.yml,dbt project
+Warehouse SQL,dbt/macros/acquisition_group.sql,acquisition group
+Warehouse SQL,dbt/macros/calendar_address_line.sql,calendar address line
+Warehouse SQL,dbt/macros/calendar_event_category.sql,calendar event category
+Warehouse SQL,dbt/macros/calendar_history_available.sql,calendar history available
+Warehouse SQL,dbt/macros/calendar_snapshot_observation_sql.sql,calendar snapshot observation sql
+Warehouse SQL,dbt/macros/generate_schema_name.sql,generate schema name
+Warehouse SQL,dbt/macros/operational_parsing.sql,operational parsing
+Warehouse SQL,dbt/macros/operational_raw_aliases.sql,operational raw aliases
+Warehouse SQL,dbt/macros/phone_numbers.sql,phone numbers
+Warehouse SQL,dbt/macros/warranty_anchor_dataset_sql.sql,warranty anchor dataset sql
+Warehouse SQL,dbt/models/analytics_ml/analytics_ml_models.yml,analytics ml models
+Warehouse SQL,dbt/models/analytics_ml/analytics_ml_outputs.yml,analytics ml outputs
+Warehouse SQL,dbt/models/analytics_ml/flood_sources.yml,flood sources
+Warehouse SQL,dbt/models/analytics_ml/README.md,Analytics ML experiment layer
+Warehouse SQL,dbt/models/analytics_ml/warranty_anchor_environment_features.sql,warranty anchor environment features
+Warehouse SQL,dbt/models/analytics_ml/warranty_callback_fixed_horizon_dataset.sql,warranty callback fixed horizon dataset
+Warehouse SQL,dbt/models/analytics_ml/warranty_callback_flood_dataset.sql,warranty callback flood dataset
+Warehouse SQL,dbt/models/analytics_ml/warranty_coverage_service_episodes.sql,warranty coverage service episodes
+Warehouse SQL,dbt/models/analytics_ml/warranty_fixed_horizon_dataset.sql,warranty fixed horizon dataset
+Warehouse SQL,dbt/models/analytics_ml/warranty_risk_3session_dataset.sql,warranty risk 3session dataset
+Warehouse SQL,dbt/models/analytics_ml/worldcover_sources.yml,worldcover sources
+Warehouse SQL,dbt/models/b2b_follow_up.sql,b2b follow up
+Warehouse SQL,dbt/models/calendar_event_locations.sql,calendar event locations
+Warehouse SQL,dbt/models/calendar_event_matches.sql,calendar event matches
+Warehouse SQL,dbt/models/calendar_event_weather.sql,calendar event weather
+Warehouse SQL,dbt/models/calendar_events.sql,calendar events
+Warehouse SQL,dbt/models/commercial_clients.sql,commercial clients
+Warehouse SQL,dbt/models/gold/calendar_programme_service_facts.sql,calendar programme service facts
+Warehouse SQL,dbt/models/gold/calendar_service_event_facts.sql,calendar service event facts
+Warehouse SQL,dbt/models/gold/dashboard_attention.sql,dashboard attention
+Warehouse SQL,dbt/models/gold/dashboard_data_quality.sql,dashboard data quality
+Warehouse SQL,dbt/models/gold/dashboard_feature_comparison.sql,dashboard feature comparison
+Warehouse SQL,dbt/models/gold/dashboard_followup_baselines.sql,dashboard followup baselines
+Warehouse SQL,dbt/models/gold/dashboard_ml_evaluation.sql,dashboard ml evaluation
+Warehouse SQL,dbt/models/gold/dashboard_model_review.sql,dashboard model review
+Warehouse SQL,dbt/models/gold/dashboard_package_fit_matrix.sql,dashboard package fit matrix
+Warehouse SQL,dbt/models/gold/dashboard_payment_link_monthly.sql,dashboard payment link monthly
+Warehouse SQL,dbt/models/gold/dashboard_recurrence_monthly.sql,dashboard recurrence monthly
+Warehouse SQL,dbt/models/gold/dashboard_recurrence_windows.sql,dashboard recurrence windows
+Warehouse SQL,dbt/models/gold/dashboard_recurring_payment_quality.sql,dashboard recurring payment quality
+Warehouse SQL,dbt/models/gold/dashboard_recurring_reminder_schedule.sql,dashboard recurring reminder schedule
+Warehouse SQL,dbt/models/gold/dashboard_refund_monthly.sql,dashboard refund monthly
+Warehouse SQL,dbt/models/gold/dashboard_scheduling_capacity.sql,dashboard scheduling capacity
+Warehouse SQL,dbt/models/gold/dashboard_service_monthly.sql,dashboard service monthly
+Warehouse SQL,dbt/models/gold/dashboard_source_freshness.sql,dashboard source freshness
+Warehouse SQL,dbt/models/gold/dashboard_spatial_area.sql,dashboard spatial area
+Warehouse SQL,dbt/models/gold/dashboard_spatial_cluster_summary.sql,dashboard spatial cluster summary
+Warehouse SQL,dbt/models/gold/dashboard_team_workload.sql,dashboard team workload
+Warehouse SQL,dbt/models/gold/dashboard_treatment_difficulty.sql,dashboard treatment difficulty
+Warehouse SQL,dbt/models/gold/dashboard_upcoming_appointments.sql,dashboard upcoming appointments
+Warehouse SQL,dbt/models/gold/dashboard_warranty_package_metrics.sql,dashboard warranty package metrics
+Warehouse SQL,dbt/models/gold/dashboard_weather_monthly.sql,dashboard weather monthly
+Warehouse SQL,dbt/models/gold/decision_support.yml,decision support
+Warehouse SQL,dbt/models/gold/gold_models.yml,gold models
+Warehouse SQL,dbt/models/gold/payment_record_facts.sql,payment record facts
+Warehouse SQL,dbt/models/gold/payments_monthly_recorded.sql,payments monthly recorded
+Warehouse SQL,dbt/models/gold/prospect_reply_monthly_recorded.sql,prospect reply monthly recorded
+Warehouse SQL,dbt/models/gold/README.md,Gold recorded-activity foundation
+Warehouse SQL,dbt/models/gold/recorded_activity_quality.sql,recorded activity quality
+Warehouse SQL,dbt/models/gold/refund_record_facts.sql,refund record facts
+Warehouse SQL,dbt/models/gold/sales_monthly_recorded.sql,sales monthly recorded
+Warehouse SQL,dbt/models/gold/sales_package_facts.sql,sales package facts
+Warehouse SQL,dbt/models/gold/service_programme_facts.sql,service programme facts
+Warehouse SQL,dbt/models/gold/service_programme_warranty_windows.sql,service programme warranty windows
+Warehouse SQL,dbt/models/gold/spatial_repeat_signal_events.sql,spatial repeat signal events
+Warehouse SQL,dbt/models/gold/spatial_repeat_signal_properties.sql,spatial repeat signal properties
+Warehouse SQL,dbt/models/gold/spatial_repeat_signal_property_clusters.sql,spatial repeat signal property clusters
+Warehouse SQL,dbt/models/gold/spatial_service_area_metrics.sql,spatial service area metrics
+Warehouse SQL,dbt/models/gold/warranty_claim_record_facts.sql,warranty claim record facts
+Warehouse SQL,dbt/models/operational_models.yml,operational models
+Warehouse SQL,dbt/models/operational_sources.yml,operational sources
+Warehouse SQL,dbt/models/payment_link.sql,payment link
+Warehouse SQL,dbt/models/payment_sales_links.sql,payment sales links
+Warehouse SQL,dbt/models/payments.sql,payments
+Warehouse SQL,dbt/models/prospects_2026.sql,prospects 2026
+Warehouse SQL,dbt/models/prospects_2026.yml,prospects 2026
+Warehouse SQL,dbt/models/README.md,Nomobug transformations
+Warehouse SQL,dbt/models/recurring_contract_candidates.sql,recurring contract candidates
+Warehouse SQL,dbt/models/recurring_contract_payment_tracker.sql,recurring contract payment tracker
+Warehouse SQL,dbt/models/recurring_payment_date_candidates.sql,recurring payment date candidates
+Warehouse SQL,dbt/models/recurring_payments.sql,recurring payments
+Warehouse SQL,dbt/models/recurring_tracking.yml,recurring tracking
+Warehouse SQL,dbt/models/refund.sql,refund
+Warehouse SQL,dbt/models/regional_weather_features_by_date.sql,regional weather features by date
+Warehouse SQL,dbt/models/sales.sql,sales
+Warehouse SQL,dbt/models/sources.yml,sources
+Warehouse SQL,dbt/models/warranty_calendar_visits.sql,warranty calendar visits
+Warehouse SQL,dbt/models/warranty_claim.sql,warranty claim
+Warehouse SQL,dbt/profiles.yml,profiles
+Warehouse SQL,dbt/seeds/calendar_warranty_review_overrides.yml,calendar warranty review overrides
+Warehouse SQL,dbt/seeds/sale_disposition_overrides.yml,sale disposition overrides
+Warehouse SQL,dbt/tests/acquisition_mapping_examples.sql,acquisition mapping examples
+Warehouse SQL,dbt/tests/calendar_address_formats.sql,calendar address formats
+Warehouse SQL,dbt/tests/calendar_appointment_override_invariants.sql,calendar appointment override invariants
+Warehouse SQL,dbt/tests/calendar_closed_date_examples.sql,calendar closed date examples
+Warehouse SQL,dbt/tests/calendar_event_grain_reconciliation.sql,calendar event grain reconciliation
+Warehouse SQL,dbt/tests/calendar_event_invariants.sql,calendar event invariants
+Warehouse SQL,dbt/tests/calendar_known_match_examples.sql,calendar known match examples
+Warehouse SQL,dbt/tests/calendar_match_invariants.sql,calendar match invariants
+Warehouse SQL,dbt/tests/calendar_sequence_anchor_examples.sql,calendar sequence anchor examples
+Warehouse SQL,dbt/tests/calendar_shared_phone_property_examples.sql,calendar shared phone property examples
+Warehouse SQL,dbt/tests/calendar_warranty_claim_examples.sql,calendar warranty claim examples
+Warehouse SQL,dbt/tests/calendar_warranty_classifier_regressions.sql,calendar warranty classifier regressions
+Warehouse SQL,dbt/tests/calendar_warranty_review_invariants.sql,calendar warranty review invariants
+Warehouse SQL,dbt/tests/dashboard_extended_metric_invariants.sql,dashboard extended metric invariants
+Warehouse SQL,dbt/tests/dashboard_metric_invariants.sql,dashboard metric invariants
+Warehouse SQL,dbt/tests/dashboard_source_freshness_invariants.sql,dashboard source freshness invariants
+Warehouse SQL,dbt/tests/decision_support_invariants.sql,decision support invariants
+Warehouse SQL,dbt/tests/gdacs_flood_source_invariants.sql,gdacs flood source invariants
+Warehouse SQL,dbt/tests/gfm_flood_source_invariants.sql,gfm flood source invariants
+Warehouse SQL,dbt/tests/gold_grain_reconciliation.sql,gold grain reconciliation
+Warehouse SQL,dbt/tests/gold_payment_date_reconciliation.sql,gold payment date reconciliation
+Warehouse SQL,dbt/tests/gold_recorded_activity_reconciliation.sql,gold recorded activity reconciliation
+Warehouse SQL,dbt/tests/gold_refund_warranty_reconciliation.sql,gold refund warranty reconciliation
+Warehouse SQL,dbt/tests/gold_sales_date_evidence.sql,gold sales date evidence
+Warehouse SQL,dbt/tests/looker_release_invariants.sql,looker release invariants
+Warehouse SQL,dbt/tests/operational_parser_examples.sql,operational parser examples
+Warehouse SQL,dbt/tests/operational_raw_preserved.sql,operational raw preserved
+Warehouse SQL,dbt/tests/operational_remaining_invariants.sql,operational remaining invariants
+Warehouse SQL,dbt/tests/payment_link_invariants.sql,payment link invariants
+Warehouse SQL,dbt/tests/phone_numbers_examples.sql,phone numbers examples
+Warehouse SQL,dbt/tests/prospects_cleaning_invariants.sql,prospects cleaning invariants
+Warehouse SQL,dbt/tests/prospects_raw_preserved.sql,prospects raw preserved
+Warehouse SQL,dbt/tests/recurring_tracking_invariants.sql,recurring tracking invariants
+Warehouse SQL,dbt/tests/service_programme_upgrade_invariants.sql,service programme upgrade invariants
+Warehouse SQL,dbt/tests/spatial_repeat_signal_invariants.sql,spatial repeat signal invariants
+Warehouse SQL,dbt/tests/spatial_service_area_invariants.sql,spatial service area invariants
+Warehouse SQL,dbt/tests/upcoming_appointments_invariants.sql,upcoming appointments invariants
+Warehouse SQL,dbt/tests/warranty_anchor_environment_feature_invariants.sql,warranty anchor environment feature invariants
+Warehouse SQL,dbt/tests/warranty_calendar_visit_examples.sql,warranty calendar visit examples
+Warehouse SQL,dbt/tests/warranty_callback_flood_invariants.sql,warranty callback flood invariants
+Warehouse SQL,dbt/tests/warranty_callback_horizon_invariants.sql,warranty callback horizon invariants
+Warehouse SQL,dbt/tests/warranty_coverage_service_episode_invariants.sql,warranty coverage service episode invariants
+Warehouse SQL,dbt/tests/warranty_fixed_horizon_invariants.sql,warranty fixed horizon invariants
+Warehouse SQL,dbt/tests/warranty_risk_3session_invariants.sql,warranty risk 3session invariants
+Warehouse SQL,dbt/tmp/reporting-dbt-target/manifest.json,manifest
+Warehouse SQL,dbt/tmp/reporting-dbt-target/osi_document.json,osi document
+Warehouse SQL,dbt/tmp/reporting-dbt-target/perf_info.json,perf info
+Warehouse SQL,dbt/tmp/reporting-dbt-target/semantic_manifest.json,semantic manifest
+Website,webapp/__init__.py,Nomobug management portal. Separate from the frozen collector.
+Website,webapp/action_log.py,"Private, optimistic-concurrency ledger; separate from financial/source facts."
+Website,webapp/analytics.py,"Business-intelligence summary: descriptive, predictive and prescriptive views."
+Website,webapp/assistant.py,"Ollama explanation layer. No arbitrary SQL, source writes or autonomous tools."
+Website,webapp/booking.py,Calendar-fit booking options. No Calendar writes or learned accuracy claims.
+Website,webapp/business.py,"Business reporting at sale, programme and appointment grains."
+Website,webapp/data.py,"Fixed, bounded reads from approved aggregate Gold views."
+Website,webapp/DESIGN.md,Interface design
+Website,webapp/followup.py,Read-only staff review queue from recorded contract facts.
+Website,webapp/geography.py,Server-side geographic evaluation of saved historical predictions.
+Website,webapp/LUCIDE_LICENSE.txt,LUCIDE LICENSE
+Website,webapp/models/planning_v1.json,planning v1
+Website,webapp/models/repeat90_v1.json,repeat90 v1
+Website,webapp/models/return30_evidence.json,return30 evidence
+Website,webapp/models/return_research_best.json,return research best
+Website,webapp/models/warranty_risk_v1.json,warranty risk v1
+Website,webapp/oauth_info/index.html,index
+Website,webapp/oauth_info/privacy.html,privacy
+Website,webapp/oauth_info/server.py,Serve only approved public information assets; no source or customer API.
+Website,webapp/oauth_info/usage.html,usage
+Website,webapp/performance_targets.json,performance targets
+Website,webapp/planning.py,Read-only presentation of independently logged planning forecasts.
+Website,webapp/predictions.py,Experimental planning tools. No writes to the frozen v5 experiment.
+Website,webapp/README.md,Nomobug staff website
+Website,webapp/server.py,Private management website; run with python -m webapp.server.
+Website,webapp/spatial.py,"Staff-only map payloads from checked runtime snapshots, without risk scores."
+Website,webapp/static/app.js,app
+Website,webapp/static/archivo-LICENSE.txt,archivo LICENSE
+Website,webapp/static/booking.js,booking
+Website,webapp/static/guide.js,guide
+Website,webapp/static/index.html,index
+Website,webapp/static/instrument-sans-LICENSE.txt,instrument sans LICENSE
+Website,webapp/static/maps.css,maps
+Website,webapp/static/maps.html,maps
+Website,webapp/static/maps.js,maps
+Website,webapp/static/shell.js,shell
+Website,webapp/static/stages.js,stages
+Website,webapp/static/style.css,style
+Website,webapp/static/tools.js,tools
+Website,webapp/static/workspace.js,workspace
+Website,webapp/storage.py,Private runtime snapshot delivery; no warehouse grants on the web identity.
+Website,webapp/warranty_risk.py,Property warranty-risk scoring (warranty_risk_v1). Read-only; no records change.
+Website,webapp/workspace.py,Decision support from published facts; no source edits or customer messaging.
+Rules and protocols,config/callback_date_authority_review_v1.json,callback date authority review v1
+Rules and protocols,config/callback_quality_repairs_v5.json,callback quality repairs v5
+Rules and protocols,config/cp2_3x_final_target_research_20261017.json,cp2 3x final target research 20261017
+Rules and protocols,config/cp2_additional_model_research_v1.json,cp2 additional model research v1
+Rules and protocols,config/cp2_broad_challenger_later_period_v1.json,cp2 broad challenger later period v1
+Rules and protocols,config/cp2_broad_challenger_results_v1.json,cp2 broad challenger results v1
+Rules and protocols,config/cp2_broad_challenger_v1.json,cp2 broad challenger v1
+Rules and protocols,config/cp2_cloud_artifacts.json,cp2 cloud artifacts
+Rules and protocols,config/cp2_cloud_cohort.json,cp2 cloud cohort
+Rules and protocols,config/cp2_first_service_challenger_results_v1.json,cp2 first service challenger results v1
+Rules and protocols,config/cp2_first_service_challenger_v1.json,cp2 first service challenger v1
+Rules and protocols,config/cp2_followup_policy_v1.json,cp2 followup policy v1
+Rules and protocols,config/cp2_historical_callback_validation.json,cp2 historical callback validation
+Rules and protocols,config/cp2_live_feature_contract.json,cp2 live feature contract
+Rules and protocols,config/cp2_model_current.json,cp2 model current
+Rules and protocols,config/cp2_october10_cohort.json,cp2 october10 cohort
+Rules and protocols,config/cp2_october5_cohort.json,cp2 october5 cohort
+Rules and protocols,config/cp2_planning_festivals.json,cp2 planning festivals
+Rules and protocols,config/cp2_planning_v1.json,cp2 planning v1
+Rules and protocols,config/cp2_recovery_cohort.json,cp2 recovery cohort
+Rules and protocols,config/cp2_repaired_cohort.json,cp2 repaired cohort
+Rules and protocols,config/cp2_repeat_purchase_research_v1.json,cp2 repeat purchase research v1
+Rules and protocols,config/cp2_target_research_20261016.json,cp2 target research 20261016
+Rules and protocols,config/cp2_team_coverage.json,cp2 team coverage
+Rules and protocols,config/cp2_validated_forward_comparison_20261016.json,cp2 validated forward comparison 20261016
+Rules and protocols,config/google_source_ids.example.json,google source ids.example
+Rules and protocols,config/owner_service_clarifications_20261017.json,owner service clarifications 20261017
+Rules and protocols,config/README.md,CP2 configuration map
+Rules and protocols,config/warranty_2026_training_experiment_v1.json,warranty 2026 training experiment v1
+Rules and protocols,config/warranty_blind_spot_experiment_v1.json,warranty blind spot experiment v1
+Rules and protocols,config/warranty_callback_description_experiment_v1.json,warranty callback description experiment v1
+Rules and protocols,config/warranty_callback_error_analysis_v1.json,warranty callback error analysis v1
+Rules and protocols,config/warranty_coverage_episode_model_v1.json,warranty coverage episode model v1
+Rules and protocols,config/warranty_flood_experiment_v1.json,warranty flood experiment v1
+Rules and protocols,config/warranty_model_experiment_v4.json,warranty model experiment v4
+Rules and protocols,config/warranty_model_experiment_v5.json,warranty model experiment v5
+Rules and protocols,config/warranty_new_holdout_v5.json,warranty new holdout v5
+Rules and protocols,config/warranty_prospective_experiment_v1.json,warranty prospective experiment v1
+Rules and protocols,config/warranty_prospective_experiment_v2.json,warranty prospective experiment v2
+Rules and protocols,config/warranty_risk_model_v1.json,warranty risk model v1
+Rules and protocols,config/warranty_risk_model_v2.json,warranty risk model v2
+Rules and protocols,config/warranty_risk_model_v3.json,warranty risk model v3
+Tests,tests/test_2026_training_comparison.py,test 2026 training comparison
+Tests,tests/test_additional_model_research.py,Check time boundaries rather than whether a model fits its own output.
+Tests,tests/test_age_holiday_predictors.py,test age holiday predictors
+Tests,tests/test_ai_assistant_removed.py,test ai assistant removed
+Tests,tests/test_analytics.py,test analytics
+Tests,tests/test_bigquery_migration.py,"Mock-only migration tests: never use ADC, Google APIs or private .env."
+Tests,tests/test_booking.py,test booking
+Tests,tests/test_broad_callback_challengers.py,test broad callback challengers
+Tests,tests/test_broad_callback_evaluation.py,test broad callback evaluation
+Tests,tests/test_business_analytics.py,test business analytics
+Tests,tests/test_business_kpis.py,Acceptance-validator failure modes; no live source/API calls.
+Tests,tests/test_business_output_version.py,test business output version
+Tests,tests/test_calendar_address_blocks.py,test calendar address blocks
+Tests,tests/test_calendar_appointment_policy.py,test calendar appointment policy
+Tests,tests/test_calendar_geocodes_quality.py,Safety tests for the sanitized Calendar geocode quality loader.
+Tests,tests/test_calendar_history_availability.py,Backdated Calendar records must not contribute prediction-time histories.
+Tests,tests/test_calendar_history_links.py,The optimized three-join history must preserve the gated OR-join pairs.
+Tests,tests/test_calendar_note_predictors.py,test calendar note predictors
+Tests,tests/test_calendar_quote_sizes.py,test calendar quote sizes
+Tests,tests/test_calendar_snapshot_observation.py,Ensure both model targets use extraction coverage rather than appointments.
+Tests,tests/test_callback_blind_spot_features.py,test callback blind spot features
+Tests,tests/test_callback_candidates_v2.py,test callback candidates v2
+Tests,tests/test_callback_date_authority.py,test callback date authority
+Tests,tests/test_callback_error_analysis.py,test callback error analysis
+Tests,tests/test_callback_evaluation.py,test callback evaluation
+Tests,tests/test_callback_evidence_audit.py,test callback evidence audit
+Tests,tests/test_callback_evidence_reconciliation.py,test callback evidence reconciliation
+Tests,tests/test_callback_live_features.py,Live extraction contract checks with no API or warehouse contact.
+Tests,tests/test_callback_prospective.py,test callback prospective
+Tests,tests/test_callback_refresh.py,test callback refresh
+Tests,tests/test_callback_target_horizons.py,test callback target horizons
+Tests,tests/test_check_neon_storage.py,"Offline storage-check tests, using only synthetic results."
+Tests,tests/test_collection_reconciliation.py,test collection reconciliation
+Tests,tests/test_commercial_quote_refinement.py,test commercial quote refinement
+Tests,tests/test_compact_notes_rain.py,test compact notes rain
+Tests,tests/test_cp2_cloud_collector.py,Cloud collector must release its lease and preserve failed-tick evidence.
+Tests,tests/test_cp2_collection_policy.py,"Prospective timing regressions: no late scores, invented outcomes or erased gaps."
+Tests,tests/test_cp2_decision_support.py,test cp2 decision support
+Tests,tests/test_cp2_followup_policy.py,test cp2 followup policy
+Tests,tests/test_cp2_live_pipeline.py,"Operational recovery and source-boundary regressions, without live APIs."
+Tests,tests/test_cp2_model_entrypoint.py,test cp2 model entrypoint
+Tests,tests/test_cp2_reporting_release.py,Release safety checks without live Google calls.
+Tests,tests/test_cp2_usability.py,test cp2 usability
+Tests,tests/test_daily_geocoding.py,test daily geocoding
+Tests,tests/test_dashboard_ml_seed.py,Guard the published model aggregates against stale or private source rows.
+Tests,tests/test_expanded_target_research.py,test expanded target research
+Tests,tests/test_extract_prospects_2026.py,Synthetic API fixtures only; never contact Google or read private configuration.
+Tests,tests/test_feature_deadline.py,test feature deadline
+Tests,tests/test_final_evaluation_guards.py,test final evaluation guards
+Tests,tests/test_first_service_challengers.py,test first service challengers
+Tests,tests/test_flood_context.py,Offline checks for publication-gated flood exposure and unknown-data semantics.
+Tests,tests/test_flood_model_comparison.py,test flood model comparison
+Tests,tests/test_forward_selection_rules.py,test forward selection rules
+Tests,tests/test_frozen_age_rain.py,test frozen age rain
+Tests,tests/test_full_google_place_address_retry.py,Offline safety tests for the full-place transient retry.
+Tests,tests/test_full_sheet_checklist.py,test full sheet checklist
+Tests,tests/test_gdacs_flood_context.py,Reported-region geometry and conservative publication-time checks.
+Tests,tests/test_geoapify_pilot.py,Offline safety checks for the capped Calendar geocoding pilot.
+Tests,tests/test_google_geoapify_proximity.py,Offline tests for transient Google-to-Geoapify proximity validation.
+Tests,tests/test_google_identification_retry.py,Offline checks for the Google-identification Geoapify retry.
+Tests,tests/test_google_place_hint_retry.py,Offline tests for transient Google place hints and persistent Geoapify output.
+Tests,tests/test_interservice_weather.py,test interservice weather
+Tests,tests/test_larger_frozen_split.py,test larger frozen split
+Tests,tests/test_load_prospects_2026_bronze.py,Offline loader tests: no real Google/Neon access or private .env reads.
+Tests,tests/test_manual_geocode_overrides.py,test manual geocode overrides
+Tests,tests/test_matured_cp2_subset.py,test matured cp2 subset
+Tests,tests/test_metabase_proxy.py,test metabase proxy
+Tests,tests/test_named_property_aliases.py,test named property aliases
+Tests,tests/test_named_property_peer_resolution.py,test named property peer resolution
+Tests,tests/test_next_predictor_history.py,test next predictor history
+Tests,tests/test_open_meteo_weather.py,Offline safety tests for historical weather caching.
+Tests,tests/test_open_meteo_weather_quality.py,Offline grain tests for the weather Quality loader.
+Tests,tests/test_operational_bronze.py,Mock-only loader checks: no Google access or credentials.
+Tests,tests/test_outcome_sample_screen.py,test outcome sample screen
+Tests,tests/test_payment_date_serials.py,Date-sidecar lineage checks without API or warehouse calls.
+Tests,tests/test_planning_forecasts.py,Forecast receipts must reject late/mismatched evidence; UI cannot invent results.
+Tests,tests/test_planning_tools.py,test planning tools
+Tests,tests/test_portal.py,"Meaningful guards for historical evaluation, data access, auth and Ollama."
+Tests,tests/test_portal_followup.py,test portal followup
+Tests,tests/test_portal_iap.py,IAP-only access must verify signatures and ignore staff cookies.
+Tests,tests/test_portal_storage.py,Release consistency and last-good snapshot recovery at the storage boundary.
+Tests,tests/test_premise_classifier.py,test premise classifier
+Tests,tests/test_preview_prospects_2026_silver.py,Synthetic Bronze responses only. No real credentials or network calls.
+Tests,tests/test_probability_calibration.py,test probability calibration
+Tests,tests/test_programme_end_purchase.py,test programme end purchase
+Tests,tests/test_prospects_source_contract.py,test prospects source contract
+Tests,tests/test_quote_estimate.py,test quote estimate
+Tests,tests/test_recurring_payment_preview.py,Private tracker export and dependency expansion safeguards.
+Tests,tests/test_renew_google_access.py,Renewal checks use only synthetic private files and a mocked browser flow.
+Tests,tests/test_repeat_purchase_research.py,test repeat purchase research
+Tests,tests/test_sales_payment_rules.py,test sales payment rules
+Tests,tests/test_service_observation_features.py,test service observation features
+Tests,tests/test_service_programme_policy.py,test service programme policy
+Tests,tests/test_spatial_payload.py,test spatial payload
+Tests,tests/test_supervisor_model_review.py,test supervisor model review
+Tests,tests/test_unmapped_purchase_resolution.py,test unmapped purchase resolution
+Tests,tests/test_warranty_coverage_model_contract.py,test warranty coverage model contract
+Tests,tests/test_warranty_experiment_contract.py,Keep the reviewed experimental model contract safe to interpret and replay.
+Tests,tests/test_warranty_label_review.py,test warranty label review
+Tests,tests/test_warranty_model_benchmark.py,test warranty model benchmark
+Tests,tests/test_warranty_risk.py,test warranty risk
+Tests,tests/test_warranty_risk_model_contract.py,test warranty risk model contract
+Tests,tests/test_warranty_risk_prospective.py,test warranty risk prospective
+Tests,tests/test_warranty_validation_splits.py,test warranty validation splits
+Tests,tests/test_workspace.py,test workspace
+Tests,tests/test_worldcover_context.py,Offline checks for bounded COG reading and land-cover missing-data semantics.
+Hosting,infra/bootstrap_cp2.ps1,bootstrap cp2
+Hosting,infra/CP2_CLOUD_RESOURCE_MAP.md,CP2 cloud resource map and cleanup record
+Hosting,infra/CP2_PROSPECTIVE_CLOUD.md,CP2 prospective cloud collector
+Hosting,infra/deploy_planning.ps1,deploy planning
+Hosting,infra/grant_bigquery_dataset_access.py,Grant only the existing CP2 datasets needed by the reporting job.
+Hosting,infra/metabase/proxy.py,Open Vercel's port while the JVM initializes; never claim early readiness.
+Hosting,infra/metabase/README.md,Metabase demo
+Hosting,infra/metabase/vercel.json,vercel
+Hosting,infra/README.md,CP2 reporting job runbook
+Hosting,infra/schedule_cp2.ps1,schedule cp2
+Hosting,infra/seed_cp2_secrets.ps1,seed cp2 secrets
+Hosting,infra/setup_portal.ps1,setup portal
+Specifications and dated records,planning/archive/implementation/B2B_SALES_PAYMENTS_MAPPING.md,B2B / Sales / Payments: live profiling checkpoint
+Specifications and dated records,planning/archive/implementation/bigquery_migration.md,BigQuery primary; Neon retained
+Specifications and dated records,planning/archive/implementation/CALENDAR_MATCHING_RULES.md,Calendar-to-customer matching rules
+Specifications and dated records,planning/archive/implementation/CP2_IMPLEMENTATION_GUIDE_20260903.md,CP2 Implementation Guide
+Specifications and dated records,planning/archive/implementation/cp2_plan_before_zero_cost_revision.md,Historical CP2 Plan — Superseded 3 September 2026
+Specifications and dated records,planning/archive/implementation/CP2_SEP_NOV_IMPLEMENTATION_PLAN.md,Nomobug CP2: Active Implementation Plan
+Specifications and dated records,planning/archive/implementation/LOCATION_VALIDATION.md,Calendar location validation gate
+Specifications and dated records,planning/archive/implementation/OPERATIONAL_BRONZE_BATCH.md,Complete operational Bronze batch
+Specifications and dated records,planning/archive/implementation/OPERATIONAL_SILVER_BATCH.md,Operational Silver: complete source snapshot batch
+Specifications and dated records,planning/archive/implementation/PROSPECTS_REFRESH.md,Manual Prospects refresh
+Specifications and dated records,planning/archive/implementation/prospects_silver_rules.md,Prospects 2026: confirmed business rules
+Specifications and dated records,planning/archive/model_evaluations/CP2_2026_TRAINING_EVALUATION.md,CP2: does training on 2026 records improve callback prediction?
+Specifications and dated records,planning/archive/model_evaluations/CP2_BLIND_SPOT_EVALUATION.md,CP2 mixed-pest and first-service experiment
+Specifications and dated records,planning/archive/model_evaluations/CP2_CALLBACK_ERROR_ANALYSIS.md,CP2 callback model error analysis
+Specifications and dated records,planning/archive/model_evaluations/CP2_CALLBACK_EVIDENCE_RECONCILIATION.md,CP2 claim-date reconciliation and description-feature experiment
+Specifications and dated records,planning/archive/model_evaluations/CP2_FLOOD_MODEL_EVALUATION.md,CP2 flood context and callback model comparison
+Specifications and dated records,planning/archive/model_evaluations/CP2_FLOOD_SOURCE_REVIEW.md,CP2 observed-flood source and method review
+Specifications and dated records,planning/archive/model_evaluations/CP2_MODEL_IMPROVEMENT.md,CP2 model improvement — 27 September 2026
+Specifications and dated records,planning/archive/model_evaluations/CP2_PROSPECTIVE_MODEL_TEST.md,CP2 frozen prospective comparison
+Specifications and dated records,planning/archive/model_evaluations/ENVIRONMENTAL_MODEL_EVALUATION.md,Environmental factors in the warranty-risk experiments
+Specifications and dated records,planning/archive/model_evaluations/WARRANTY_COVERAGE_MODEL_EVALUATION.md,Residential 4x/6x/12x warranty coverage model evaluation
+Specifications and dated records,planning/archive/model_evaluations/WARRANTY_LABEL_VALIDATION.md,Warranty label manual validation
+Specifications and dated records,planning/archive/model_evaluations/WARRANTY_REVIEW_FINDINGS.md,Warranty review findings — 27 September 2026
+Specifications and dated records,planning/archive/README.md,Preserved CP2 evidence
+Specifications and dated records,planning/BIGQUERY_START_HERE.md,Current warehouse catalogue · 25 October 2026
+Specifications and dated records,planning/CP2_REMAINING_TASKS_20261102.md,"Codex tasks from the Claude session, 2 November 2026"
+Specifications and dated records,planning/CP2_ADDITIONAL_MODEL_RESEARCH_20261015.md,Additional predictive models — research completed 15 October 2026
+Specifications and dated records,planning/CP2_AGE_HOLIDAY_RESEARCH_20261018.md,Settlement age and holiday follow-up — 18 October2026
+Specifications and dated records,planning/CP2_AI_ASSISTANT_REMOVAL_20261101.md,AI assistant removal — 1 November 2026
+Specifications and dated records,planning/CP2_APPROVED_THEME_20261016.md,"Approved black, white and blue website theme"
+Specifications and dated records,planning/CP2_ASSISTANT_SPEED_20261016.md,Assistant speed release — 16 October 2026
+Specifications and dated records,planning/CP2_BROAD_MODEL_REVIEW.md,Broad model improvement review — 1 October 2026
+Specifications and dated records,planning/CP2_BUSINESS_KPI_VALIDATION.md,CP2 business KPI validation — 28 September 2026
+Specifications and dated records,planning/CP2_CALENDAR_APPOINTMENT_POLICY.md,Calendar cancellations and temporary appointments
+Specifications and dated records,planning/CP2_CALLBACK_RECORDING_GUIDE.md,CP2: useful structured records for the next model
+Specifications and dated records,planning/CP2_PROJECT_HANDOVER_20261102.md,"Claude session handover, 2 November 2026"
+Specifications and dated records,planning/CP2_COLLECTION_AND_AI_RESOLUTION_20261015.md,Collection and assistant resolution — 15 October 2026
+Specifications and dated records,planning/CP2_COMPLETE_SYSTEM_DESIGN.md,"Complete system design — proposal, 14 October 2026"
+Specifications and dated records,planning/CP2_COMPLETION_STATUS.md,CP2 status
+Specifications and dated records,planning/CP2_CORRECTED_MODEL_CANDIDATES_V5.md,Corrected callback model comparison v5
+Specifications and dated records,planning/CP2_DAILY_GEOCODING.md,Daily address mapping
+Specifications and dated records,planning/CP2_DASHBOARD_BUILD_GUIDE.md,Nomobug dashboard — build guide
+Specifications and dated records,planning/CP2_DASHBOARD_FIELD_REFERENCE.md,Deployed dashboard field reference — 1 October 2026
+Specifications and dated records,planning/CP2_DASHBOARD_HANDOFF.md,Current dashboard handoff — 14 October 2026
+Specifications and dated records,planning/CP2_DASHBOARD_MOCKUP_IMPLEMENTATION_20261015.md,Approved dashboard implementation — 15 October 2026
+Specifications and dated records,planning/CP2_DASHBOARD_USABILITY_TEST.md,Short management usability test
+Specifications and dated records,planning/CP2_DEMO_GUIDE.md,CP2 demonstration guide
+Specifications and dated records,planning/CP2_ENVIRONMENTAL_FEATURE_NOTES.md,"Environmental features: sources, coverage and timing"
+Specifications and dated records,planning/CP2_EXPANDED_MODEL_RESEARCH_20261018.md,Expanded model research — 18 October 2026
+Specifications and dated records,planning/CP2_FINAL_HANDOVER_20261016.md,CP2 handover — 16 October 2026
+Specifications and dated records,planning/CP2_FINAL_REPORT_DRAFT.md,Nomobug management and decision-support system
+Specifications and dated records,planning/CP2_FIRST_SERVICE_CHALLENGER.md,First-service challenger: completed exploratory comparison
+Specifications and dated records,planning/CP2_FOLDER_CLEANUP.md,Project folder cleanup — 4 October 2026
+Specifications and dated records,planning/CP2_GOAL_COVERAGE_AUDIT.md,CP2 goal coverage audit
+Specifications and dated records,planning/CP2_IMPLEMENTATION_STATUS_20261011.md,CP2 decision-support implementation — 11 October 2026
+Specifications and dated records,planning/CP2_IMPLEMENTATION_STATUS_20261012.md,CP2 status â€” 12 October 2026
+Specifications and dated records,planning/CP2_LARGER_SHORTLIST_20261018.md,Larger shortlist comparison — 18 October 2026
+Specifications and dated records,planning/CP2_LIVE_PIPELINE_OPERATIONS.md,CP2 local refresh and future evaluation
+Specifications and dated records,planning/CP2_MAIN_MODEL_REVIEW_20261028.md,Main model review — 28 October 2026
+Specifications and dated records,planning/CP2_METRIC_DICTIONARY.md,CP2 metric dictionary — management meaning
+Specifications and dated records,planning/CP2_MODEL_EXPLAINED.md,CP2 model explained — 1 October 2026
+Specifications and dated records,planning/CP2_MODEL_SEARCH_20261021.md,Model research addendum — 21 October 2026
+Specifications and dated records,planning/CP2_MODEL_VALIDATION_NOTES.md,Model validation repair — 4 October 2026
+Specifications and dated records,planning/CP2_MODEL_YES_NO_EVALUATION_20261016.md,Predicting a recorded return within 30 days — evaluation update
+Specifications and dated records,planning/CP2_NON_DASHBOARD_STATUS_20261015.md,Non-dashboard work — 15 October 2026
+Specifications and dated records,planning/CP2_NOVEMBER30_FINISH.md,Finish the prospective test by 30 November 2026
+Specifications and dated records,planning/CP2_OCTOBER10_COLLECTION_REPAIR.md,Collection repair declared 9 October 2026
+Specifications and dated records,planning/CP2_OCTOBER5_TEST.md,Separate 5 October prospective test
+Specifications and dated records,planning/CP2_OCTOBER_SUBMISSION.md,CP2 October submission record
+Specifications and dated records,planning/CP2_OFFICIAL_BRAND_20261016.md,Official branding and mockup styling
+Specifications and dated records,planning/CP2_OPERATIONAL_MODEL_SEARCH_20261102.md,"Operational model search, 2 November 2026"
+Specifications and dated records,planning/CP2_OPERATIONS_METRIC_DICTIONARY.md,"CP2 operations, geography, weather and quality metrics"
+Specifications and dated records,planning/CP2_OWNER_REVIEW.md,CP2 — items for owner review
+Specifications and dated records,planning/CP2_PARTIAL_EVALUATION_20261101.md,Partial pest-return evaluation — 1 November 2026
+Specifications and dated records,planning/CP2_PAYMENT_RECONCILIATION_REVIEW.md,"SALES, PAYMENTS and Recurring Payments reconciliation — 4 October 2026"
+Specifications and dated records,planning/CP2_PLANNING_FORECAST_OPERATIONS.md,Planning forecasts — 21 October 2026
+Specifications and dated records,planning/CP2_PORTAL_IMPLEMENTATION_STATUS_20261014.md,CP2 portal handoff — 14 October 2026
+Specifications and dated records,planning/CP2_PROJECT_HISTORY.md,Nomobug CP2 — implementation history
+Specifications and dated records,planning/CP2_PROJECT_REVIEW_20261004.md,CP2 project review — 4 October 2026
+Specifications and dated records,planning/CP2_PROJECT_VALUE_PLAN_20261011.md,CP2: making the project useful and defensible
+Specifications and dated records,planning/CP2_RECURRING_PAYMENTS_DASHBOARD_GUIDE.md,Page 11 — Recurring payments and staff reminders
+Specifications and dated records,planning/CP2_RECURRING_PAYMENTS_REVIEW.md,Recurring payment tracking review
+Specifications and dated records,planning/CP2_REMAINING_RESOLUTION_20261004.md,Remaining issues: resolution and evidence limits
+Specifications and dated records,planning/CP2_REPAIR_STATUS_20261004.md,CP2 repair status — 4 October 2026
+Specifications and dated records,planning/CP2_SCOPE_AND_DELIVERABLES.md,Nomobug CP2 scope and deliverables
+Specifications and dated records,planning/CP2_SERVICE_PROGRAMME_REPAIR.md,Linked service programme repair
+Specifications and dated records,planning/CP2_SOURCE_REPAIR_20261004.md,Source formula repair — 4 October 2026
+Specifications and dated records,planning/CP2_SPLIT_COMPARISON_20261016.md,CP2 evaluation split comparison — 16 October 2026
+Specifications and dated records,planning/CP2_START_HERE.md,CP2: current model
+Specifications and dated records,planning/CP2_TARGET_RESEARCH_20261017.md,Return-prediction alternatives — 17 October 2026
+Specifications and dated records,planning/CP2_THAS_PROGRAMME_REPAIR_20261011.md,THAS service programme correction — 11 October 2026
+Specifications and dated records,planning/CP2_UNRESOLVED_SOURCE_FACTS.md,Source facts that remain unknown
+Specifications and dated records,planning/CP2_VALIDATED_MODEL_COMPARISON_20261016.md,Validated historical model comparison — 16 October 2026
+Specifications and dated records,planning/CP2_VERIFICATION_20261017.md,CP2 verification — 17 October 2026
+Specifications and dated records,planning/CP2_WEBSITE_ACCEPTANCE_20261015.md,"Website acceptance — 15 October, handover 16 October 2026"
+Specifications and dated records,planning/CP2_WEBSITE_ACCEPTANCE_20261018.md,Website acceptance — 18 October 2026
+Specifications and dated records,planning/CP2_WEBSITE_ACCESS.md,Website access — Google sign-in only
+Specifications and dated records,planning/CP2_WEBSITE_REFINEMENT_20261016.md,Website refinement — 16 October 2026
+Specifications and dated records,planning/CP2_WEBSITE_REPAIR_20261016.md,Website repair and assistant latency check — 16 October 2026
+Specifications and dated records,planning/CP2_WORK_QUEUE_LAYOUT.md,Work page layout
+Specifications and dated records,planning/CP2_WORKSPACE_DESIGN_20261016.md,Workspace design release — 16 October 2026
+Specifications and dated records,planning/CP2_WORKSPACE_PURPOSE.md,Nomobug decision workspace — 25 October 2026
+Specifications and dated records,planning/DASHBOARD_AND_WEBSITE_BUILD_SPEC.md,Dashboard and website — agreed split and map specification
+Specifications and dated records,planning/deferred/LOOKER_STUDIO_BUILD_SPEC.md,Nomobug Looker Studio build specification
+Specifications and dated records,planning/deferred/README.md,Deferred work
+Specifications and dated records,planning/PROJECT_ORGANISATION.md,Current organisation
+Specifications and dated records,planning/protocol_archive/cp2_october10_before_extension.json,cp2 october10 before extension
+Specifications and dated records,planning/README.md,CP2 model files
+Specifications and dated records,planning/WARRANTY_POLICY_RULES.md,Confirmed warranty policy rules
+Specifications and dated records,planning/WRITING_VOICE_GUIDE.md,Nomobug Writing Voice Guide
+File guides,project_guide/Cloud_Resources.md,Cloud resources
+File guides,project_guide/Project_Structure.md,Nomobug project structure
+Templates,templates/README.md,New evidence for future model improvements
+Templates,templates/spatial_preview.html,spatial preview
+Automation,.github/workflows/cp2-ci.yml,cp2 ci
+Automation,.github/workflows/cp2-deploy.yml,cp2 deploy

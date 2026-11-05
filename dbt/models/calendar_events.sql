@@ -20,6 +20,7 @@ with raw_events as (
         case
             -- Cancellation/admin rules still control operational eligibility.
             when c.rule_event_category in ('cancelled', 'administrative') then c.rule_event_category
+            when a.event_identity_hash is not null then 'placeholder'
             when r.review_label = 'Confirmed warranty claim' then 'warranty'
             when r.review_label = 'Not a warranty claim' then c.non_claim_event_category
             when r.review_label = 'Unclear' then 'label_unresolved'
@@ -29,6 +30,13 @@ with raw_events as (
     left join {{ ref('calendar_warranty_review_overrides') }} r
       on r.event_identity_hash = to_hex(sha256(concat(c.calendar_id, '|', c.event_id)))
      and r.event_id = c.event_id
+    -- An owner review binds an exact identity AND its original temporary slot.
+    -- Weekday is never evidence. Moving the event automatically expires this review.
+    left join {{ ref('calendar_appointment_overrides') }} a
+      on a.event_identity_hash = lower(to_hex(sha256(concat(c.calendar_id, '|', c.event_id))))
+     and safe_cast(c.start_raw as timestamp) = safe_cast(a.expected_start_at_utc as timestamp)
+     and safe_cast(c.end_raw as timestamp) = safe_cast(a.expected_end_at_utc as timestamp)
+     and a.appointment_state = 'awaiting_client_date'
 )
 select
     calendar_event_row,

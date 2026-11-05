@@ -1,3 +1,5 @@
+> Current dates amended before collection: **10–30 October**, final evaluation **30 November at 14:00 MYT**. See [finish record](CP2_NOVEMBER30_FINISH.md). The original repair/deployment evidence below remains historical.
+
 # Collection repair declared 9 October 2026
 
 The cloud was running, but the 5 October test had five unacknowledged Calendar
@@ -7,13 +9,13 @@ the eligible frozen predictor population. That fresh check cannot reconstruct
 the exact earlier source state. Preserve all five raw windows and timestamps;
 do not present the raw candidate count as five confirmed eligible services.
 
-## New test: 10–27 October
+## New test: 10â€“27 October
 
 The immutable protocol is `config/cp2_october10_cohort.json`, hash
 `7224062bf8a41110769aa4d2b6d951aec4ccb562d00d6a5631301c4a3684a4d3`.
 The model bundle remains
 `6ace4314b4a5e170ea1bd6feee40dadbdd14eb3c986db9223d888b3c3ee302e0`.
-The outcome remains recorded Calendar callbacks on days 1–30 after the scheduled
+The outcome remains recorded Calendar callbacks on days 1â€“30 after the scheduled
 service **start date**. Neither training, thresholds nor the label clock changes.
 
 Daytime predictions must be committed within five minutes after scheduled end.
@@ -50,8 +52,21 @@ any performance claim. No late prediction can repair an earlier missed window.
 
 ## Verification record
 
-Python suite: 494 tests passed. Frozen replay: 5,695 rows reproduced within
+Python suite: 496 tests passed. Frozen replay: 5,695 rows reproduced within
 3.33e-16 maximum probability difference. See
 `outputs/project_audit/20261009/` for real source diagnosis and deployment checks.
-Live deployment and a genuine scheduled tick must be checked before declaring the
-new collector active; local tests alone are insufficient.
+Live deployment verified: revision `cp2-prospective-collector-00019-xus` serves
+100% of traffic. Image hash:
+`aee4554cd53dfe6592c07a03db499cdaf9f1b8e3b57bea2469c85b45f0777ef9`.
+Cloud full smoke `20261009T021136Z_78ebdeb7` succeeded with durable terminal stage
+journals. Genuine automatic Scheduler ticks succeeded at 10:16 and 10:18 MYT on
+9 October, and durable state reports the new cohort as `not_started` with zero
+eligible misses. All five earlier candidate timestamps remain preserved; there
+are 63 durable older prediction receipts. No future accuracy result exists yet.
+The temporary verification job and revision tag were removed after verification.
+
+Fresh source reasons for the three daytime candidates: an unmatched/ambiguous
+sale, package/session mismatch, and duplicate paid session. These are source-review
+cases; their raw history is retained and no owner fact or link is invented.
+The aggregate deployment record is
+`outputs/project_audit/20261009/collector_repair_verification.json`.

@@ -16,6 +16,34 @@ def current_bundle():
     return registry,bundle
 
 
+def readiness(registry):
+    """Report evidence limits; successful collection never implies approval."""
+    evidence=registry.get('new_retrospective_test',{})
+    accuracy=evidence.get('threshold_accuracy')
+    baseline=evidence.get('always_no_callback_accuracy')
+    def probability(value):
+        return isinstance(value,(int,float)) and not isinstance(value,bool) and 0 <= value <= 1
+    comparable=probability(accuracy) and probability(baseline)
+    return {
+        'model_version':registry.get('version'),
+        'operational_approved':False,
+        'permitted_use':'experimental risk scoring and documented research evaluation',
+        'historical_accuracy_beats_baseline':accuracy > baseline if comparable else None,
+        'historical_accuracy':accuracy if probability(accuracy) else None,
+        'historical_no_callback_baseline':baseline if probability(baseline) else None,
+        'historical_services':evidence.get('services'),
+        'historical_positive_windows':evidence.get('callback_positive_service_windows'),
+        'replacement_qualified':registry.get('research_review',{}).get('replacement_qualified') is True,
+        'earliest_full_outcome_evaluation':registry.get('october10_earliest_final_evaluation',registry.get('earliest_final_evaluation')),
+        'limits':[
+            'This report does not authorize operational use, even if a historical accuracy improves.',
+            evidence.get('limits','Historical performance evidence is missing.'),
+            'The declared cohorts require complete timely predictions and mature Calendar outcomes; missing predictions cannot be backfilled.',
+            'A working cloud collector is evidence of collection, not evidence of model reliability.',
+        ],
+    }
+
+
 def predict(bundle,input_path,output):
     output=output.resolve()
     if not output.is_relative_to((p.b.ROOT/'outputs').resolve()):
@@ -34,11 +62,12 @@ def predict(bundle,input_path,output):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode',choices=['status','verify','predict','log-prospective','prepare-prospective-labels','evaluate-prospective'])
+    parser.add_argument('mode',choices=['status','readiness','verify','predict','log-prospective','prepare-prospective-labels','evaluate-prospective'])
     parser.add_argument('--input-json',type=Path);parser.add_argument('--output-csv',type=Path)
     parser.add_argument('--source-receipt',type=Path);parser.add_argument('--output-json',type=Path)
     args=parser.parse_args();registry,bundle=current_bundle()
     if args.mode=='status':result=registry
+    elif args.mode=='readiness':result=readiness(registry)
     elif args.mode=='verify':result=p.verify(bundle)
     elif args.mode=='predict':
         if not args.input_json or not args.output_csv:parser.error('predict requires --input-json and --output-csv')

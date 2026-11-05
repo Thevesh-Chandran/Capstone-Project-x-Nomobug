@@ -8,6 +8,10 @@ $python=Join-Path $root '.venv\Scripts\pythonw.exe'
 $runner=Join-Path $root 'scripts\cp2_pipeline_tick.py'
 $final=Join-Path $root 'scripts\cp2_pipeline.py'
 
+if ($Mode -in @('Install','InstallFinal','Repair')) {
+    throw 'Local CP2 scheduling is retired. Collection and the one-time evaluation are hosted in Google Cloud. Use Status or Remove to inspect or remove the old laptop tasks.'
+}
+
 if ($Mode -eq 'Status') {
     foreach ($name in @($taskName,$finalTaskName)) {
         $task=Get-ScheduledTask -TaskName $name -ErrorAction SilentlyContinue

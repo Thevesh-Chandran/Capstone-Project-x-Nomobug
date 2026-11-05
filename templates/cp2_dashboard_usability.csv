@@ -1,0 +1,7 @@
+participant_code,task_id,started_at,finished_at,answer,correct,help_needed,issue_note
+,reminders,,,,,,
+,balances,,,,,,
+,bookings,,,,,,
+,model_tradeoff,,,,,,
+,weather_evidence,,,,,,
+,freshness,,,,,,

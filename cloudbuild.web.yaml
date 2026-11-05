@@ -1,0 +1,11 @@
+steps:
+  - name: gcr.io/cloud-builders/docker
+    args: [build, -f, Dockerfile.web, -t, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/portal:$BUILD_ID', .]
+  - name: gcr.io/cloud-builders/docker
+    args: [run, --rm, --entrypoint, python, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/portal:$BUILD_ID', -c, 'from webapp.server import Portal; from google.oauth2 import id_token; import cachecontrol, cryptography; print("portal and IAP imports passed")']
+images:
+  - 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/portal:$BUILD_ID'
+serviceAccount: projects/profound-keel-500007-s4/serviceAccounts/cp2-reporting-deployer@profound-keel-500007-s4.iam.gserviceaccount.com
+options:
+  logging: CLOUD_LOGGING_ONLY
+timeout: 600s

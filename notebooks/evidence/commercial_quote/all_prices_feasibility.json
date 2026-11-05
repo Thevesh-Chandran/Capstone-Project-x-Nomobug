@@ -1,0 +1,33 @@
+{
+  "audit": {
+    "source_sales": 2538,
+    "unknown_invalid_free_or_incomplete_date": 25,
+    "pooled_programme_member": 4,
+    "eligible_quotes": 2509
+  },
+  "split": {
+    "validation_start": "2025-11-26",
+    "test_start": "2026-04-23",
+    "rule": "60th/80th percentile sale dates; customer groups disjoint, never choose split by score"
+  },
+  "samples": {
+    "train": {
+      "rows": 1404,
+      "customers": 1337,
+      "from": "2024-03-06",
+      "to": "2025-11-25"
+    },
+    "validation": {
+      "rows": 481,
+      "customers": 469,
+      "from": "2025-11-26",
+      "to": "2026-04-22"
+    },
+    "test": {
+      "rows": 507,
+      "customers": 484,
+      "from": "2026-04-23",
+      "to": "2026-10-27"
+    }
+  }
+}

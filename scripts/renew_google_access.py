@@ -9,6 +9,7 @@ import json
 import os
 import tempfile
 import uuid
+import argparse
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -43,10 +44,14 @@ scopes = [
 ]
 print("Opening Google sign-in. Choose the account with access to Nomobug's sources.")
 print("Only read-only Sheets and Calendar permissions are requested. No source records will be read.")
+parser=argparse.ArgumentParser()
+parser.add_argument('--timeout',type=int,default=180)
+renewal_args=parser.parse_args()
+if not 60<=renewal_args.timeout<=1800:raise SystemExit('Renewal timeout must be60–1800seconds')
 try:
     flow = InstalledAppFlow.from_client_config(config, scopes)
     credentials = flow.run_local_server(
-        host="localhost", port=8081, timeout_seconds=180,
+        host="localhost", port=8081, timeout_seconds=renewal_args.timeout,
         prompt="consent", access_type="offline",
         authorization_prompt_message="Complete Google consent in the browser; do not share the callback URL.",
         success_message="Sign-in completed. You can close this tab and return to your terminal.",

@@ -518,6 +518,7 @@ def build(value, snapshot, planning, repeat, return_evidence, research_best, rev
     except (FileNotFoundError, KeyError, ValueError, TypeError):
         risk = {'status': 'unavailable'}
     des = design(desc, pred, review, work, risk)
+    from webapp import overview
     choice = {'ranked': score_options(des['options']), 'weights': DEFAULT_WEIGHTS,
               'levels': LEVELS, 'actions': pres['actions'], 'capacity': pres['capacity'], 'notice': pres['notice']}
     return {'as_of': as_of.isoformat(), 'release': value.get('receipt', {}).get('published_release'),
@@ -525,4 +526,5 @@ def build(value, snapshot, planning, repeat, return_evidence, research_best, rev
             'coverage': value.get('receipt', {}).get('coverage', {}),
             'descriptive': desc, 'predictive': pred, 'design': des, 'choice': choice,
             'prescriptive': pres, 'performance': performance(desc, pred, work), 'warranty_risk': risk,
-            'return_risk': return_risk_evidence(desc)}
+            'return_risk': return_risk_evidence(desc),
+            'packages': overview.packages(value, as_of), 'areas': overview.areas(value, as_of)}

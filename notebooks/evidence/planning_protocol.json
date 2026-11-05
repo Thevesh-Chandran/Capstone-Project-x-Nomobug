@@ -1,0 +1,163 @@
+{
+  "version": "planning_v1",
+  "declared_at_utc": "2026-10-21T03:02:55.319367+00:00",
+  "first_origin": "2026-10-26",
+  "timezone": "Asia/Kuala_Lumpur",
+  "schedule": "Sunday23:50MYT",
+  "forecast_window": "Monday00:00, exclusive end after1or2weeks",
+  "timely_rule": "Source capture starts no earlier than30minutes before origin; full prediction artifact committed strictly before origin. Late runs are never primary predictions.",
+  "outcome_rule": "Complete fresh Calendar extraction covering the window, at least3days after exclusive window end. Recorded confirmed service-like entries/hours, not completed treatments or productive effort.",
+  "model_rule": "Freeze algorithms, input formulas and baseline choices; refit parameters weekly on earlier timestamp-matured windows only. Store each fitted model and its hash. No retuning from future results.",
+  "maturity_rule": "Exclude training outcomes ending after source capture begins, even if they end at forecast origin. This is more conservative than retrospective Monday00 refits.",
+  "historical_limit": "Monday00 historical rolling forecasts; new live run starts10minutes earlier. Source versions, partial last10minutes and refit availability differ; report live scores separately. Historical outcomes were repeatedly examined.",
+  "failures": "No automatic job retry. Missing/late week remains missing. Never reconstruct a primary forecast afterwards. Website retains last successful data and shows window dates/staleness.",
+  "targets": [
+    {
+      "task": "booking_entries_h2",
+      "target": "booking_entries",
+      "horizon_weeks": 2,
+      "selected": {
+        "task": "booking_entries_h2",
+        "horizon_weeks": 2,
+        "id": "extra_trees_w1000_activity_calendar_weather",
+        "family": "extra_trees",
+        "history_weeks": 1000,
+        "features": "activity_calendar_weather",
+        "target": "booking_entries",
+        "origins": 10,
+        "mae": 14.992605389394475,
+        "rmse": 20.828714175722638,
+        "wape": 0.09465028654920754,
+        "bias": 6.175877884685798,
+        "mean_actual": 158.4,
+        "actual_total_across_windows": 1584.0,
+        "mean_visible_share": 0.3743203535846593,
+        "mean_train_windows": 45.2
+      },
+      "baseline": {
+        "task": "booking_entries_h2",
+        "horizon_weeks": 2,
+        "id": "median8_late_additions",
+        "family": "median8_late_additions",
+        "history_weeks": 1000,
+        "features": "activity_calendar",
+        "target": "booking_entries",
+        "origins": 10,
+        "mae": 18.7,
+        "rmse": 22.812277396174192,
+        "wape": 0.11805555555555555,
+        "bias": -7.3,
+        "mean_actual": 158.4,
+        "actual_total_across_windows": 1584.0,
+        "mean_visible_share": 0.3743203535846593,
+        "mean_train_windows": 45.2
+      },
+      "input_count": 36,
+      "assessment": {
+        "origins": 13,
+        "mae": 12.756896427985302,
+        "rmse": 18.148299109210303,
+        "wape": 0.09017925696781344,
+        "bias": 9.610692371049545,
+        "mean_actual": 141.46153846153845,
+        "actual_total_across_windows": 1839.0,
+        "mean_visible_share": 0.31708405564927733,
+        "mean_train_windows": 112.53846153846153
+      },
+      "baseline_assessment": {
+        "origins": 13,
+        "mae": 20.73076923076923,
+        "rmse": 25.07565475792131,
+        "wape": 0.14654703643284395,
+        "bias": 13.807692307692308,
+        "mean_actual": 141.46153846153845,
+        "actual_total_across_windows": 1839.0,
+        "mean_visible_share": 0.31708405564927733,
+        "mean_train_windows": 112.53846153846153
+      },
+      "uncertainty": {
+        "baseline_minus_selected_mae_95pct_interval": [
+          4.261354404405586,
+          12.70146047474267
+        ],
+        "fraction_origins_selected_lower_error": 0.7692307692307693,
+        "block_length": 2,
+        "warning": "Exploratory dependent historical sample; no multiple-search-adjusted inference."
+      }
+    },
+    {
+      "task": "booked_hours_h1",
+      "target": "booked_hours",
+      "horizon_weeks": 1,
+      "selected": {
+        "task": "booked_hours_h1",
+        "horizon_weeks": 1,
+        "id": "ridge_100_w78_activity_calendar",
+        "family": "ridge_100",
+        "history_weeks": 78,
+        "features": "activity_calendar",
+        "target": "booked_hours",
+        "origins": 12,
+        "mae": 10.6293422586753,
+        "rmse": 11.998766099295537,
+        "wape": 0.1054367490011189,
+        "bias": 2.5452603044291124,
+        "mean_actual": 100.8125,
+        "actual_total_across_windows": 1209.75,
+        "mean_visible_share": 0.5240557294146075,
+        "mean_train_windows": 50.75
+      },
+      "baseline": {
+        "task": "booked_hours_h1",
+        "horizon_weeks": 1,
+        "id": "median8_late_additions",
+        "family": "median8_late_additions",
+        "history_weeks": 1000,
+        "features": "activity_calendar",
+        "target": "booked_hours",
+        "origins": 12,
+        "mae": 15.958333333333334,
+        "rmse": 17.380469762542862,
+        "wape": 0.15829716883653647,
+        "bias": -1.6666666666666667,
+        "mean_actual": 100.8125,
+        "actual_total_across_windows": 1209.75,
+        "mean_visible_share": 0.5240557294146075,
+        "mean_train_windows": 68.41666666666667
+      },
+      "input_count": 32,
+      "assessment": {
+        "origins": 14,
+        "mae": 8.972132979172784,
+        "rmse": 10.368672262211263,
+        "wape": 0.10761178985514583,
+        "bias": 2.799726108547661,
+        "mean_actual": 83.375,
+        "actual_total_across_windows": 1167.25,
+        "mean_visible_share": 0.4334386778136858,
+        "mean_train_windows": 74.5
+      },
+      "baseline_assessment": {
+        "origins": 14,
+        "mae": 11.767857142857142,
+        "rmse": 13.13919300631294,
+        "wape": 0.14114371385735702,
+        "bias": 4.696428571428571,
+        "mean_actual": 83.375,
+        "actual_total_across_windows": 1167.25,
+        "mean_visible_share": 0.4334386778136858,
+        "mean_train_windows": 116.0
+      },
+      "uncertainty": {
+        "baseline_minus_selected_mae_95pct_interval": [
+          0.5082136744687487,
+          5.2377281285156645
+        ],
+        "fraction_origins_selected_lower_error": 0.7857142857142857,
+        "block_length": 2,
+        "warning": "Exploratory dependent historical sample; no multiple-search-adjusted inference."
+      }
+    }
+  ],
+  "research_protocol_sha256": "d49273583a580101dfdf1c8889f49d2ba5c33db3b000675e87e0c830ce6c2939"
+}

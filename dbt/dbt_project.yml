@@ -13,3 +13,8 @@ seeds:
   nomobug:
     +schema: gold
     +tags: ['gold']
+    calendar_appointment_overrides:
+      +column_types:
+        expected_start_at_utc: string
+        expected_end_at_utc: string
+        reviewed_at_utc: string

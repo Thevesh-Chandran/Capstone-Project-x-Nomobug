@@ -3,14 +3,15 @@
    no inline style attributes (strict CSP), values set through CSSOM. */
 (function () {
   const NS = 'http://www.w3.org/2000/svg';
-  // Chart colours: one distinct colour per series so charts read at a glance.
+  // Chart colours: one distinct colour per series, read from the stylesheet's tokens.
+  const tok = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   const C = {
-    blue: '#2F74E6', // the model / main series
-    amber: '#F29D12', // the simple rule or comparison
-    teal: '#13A38A', // recorded actuals
-    coral: '#E5604E', // misses, things that raise risk
-    grey: '#B8C4D3', // random order or neutral baseline
-    ink: '#14161A'
+    get blue() { return tok('--chart-model'); }, // the model / main series
+    get amber() { return tok('--chart-rule'); }, // the simple rule or comparison
+    get teal() { return tok('--chart-actual'); }, // recorded actuals
+    get coral() { return tok('--chart-miss'); }, // misses, things that raise risk
+    get grey() { return tok('--chart-neutral'); }, // random order or neutral baseline
+    get ink() { return tok('--color-ink'); },
   };
   const g = id => document.getElementById(id);
   const mk = (tag, text, cls) => {
@@ -204,7 +205,7 @@
             cx: last[0],
             cy: last[1],
             r: 4,
-            fill: '#fff',
+            fill: tok('--color-paper-3'),
             stroke: se.color,
             'stroke-width': 2.5,
           }),
@@ -499,8 +500,11 @@
           'row-sub',
         ),
       );
+      const history = link('Open customer history', '#customers', 'block-more');
+      history.addEventListener('click', () => sessionStorage.setItem('cp2_map_sale', c.sale_id));
+      main.append(history);
       const side = mk('div', undefined, 'row-side');
-      side.append(mk('span', pct(c.chance) + ' chance', 'row-value'));
+      side.append(mk('span', pct(c.chance) + ' estimated return risk', 'row-value'));
       if (c.outcome)
         side.append(mk('span', c.outcome.label, 'chip ' + (c.outcome.status === 'no_answer' ? '' : 'dark')));
       else
@@ -630,7 +634,7 @@
     return (
       pl.trim() +
       (pl ? ' ' : '') +
-      `${p.open_windows} services are inside their 30-day window. About ${nf.format(p.expected_returns_open)} return visits are expected from them; these ${p.check_ins.length} calls reach about ${nf.format(p.expected_returns_reached)} of them (${pct(p.share_reached)}). Scores use services recorded up to ${day(p.predictors_through)}.`
+      `${p.check_ins.length} eligible services are listed for review. Open a customer history, contact the customer, then save the result below. Risk estimates use service records through ${day(p.predictors_through)}; they are not confirmed return visits.`
     );
   }
 
@@ -650,11 +654,10 @@
       o = live ? rplan.outcomes : null;
     const intro = mk('section', undefined, 'solution-intro');
     intro.append(
-      mk('span', 'SERVICE FOLLOW-UP', 'solution-kicker'),
-      mk('h1', 'A clear next step after each service'),
+      mk('h1', 'Workspace'),
       mk(
         'p',
-        'Review the service record, use return-risk estimates as context, then record what the customer says.',
+        'Recent services, customer follow-up and booking plans.',
         'solution-lead',
       ),
     );
@@ -662,18 +665,6 @@
     actions.append(link('Open service follow-up', '#returns', 'btn btn-dark'));
     intro.append(actions);
     root.append(intro);
-    const flow = mk('ol', undefined, 'solution-flow');
-    [
-      ['01', 'Review', 'Bring the purchase and service history together.'],
-      ['02', 'Follow up', 'Check for problems and decide whether another visit is needed.'],
-      ['03', 'Record', 'Save the result so the team can see what happened.'],
-    ].forEach(([n, t, d]) => {
-      const li = mk('li');
-      li.append(mk('b', n), mk('div'));
-      li.lastChild.append(mk('strong', t), mk('span', d));
-      flow.append(li);
-    });
-    root.append(flow);
     const layout = mk('div', undefined, 'solution-grid');
     const main = mk('div'),
       side = mk('aside');
@@ -720,7 +711,7 @@
     const tiles = mk('div', undefined, 'tiles');
     tiles.append(
       tile('Customer history', 'Check the programme and earlier visits', '#customers'),
-      tile('Find a visit slot', 'Compare teams and backup cover', '#plan'),
+      tile('Bookings & workload', 'Team calendars and next week\'s workload', '#plan'),
       tile('Return-visit map', 'Inspect the recorded local pattern', '/maps'),
     );
     tools.append(tiles);
@@ -762,7 +753,7 @@
     if (hrs && !data.source_stale) {
       const plan = hrs.prediction + hrs.mae;
       const returnHours = null; // No verified duration per return visit is available.
-      const cap = block('Next week: staffing scenario', { cls: 'block-sky', more: ['Booking calendar', '#plan'] });
+      const cap = block('Next week: staffing scenario', { cls: 'block-sky', more: ['Bookings & workload', '#plan'] });
       const big = mk('p', undefined, 'meter-big');
       big.append(mk('strong', nf.format(plan) + ' h'), document.createTextNode(' of appointments to staff for'));
       cap.append(
@@ -1051,7 +1042,7 @@
     ['gap_missing', 'No earlier service recorded'],
     ['first_service', 'First service of a programme'],
   ];
-  function renderReturns(root) {
+  function renderReturnsEvidence(root) {
     const R = data.return_risk || {};
     root.replaceChildren();
     if (!R.evaluation) {
@@ -1125,9 +1116,8 @@
       stats.replaceChildren();
       if (p && p.status === 'live') {
         [
-          [nf.format(p.expected_returns_reached), 'estimated return cases in this list'],
-          [pct(p.share_reached), 'share of model estimates'],
-          [nf.format(p.check_ins.length), 'planned check-ins'],
+          [nf.format(p.check_ins.length), 'services ready to review'],
+          [nf.format((p.done || []).length), 'contacts already completed'],
         ].forEach(([v, l]) => {
           const d = mk('div');
           d.append(mk('strong', v), mk('span', l));
@@ -1336,6 +1326,56 @@
   }
   function renderModels(root) {
     root.replaceChildren();
+    const intro = block('Predictions: choose what you need help with');
+    intro.append(mk('p', 'Start with a business question. Open the matching tool to see current estimates and take the next step.', 'side-text'));
+    root.append(intro);
+    const E = (data.return_risk || {}).evaluation;
+    const forecasts = data.predictive.forecasts || [];
+    const add = (title, question, result, reliability, action, href, steps) => {
+      const card = block(title, { cls: 'model-decision' });
+      card.append(mk('p', question, 'decision-question'));
+      for (const [label, text] of [['What you get', result], ['How reliable is it?', reliability], ['What to do next', steps]]) {
+        const section = mk('div', undefined, 'decision-section');
+        section.append(mk('h3', label), mk('p', text)); card.append(section);
+      }
+      card.append(link(action, href, 'btn primary')); root.append(card);
+    };
+    add('1. Which customers may need another visit?',
+      'After a paid service, could this customer need a pest-related return visit within 30 days?',
+      'A risk estimate beside each recent service in Service follow-up. For example, 20% means an estimated chance, not a confirmed problem or warranty entitlement.',
+      E ? `Historical assessment: ${nf.format(E.services)} services, including ${nf.format(E.returns)} recorded returns. This is a ranking model, so it has no single yes/no accuracy percentage. Its historical ranking score was ${E.compare["Return-risk score (chosen)"].auc.toFixed(2)} out of 1; this is not a percentage of correctly predicted customers. Reliability on future services is still being checked.` : 'Assessment unavailable for this release.',
+      'Open customer follow-up', '#returns',
+      'Review the service history, contact the customer using normal company practice, record the response, and open the booking calendar if another visit is needed. Everyone remains available for follow-up; the score is supporting context.');
+    for (const [id, title, question, unit, action] of [
+      ['booking_entries_h2', '2. How busy might the next two weeks be?', 'How many appointment bookings are expected over the next two weeks?', 'bookings', 'Open workload planning'],
+      ['booked_hours_h1', '3. How many appointment hours should we plan for?', 'How many appointment hours are expected next week?', 'hours', 'Compare workload and team capacity']]) {
+      const f = forecasts.find(x => x.id === id); if (!f) continue;
+      add(title, question, `Latest saved estimate: about ${nf.format(f.prediction)} ${unit}. Open planning to check its forecast dates and source freshness before using it.`,
+        `In historical tests, the forecast missed by ${nf.format(f.mae)} ${unit} on average, compared with ${nf.format(f.baseline_mae)} for a simple average. Lower error is better. This is not a guaranteed range or a classification accuracy percentage.`,
+        'Open weekly workload', '#plan', 'Compare the forecast with bookings already in the calendar and the capacity staff have confirmed. Use that comparison to discuss cover; no roster or booking is changed automatically.');
+    }
+    const evidence = mk('details', undefined, 'model-evidence');
+    evidence.append(mk('summary', 'See test results, older experiments and monthly checks'));
+    const body = mk('div'); renderModelsEvidence(body); evidence.append(body); root.append(evidence);
+  }
+
+  function renderReturns(root) {
+    renderReturnsEvidence(root);
+    if (!(data.return_risk || {}).evaluation) return;
+    const heading = block('Customer follow-up: review, contact, record');
+    heading.append(mk('p', 'The list below contains current service records and estimated chances of a pest-related return within 30 days. It does not confirm that a customer has a problem.', 'side-text'));
+    heading.append(link('Understand this model and its reliability', '#models', 'block-more'));
+    root.firstElementChild.replaceWith(heading);
+    const extra = Array.from(root.children).slice(2);
+    if (extra.length) {
+      const details = mk('details', undefined, 'model-evidence');
+      details.append(mk('summary', 'Historical test charts and explanation'));
+      extra.forEach(node => details.append(node)); root.append(details);
+    }
+  }
+
+  function renderModelsEvidence(root) {
+    root.replaceChildren();
     const R = data.return_risk || {},
       E = R.evaluation;
     const fc = id => (data.predictive.forecasts || []).find(f => f.id === id);
@@ -1515,7 +1555,243 @@
     read.append(dl);
     root.append(read);
   }
+
+  /* =========================== Management overview =========================== */
+  // One page for the owner: where the business stands, what to do this week and why,
+  // then the areas and packages behind it. Every action links to its detail.
+  const change = v => (v == null ? null : [(v >= 0 ? '+' : '') + pct(v), v >= 0 ? 'up' : 'down']);
+  function overviewActions() {
+    const list = [];
+    const due = rplan && rplan.status === 'live' ? rplan.check_ins.filter(c => daysUntil(c.call_on) <= 0) : [];
+    if (due.length) {
+      const first = due.slice().sort((a, b) => b.chance - a.chance).slice(0, 10);
+      const hi = first[0].chance,
+        lo = first[first.length - 1].chance;
+      const E = (data.return_risk || {}).evaluation;
+      const auc = E && E.compare && E.compare['Return-risk score (chosen)'];
+      list.push({
+        tone: 'model',
+        title: `Call the ${first.length} customers most likely to need a return visit`,
+        why:
+          `${due.length} recently finished services are on today's follow-up list. The return-visit model puts these ${first.length} at the top, ` +
+          `with an estimated ${pct(lo)} to ${pct(hi)} chance of a pest-related return within 30 days. A short call now can catch a problem before a complaint.` +
+          (auc ? ` In past records the model ranked real return visits above other services ${pct(auc.auc)} of the time.` : ''),
+        go: ['Open the call list', '#returns'],
+        see: ['How the model works', '#models'],
+      });
+    }
+    const cash = (data.prescriptive.actions || []).find(a => a.area === 'Cash flow');
+    if (cash)
+      list.push({
+        tone: 'rule',
+        title: cash.title,
+        why: cash.why + (cash.impact ? ` Recorded balance: ${rm(cash.impact)}.` : ''),
+        go: ['Open payment reminders', '#home'],
+      });
+    const bk = (data.predictive.forecasts || []).find(f => f.id === 'booking_entries_h2');
+    if (bk && bk.prediction && (bk.baseline || (bk.history && bk.history.length))) {
+      // "Usual" is the simple-average forecast for the same fortnight, so both cover the same dates.
+      const recent = bk.history.slice(-8).map(h => h.actual);
+      const usual = bk.baseline || recent.reduce((a, b) => a + b, 0) / recent.length;
+      const diff = (bk.prediction - usual) / usual;
+      const busy = diff > 0.1,
+        quiet = diff < -0.1;
+      if (busy || quiet) list.push({
+        tone: 'actual',
+        title: busy
+          ? `The next two weeks look busier than usual (${nf.format(bk.prediction)} bookings)`
+          : quiet
+            ? `The next two weeks look quieter than usual (${nf.format(bk.prediction)} bookings)`
+            : `A normal fortnight is expected (${nf.format(bk.prediction)} bookings)`,
+        why:
+          `The booking forecast expects about ${nf.format(bk.prediction)} bookings against ${nf.format(usual)} from a simple average of past fortnights ` +
+          `(${change(diff)[0]}). It is usually off by about ${nf.format(bk.mae)} bookings. ` +
+          (busy
+            ? 'Check team cover and backup before the slots fill.'
+            : quiet
+              ? 'There is room for promotions, follow-up visits or training.'
+              : 'No change to the roster is needed.'),
+        go: ['Open weekly workload', '#plan'],
+        see: ['How the forecast works', '#models'],
+      });
+    }
+    const P = data.packages || { rows: [] };
+    const moved = P.rows
+      .filter(r => r.change != null && r.quarter_before >= 10)
+      .sort((a, b) => Math.abs(b.change) - Math.abs(a.change))[0];
+    if (moved && Math.abs(moved.change) >= 0.25)
+      list.push({
+        tone: 'miss',
+        title: `${moved.package}: sales ${moved.change < 0 ? 'fell' : 'rose'} from ${moved.quarter_before} to ${moved.last_quarter} this quarter`,
+        why:
+          moved.change < 0
+            ? `It earned ${rm(moved.sales_rm)} since packages were first recorded, at about ${rm(moved.average_rm)} a sale. If a promotion ended, decide whether to run it again or move those customers to another package.`
+            : `It earned ${rm(moved.sales_rm)} since packages were first recorded, at about ${rm(moved.average_rm)} a sale. Keep it visible in quotes and check the team has time for it.`,
+        go: ['See all packages', '#overview-packages'],
+      });
+    const A = data.areas || {};
+    const grow = A.fastest_growing;
+    if (grow && grow.change > 0.2)
+      list.push({
+        tone: 'extra',
+        title: `${grow.area}: sales up ${pct(grow.change)} on the year before`,
+        why:
+          `${rm(grow.sales_rm)} in the last 12 months against ${rm(grow.previous_rm)} the year before, from ${grow.sales} sales.` +
+          (grow.warranty_share != null ? ` ${pct(grow.warranty_share)} of visits there were return visits.` : '') +
+          ' Consider more marketing or team time in this area.',
+        go: ['Open the map', '/maps'],
+        see: ['See all areas', '#overview-areas'],
+      });
+    const growth = (data.prescriptive.actions || []).find(a => a.area === 'Growth');
+    if (growth)
+      list.push({ tone: 'model', title: growth.title, why: growth.why, go: ['Open customers', '#customers'] });
+    return list.slice(0, 5);
+  }
+  function renderOverview(root) {
+    root.replaceChildren();
+    const k = data.descriptive.kpis;
+    const bk = (data.predictive.forecasts || []).find(f => f.id === 'booking_entries_h2');
+    const due = rplan && rplan.status === 'live' ? rplan.check_ins.filter(c => daysUntil(c.call_on) <= 0).length : null;
+    root.append(
+      hero(
+        'Management overview',
+        `Where the business stands, what to do this week and why. Records up to ${day(data.descriptive.anchor_date)}.`,
+        [
+          { label: 'Sales, last 30 days', value: rmShort(k.last30_sales_rm), note: 'vs previous 30 days', tone: change(k.last30_change) },
+          { label: 'Sales this year', value: rmShort(k.ytd_sales_rm), note: 'vs same period last year', tone: change(k.ytd_change) },
+          { label: 'Bookings, next 2 weeks', value: bk && bk.prediction ? nf.format(bk.prediction) : '-', note: 'forecast' },
+          { label: 'Customers to check', value: due == null ? '-' : nf.format(due), note: 'call the top 10 first' },
+        ],
+      ),
+    );
+    const grid = mk('div', undefined, 'overview-grid');
+    const todo = block('This week: what to do', {
+      note: 'The most useful actions from the models and records, with the reason for each.',
+    });
+    const ol = mk('ol', undefined, 'ov-actions');
+    const acts = overviewActions();
+    acts.forEach(a => {
+      const li = mk('li', undefined, 'ov-action tone-' + a.tone);
+      const body = mk('div', undefined, 'ov-action-body');
+      body.append(mk('h3', a.title), mk('p', a.why));
+      const links = mk('div', undefined, 'ov-action-links');
+      links.append(link(a.go[0], a.go[1], 'btn btn-primary btn-sm'));
+      if (a.see) links.append(link(a.see[0], a.see[1], 'btn btn-ghost btn-sm'));
+      body.append(links);
+      li.append(body);
+      ol.append(li);
+    });
+    if (!acts.length) todo.append(mk('p', 'Nothing needs attention from the current records.', 'block-empty'));
+    else todo.append(ol);
+    const P = data.packages || { rows: [] };
+    const mix = block('Where the money comes from', { note: 'Share of package sales since ' + (P.since ? day(P.since) : '-') });
+    const bars = mk('ul', undefined, 'ov-mix');
+    P.rows.slice(0, 5).forEach(r => {
+      const li = mk('li');
+      const top = mk('div', undefined, 'ov-mix-top');
+      top.append(mk('span', r.package), mk('strong', pct(r.revenue_share)));
+      li.append(top, bar(r.revenue_share));
+      bars.append(li);
+    });
+    mix.append(bars);
+    const side = mk('div', undefined, 'overview-side');
+    // Sales charts live in the business dashboard (4 November split).
+    side.append(mix);
+    grid.append(todo, side);
+    root.append(grid);
+
+    // Areas
+    const A = data.areas || { top: [] };
+    const areas = block('Top 5 areas', {
+      more: ['Open the map', '/maps'],
+      note: `Last 12 months. ${A.located_share != null ? pct(A.located_share) + ' of sales have a known area; the rest are left out.' : ''}`,
+    });
+    areas.id = 'overview-areas';
+    const at = mk('table', undefined, 'ov-table');
+    const ah = mk('tr');
+    ['Area', 'Sales, 12 months', 'vs year before', 'Sales', 'Return visits'].forEach(t => ah.append(mk('th', t)));
+    at.append(mk('thead'));
+    at.tHead.append(ah);
+    const ab = mk('tbody');
+    A.top.forEach(r => {
+      const tr = mk('tr');
+      const c = change(r.change);
+      const ch = mk('td', undefined, 'num');
+      ch.append(c ? mk('b', c[0], 'delta ' + c[1]) : document.createTextNode('-'));
+      tr.append(mk('td', r.area), mk('td', rm(r.sales_rm), 'num'), ch, mk('td', nf.format(r.sales), 'num'),
+        mk('td', r.warranty_share == null ? '-' : pct(r.warranty_share), 'num'));
+      ab.append(tr);
+    });
+    at.append(ab);
+    const aw = mk('div', undefined, 'table-scroll');
+    aw.append(at);
+    areas.append(aw, mk('p', A.method || '', 'block-note'));
+    root.append(areas);
+
+    // Packages
+    const pk = block('How each package performs', {
+      note: `Since ${P.since ? day(P.since) : '-'}, when packages started being recorded: ${nf.format(P.recorded_sales || 0)} sales, ${rm(P.recorded_rm)}.`,
+    });
+    pk.id = 'overview-packages';
+    const pt = mk('table', undefined, 'ov-table');
+    const ph = mk('tr');
+    ['Package', 'Sales', 'Revenue', 'Average sale', 'Last quarter', 'Returning customers'].forEach(t => ph.append(mk('th', t)));
+    pt.append(mk('thead'));
+    pt.tHead.append(ph);
+    const pb = mk('tbody');
+    P.rows.forEach(r => {
+      const tr = mk('tr');
+      const q = mk('td', undefined, 'num');
+      q.append(document.createTextNode(nf.format(r.last_quarter) + ' '));
+      const c = change(r.change);
+      if (c) q.append(mk('b', c[0], 'delta ' + c[1]));
+      tr.append(mk('td', r.package), mk('td', nf.format(r.sales), 'num'), mk('td', rm(r.sales_rm), 'num'),
+        mk('td', rm(r.average_rm), 'num'), q, mk('td', pct(r.returning_share), 'num'));
+      pb.append(tr);
+    });
+    pt.append(pb);
+    const pw = mk('div', undefined, 'table-scroll');
+    pw.append(pt);
+    pk.append(pw);
+    if ((P.by_job || []).length) {
+      const jobs = mk('div', undefined, 'ov-jobs');
+      jobs.append(mk('h3', 'Usual package by type of job'));
+      const ul = mk('ul');
+      P.by_job.forEach(j => {
+        const li = mk('li');
+        li.append(
+          mk('span', `${j.premise}, ${j.pest.toLowerCase()}`, 'ov-job'),
+          mk('strong', j.usual_package),
+          mk('span', `${pct(j.usual_share)} of ${nf.format(j.sales)} sales` + (j.second_package ? `; next: ${j.second_package}` : ''), 'ov-job-note'),
+        );
+        ul.append(li);
+      });
+      jobs.append(ul);
+      pk.append(jobs);
+    }
+    pk.append(mk('p', P.method || '', 'block-note'));
+    root.append(pk);
+
+    // Detail
+    const more = block('Want the detail?');
+    const tiles = mk('div', undefined, 'tiles');
+    tiles.append(
+      tile('Prediction models', 'What each model does and how reliable it is', '#models'),
+      tile('Technical evidence', 'Tests, errors and data checks', '#status'),
+      tile('Business dashboard', 'Sales, visits and payments with filters', '#dashboard'),
+    );
+    more.append(tiles);
+    root.append(more);
+    root.querySelectorAll('a[href^="#overview-"]').forEach(a =>
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        g(a.getAttribute('href').slice(1)).scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' });
+      }),
+    );
+  }
   const RENDER = {
+    overview: renderOverview,
     today: renderToday,
     performance: renderPerformance,
     risk: renderRisk,
@@ -1547,6 +1823,8 @@
       return;
     }
     if (loading) return loading;
+    const waiting = g('view-' + route);
+    if (waiting && !waiting.childElementCount) waiting.replaceChildren(mk('p', 'Loading the latest records…', 'block-empty'));
     loading = (async () => {
       try {
         const [a, w] = await Promise.all([
@@ -1579,7 +1857,7 @@
   window.addEventListener('resize', () => {
     clearTimeout(rt);
     rt = setTimeout(() => {
-      if (data && (current === 'performance' || current === 'returns') && !g('view-' + current).hidden)
+      if (data && (current === 'performance' || current === 'returns' || current === 'overview') && !g('view-' + current).hidden)
         draw(current);
     }, 200);
   });

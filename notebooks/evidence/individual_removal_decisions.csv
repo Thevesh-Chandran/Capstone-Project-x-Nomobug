@@ -1,0 +1,94 @@
+Technical field,Variable,Mean AP change after removal,Mean Brier change after removal,Folds improved both,Decision
+anchor_is_final,Last paid visit?,-0.0059736565666458725,-0.000571457076897953,0,Mixed evidence: no automatic removal
+anchor_is_first,First visit?,0.006977597200126344,-0.0006707296943383919,1,Mixed evidence: no automatic removal
+anchor_is_mixed_pest,Multiple pest types?,-0.0072635013738381144,-0.0003358416442135285,0,Mixed evidence: no automatic removal
+anchor_is_single_service,One-visit package?,-0.00351838496451932,-0.0006232769457037157,0,Mixed evidence: no automatic removal
+anchor_month_cos,Service month — seasonal input B,-0.003017869341000771,0.0001694805637311748,1,Mixed evidence: no automatic removal
+anchor_month_sin,Service month — seasonal input A,0.004317766137571326,-0.0003414563061928365,1,Mixed evidence: no automatic removal
+anchor_remaining_services,Paid visits remaining,-0.0019248429515272558,-0.0005062040426869405,1,Mixed evidence: no automatic removal
+anchor_service_progress,Package progress,-0.003477219446898744,-0.0004475347771915004,0,Mixed evidence: no automatic removal
+calendar_pest_text_category,Pest mentioned in appointment,0.000980535877062853,-0.0005454670390559422,1,Mixed evidence: no automatic removal
+calendar_service_method_category,Treatment method,-0.008705542983672937,-0.00026823806931032995,0,Mixed evidence: no automatic removal
+days_sale_to_anchor,Days from sale to visit,-0.004396778468219897,-0.0003540871982210328,1,Mixed evidence: no automatic removal
+days_since_last_rain_1mm_capped_30d,Days since rain,-0.0066291914762952415,-0.0005466987307042847,0,Mixed evidence: no automatic removal
+days_since_previous_service,Days since previous visit,-0.008649123084764157,-0.0002522748723302164,1,Mixed evidence: no automatic removal
+days_since_prior_property_claim,Days since last recorded return,0.0007066060477033398,-0.0009195175652894466,2,Mixed evidence: no automatic removal
+drainage_rain_interaction,Rain combined with drain proximity,0.0026799865287489657,-0.0004881392393075422,2,Mixed evidence: no automatic removal
+elevation_m,Elevation (metres),-0.0012656280484476719,-0.0005407870373564383,0,Mixed evidence: no automatic removal
+final_pest_ant,Ant at last paid visit?,-0.0014428492564259692,-0.0004995562186609232,0,Mixed evidence: no automatic removal
+final_pest_bed_bug,Bed Bug at last paid visit?,-0.001594005708016331,-0.0005160130277860863,0,Mixed evidence: no automatic removal
+final_pest_cockroach,Cockroach at last paid visit?,-0.00846098397609385,-0.0005672355158049721,0,Mixed evidence: no automatic removal
+final_pest_fly,Fly at last paid visit?,-0.0032160073886372633,-0.00034976182152803476,0,Mixed evidence: no automatic removal
+final_pest_mosquito,Mosquito at last paid visit?,-0.0015057464060636478,-0.0003686874120976888,0,Mixed evidence: no automatic removal
+final_pest_rodent,Rodent at last paid visit?,0.000239509963856586,-0.00033840247408032514,0,Mixed evidence: no automatic removal
+final_pest_termite,Termite at last paid visit?,0.0031998266394304884,-0.00042451418965132093,1,Mixed evidence: no automatic removal
+first_pest_ant,Ant at first paid visit?,-0.014015920761890366,-9.394976314844085e-05,0,Mixed evidence: no automatic removal
+first_pest_bed_bug,Bed Bug at first paid visit?,-0.009028083791252228,-0.00018054740920647275,1,Mixed evidence: no automatic removal
+first_pest_cockroach,Cockroach at first paid visit?,-0.01053960563304282,-0.0003096874252036484,1,Mixed evidence: no automatic removal
+first_pest_fly,Fly at first paid visit?,-0.010942673718396273,-0.000699782946216763,1,Mixed evidence: no automatic removal
+first_pest_mosquito,Mosquito at first paid visit?,-0.004596458650931186,-0.0006913781293267501,1,Mixed evidence: no automatic removal
+first_pest_rodent,Rodent at first paid visit?,-0.011885602953339605,-0.00035762899832895756,0,Mixed evidence: no automatic removal
+first_pest_termite,Termite at first paid visit?,-0.006028040241360518,-0.00047033160636644294,0,Mixed evidence: no automatic removal
+first_service_no_property_history,First visit with no recorded history?,-0.01251162426475968,-0.0001700794013830669,0,Mixed evidence: no automatic removal
+first_service_prior_property_return_rate,Past return ratio on first visit,-0.0135041763080466,-0.0003733804930487079,0,Mixed evidence: no automatic removal
+first_service_rain_14d,Rain before first visit,-0.014529982630223676,-0.0004969085932129529,0,Mixed evidence: no automatic removal
+hotosm_nearest_drainage_m,Distance to mapped drainage (metres),-0.0028351127356275687,-0.0004954509594431005,0,Mixed evidence: no automatic removal
+hotosm_nearest_flowing_water_m,Distance to mapped flowing water (metres),-0.007932315189105374,-0.00047089726610957905,0,Mixed evidence: no automatic removal
+hotosm_nearest_standing_water_m,Distance to mapped standing water (metres),-0.007020884552869593,-0.00033466350557155344,0,Mixed evidence: no automatic removal
+hotosm_nearest_waterway_m,Distance to mapped waterway (metres),0.0008597609375020077,-0.0004322572780830804,0,Mixed evidence: no automatic removal
+hotosm_water_features_1km,Water features within 1km,-0.007566794169699779,-9.348856740772533e-05,0,Mixed evidence: no automatic removal
+hotosm_water_features_2km,Water features within 2km,-0.004391239366989587,-0.00043658182782354654,1,Mixed evidence: no automatic removal
+hotosm_water_features_500m,Water features within 500m,-0.0036442932398749925,-0.00039986886026866647,1,Mixed evidence: no automatic removal
+local_relief_500m_m,Nearby height variation (metres),-0.0062906446494691475,-0.00036712883432866067,0,Mixed evidence: no automatic removal
+location_uncertainty_radius_m,Location uncertainty (metres),0.000821214006376599,-0.000256000212693538,1,Mixed evidence: no automatic removal
+log1p_waterway_distance,Transformed distance to waterway,0.008321821970539267,-0.0006752440981111635,3,Candidate to remove; confirm independently
+mixed_pest_prior_property_return_rate,Past return ratio for multiple pests,0.005690860625813097,-0.0001260408698960866,1,Mixed evidence: no automatic removal
+mixed_pest_rain_14d,Rain with multiple pest types,0.005458715418833397,-5.4416070343341526e-05,1,Mixed evidence: no automatic removal
+nearest_mapped_forest_m,Distance to mapped forest (metres),-0.003134775075287838,-0.00035888302854690757,1,Mixed evidence: no automatic removal
+nearest_mapped_water_m,Distance to mapped water (metres),0.003139764773105222,-0.0004799010705730152,2,Mixed evidence: no automatic removal
+normalized_pest_category,Standardised pest category,-0.009237332197807377,-0.0002660608308101807,0,Mixed evidence: no automatic removal
+package_category,Package type,0.003923099399932646,-0.00039583663634032196,2,Mixed evidence: no automatic removal
+package_sessions_recorded,Services in package,0.00596393587609359,-0.0006816383158764783,1,Mixed evidence: no automatic removal
+pest_category,Recorded pest category,-0.0031321538731064378,-0.0004843780157617374,0,Mixed evidence: no automatic removal
+pest_distinct_known_types,Number of pest types,0.003772466967697017,-0.0008832223010946105,0,Mixed evidence: no automatic removal
+pest_has_ant,Ant recorded?,-0.000606201485946987,-0.0006371026713170672,0,Mixed evidence: no automatic removal
+pest_has_bed_bug,Bed Bug recorded?,-0.00456818464160912,-0.0007372028458265076,1,Mixed evidence: no automatic removal
+pest_has_cockroach,Cockroach recorded?,0.003887769646422623,-0.0006935998294890453,2,Mixed evidence: no automatic removal
+pest_has_fly,Fly recorded?,0.0072799428313340036,-0.0010889030059472542,3,Candidate to remove; confirm independently
+pest_has_general_control,General Control recorded?,0.000417083849841358,-0.0006938920810316528,2,Mixed evidence: no automatic removal
+pest_has_mosquito,Mosquito recorded?,-0.001868576345572211,-0.0010248694036405909,2,Mixed evidence: no automatic removal
+pest_has_other_terms,Other Terms recorded?,0.002996456164789089,-0.001120192776122272,2,Mixed evidence: no automatic removal
+pest_has_rodent,Rodent recorded?,0.0008448095656379181,-0.001122987250135321,1,Mixed evidence: no automatic removal
+pest_has_termite,Termite recorded?,-0.002741557756171927,-0.0009930144092560461,1,Mixed evidence: no automatic removal
+premise_type,Client / premises type,0.00033034044956443503,-0.0006397269317190771,1,Mixed evidence: no automatic removal
+prior_14d_heavy_rain_days_10mm,Days with at least 10 mm rain — previous 14 days,-0.00013554925412123664,-0.0008490475358641503,1,Mixed evidence: no automatic removal
+prior_14d_max_daily_precipitation_mm,Highest daily rain (mm) — previous 14 days,0.0014881336151628861,-0.0010095577449489093,2,Mixed evidence: no automatic removal
+prior_14d_precipitation_mm,Total rain (mm) — previous 14 days,0.00569254391981457,-0.0009023270272323289,2,Mixed evidence: no automatic removal
+prior_14d_wet_days_1mm,Days with at least 1 mm rain — previous 14 days,0.0046460754870635374,-0.0007590783138325258,2,Mixed evidence: no automatic removal
+prior_1d_precipitation_mm,Total rain (mm) — previous 1 days,0.010150209493681561,-0.0007342472640216082,1,Mixed evidence: no automatic removal
+prior_30d_precipitation_mm,Total rain (mm) — previous 30 days,0.007625078429961111,-0.0006692758814978323,2,Mixed evidence: no automatic removal
+prior_30d_relative_humidity_mean_pct,Average relative humidity (%) — previous 30 days,-0.002482613198088124,-0.0006610939373226538,1,Mixed evidence: no automatic removal
+prior_30d_soil_moisture_0_to_7cm_mean,Average surface soil moisture (top 7 cm) — previous 30 days,0.00014522357073780875,-0.00056413622600128,0,Mixed evidence: no automatic removal
+prior_30d_temperature_mean_c,Average temperature (°C) — previous 30 days,-0.0005834504878108049,-0.00034602131890047044,0,Mixed evidence: no automatic removal
+prior_30d_wet_days_1mm,Days with at least 1 mm rain — previous 30 days,0.002268644724366479,-0.0004866958774608308,1,Mixed evidence: no automatic removal
+prior_3d_precipitation_mm,Total rain (mm) — previous 3 days,-0.002802211149690842,-0.0003953067876943314,0,Mixed evidence: no automatic removal
+prior_3d_vs_previous_11d_daily_rain_trend_mm,Recent rain trend (mm/day) — previous 3 days,0.005508543923949773,-0.00047569779394887834,3,Candidate to remove; confirm independently
+prior_7d_precipitation_mm,Total rain (mm) — previous 7 days,0.0060983286399669545,-0.0005220026312920262,1,Mixed evidence: no automatic removal
+prior_7d_relative_humidity_mean_pct,Average relative humidity (%) — previous 7 days,0.0014493306618247048,-0.0003448145874403984,1,Mixed evidence: no automatic removal
+prior_7d_soil_moisture_0_to_7cm_mean,Average surface soil moisture (top 7 cm) — previous 7 days,0.0022131876742393455,-0.00028121138388803824,1,Mixed evidence: no automatic removal
+prior_7d_temperature_max_c,Maximum temperature (°C) — previous 7 days,0.0034415310498826976,-0.0005392141362592154,1,Mixed evidence: no automatic removal
+prior_7d_temperature_mean_c,Average temperature (°C) — previous 7 days,-0.0032377728808299553,-0.00040224358212578165,1,Mixed evidence: no automatic removal
+prior_7d_wet_days_1mm,Days with at least 1 mm rain — previous 7 days,0.0036520072775092136,-0.0003376152128079628,2,Mixed evidence: no automatic removal
+prior_area_claims_90d,Recorded returns in previous 90 days — area,0.00017380244566717976,-0.0006650203281614864,1,Mixed evidence: no automatic removal
+prior_area_services_90d,Recorded services in previous 90 days — area,0.0020380147981871413,-0.0003041093700009087,0,Mixed evidence: no automatic removal
+prior_package_return_rate_smoothed,Adjusted past return ratio — package,-0.0005068690190003963,-0.000440550659113544,0,Mixed evidence: no automatic removal
+prior_package_service_events,Recorded earlier services — package,0.0007492854687481121,-0.00028758332983726265,0,Mixed evidence: no automatic removal
+prior_package_warranty_claims,Recorded earlier returns — package,-0.0017061046813846663,-0.00017809629633699225,0,Mixed evidence: no automatic removal
+prior_property_claims_90d,Recorded returns in previous 90 days — property,-0.0017061046813846663,-0.00017809629633699225,0,Mixed evidence: no automatic removal
+prior_property_return_rate_smoothed,Adjusted past return ratio — property,-0.010911925803392083,-0.0005228289105757497,0,Mixed evidence: no automatic removal
+prior_property_service_events,Recorded earlier services — property,-0.009676294419022355,-0.00044965136444503895,0,Mixed evidence: no automatic removal
+prior_property_warranty_claims,Recorded earlier returns — property,-0.007035096340009696,-0.00023867145570638745,1,Mixed evidence: no automatic removal
+rain_soil_interaction,Rain combined with soil moisture,0.011703943595322822,-0.000607833990451008,3,Candidate to remove; confirm independently
+sale_total_rm,Package price (RM),-0.003179588317024843,-6.576389841164015e-05,0,Mixed evidence: no automatic removal
+service_number,Service number,-0.0014106908645032483,-0.00046032450294405947,1,Mixed evidence: no automatic removal
+water_rain_interaction,Rain combined with waterway proximity,-0.006244040299338237,-0.00023301162959839944,0,Mixed evidence: no automatic removal

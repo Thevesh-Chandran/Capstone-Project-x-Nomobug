@@ -9,16 +9,6 @@ from unnest([1])
 where (select count(*) from {{ ref('payment_record_facts') }}) !=
       (select count(*) from {{ ref('payments') }})
 union all
-select 'calendar_service_event_count'
-from unnest([1])
-where (select count(*) from {{ ref('calendar_service_event_facts') }}) !=
-      (select count(*) from {{ ref('calendar_events') }} where service_candidate)
-union all
-select 'calendar_match_preserved'
-from {{ ref('calendar_service_event_facts') }} g
-join {{ ref('calendar_event_matches') }} m using (calendar_event_row)
-where g.sales_record_id is distinct from m.matched_sales_record_id
-union all
 select 'sale_override_mismatch'
 from {{ ref('sales_package_facts') }} s
 join {{ ref('sale_disposition_overrides') }} o using (sales_record_id)

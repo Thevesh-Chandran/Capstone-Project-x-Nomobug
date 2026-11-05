@@ -1,0 +1,81 @@
+{
+  "selected_on_validation": "Original commercial model",
+  "validation": [
+    {
+      "candidate": "Original commercial model",
+      "rows": 75,
+      "mae_rm": 412.613302623715,
+      "mse_rm_squared": 1772808.2822586754,
+      "rmse_rm": 1331.468468368168,
+      "r_squared": 0.40189261968989676,
+      "wape": 0.2875754827318895,
+      "median_absolute_percentage_error": 0.10909090899581253,
+      "within_20_percent": 0.7466666666666667,
+      "median_absolute_error_rm": 122.50000039553333
+    },
+    {
+      "candidate": "Add Calendar area",
+      "rows": 75,
+      "mae_rm": 412.613302623715,
+      "mse_rm_squared": 1772808.2822586754,
+      "rmse_rm": 1331.468468368168,
+      "r_squared": 0.40189261968989676,
+      "wape": 0.2875754827318895,
+      "median_absolute_percentage_error": 0.10909090899581253,
+      "within_20_percent": 0.7466666666666667,
+      "median_absolute_error_rm": 122.50000039553333
+    },
+    {
+      "candidate": "Add Calendar area and floors",
+      "rows": 75,
+      "mae_rm": 412.613302623715,
+      "mse_rm_squared": 1772808.2822586754,
+      "rmse_rm": 1331.468468368168,
+      "r_squared": 0.40189261968989676,
+      "wape": 0.2875754827318895,
+      "median_absolute_percentage_error": 0.10909090899581253,
+      "within_20_percent": 0.7466666666666667,
+      "median_absolute_error_rm": 122.50000039553333
+    }
+  ],
+  "assessment": [
+    {
+      "candidate": "Original commercial model",
+      "rows": 82,
+      "mae_rm": 201.786517531203,
+      "mse_rm_squared": 191017.88895877666,
+      "rmse_rm": 437.05593344419503,
+      "r_squared": 0.7917164360897553,
+      "wape": 0.192083936262899,
+      "median_absolute_percentage_error": 0.06073762038816695,
+      "within_20_percent": 0.8048780487804879,
+      "median_absolute_error_rm": 52.92031173726059
+    },
+    {
+      "candidate": "Add Calendar area",
+      "rows": 82,
+      "mae_rm": 201.62578309046566,
+      "mse_rm_squared": 187931.77033386985,
+      "rmse_rm": 433.5109806381724,
+      "r_squared": 0.7950815019971903,
+      "wape": 0.19193093048011636,
+      "median_absolute_percentage_error": 0.0816637340666651,
+      "within_20_percent": 0.8048780487804879,
+      "median_absolute_error_rm": 57.22356704754765
+    },
+    {
+      "candidate": "Add Calendar area and floors",
+      "rows": 82,
+      "mae_rm": 201.62578309046566,
+      "mse_rm_squared": 187931.77033386985,
+      "rmse_rm": 433.5109806381724,
+      "r_squared": 0.7950815019971903,
+      "wape": 0.19193093048011636,
+      "median_absolute_percentage_error": 0.0816637340666651,
+      "within_20_percent": 0.8048780487804879,
+      "median_absolute_error_rm": 57.22356704754765
+    }
+  ],
+  "deployed": false,
+  "interpretation": "Exploratory size enrichment comparison; timestamp and missingness limitations apply"
+}

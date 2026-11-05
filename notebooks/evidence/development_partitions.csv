@@ -1,0 +1,4 @@
+period,validation_start,validation_end_exclusive,fit_services,validation_services,validation_returns,embargoed_training_rows,property_purged_training_rows
+2025_q2,2025-04-01,2025-07-01,828,878,35,190,124
+2025_q3,2025-07-01,2025-10-01,1567,877,78,258,195
+2025_q4,2025-10-01,2026-01-01,2434,723,116,191,272

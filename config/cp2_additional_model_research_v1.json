@@ -1,0 +1,23 @@
+{
+  "name": "cp2_additional_model_research_v1",
+  "declared_local_date": "2026-10-14",
+  "status": "retrospective_research_not_live_predictions",
+  "preserve_existing_model": true,
+  "source_release": "cp2r_20261014045314a561c6",
+  "last_complete_week_start": "2026-10-05",
+  "last_complete_week_end": "2026-10-11",
+  "week_start": "Monday, Asia/Kuala_Lumpur",
+  "targets": ["weekly_bookings", "weekly_packages", "weekly_sales_rm"],
+  "horizons_weeks": [1, 4],
+  "development_origins": ["2026-05-04", "2026-06-22"],
+  "holdout_origins_start": "2026-07-20",
+  "holdout_origins_end_exclusive": "2026-10-12",
+  "training_windows": ["all", "last_52_weeks", "2026_only"],
+  "baseline_candidates": ["last_week", "mean_4", "mean_8", "seasonal_52"],
+  "model_candidates": ["ses", "holt_damped", "ridge", "poisson", "random_forest", "extra_trees", "hist_gradient_boosting", "hist_gradient_boosting_poisson", "catboost"],
+  "features": "8 lag weeks, past-only rolling moments, slope, origin calendar seasonality; no future weather, future bookings, customer balances or retrospectively known outcomes",
+  "selection": "Smallest development MAE per target/horizon, including baseline/window choice; freeze before holdout. Final holdout never selects a replacement.",
+  "acceptance": "At least 10% holdout MAE improvement versus development-selected baseline, development improvement, at least 60% paired holdout origin wins, 90% paired block-bootstrap MAE-difference upper bound below zero. Otherwise exploratory only; no guaranteed success.",
+  "uncertainty": "Development-only absolute residual intervals; report holdout coverage and width without claiming guaranteed coverage.",
+  "limits": "Current published records reconstruct historical labels, not historical as-of snapshots. Current cancellation/edit state and inferred Sales years may bias retrospective results. Even qualifying candidates require source and future shadow validation before operational use. Three targets and two horizons are an exploratory family, not six independent confirmatory claims."
+}
