@@ -1,0 +1,541 @@
+{
+  "at_utc": "2026-10-26T11:02:08.320497+00:00",
+  "files": [
+    {
+      "path": "scripts/apply_manual_geocode_overrides.py",
+      "sha256": "6daf9c8ecb62425704f68482adb81bb39cd66658f3aa431a2a557bba28784ce5",
+      "bytes": 3095,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/apply_manual_geocode_overrides.py"
+    },
+    {
+      "path": "scripts/build_cp2_decision_frames.py",
+      "sha256": "d0b85ba69e51bdc77f19b9e19cec887367628c36ed78ff297a3f7a9c4d0d7ab9",
+      "bytes": 3402,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/build_cp2_decision_frames.py"
+    },
+    {
+      "path": "scripts/build_dashboard_live_frames.py",
+      "sha256": "0aee72ca4ced7ed4a2c03e3733b3b4800bd6f1142788b5551cf926dc471d046c",
+      "bytes": 2800,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/build_dashboard_live_frames.py"
+    },
+    {
+      "path": "scripts/build_geocode_review_report.py",
+      "sha256": "5d7329a11c54406d0be286076d53e9730b278e832a29ff655cf5aabcea813f0e",
+      "bytes": 14366,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/build_geocode_review_report.py"
+    },
+    {
+      "path": "scripts/build_google_geoapify_distance_review.py",
+      "sha256": "c5997978c1f6016dc7e44cef7199cd0d225b7790faea6e343d7b363b617caaa8",
+      "bytes": 8050,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/build_google_geoapify_distance_review.py"
+    },
+    {
+      "path": "scripts/build_simple_model_notebook.py",
+      "sha256": "5c3ba92fbd933c50067a996910f52af80ab7f9b84394465e70b9e7f5e8019d78",
+      "bytes": 9984,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/build_simple_model_notebook.py"
+    },
+    {
+      "path": "scripts/build_spatial_preview.py",
+      "sha256": "1da8ff954226e2b905f6f04993c2fdbafd73d5fe7a330d613e8a5029617fed11",
+      "bytes": 1940,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/build_spatial_preview.py"
+    },
+    {
+      "path": "scripts/declare_cp2_october_extension.py",
+      "sha256": "c09050cda1d29a91cbc0fdf990007789539fd8675bbb321f4b7aeeaf542e04b9",
+      "bytes": 2151,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/declare_cp2_october_extension.py"
+    },
+    {
+      "path": "scripts/deploy_reporting_address_fix.py",
+      "sha256": "841d5373e388edae342cdf7e46ef2cb0a9009eae398c6bec00127d635508ccd8",
+      "bytes": 1867,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/deploy_reporting_address_fix.py"
+    },
+    {
+      "path": "scripts/export_missing_postcode_events.py",
+      "sha256": "1fed152dcbbb0a864936207c984e1140bb99e5f8219b92dbb709092da0d98403",
+      "bytes": 6967,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/export_missing_postcode_events.py"
+    },
+    {
+      "path": "scripts/export_repeat_model_json.py",
+      "sha256": "0905d6bb7b54d1c1c834a26d46e84c9e642d0dc54212f7dbbcedf6647bc77456",
+      "bytes": 2517,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/export_repeat_model_json.py"
+    },
+    {
+      "path": "scripts/export_unmapped_purchase_review.py",
+      "sha256": "db4a67c78f821ec70155157cecdc18ee27776888eb15767d1c15f655bb9a6d14",
+      "bytes": 7153,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/export_unmapped_purchase_review.py"
+    },
+    {
+      "path": "scripts/export_unmatched_calendar_review.py",
+      "sha256": "5622fac142d0f320943fc46694e4f1b85551339b20b60d754cba82610e4c447b",
+      "bytes": 4882,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/export_unmatched_calendar_review.py"
+    },
+    {
+      "path": "scripts/export_warranty_review_decisions.py",
+      "sha256": "e47aa02034687f0d6d353ed2c3b33d2632674f911e7c23e1c3d462c11f1b5f2e",
+      "bytes": 2058,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/export_warranty_review_decisions.py"
+    },
+    {
+      "path": "scripts/finish_age_holiday_report.py",
+      "sha256": "d5dfebac3c1ba9b612b7879ba0ef5f65fa2ade39ae67ecf37b1e331c237f5ce8",
+      "bytes": 7683,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/finish_age_holiday_report.py"
+    },
+    {
+      "path": "scripts/inspect_calendar_ambiguity.py",
+      "sha256": "b30ec201c18961684dffdd4ea78df83e3d9c93c199a0e2f90d07e450a69cf54f",
+      "bytes": 2287,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_calendar_ambiguity.py"
+    },
+    {
+      "path": "scripts/inspect_calendar_competing_sales.py",
+      "sha256": "c5ccc78749b088b4408ccca79d23e1bdf35de2c170b06dfb0744615f2c757968",
+      "bytes": 5104,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_calendar_competing_sales.py"
+    },
+    {
+      "path": "scripts/inspect_calendar_location_coverage.py",
+      "sha256": "161ee6cce323650cb764c4f3850a123425261df2ba65d5454fcc837ab759e375",
+      "bytes": 3210,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_calendar_location_coverage.py"
+    },
+    {
+      "path": "scripts/inspect_calendar_location_disagreements.py",
+      "sha256": "f9d43ef979d8447535f68493b97bdca981ec429a4c6500dfa8d9c3bc66407f8e",
+      "bytes": 3718,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_calendar_location_disagreements.py"
+    },
+    {
+      "path": "scripts/inspect_predictive_label_feasibility.py",
+      "sha256": "0ff8755f45233149ea8f6201f554398b29604b711f3bf8571e42d00e0f2442bd",
+      "bytes": 5652,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_predictive_label_feasibility.py"
+    },
+    {
+      "path": "scripts/inspect_prospects_2026_categories.py",
+      "sha256": "8a258b63bcc285281488d45cb93ae48f88db38dc16f323739b0da28142e1d221",
+      "bytes": 2556,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_prospects_2026_categories.py"
+    },
+    {
+      "path": "scripts/inspect_sales_payment_exceptions.py",
+      "sha256": "e311d86ffc06dfb407a4378a09cc799901887557ab70cbdf67ac56975654b608",
+      "bytes": 5099,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_sales_payment_exceptions.py"
+    },
+    {
+      "path": "scripts/inspect_spatial_cluster_sensitivity.py",
+      "sha256": "2a79cdcc9468651f48b70499f35664717d256f81e0bbf177857cfb152d5912f1",
+      "bytes": 2945,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_spatial_cluster_sensitivity.py"
+    },
+    {
+      "path": "scripts/inspect_weather_repeat_association.py",
+      "sha256": "f0d3f22d4259d08d58cca4b776ffec66cc269f48ce1cfb1e694ae3ab80b30e16",
+      "bytes": 2238,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_weather_repeat_association.py"
+    },
+    {
+      "path": "scripts/migrate_geoapify_cache_sanitized.py",
+      "sha256": "ddfdab24363aa68004a6b4d9ec7c93311f5aaf10de3922778c1647f15df5abc6",
+      "bytes": 3097,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/migrate_geoapify_cache_sanitized.py"
+    },
+    {
+      "path": "scripts/publish_cp2_collector_artifacts.py",
+      "sha256": "ebd7c8844195d07e3be887b18620d1963b50494f99e79886fa7ecad1a2a126d1",
+      "bytes": 3495,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/publish_cp2_collector_artifacts.py"
+    },
+    {
+      "path": "scripts/publish_cp2_decision_support.py",
+      "sha256": "64095d7a1d6fbc4920f746b6185a5949b889cb7625c82fabb400857635295bf9",
+      "bytes": 7234,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/publish_cp2_decision_support.py"
+    },
+    {
+      "path": "scripts/publish_new_predictor_sources.py",
+      "sha256": "544605cdde6971900e75f4be5014fd916a00df51fa404e81c2c4cd1f71adc8f6",
+      "bytes": 5500,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/publish_new_predictor_sources.py"
+    },
+    {
+      "path": "scripts/publish_predictor_audit_review.py",
+      "sha256": "937183cf794f9b1f5c2a939b738851760007b877e04da8c2302b4913c3575f84",
+      "bytes": 9672,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/publish_predictor_audit_review.py"
+    },
+    {
+      "path": "scripts/publish_resolved_purchase_locations.py",
+      "sha256": "fe84e9559d2f0f7cb04d09da0ef83ae369a76a19c3a4cb08618d8ba5bf68f49e",
+      "bytes": 3811,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/publish_resolved_purchase_locations.py"
+    },
+    {
+      "path": "scripts/remove_google_proximity_rule.py",
+      "sha256": "41651d58232b3fec94ade3d202ba5511fb04b3d5da3ea1f86ba4cb1c2f53736f",
+      "bytes": 1541,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/remove_google_proximity_rule.py"
+    },
+    {
+      "path": "scripts/report_before_first_weather.py",
+      "sha256": "bf314f7238789659679dcaec09659375657d57953273357a9ab9f9eadc588161",
+      "bytes": 7893,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/report_before_first_weather.py"
+    },
+    {
+      "path": "scripts/report_calendar_notes_pooled.py",
+      "sha256": "a43ebf62cc0b9db55c102bd272c020ea85d68ad49c3839f0443201f2f1fcddaf",
+      "bytes": 2163,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/report_calendar_notes_pooled.py"
+    },
+    {
+      "path": "scripts/report_enquiry_conversion_20261021.py",
+      "sha256": "6f7f3df748f7935ed73a89a1544a0f406b6120c51df2a9755f7a8d45192e8133",
+      "bytes": 6054,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/report_enquiry_conversion_20261021.py"
+    },
+    {
+      "path": "scripts/report_expanded_target_research.py",
+      "sha256": "586f1dea9decfb6a9c647bc0abaaa5b3a6734df9668be43d26098b73aa199ff3",
+      "bytes": 15612,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/report_expanded_target_research.py"
+    },
+    {
+      "path": "scripts/report_interservice_weather.py",
+      "sha256": "cc189ce7b908f572368fa9ac808b71cdcd2a4534d2135571ee38fc3e6c911fd0",
+      "bytes": 8027,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/report_interservice_weather.py"
+    },
+    {
+      "path": "scripts/report_larger_frozen_test.py",
+      "sha256": "32926a10c7bc7c0e56038c096def4a51ea40509fad218b146f3124ce7d4a9129",
+      "bytes": 7635,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/report_larger_frozen_test.py"
+    },
+    {
+      "path": "scripts/report_next_predictor_sources.py",
+      "sha256": "bcdfe1729ba382a83722597a350e0c184e7e309ac02c6ddf45e8502edf56defe",
+      "bytes": 7939,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/report_next_predictor_sources.py"
+    },
+    {
+      "path": "scripts/report_next_predictor_test.py",
+      "sha256": "753c5eb478c5de078dabe4396dfcaa417c4589845f973aec99e0c558abf1fbbb",
+      "bytes": 5374,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/report_next_predictor_test.py"
+    },
+    {
+      "path": "scripts/report_variable_selection.py",
+      "sha256": "e99c71c58b7d5ce1516e415bdb0865a903b46f67820290873260e743afd67014",
+      "bytes": 8955,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/report_variable_selection.py"
+    },
+    {
+      "path": "scripts/research_dosm_inputs_20261021.py",
+      "sha256": "f18def0eb5873ee723ec3c617218118689c5151309116c920a603be17470a104",
+      "bytes": 13883,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/research_dosm_inputs_20261021.py"
+    },
+    {
+      "path": "scripts/research_management_forecasts_20261021.py",
+      "sha256": "0c03254e45e15169411029a99b16db95e82d6d7c786d551daa74076091309144",
+      "bytes": 27237,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/research_management_forecasts_20261021.py"
+    },
+    {
+      "path": "scripts/research_precision_targets_20261021.py",
+      "sha256": "b3867a1e182e5d0142aa81d8c1606eab9f57d45d9b09e9fde9f26a51df3178f7",
+      "bytes": 12947,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/research_precision_targets_20261021.py"
+    },
+    {
+      "path": "scripts/research_renewal_targets_20261021.py",
+      "sha256": "d79e28071992267436d65cc60997e6a53c0e1315e292f79c99bf607d0ab9b6c5",
+      "bytes": 34753,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/research_renewal_targets_20261021.py"
+    },
+    {
+      "path": "scripts/research_residential_3x_final.py",
+      "sha256": "f712259bc70358bcbc81b0c6f3f4978fe702f70f490a06be9ee10e67c1d40d3b",
+      "bytes": 2236,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/research_residential_3x_final.py"
+    },
+    {
+      "path": "scripts/retry_geoapify_postcode_conflicts.py",
+      "sha256": "293d2ac233881711bb893798a9d9493f64f2240fc22adc41c864e3908ccc5497",
+      "bytes": 4418,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/retry_geoapify_postcode_conflicts.py"
+    },
+    {
+      "path": "scripts/retry_geoapify_review_candidates.py",
+      "sha256": "4e84e087fc9c0bae0e9b6fbf8c8b0f9d53c0cec6d102595c2c1dcdb9b1d022f5",
+      "bytes": 5184,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/retry_geoapify_review_candidates.py"
+    },
+    {
+      "path": "scripts/summarize_additional_model_research.py",
+      "sha256": "4e530c69a3a033d3aa1313d13e8467080870a1099ed413a9bb8df89772301b40",
+      "bytes": 20051,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/summarize_additional_model_research.py"
+    },
+    {
+      "path": "scripts/summarize_callback_target_research.py",
+      "sha256": "cf5e8af0fe7b5c73c49ee6eccf8a62b448eaf122077eeb95389665b33cb11e13",
+      "bytes": 8395,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/summarize_callback_target_research.py"
+    },
+    {
+      "path": "scripts/test_district_population_predictor.py",
+      "sha256": "33ac5b978901f71902a932de8f7bef98adfa907bd85bbc0f57b64f136e820c56",
+      "bytes": 3398,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/test_district_population_predictor.py"
+    },
+    {
+      "path": "scripts/write_warranty_benchmark_report.py",
+      "sha256": "488092825c4c20ca66b3a9ac1a86b071d6d7473b86aa222a84179fe82a3619ad",
+      "bytes": 20320,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/write_warranty_benchmark_report.py"
+    },
+    {
+      "path": "scripts/neon/check_neon_connection.py",
+      "sha256": "7aad9a15dedda89b281a6e70710d13a9f8fc3dfc4312db4d42968cd3f2be41f7",
+      "bytes": 1157,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/neon/check_neon_connection.py"
+    },
+    {
+      "path": "scripts/prototypes/fetch_calendar_events.py",
+      "sha256": "289d48374ea7ff643d686c37b65787adf64d5403c9c2b4d99330955af8956175",
+      "bytes": 15185,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/prototypes/fetch_calendar_events.py"
+    },
+    {
+      "path": "scripts/prototypes/inspect_prospects_2026.py",
+      "sha256": "b3795587d35abc8f55e417b9dbbe8078e1cd4126511357dd23835922bdc68439",
+      "bytes": 974,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/prototypes/inspect_prospects_2026.py"
+    },
+    {
+      "path": "scripts/prototypes/profile_calendars_all_events.py",
+      "sha256": "d9cb628239fcc5ff67174fbb28fc1569023c297ba9c4a94d2793d783e28a9ebf",
+      "bytes": 6624,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/prototypes/profile_calendars_all_events.py"
+    },
+    {
+      "path": "scripts/prototypes/profile_prospects_all_rows.py",
+      "sha256": "b603010d3fe64a4485d19ad5cef876258e7c8f22a15d044995bef8e200e10a57",
+      "bytes": 5413,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/prototypes/profile_prospects_all_rows.py"
+    },
+    {
+      "path": "scripts/prototypes/profile_session_payment_all_rows.py",
+      "sha256": "e92779732873f2d5194e4916769a1454b8fbf50e97c7666a044d117781b9e924",
+      "bytes": 5960,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/prototypes/profile_session_payment_all_rows.py"
+    },
+    {
+      "path": "scripts/prototypes/test_open_meteo_history.py",
+      "sha256": "eb707aba2b45222e49d94549470c36ec39f864e309e6d68e85f1b5e1bb913e3a",
+      "bytes": 3894,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/prototypes/test_open_meteo_history.py"
+    },
+    {
+      "path": "scripts/inspect_calendar_address_join_candidates.sql",
+      "sha256": "3e14bd65240fa78675531a33e99e462876bfec19de2373621f553eee94e4eda8",
+      "bytes": 1937,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_calendar_address_join_candidates.sql"
+    },
+    {
+      "path": "scripts/inspect_calendar_auxiliary_join_candidates.sql",
+      "sha256": "21fa35c0385fce6ed82eabc12906460f9be16c430c36515c4386efa8b1d4f523",
+      "bytes": 5481,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_calendar_auxiliary_join_candidates.sql"
+    },
+    {
+      "path": "scripts/inspect_calendar_email_join_candidates.sql",
+      "sha256": "447c78dd436ca365afe492704e527b96964bbf4d528bc3c9266aa1be124e269d",
+      "bytes": 1861,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_calendar_email_join_candidates.sql"
+    },
+    {
+      "path": "scripts/inspect_calendar_invoice_gap_shapes.sql",
+      "sha256": "0ae0e3b8de79d340365083232aa20304961ca9f18b87b0af04594cd215342755",
+      "bytes": 1283,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_calendar_invoice_gap_shapes.sql"
+    },
+    {
+      "path": "scripts/inspect_calendar_invoice_join_candidates.sql",
+      "sha256": "2155117b9dba999810431fcbcf848658e467998299e6c1a477bd2baff19a3390",
+      "bytes": 2220,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_calendar_invoice_join_candidates.sql"
+    },
+    {
+      "path": "scripts/inspect_calendar_match_gaps.sql",
+      "sha256": "a2487baf8e06f35d7fdc01be9d8c9df10940c94219926acd458b7c861c59d59f",
+      "bytes": 1082,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_calendar_match_gaps.sql"
+    },
+    {
+      "path": "scripts/inspect_calendar_name_join_candidates.sql",
+      "sha256": "f349984e5b5220376d4c77d36ddf6e0dc401a6569cc690e132fb50521ef90be6",
+      "bytes": 1793,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_calendar_name_join_candidates.sql"
+    },
+    {
+      "path": "scripts/inspect_calendar_phone_gap_shapes.sql",
+      "sha256": "cd714dd6a74e1cb580f48b3a1edf31081e6fc45c28059b25e57b5f8fbb8054f3",
+      "bytes": 1499,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_calendar_phone_gap_shapes.sql"
+    },
+    {
+      "path": "scripts/inspect_calendar_phone_join_candidates.sql",
+      "sha256": "c341a3a6e7b3d90f5b4e35b54f9ee7b538100c415aa60150359e74aa2a70e393",
+      "bytes": 3215,
+      "references": [],
+      "action": "archive",
+      "archived_path": "archive/retired_scripts/inspect_calendar_phone_join_candidates.sql"
+    }
+  ]
+}
