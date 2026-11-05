@@ -1,4 +1,11 @@
 'use strict';
+// Readable page addresses. Internal view names stay as they were, so older links
+// (#home, #today, #returns, #plan) keep working.
+window.CP2_ALIAS = { workspace: 'today', 'follow-up': 'returns', reminders: 'home', bookings: 'plan' };
+window.cp2Page = () => {
+  const h = location.hash.slice(1);
+  return window.CP2_ALIAS[h] || h;
+};
 let state, boundaries;
 const $ = id => document.getElementById(id);
 const el = (tag, text, cls) => {
@@ -214,7 +221,7 @@ function drawMap() {
     });
     svg.append(path);
   });
-  svg.append(svgNode('text', { x: 580, y: 25, fill: '#6d8271', 'font-size': 11 }, 'N ↑'));
+  svg.append(svgNode('text', { x: 580, y: 25, fill: getComputedStyle(document.documentElement).getPropertyValue('--color-muted').trim(), 'font-size': 11 }, 'N ↑'));
   $('district-map').replaceChildren(svg);
 }
 function render() {
@@ -284,6 +291,7 @@ function render() {
 }
 function navigate() {
   const pages = [
+    'overview',
     'today',
     'returns',
     'models',
@@ -298,8 +306,8 @@ function navigate() {
     'areas',
     'status',
   ];
-  let page = location.hash.slice(1) || 'today';
-  if (!pages.includes(page)) page = 'today';
+  let page = window.cp2Page() || 'overview';
+  if (!pages.includes(page)) page = 'overview';
   document.querySelectorAll('[data-view]').forEach(n => (n.hidden = n.dataset.view !== page));
   document
     .querySelectorAll('[data-page]')
@@ -307,6 +315,7 @@ function navigate() {
   $('breadcrumb').textContent =
     'Nomobug / ' +
     {
+      overview: 'Management overview',
       today: 'Workspace',
       returns: 'Service follow-up',
       models: 'Prediction models',

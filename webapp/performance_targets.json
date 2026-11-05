@@ -1,0 +1,8 @@
+{
+ "note": "Targets the owner sets for the Performance page. While status is 'placeholder' the page labels them 'to confirm'. When the owner agrees a number, change target and watch, set status to 'confirmed', and fill confirmed_by and confirmed_on.",
+ "targets": {
+  "repeat_rate": {"label": "Repeat-customer rate", "target": 0.10, "watch": 0.07, "direction": "higher", "status": "placeholder", "confirmed_by": null, "confirmed_on": null},
+  "warranty_rate": {"label": "Warranty visit rate (ceiling)", "target": 0.15, "watch": 0.20, "direction": "lower", "status": "placeholder", "confirmed_by": null, "confirmed_on": null},
+  "collected_share": {"label": "Contract value collected", "target": 0.50, "watch": 0.30, "direction": "higher", "status": "placeholder", "confirmed_by": null, "confirmed_on": null}
+ }
+}

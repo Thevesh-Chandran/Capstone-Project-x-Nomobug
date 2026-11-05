@@ -1,3 +1,5 @@
+// Colours come from the stylesheet's tokens, so the map follows the theme.
+const tok = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 (async () => {
   const response = await fetch('/api/spatial', { credentials: 'same-origin' });
   if (!response.ok)
@@ -151,6 +153,7 @@
     const max = Math.max(0, ...grid);
     if (!max) return '';
     const stops = [
+      // Sequential data ramp for the heatmap (a data scale, light to dark blue), kept as numbers to interpolate.
       [219, 234, 254],
       [147, 197, 253],
       [96, 165, 250],
@@ -229,9 +232,9 @@
             layer === 'model'
               ? g.metrics.supported
                 ? g.metrics.accuracy > g.metrics.baseline
-                  ? '#1d4ed8'
-                  : '#0a0a0a'
-                : '#ccd3df'
+                  ? tok('--color-accent')
+                  : tok('--color-ink')
+                : tok('--color-rule')
               : `hsl(${layer === 'sales' ? '224 76%' : '0 0%'} ${92 - (58 * g.value) / max}%)`;
         return `<rect tabindex="0" role="button" aria-label="Proximity group with ${g.rs.length} records" class="cell" data-id="${g.id}" x="${x - w / 2}" y="${y - w / 2}" width="${w}" height="${w}" rx="4" fill="${fill}" opacity=".82"><title>${g.rs.length} records${layer === 'sales' ? ', ' + money(g.value) : ''}</title></rect>`;
       })
@@ -259,7 +262,7 @@
           p[1] > 535
         )
           return '';
-        return `<text x="${p[0]}" y="${p[1]}" text-anchor="middle" fill="#475e76" font-size="11" pointer-events="none">${safe(f.properties.district)}</text>`;
+        return `<text x="${p[0]}" y="${p[1]}" text-anchor="middle" fill="${tok('--color-muted')}" font-size="11" pointer-events="none">${safe(f.properties.district)}</text>`;
       })
       .join('');
     let points =
@@ -267,7 +270,7 @@
         ? rows
             .map((r, i) => {
               let [x, y] = position(r.longitude, r.latitude);
-              return `<circle tabindex="0" role="button" aria-label="Inspect recorded location" class="point" data-point="${i}" cx="${x}" cy="${y}" r="5" fill="${layer === 'visits' ? '#0a0a0a' : '#1d4ed8'}"><title>${safe(layer === 'sales' ? r.id : 'Recorded location')}, approximate mapped location</title></circle>`;
+              return `<circle tabindex="0" role="button" aria-label="Inspect recorded location" class="point" data-point="${i}" cx="${x}" cy="${y}" r="5" fill="${layer === 'visits' ? tok('--color-ink') : tok('--color-accent')}"><title>${safe(layer === 'sales' ? r.id : 'Recorded location')}, approximate mapped location</title></circle>`;
             })
             .join('')
         : '';
@@ -280,7 +283,7 @@
       hitAreas +
       labels +
       points +
-      `<text x="20" y="30" fill="#737373" font-size="12">${zoom.toFixed(zoom < 0.1 ? 2 : 1)}×, ${zoom >= 3 ? 'individual locations' : heatMode ? 'heatmap' : 'area groups'}</text>`;
+      `<text x="20" y="30" fill="${tok('--color-muted')}" font-size="12">${zoom.toFixed(zoom < 0.1 ? 2 : 1)}×, ${zoom >= 3 ? 'individual locations' : heatMode ? 'heatmap' : 'area groups'}</text>`;
     $('legend').innerHTML =
       layer === 'model'
         ? '● Grey: insufficient evidence, Blue: above no-return baseline, Black: at/below baseline'

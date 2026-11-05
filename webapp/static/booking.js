@@ -1,5 +1,8 @@
 'use strict';
-let bookingView = 'booking';
+// Staff already plan travel and slots with Google Maps and Google Calendar, so this page shows
+// the weekly workload forecast and the team calendars. The slot finder below is kept in the code
+// (renderBookingTools) but no longer shown on the page.
+let bookingView = 'demand';
 function attachBookingTools(root) {
   const demand = el('div'),
     children = Array.from(root.children);
@@ -9,9 +12,8 @@ function attachBookingTools(root) {
     tabs = el('div', undefined, 'context-tabs booking-tabs');
   const buttons = [];
   [
-    ['booking', 'Find a time slot'],
-    ['google', 'Google Calendar'],
     ['demand', 'Weekly workload'],
+    ['google', 'Google Calendar'],
   ].forEach(([key, label]) => {
     const b = deskButton(
       label,
@@ -31,9 +33,8 @@ function attachBookingTools(root) {
     if (bookingView === 'google') renderGoogleCalendar(googleRoot);
     buttons.forEach(([key, b]) => b.setAttribute('aria-pressed', String(key === bookingView)));
   }
-  root.append(bookingIntro(), tabs, bookingRoot, googleRoot, demand);
+  root.append(tabs, googleRoot, demand);
   sync();
-  renderBookingTools(bookingRoot);
 }
 // Plain explanation at the top of the page: what it does and what it does not do.
 function bookingIntro() {
