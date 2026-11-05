@@ -16,7 +16,7 @@ with payment_evidence as (
         countif(warranty_claim_candidate) as warranty_claim_event_rows,
         countif(event_category = 'complimentary' and not warranty_claim_candidate)
             as generic_complimentary_event_rows
-    from {{ ref('calendar_service_event_facts') }}
+    from {{ ref('calendar_programme_service_facts') }}
     where sales_record_id is not null
       and event_date_local between date '2026-01-01' and date '2026-12-31'
     group by sales_record_id

@@ -1,0 +1,18 @@
+version: 2
+models:
+  - name: recurring_contract_candidates
+    description: "Restricted SALES-grain recurring arrangement candidates; custom-note signals and fully recorded-paid history retained."
+    columns:
+      - name: sales_row_id
+        data_tests: [not_null, unique]
+  - name: recurring_payment_date_candidates
+    description: "Restricted, unpivoted source-generated schedule cells; owner confirms dates are staff reminder dates, with green meaning elapsed only."
+  - name: recurring_contract_payment_tracker
+    description: "Restricted contract register using SALES paid amounts/balances and source reminder dates. PAYMENTS is excluded; no payment dates or automated reminders."
+    columns:
+      - name: sales_row_id
+        data_tests: [not_null, unique]
+  - name: dashboard_recurring_payment_quality
+    description: "Aggregate contract payment coverage and schedule review counts; no private identifiers or claimed overdue balances."
+  - name: dashboard_recurring_reminder_schedule
+    description: "Aggregate future staff reminder dates by arrangement. Positive SALES balances and validated unique schedules only; no names, identifiers, contacts, payment due dates or delivery claims."

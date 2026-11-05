@@ -16,7 +16,7 @@ with package_events as (
             as warranty_claims_with_complete_prior_14d_weather,
         min(event_date_local) as first_calendar_service_date,
         max(event_date_local) as last_calendar_service_date
-    from {{ ref('calendar_service_event_facts') }}
+    from {{ ref('calendar_programme_service_facts') }}
     where sales_record_id is not null
       and event_date_local between date '2026-01-01' and date '2026-12-31'
     group by sales_record_id

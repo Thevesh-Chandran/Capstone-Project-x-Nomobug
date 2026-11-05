@@ -1,0 +1,5 @@
+feature_order,input_set,mean_average_precision,mean_callback_capture,validation_folds,review_fraction,evidence_type,limitation
+1,Service history; no weather or mapped environment,0.23685983444740255,0.5237817452972181,3,0.2,Exploratory 2025 chronological development; not fresh test accuracy,Mean of three fold metrics; additional inputs did not consistently improve both measures
+2,Service history and weather,0.23140900665542982,0.5050024025742134,3,0.2,Exploratory 2025 chronological development; not fresh test accuracy,Mean of three fold metrics; additional inputs did not consistently improve both measures
+3,"Service history, weather and mapped environment",0.2406643480830334,0.5185073002731643,3,0.2,Exploratory 2025 chronological development; not fresh test accuracy,Mean of three fold metrics; additional inputs did not consistently improve both measures
+4,Current inputs plus land cover,0.22355129215805572,0.4521682063708415,3,0.2,Exploratory 2025 chronological development; not fresh test accuracy,Mean of three fold metrics; additional inputs did not consistently improve both measures
