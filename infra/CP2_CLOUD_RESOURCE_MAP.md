@@ -22,3 +22,5 @@ On 30 September 2026, four failed releases were confirmed as `FAILED` by their l
 | `20260928075706feaf1f` | Silver (8 views), Gold (14 objects) |
 
 The published candidate datasets, including a run that initially failed and was subsequently published, were preserved. Old Cloud Run revisions and Artifact Registry images were preserved because they are rollback/replay material, not proven duplicate live resources. This cleanup was housekeeping after checking published pointers; never delete candidates as a way to recover from a failed release. See [the reporting runbook](README.md) for failure recovery.
+
+| Cloud Run service `cp2-info` | Approved public app description/privacy/use information only; no customer APIs or source credentials | Dedicated identity has no data roles; public invoker access is scoped to this separate static site |

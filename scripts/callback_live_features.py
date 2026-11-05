@@ -24,12 +24,14 @@ try:
     from scripts import refresh_callback_validation as replay
     from scripts.load_calendar_bronze import FIELDS
     from scripts.operational_source_contracts import PREFIXES
+    from scripts.calendar_appointment_policy import load_policy, policy_sha256
 except ModuleNotFoundError:
     import benchmark_warranty_models as b
     import freeze_callback_prospective as prospective
     import refresh_callback_validation as replay
     from load_calendar_bronze import FIELDS
     from operational_source_contracts import PREFIXES
+    from calendar_appointment_policy import load_policy, policy_sha256
 
 LOCAL = ZoneInfo('Asia/Kuala_Lumpur')
 COMPILED = b.ROOT / 'dbt/target/compiled/nomobug/models'
@@ -260,7 +262,7 @@ def validate_weather_records(records, watermark):
         keys.add(key)
 
 
-def adapt_anchor_sql(source, watermark, *, predictors):
+def adapt_anchor_sql(source, watermark, *, predictors, collection_protocol=None):
     """Change only observation/eligibility/output, retaining contracted features."""
     source, count = re.subn(r'with observation as \(.*?\), uncertain_packages as \(',
         f"with observation as (SELECT DATE '{watermark.isoformat()}' AS observed_through), uncertain_packages as (",
@@ -277,11 +279,17 @@ def adapt_anchor_sql(source, watermark, *, predictors):
         # disambiguation; a later-created appointment cannot veto an anchor.
         match = 'and f.event_date_local >= p.closed_date'
         if source.count(match) != 1: raise ValueError('Unexpected compiled candidate timing SQL')
+        availability = 'f.event_end_ts <= @as_of'
+        if collection_protocol:
+            from scripts.cp2_collection_policy import sql_capture
+            capture = sql_capture('f.event_start_ts', 'f.event_end_ts')
+            availability = (f"({availability} OR (f.event_date_local BETWEEN DATE '{collection_protocol['cohort_start']}' "
+                f"AND DATE '{collection_protocol['cohort_end']}' AND {capture} <= @as_of))")
         source = source.replace(match, match + '\n      and f.event_created_ts <= @as_of'
-            '\n      and f.event_end_ts <= @as_of')
+            '\n      and ' + availability)
         source = source.replace(mature_clause,
             'and event_date_local >= DATE_SUB(DATE(@as_of, "Asia/Kuala_Lumpur"), INTERVAL 30 DAY)'
-            '\n      and event_end_ts <= @as_of and event_created_ts <= @as_of')
+            '\n      and event_created_ts <= @as_of')
         source, count = re.subn(r'\), outcomes as \(.*?\n\)\nselect a\.population',
             ')\nselect a.population', source, flags=re.S)
         if count != 1:
@@ -301,28 +309,51 @@ def adapt_anchor_sql(source, watermark, *, predictors):
 def build_stages(old, calendar_snapshot, sheet_snapshots, *, now, weather_records=None):
     """Return parameterized session stages without contacting the warehouse."""
     watermark = validate_calendar(calendar_snapshot, now)
+    from scripts.cp2_collection_policy import load, sql_capture
+    collection_protocol = load(b.ROOT)
     delta, replaced, invalid_geo, invalid_review, summary = calendar_delta(old, calendar_snapshot)
     params = {'delta': delta, 'replaced': replaced, 'invalid_geocodes': invalid_geo,
               'invalid_reviews': invalid_review, 'as_of': now,
-              'snapshot_at': aware(calendar_snapshot['metadata']['extracted_at'])}
+              'snapshot_at': aware(calendar_snapshot['metadata']['extracted_at']),
+              'appointment_reviews': load_policy()}
     replacement = {}
     stages, hashes = [], {}
     source_lineage_literals = {}
+    available = 'SAFE_CAST(start_raw AS TIMESTAMP) <= @as_of'
+    delta_available = "SAFE_CAST(JSON_VALUE(item,'$.start_raw') AS TIMESTAMP) <= @as_of"
+    if collection_protocol:
+        def availability(start, end):
+            return (f"({start} <= @as_of OR (DATE({start}, 'Asia/Kuala_Lumpur') "
+                f"BETWEEN DATE '{collection_protocol['cohort_start']}' AND DATE '{collection_protocol['cohort_end']}' "
+                f"AND {sql_capture(start, end)} <= @as_of))")
+        available = availability('SAFE_CAST(start_raw AS TIMESTAMP)', 'SAFE_CAST(end_raw AS TIMESTAMP)')
+        delta_available = availability("SAFE_CAST(JSON_VALUE(item,'$.start_raw') AS TIMESTAMP)",
+            "SAFE_CAST(JSON_VALUE(item,'$.end_raw') AS TIMESTAMP)")
     raw = (f'CREATE TEMP TABLE live_calendar_raw AS SELECT {",".join(FIELDS)} '
            f'FROM `{b.PROJECT}.bronze.{replay.OLD_TABLE}` '
            'WHERE calendar_event_row NOT IN UNNEST(@replaced) '
-           'AND SAFE_CAST(start_raw AS TIMESTAMP) <= @as_of '
+           f'AND {available} '
            'AND (SAFE_CAST(created_raw AS TIMESTAMP) IS NULL '
            'OR SAFE_CAST(created_raw AS TIMESTAMP) <= @as_of) UNION ALL SELECT '
            + _projection(FIELDS, ('calendar_event_row',), ('is_all_day',))
            + ' FROM UNNEST(JSON_QUERY_ARRAY(@delta)) AS item '
-           "WHERE SAFE_CAST(JSON_VALUE(item,'$.start_raw') AS TIMESTAMP) <= @as_of "
+           f"WHERE {delta_available} "
            "AND (SAFE_CAST(JSON_VALUE(item,'$.created_raw') AS TIMESTAMP) IS NULL "
            "OR SAFE_CAST(JSON_VALUE(item,'$.created_raw') AS TIMESTAMP) <= @as_of)")
     # Future scheduled appointments are excluded even from matching, so neither
     # matched-sale selection nor duplicate-session counts can see future dates.
     stages.append(('calendar_raw', raw))
-    replacement[f'`{b.PROJECT}`.`bronze`.`{replay.OLD_TABLE}`'] = 'live_calendar_raw'
+    stages.append(('calendar_observed', '''CREATE TEMP TABLE live_calendar_observed AS
+SELECT e.* FROM live_calendar_raw e WHERE NOT EXISTS (
+    SELECT 1 FROM UNNEST(JSON_QUERY_ARRAY(@appointment_reviews)) p
+    WHERE LOWER(TO_HEX(SHA256(CONCAT(e.calendar_id, '|', e.event_id))))
+        = JSON_VALUE(p, '$.event_identity_hash')
+      AND SAFE_CAST(e.start_raw AS TIMESTAMP)
+        = SAFE_CAST(JSON_VALUE(p, '$.expected_start_at_utc') AS TIMESTAMP)
+      AND SAFE_CAST(e.end_raw AS TIMESTAMP)
+        = SAFE_CAST(JSON_VALUE(p, '$.expected_end_at_utc') AS TIMESTAMP)
+)'''))
+    replacement[f'`{b.PROJECT}`.`bronze`.`{replay.OLD_TABLE}`'] = 'live_calendar_observed'
     for tab in REQUIRED_TABS:
         snapshot = sheet_snapshots[tab]
         metadata = snapshot['metadata']
@@ -417,9 +448,45 @@ def build_stages(old, calendar_snapshot, sheet_snapshots, *, now, weather_record
     source = (COMPILED / 'analytics_ml/warranty_callback_fixed_horizon_dataset.sql').read_text(encoding='utf-8')
     hashes['analytics_ml/warranty_callback_fixed_horizon_dataset.sql'] = hashlib.sha256(source.encode()).hexdigest()
     for old_name, new_name in replacement.items(): source = source.replace(old_name, new_name)
-    stages.extend([('predictors', adapt_anchor_sql(source, watermark, predictors=True)),
+    stages.append(('collection_candidates', """WITH candidates AS (
+SELECT e.calendar_event_row, e.event_date_local, e.event_start_ts, e.event_end_ts,
+  e.session_current, e.session_total, e.event_category, e.warranty_claim_candidate,
+  m.matched_sales_record_id, m.match_status, p.premise_type, p.include_in_sale_count,
+  p.closed_date, p.package_sessions_recorded,
+  EXISTS(SELECT 1 FROM live_calendar_events u JOIN live_calendar_event_matches um
+    USING(calendar_event_row) WHERE u.warranty_label_uncertain
+    AND um.matched_sales_record_id=m.matched_sales_record_id) AS uncertain_package
+FROM live_calendar_events e LEFT JOIN live_calendar_event_matches m USING(calendar_event_row)
+LEFT JOIN live_sales_package_facts p ON p.sales_record_id=m.matched_sales_record_id
+WHERE e.service_candidate
+), classified AS (
+SELECT *, CASE
+  WHEN matched_sales_record_id IS NULL THEN 'unmatched_or_ambiguous_sale'
+  WHEN NOT include_in_sale_count THEN 'excluded_sale'
+  WHEN closed_date IS NULL THEN 'missing_sale_date'
+  WHEN event_date_local < closed_date THEN 'calendar_before_sale_date'
+  WHEN premise_type NOT IN ('RESIDENTIAL','COMMERCIAL') THEN 'unsupported_premise'
+  WHEN event_category != 'service' OR warranty_claim_candidate THEN 'not_paid_service'
+  WHEN package_sessions_recorded IS NULL OR package_sessions_recorded < 1
+    OR session_current NOT BETWEEN 1 AND package_sessions_recorded
+    OR session_total != package_sessions_recorded THEN 'package_sequence_mismatch'
+  WHEN uncertain_package THEN 'uncertain_package'
+  ELSE 'candidate' END AS population_reason
+FROM candidates
+), counted AS (
+SELECT *, COUNTIF(population_reason='candidate') OVER
+  (PARTITION BY matched_sales_record_id,session_current) AS matching_anchor_count FROM classified
+)
+SELECT calendar_event_row,event_date_local,event_start_ts,event_end_ts,
+  CASE WHEN population_reason='candidate' AND matching_anchor_count != 1
+    THEN 'duplicate_paid_session' ELSE population_reason END AS population_reason
+FROM counted"""))
+    stages.extend([('predictors', adapt_anchor_sql(source, watermark, predictors=True,
+                         collection_protocol=collection_protocol)),
                    ('mature_labels', adapt_anchor_sql(source, watermark, predictors=False))])
     return stages, params, {'calendar_delta': summary, 'complete_outcomes_through': watermark.isoformat(),
+        'appointment_policy_sha256': policy_sha256(),
+        'appointment_review_count': len(params['appointment_reviews']),
         'compiled_query_hashes': hashes, 'calendar_snapshot_id': calendar_snapshot['metadata']['snapshot_id'],
         'sheet_snapshot_ids': {tab: sheet_snapshots[tab]['metadata']['snapshot_id'] for tab in REQUIRED_TABS},
         'source_extracted_at': calendar_snapshot['metadata']['extracted_at'],
@@ -429,7 +496,17 @@ def build_stages(old, calendar_snapshot, sheet_snapshots, *, now, weather_record
         'fresh_weather_rows': len(weather_records or [])}
 
 
-def derive(calendar_snapshot, sheet_snapshots, run_dir, *, weather_records=None, now=None, client=None):
+def query_budget(deadline, maximum=60, *, now=None):
+    """Bound timely feature work; never enlarge a frozen prediction window."""
+    if deadline is None:
+        return 300
+    remaining=(aware(deadline)-aware(now or datetime.now(timezone.utc))).total_seconds()
+    if remaining <= 0:
+        raise TimeoutError('Prospective feature deadline elapsed')
+    return min(float(maximum),remaining)
+
+
+def derive(calendar_snapshot, sheet_snapshots, run_dir, *, weather_records=None, now=None, client=None, deadline=None):
     """Persist predictor/mature-label inputs and return a PII-free run receipt."""
     from google.cloud import bigquery
     now = aware(now or datetime.now(timezone.utc))
@@ -467,11 +544,21 @@ def derive(calendar_snapshot, sheet_snapshots, run_dir, *, weather_records=None,
                 create_session=session_id is None)
             if session_id:
                 config.connection_properties = [bigquery.ConnectionProperty('session_id', session_id)]
-            job = client.query(sql, job_config=config)
-            try: rows = job.result(timeout=300)
+            budget=query_budget(deadline)
+            if deadline is None:
+                job = client.query(sql, job_config=config)
+            else:
+                from google.api_core.retry import Retry
+                job = client.query(sql, job_config=config, timeout=min(15,budget),
+                    retry=Retry(deadline=budget), job_retry=None)
+            try: rows = job.result(timeout=query_budget(deadline))
             except Exception:
-                job.cancel()
-                try: job.result(timeout=30)
+                if deadline is None:
+                    job.cancel()
+                else:
+                    try: job.cancel(timeout=5,retry=None)
+                    except Exception: pass
+                try: job.result(timeout=30 if deadline is None else 5)
                 except Exception: pass
                 raise
             if session_id is None: session_id = job.session_info.session_id
@@ -487,6 +574,9 @@ def derive(calendar_snapshot, sheet_snapshots, run_dir, *, weather_records=None,
                 parameters.append(bigquery.ScalarQueryParameter('address_candidates', 'STRING', serialized))
             if title == 'geocode_reuse_summary':
                 reused_events = int(next(iter(rows))['reused_event_rows'])
+            if title == 'collection_candidates':
+                (run_dir/'collection_candidates_private.json').write_text(json.dumps(
+                    [dict(row) for row in rows], default=str, indent=2), encoding='utf-8')
             if title in {'predictors', 'mature_labels'}:
                 frames[title] = pd.DataFrame([dict(row) for row in rows], columns=[field.name for field in rows.schema])
         for title, frame in frames.items():
@@ -498,7 +588,9 @@ def derive(calendar_snapshot, sheet_snapshots, run_dir, *, weather_records=None,
             prospective.prepare_scoring_frame(frames['predictors'], 'candidate_v5')
         receipt['predictor_input_sha256'] = b.persist_dataset_input(frames['predictors'], run_dir / 'predictors')
         receipt['mature_input_sha256'] = b.persist_dataset_input(frames['mature_labels'], run_dir / 'mature_labels')
-        receipt.update(predictor_rows=len(frames['predictors']), mature_rows=len(frames['mature_labels']),
+        receipt.update(collection_candidates_sha256=hashlib.sha256(
+            (run_dir/'collection_candidates_private.json').read_bytes()).hexdigest(),
+            predictor_rows=len(frames['predictors']), mature_rows=len(frames['mature_labels']),
             frozen_feature_contract_sha256=contract_sha256,
             eligible_new_address_hash_candidates=candidate_count,
             exact_hash_reused_calendar_event_rows=reused_events,
@@ -521,7 +613,12 @@ def derive(calendar_snapshot, sheet_snapshots, run_dir, *, weather_records=None,
         if session_id:
             config = bigquery.QueryJobConfig(maximum_bytes_billed=b.MAX_BYTES,
                 connection_properties=[bigquery.ConnectionProperty('session_id', session_id)])
-            try: client.query('CALL BQ.ABORT_SESSION();', job_config=config).result(timeout=30)
+            try:
+                if deadline is None:
+                    client.query('CALL BQ.ABORT_SESSION();', job_config=config).result(timeout=30)
+                else:
+                    client.query('CALL BQ.ABORT_SESSION();', job_config=config,
+                        timeout=5,retry=None,job_retry=None).result(timeout=5)
             except Exception:
                 # Session cleanup must not replace the actionable stage error.
                 pass

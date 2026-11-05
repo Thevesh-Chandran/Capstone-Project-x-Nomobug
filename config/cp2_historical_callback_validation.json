@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "purpose": "Archived 5598-service research validation; never join its row numbers to current Silver",
+  "project": "profound-keel-500007-s4",
+  "location": "asia-southeast1",
+  "anchor_table": "analytics_ml.warranty_callback_fixed_horizon_dataset",
+  "anchor_modified_utc": "2026-09-27T05:45:25.874000+00:00",
+  "anchor_rows": 5598,
+  "fact_table": "gold.calendar_service_event_facts",
+  "fact_modified_utc": "2026-09-27T05:45:10.008000+00:00",
+  "fact_rows": 7647,
+  "calendar_table": "bronze.calendar_events_78147d417f3d97d3c1d9ef0be59638fd7850e4195108e1fc7b879483c7f35b66",
+  "anchor_build_job": "a8766d37-7629-4b8d-99d9-841796938292",
+  "calendar_view_build_job": "196f1609-f0b3-47a5-a4bf-e64cbe487a60",
+  "limitation": "Historical source rules retain cancelled-title/status mismatches; this checker records them without relabelling or retraining"
+}

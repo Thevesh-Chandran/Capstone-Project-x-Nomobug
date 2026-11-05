@@ -88,20 +88,33 @@ def snapshot_known_by_service_end(row):
 
 def fetch(output):
     from google.cloud import bigquery
+    try:
+        from scripts import audit_callback_evidence as epoch
+    except ModuleNotFoundError:
+        import audit_callback_evidence as epoch
+    output=epoch.private_output(output)
+    pin=json.loads(epoch.PIN.read_text(encoding='utf-8'))
     c=bigquery.Client(project=b.PROJECT,location=b.LOCATION)
-    v=c.get_table(f'{b.PROJECT}.silver.calendar_events')
-    raws=set(re.findall(r'profound-keel-500007-s4\.bronze\.calendar_events_[0-9a-f]{64}',v.view_query.replace('`','')))
-    if len(raws)!=1:
-        raise ValueError('Ambiguous governing Calendar snapshot')
-    raw=raws.pop()
+    try:
+        for prefix in ('anchor','fact'):
+            table=c.get_table(f"{pin['project']}.{pin[prefix+'_table']}")
+            epoch.validate_metadata(table,pin[prefix+'_modified_utc'],pin[prefix+'_rows'])
+    except Exception:
+        c.close()
+        raise
+    raw=f"{pin['project']}.{pin['calendar_table']}"
+    facts=f"{pin['project']}.{pin['fact_table']}"
     queries={
       'anchors':f'''select d.population,d.sales_record_id,cast(d.anchor_date as string) anchor_date,
  d.anchor_event_row,d.warranty_signal_within_30d as target,
  r.summary,r.description,r.created_raw,r.updated_raw,r.end_raw,
  e.calendar_service_method_category as title_method
 from `{b.PROJECT}.analytics_ml.warranty_callback_fixed_horizon_dataset` d
+join `{facts}` e on e.calendar_event_row=d.anchor_event_row
+ and e.event_date_local=d.anchor_date and e.sales_record_id=d.sales_record_id
 join `{raw}` r on r.calendar_event_row=d.anchor_event_row
-join `{b.PROJECT}.silver.calendar_events` e on e.calendar_event_row=d.anchor_event_row''',
+ and r.event_id=e.event_id and r.calendar_name=e.calendar_name
+ and date(safe_cast(r.start_raw as timestamp),'Asia/Kuala_Lumpur')=d.anchor_date''',
       'claims':f'''select c.sales_record_id,c.warranty_claim_record_id,c.source_sheet_row,
  cast(c.recorded_claim_date as string) recorded_claim_date,c.claim_date_raw,
  w.warranty_claim_service_date_raw,w.complimentary_service_date_raw,c.source_refund_indicator
@@ -109,13 +122,29 @@ from `{b.PROJECT}.gold.warranty_claim_record_facts` c
 join `{b.PROJECT}.silver.warranty_claim` w using(warranty_claim_record_id)
 where c.sales_record_id in
  (select distinct sales_record_id from `{b.PROJECT}.analytics_ml.warranty_callback_fixed_horizon_dataset`)'''}
-    receipt={'executed_at':datetime.now(timezone.utc).isoformat(),'queries':{},'rows':{}}
-    for name,sql in queries.items():
-        job=c.query(sql,job_config=bigquery.QueryJobConfig(maximum_bytes_billed=b.MAX_BYTES))
-        receipt['rows'][name]=[dict(r) for r in job.result(timeout=300)]
-        receipt['queries'][name]={'sql':sql,'job_id':job.job_id,'bytes_processed':job.total_bytes_processed}
-    output.write_text(json.dumps(receipt,default=str,indent=2),encoding='utf-8')
-    return receipt
+    receipt={'executed_at':datetime.now(timezone.utc).isoformat(),'queries':{},'rows':{},
+      'historical_anchor_pin_sha256':epoch.p.digest(epoch.PIN),
+      'source_epochs':{'anchors':'pinned_27_September_5598_research_inventory',
+                       'formal_claims':'current_source_record_context_not_historical_target'}}
+    try:
+        for name,sql in queries.items():
+            job=c.query(sql,job_config=bigquery.QueryJobConfig(maximum_bytes_billed=b.MAX_BYTES))
+            try: receipt['rows'][name]=[dict(r) for r in job.result(timeout=300)]
+            except Exception:
+                job.cancel()
+                raise
+            receipt['queries'][name]={'sql':sql,'job_id':job.job_id,'bytes_processed':job.total_bytes_processed}
+        if len(receipt['rows']['anchors'])!=pin['anchor_rows']:
+            raise ValueError('Incomplete pinned Calendar anchor source inventory')
+        for prefix in ('anchor','fact'):
+            table=c.get_table(f"{pin['project']}.{pin[prefix+'_table']}")
+            epoch.validate_metadata(table,pin[prefix+'_modified_utc'],pin[prefix+'_rows'])
+        output.parent.mkdir(parents=True,exist_ok=True)
+        with output.open('x',encoding='utf-8') as handle:
+            json.dump(receipt,handle,default=str,indent=2)
+        return receipt
+    finally:
+        c.close()
 
 
 def main():
@@ -187,6 +216,8 @@ def main():
       'anchors_all_service_fields_blank':sum(d['all_service_fields_blank'] for d in discrepancies),
       'anchors_any_service_field_needs_review':sum(d['any_service_field_needs_review'] for d in discrepancies)}
     report={'executed_at':r['executed_at'],'queries':r['queries'],
+      'source_epochs':r.get('source_epochs',{'anchors':'preserved_source_evidence','formal_claims':'preserved_source_evidence'}),
+      'historical_anchor_pin_sha256':r.get('historical_anchor_pin_sha256'),
       'source_sha256':hashlib.sha256(json.dumps(r['rows'],sort_keys=True).encode()).hexdigest(),
       'anchor_rows':len(anchors),'all_frozen_labels_reconciled':len(known),'frozen_2026_labels_reconciled':len(frozen['rows']),
       'claim_record_rows':len(r['rows']['claims']),

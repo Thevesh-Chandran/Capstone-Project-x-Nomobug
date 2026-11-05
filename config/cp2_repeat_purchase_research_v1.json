@@ -1,0 +1,19 @@
+{
+  "name": "cp2_repeat_purchase_research_v1",
+  "declared_local_date": "2026-10-15",
+  "status": "exploratory_research_not_operational",
+  "source": "outputs/business_implementation/current/customers_private.json",
+  "source_release": "cp2r_20261014045314a561c6",
+  "observed_through": "2026-10-11",
+  "unit": "One first recorded programme per confidently matched customer; linked upsells are one programme",
+  "target": "A different recorded paid programme purchased strictly after the first date and within 90 days",
+  "features": "Only initial-day sale amount/missingness, package, pest, premise and month seasonality. No later upsell values, appointment totals, final balances or future repeat flags.",
+  "development_first_purchase_dates": ["2025-07-01", "2025-09-30"],
+  "test_first_purchase_dates": ["2026-01-01", "2026-07-13"],
+  "purge": "Every training label's 90-day window must end before the next evaluation cohort begins",
+  "selection": "Highest development average precision; fixed 20% review capacity; freeze before test scoring",
+  "candidate_families": ["logistic", "weighted_logistic", "random_forest", "extra_trees", "hist_gradient_boosting", "catboost"],
+  "acceptance": "Minimum 20 positives in test, AP greater than prevalence, top-20%-capacity lift >1.5 and 90% customer bootstrap lift lower bound >1. No production promotion without forward validation.",
+  "prior_inspection": "Feasibility audit inspected only cohort size and prevalence: development 262/8 positive and 2026 test 557/19 positive. No model scores inspected before this declaration. This small positive count means the acceptance minimum cannot pass in this source snapshot.",
+  "limitations": "First recorded purchase is not necessarily first-ever purchase. Current identity matching and corrected records are retrospective. Repeat labels reflect recorded purchases, not intent or satisfaction. Expanding multiple tasks is exploratory; no guarantee of good performance."
+}

@@ -74,7 +74,7 @@ jobs:
             --service-account "cp2-reporting-job@${PROJECT}.iam.gserviceaccount.com" \
             --tasks 1 --parallelism 1 --task-timeout 20m --max-retries 0 \
             --cpu 1 --memory 2Gi \
-            --set-env-vars 'NOMOBUG_BQ_PROJECT=profound-keel-500007-s4,NOMOBUG_BQ_LOCATION=asia-southeast1,NOMOBUG_BQ_UPLOAD_APPROVED=yes,NOMOBUG_BQ_MAX_BYTES_BILLED=104857600,NOMOBUG_GOOGLE_TOKEN=/var/run/secrets/cp2-token/token.json,NOMOBUG_GOOGLE_SOURCE_IDS=/var/run/secrets/cp2-ids/source_ids.json,NOMOBUG_GOOGLE_METADATA=/var/run/secrets/cp2-metadata/metadata.json' \
+            --update-env-vars 'NOMOBUG_BQ_PROJECT=profound-keel-500007-s4,NOMOBUG_BQ_LOCATION=asia-southeast1,NOMOBUG_BQ_UPLOAD_APPROVED=yes,NOMOBUG_BQ_MAX_BYTES_BILLED=104857600,NOMOBUG_GOOGLE_TOKEN=/var/run/secrets/cp2-token/token.json,NOMOBUG_GOOGLE_SOURCE_IDS=/var/run/secrets/cp2-ids/source_ids.json,NOMOBUG_GOOGLE_METADATA=/var/run/secrets/cp2-metadata/metadata.json,CP2_PORTAL_GCS_URI=gs://cp2-portal-profound-keel-500007-s4/current' \
             --set-secrets '/var/run/secrets/cp2-token/token.json=cp2-google-readonly-token:latest,/var/run/secrets/cp2-ids/source_ids.json=cp2-google-source-ids:latest,/var/run/secrets/cp2-metadata/metadata.json=cp2-google-source-metadata:latest' \
             --quiet
       - name: Show bounded job configuration

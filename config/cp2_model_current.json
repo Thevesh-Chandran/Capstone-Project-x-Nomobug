@@ -57,7 +57,10 @@
   },
   "additional_retrospective_test": {
     "evidence": "config/cp2_broad_challenger_later_period_v1.json",
-    "period": ["2026-08-28", "2026-08-31"],
+    "period": [
+      "2026-08-28",
+      "2026-08-31"
+    ],
     "services": 13,
     "positive_service_windows": 1,
     "reviewed_services": 3,
@@ -69,5 +72,25 @@
   "cloud_cohort": [
     "2026-10-01",
     "2026-10-27"
-  ]
+  ],
+  "october5_cohort": [
+    "2026-10-05",
+    "2026-10-27"
+  ],
+  "october5_cohort_protocol": "config/cp2_october5_cohort.json",
+  "october5_cohort_protocol_sha256": "5c7d90df93b048454caf806cf58fad126b023126ce498a2abdb387d512c65034",
+  "october10_cohort": [
+    "2026-10-10",
+    "2026-10-30"
+  ],
+  "october10_cohort_protocol": "config/cp2_october10_cohort.json",
+  "october10_cohort_protocol_sha256": "1e951e5a112e6c6cd7ef8f3ce3050e5aae151e714c92762cce7b0454396e89a9",
+  "october10_earliest_final_evaluation": "2026-11-30",
+  "recovery_cohort": [
+    "2026-10-16",
+    "2026-10-30"
+  ],
+  "recovery_cohort_protocol": "config/cp2_recovery_cohort.json",
+  "recovery_cohort_protocol_sha256": "99d1549ad5910d4c2519888126830251b8d431393024df5cdaa9a7eb50383fff",
+  "recovery_earliest_final_evaluation": "2026-11-30"
 }
