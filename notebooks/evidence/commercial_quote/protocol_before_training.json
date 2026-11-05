@@ -1,0 +1,193 @@
+{
+  "target": "Recorded package sales amount (RM), not profit or cash received",
+  "split": {
+    "validation_start": "2026-04-09",
+    "test_start": "2026-08-01",
+    "rule": "60th/80th percentile sale dates; customer groups disjoint, never choose split by score"
+  },
+  "feature_sets": {
+    "commercial_requirements": [
+      "sessions",
+      "tbs_units",
+      "trbs_units",
+      "includes_car",
+      "misting",
+      "fogging",
+      "service_family",
+      "premise",
+      "pest",
+      "district"
+    ],
+    "business_type_and_time": [
+      "sessions",
+      "tbs_units",
+      "trbs_units",
+      "includes_car",
+      "misting",
+      "fogging",
+      "service_family",
+      "premise",
+      "pest",
+      "district",
+      "business_type",
+      "time_trend_days"
+    ]
+  },
+  "families": {
+    "Linear regression": {
+      "copy_X": true,
+      "fit_intercept": true,
+      "n_jobs": null,
+      "positive": false,
+      "tol": 1e-06
+    },
+    "Ridge 10": {
+      "alpha": 10,
+      "copy_X": true,
+      "fit_intercept": true,
+      "max_iter": null,
+      "positive": false,
+      "random_state": null,
+      "solver": "auto",
+      "tol": 0.0001
+    },
+    "Ridge 100": {
+      "alpha": 100,
+      "copy_X": true,
+      "fit_intercept": true,
+      "max_iter": null,
+      "positive": false,
+      "random_state": null,
+      "solver": "auto",
+      "tol": 0.0001
+    },
+    "Decision tree depth 3": {
+      "ccp_alpha": 0.0,
+      "criterion": "squared_error",
+      "max_depth": 3,
+      "max_features": null,
+      "max_leaf_nodes": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 15,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "random_state": 20261030,
+      "splitter": "best"
+    },
+    "Decision tree depth 6": {
+      "ccp_alpha": 0.0,
+      "criterion": "squared_error",
+      "max_depth": 6,
+      "max_features": null,
+      "max_leaf_nodes": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 10,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "random_state": 20261030,
+      "splitter": "best"
+    },
+    "Random forest": {
+      "bootstrap": true,
+      "ccp_alpha": 0.0,
+      "criterion": "squared_error",
+      "max_depth": 12,
+      "max_features": 1.0,
+      "max_leaf_nodes": null,
+      "max_samples": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 5,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "n_estimators": 300,
+      "n_jobs": 1,
+      "oob_score": false,
+      "random_state": 20261030,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "Extra Trees": {
+      "bootstrap": false,
+      "ccp_alpha": 0.0,
+      "criterion": "squared_error",
+      "max_depth": 12,
+      "max_features": 1.0,
+      "max_leaf_nodes": null,
+      "max_samples": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 3,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "n_estimators": 300,
+      "n_jobs": 1,
+      "oob_score": false,
+      "random_state": 20261030,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "Gradient boosting": {
+      "categorical_features": "from_dtype",
+      "early_stopping": "auto",
+      "interaction_cst": null,
+      "l2_regularization": 10,
+      "learning_rate": 0.1,
+      "loss": "absolute_error",
+      "max_bins": 255,
+      "max_depth": null,
+      "max_features": 1.0,
+      "max_iter": 200,
+      "max_leaf_nodes": 15,
+      "min_samples_leaf": 10,
+      "monotonic_cst": null,
+      "n_iter_no_change": 10,
+      "quantile": null,
+      "random_state": 20261030,
+      "scoring": "loss",
+      "tol": 1e-07,
+      "validation_fraction": 0.1,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "CatBoost": {
+      "iterations": 400,
+      "learning_rate": 0.04,
+      "depth": 4,
+      "l2_leaf_reg": 10,
+      "loss_function": "MAE",
+      "thread_count": 1,
+      "random_seed": 20261030,
+      "verbose": false,
+      "allow_writing_files": false
+    }
+  },
+  "target_transforms": [
+    "original RM",
+    "log1p RM",
+    "per session",
+    "log per session"
+  ],
+  "selection": "Lowest validation MAE; no assessment comparison before selection; threshold-free regression",
+  "excluded_inputs": [
+    "Current sale amount",
+    "deposit",
+    "remaining balance",
+    "paid amounts",
+    "invoices",
+    "full package name",
+    "IDs",
+    "future purchases"
+  ],
+  "baseline": "Training-only median by requirements, fallback to family median",
+  "acceptance": "At least 10% lower MAE than the same baseline, positive 95% customer-bootstrap improvement lower bound, median percentage error at most 20%",
+  "independence": "Adaptive historical research; broader assessment period already inspected; no pristine final test claim",
+  "source_sha256": {
+    "business_private.json": "652cfe59b57bd7bb95b11280d88c8295bc068416c5b24d8a4e95bfb0ea7f98ce",
+    "sales_facts_private.json": "a2a6a40c49ba7fd2cad8b2d942cb85dee9dd6e2a239725ffa9ed8a0be57ca896"
+  },
+  "scope": "Commercial only; home pricing excluded by owner confirmation",
+  "commercial_source_sha256": "26105c9b263546a3a21c9972dc0b0b69e76bb4699dec74a395419a8448e73c48"
+}

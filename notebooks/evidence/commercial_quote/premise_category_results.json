@@ -1,0 +1,78 @@
+{
+  "selected": "Complement NB alpha=0.1 / words_and_characters",
+  "raw_inputs": 2,
+  "encoded_features": 18109,
+  "training_rows": 1357,
+  "validation_rows": 468,
+  "test_rows": 507,
+  "final_fit_rows": 1825,
+  "test": {
+    "rows": 507,
+    "commercial_cases": 159,
+    "accuracy": 0.7988165680473372,
+    "balanced_accuracy": 0.7509759271307742,
+    "macro_f1": 0.7585714285714286,
+    "commercial_precision": 0.7021276595744681,
+    "commercial_recall": 0.6226415094339622,
+    "residential_precision": 0.8360655737704918,
+    "residential_recall": 0.8793103448275862,
+    "average_precision": 0.766241281274227,
+    "brier": 0.15652684802178535,
+    "tn": 306,
+    "fp": 42,
+    "fn": 60,
+    "tp": 99
+  },
+  "keyword_baseline": {
+    "rows": 507,
+    "commercial_cases": 159,
+    "accuracy": 0.777120315581854,
+    "balanced_accuracy": 0.653193450444589,
+    "macro_f1": 0.6664959105859067,
+    "commercial_precision": 0.9107142857142857,
+    "commercial_recall": 0.32075471698113206,
+    "residential_precision": 0.7605321507760532,
+    "residential_recall": 0.985632183908046,
+    "average_precision": 0.5051336544442495,
+    "brier": 0.22287968441814596,
+    "tn": 343,
+    "fp": 5,
+    "fn": 108,
+    "tp": 51
+  },
+  "majority_baseline": {
+    "rows": 507,
+    "commercial_cases": 159,
+    "accuracy": 0.6863905325443787,
+    "balanced_accuracy": 0.5,
+    "macro_f1": 0.4070175438596491,
+    "commercial_precision": 0.0,
+    "commercial_recall": 0.0,
+    "residential_precision": 0.6863905325443787,
+    "residential_recall": 1.0,
+    "average_precision": 0.3136094674556213,
+    "brier": 0.3136094674556213,
+    "tn": 348,
+    "fp": 0,
+    "fn": 159,
+    "tp": 0
+  },
+  "bootstrap_accuracy_improvement_95": [
+    -0.021655682985279014,
+    0.06395970952854944
+  ],
+  "score_at_least_0_9": {
+    "rows": 395,
+    "coverage": 0.7790927021696252,
+    "accuracy": 0.8607594936708861
+  },
+  "passed_research_gate": false,
+  "deployed": false,
+  "limitations": [
+    "Only residential/commercial labels are modelled; vehicles and unknown labels are excluded.",
+    "Labels are staff-recorded categories, not independently inspected building use.",
+    "Historical source text may have been corrected after intake; point-in-time availability is not fully proven.",
+    "This is classification of supplied information, not prediction of future warranty claims or renewals.",
+    "Suggestions must be reviewed; never use the classifier alone to grant or deny warranty."
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "query": "SELECT s.sales_record_id,s.customer_name_raw,s.address_raw,s.package_type_raw,s.contract_type_raw,s.remark_raw,s.remark_prompt_raw,f.closed_date,f.sale_total_rm,f.package_sessions_recorded,f.pest_type_raw,f.sale_total_needs_review FROM `profound-keel-500007-s4.cp2r_20261027220023217d5b_silver.sales` s JOIN `profound-keel-500007-s4.cp2r_20261027220023217d5b_gold.sales_package_facts` f USING(sales_record_id) WHERE f.premise_type='COMMERCIAL' AND f.include_in_sale_count",
+  "job_id": "987e7e02-4264-4331-a411-114e0622a221",
+  "bytes": 663114
+}

@@ -1,0 +1,23 @@
+{
+  "commercial_sales": 407,
+  "consistent_area": 72,
+  "floor_count": 3,
+  "strictly_before_sale_day_area_sales": 34,
+  "partitions": {
+    "training": {
+      "rows": 213,
+      "known_area": 52,
+      "known_floors": 3
+    },
+    "validation": {
+      "rows": 75,
+      "known_area": 8,
+      "known_floors": 0
+    },
+    "assessment": {
+      "rows": 82,
+      "known_area": 8,
+      "known_floors": 0
+    }
+  }
+}

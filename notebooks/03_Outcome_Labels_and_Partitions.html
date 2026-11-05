@@ -1,0 +1,122 @@
+<!doctype html><html><meta charset="utf-8"><title>Outcome Labels and Partitions</title><style>body{max-width:1120px;margin:45px auto;padding:0 28px;font:16px/1.7 Arial;color:#1e293b;background:#f8fafc}h1{font-size:34px;color:#0f172a}h2{margin-top:52px;padding-top:22px;border-top:3px solid #2563eb;color:#172554}h3{margin-top:28px}section{background:white;padding:16px 24px;margin:15px 0;border:1px solid #e2e8f0;border-radius:10px}table{border-collapse:collapse;font-size:12px;display:block;overflow:auto}td,th{padding:9px;border-bottom:1px solid #e2e8f0;text-align:left}th{background:#eff6ff}img{max-width:100%;height:auto}pre{font:12px/1.6 Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;background:#f1f5f9}details{margin:14px 0}summary{cursor:pointer;color:#2563eb}code{font-size:.88em}a{color:#1d4ed8}</style><body>
+<section>
+<h1>Outcome Labels and Partitions</h1>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>from pathlib import Path
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
+BASE = Path.cwd()
+if not (BASE / &quot;evidence&quot;).exists():
+    BASE = BASE / &quot;notebooks&quot; 
+assert (BASE / &quot;evidence&quot;).is_dir(), &quot;Open from the project root or notebooks.&quot;
+EVIDENCE = BASE / &quot;evidence&quot;
+def read_json(name):
+    return json.loads((EVIDENCE / name).read_text(encoding=&quot;utf-8-sig&quot;))
+pd.set_option(&quot;display.max_colwidth&quot;, 90)
+plt.rcParams.update({&quot;figure.figsize&quot;: (10, 4.5), &quot;axes.spines.top&quot;: False,
+                     &quot;axes.spines.right&quot;: False, &quot;font.size&quot;: 11})
+</pre></details>
+</section>
+<section>
+<h2>Prediction question</h2>
+<p><strong>Will a pest-related corrective return be recorded within 30 days after this paid service?</strong> Yes = 1; No = 0. A normal next paid visit does not become a return label. A recorded corrective visit is not independent proof of pest recurrence or a verified formal warranty claim. Cancellations and unresolved/immature outcomes must not become negative examples.</p>
+<h2>Business rules and model labels</h2>
+<p>Commercial clients have no warranty entitlement. Residential 1x has none. A confirmed 1x plus Upsell 2x is treated as a linked 3-service programme. Residential 3x allows the confirmed post-third-service warranty window; a scheduling delay beyond 14 days does not automatically remove eligibility. Residential 4x, 6x and 12x cover the service period plus 30 days after the final visit, regardless of pest. These entitlement rules and the model&#x27;s recorded-return target are related but different concepts.</p>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>metadata = read_json(&quot;review_metadata.json&quot;)
+display(pd.DataFrame([
+    [&quot;Earlier development pool (EDA)&quot;, metadata[&quot;eda_services&quot;], metadata[&quot;eda_returns&quot;]],
+    [&quot;Maturity gap (not added to earlier EDA or held-out assessment)&quot;, metadata[&quot;maturity_gap_services&quot;], None],
+    [&quot;Historical assessment&quot;, metadata[&quot;holdout_services&quot;], metadata[&quot;holdout_returns&quot;]],
+    [&quot;Final later prospective refit (includes all mature input)&quot;, metadata[&quot;total_refit_services&quot;], metadata[&quot;total_refit_returns&quot;]]
+], columns=[&quot;Role&quot;, &quot;Services&quot;, &quot;Recorded positive windows&quot;]))
+assert metadata[&quot;eda_services&quot;] + metadata[&quot;maturity_gap_services&quot;] + metadata[&quot;holdout_services&quot;] == metadata[&quot;total_refit_services&quot;]
+display(pd.read_csv(EVIDENCE / &quot;development_partitions.csv&quot;))</pre></details>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Role</th>
+      <th>Services</th>
+      <th>Recorded positive windows</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Earlier development pool (EDA)</td>
+      <td>5333</td>
+      <td>492.0</td>
+    </tr>
+    <tr>
+      <td>Maturity gap (not added to earlier EDA or held-out assessment)</td>
+      <td>262</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <td>Historical assessment</td>
+      <td>100</td>
+      <td>5.0</td>
+    </tr>
+    <tr>
+      <td>Final later prospective refit (includes all mature input)</td>
+      <td>5695</td>
+      <td>521.0</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>period</th>
+      <th>validation_start</th>
+      <th>validation_end_exclusive</th>
+      <th>fit_services</th>
+      <th>validation_services</th>
+      <th>validation_returns</th>
+      <th>embargoed_training_rows</th>
+      <th>property_purged_training_rows</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2025_q2</td>
+      <td>2025-04-01</td>
+      <td>2025-07-01</td>
+      <td>828</td>
+      <td>878</td>
+      <td>35</td>
+      <td>190</td>
+      <td>124</td>
+    </tr>
+    <tr>
+      <td>2025_q3</td>
+      <td>2025-07-01</td>
+      <td>2025-10-01</td>
+      <td>1567</td>
+      <td>877</td>
+      <td>78</td>
+      <td>258</td>
+      <td>195</td>
+    </tr>
+    <tr>
+      <td>2025_q4</td>
+      <td>2025-10-01</td>
+      <td>2026-01-01</td>
+      <td>2434</td>
+      <td>723</td>
+      <td>116</td>
+      <td>191</td>
+      <td>272</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+<section>
+<h2>Why the assessment has 100 services</h2>
+<p>The 100 are the reserved later-date assessment, not the entire dataset or 100 warranty visits. Five had recorded returns; 95 did not. The prospective refit was fitted later on 5,695 mature services; it must not be evaluated on those fitting rows as if they were unseen.</p>
+<p>Development uses chronological folds with outcome embargo and property-group purging. The archived audit reports 34 development/assessment shared groups: the later historical assessment is not an entirely unseen-property test. Other larger historical studies are catalogued separately; they cannot be pooled as one untouched test.</p>
+<h2>Future evaluation</h2>
+<p>The recovery cohort is 16–30 October, with earliest full outcome evaluation 30 November, conditional on complete timely predictions and outcomes. Missed or late predictions remain missing. This notebook does not check current collection health or claim a completed future result. Exact protocol: <code>config/cp2_recovery_cohort.json</code>.</p>
+</section></body></html>

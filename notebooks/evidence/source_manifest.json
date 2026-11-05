@@ -1,0 +1,168 @@
+[
+  {
+    "source": "outputs/supervisor_model_review/20261017/data/review_metadata.json",
+    "copy": "evidence/review_metadata.json",
+    "sha256": "876d452902cbe92059281376a91863709b028144a624df980b7990a066bb9e38"
+  },
+  {
+    "source": "outputs/supervisor_model_review/20261017/data/source_catalog.json",
+    "copy": "evidence/source_catalog.json",
+    "sha256": "3e3ffdd0fc86c316db0c04f3fc9bc7ca03a6dd153d89f9fb042dccd2bcb15546"
+  },
+  {
+    "source": "outputs/supervisor_model_review/20261017/data/development_partitions.csv",
+    "copy": "evidence/development_partitions.csv",
+    "sha256": "77c7a39c21580b7279f22b4711c14b1b18e32d3c07e2c642ff74b4604256ce1e"
+  },
+  {
+    "source": "outputs/supervisor_model_review/20261017/data/variables_plain_english.csv",
+    "copy": "evidence/variables_plain_english.csv",
+    "sha256": "3ec8d979f9e305483c880f650d6378a88e0fb261dcd713442f4b51e7bcb203c7"
+  },
+  {
+    "source": "outputs/supervisor_model_review/20261017/data/numeric_associations.csv",
+    "copy": "evidence/numeric_associations.csv",
+    "sha256": "6c05a8ede52ee2085ba914db7033f4efda33abe7ce0439bab4d390cd717d153f"
+  },
+  {
+    "source": "outputs/supervisor_model_review/20261017/data/group_decisions.csv",
+    "copy": "evidence/group_decisions.csv",
+    "sha256": "ba8d8c0e20f01bf5e25828bc80c1990f4db174aab1dd0400d1548fc98946300d"
+  },
+  {
+    "source": "outputs/supervisor_model_review/20261017/data/individual_removal_decisions.csv",
+    "copy": "evidence/individual_removal_decisions.csv",
+    "sha256": "d62b37bf1ba0a12bc70ac67b26d336df4e77963ca348d405423a730c3f3e6fcf"
+  },
+  {
+    "source": "outputs/supervisor_model_review/20261017/data/model_results.json",
+    "copy": "evidence/model_results.json",
+    "sha256": "0245ac1bbfca353d34637ff0f83a63b793a9cdfcc73149d48204671c7011e6e9"
+  },
+  {
+    "source": "outputs/model_validation/20261021_management_model_search/data/forecast_results.json",
+    "copy": "evidence/forecast_results.json",
+    "sha256": "e900bf53b9376b289adb8083003b7e2c632d8b875d5f48aa9a20e8abb94f9941"
+  },
+  {
+    "source": "outputs/model_validation/20261021_management_model_search/data/classification_results.csv",
+    "copy": "evidence/classification_results.csv",
+    "sha256": "4f3f008f5f9110b9bfe3d237ecce34bf07046aa2d5419d3538f66f8c134f5f4b"
+  },
+  {
+    "source": "outputs/model_validation/20261021_management_model_search/data/partitions_and_use.csv",
+    "copy": "evidence/partitions_and_use.csv",
+    "sha256": "ef272cd2f954a0af21712d5788ac8830d94f928dd46c6827b4cd12a875976ea7"
+  },
+  {
+    "source": "outputs/model_validation/20261021_management_model_search/data/exact_input_names.csv",
+    "copy": "evidence/exact_input_names.csv",
+    "sha256": "aaab82b8d599032a21bcc442eda22b2548158a1f5add9808ed6e57bf33f5dd4f"
+  },
+  {
+    "source": "outputs/model_validation/20261021_management_model_search/data/new_data_sources.json",
+    "copy": "evidence/new_data_sources.json",
+    "sha256": "a7027948379f534c60a803eb100cd8d32cda30a2a89b0c1ba16386ce73e8efdb"
+  },
+  {
+    "source": "outputs/model_validation/20261021_management_model_search/data/dosm_results.csv",
+    "copy": "evidence/dosm_results.csv",
+    "sha256": "27d3d0058786570c6f44694e7102a1e8cb8d8e0a3217342ad9dbdde7046b39fc"
+  },
+  {
+    "source": "outputs/model_validation/20261021_management_model_search/data/booking_entries_h2_assessment.csv",
+    "copy": "evidence/booking_entries_h2_assessment.csv",
+    "sha256": "498152a7061528c83d52fddb1880773135d74e575e09f28b02a7d9745b74fa75"
+  },
+  {
+    "source": "outputs/model_validation/20261021_management_model_search/data/booked_hours_h1_assessment.csv",
+    "copy": "evidence/booked_hours_h1_assessment.csv",
+    "sha256": "4d29b776180ffabe62b7e2ef6dab6208f30c01b9721d0113b5be3e74e6b9b200"
+  },
+  {
+    "source": "outputs/model_validation/20261018_model_register/Study_Summary.csv",
+    "copy": "evidence/historical_studies.csv",
+    "sha256": "5a6a7c6c50302cb71caebe6ad82fe710bd4f4068a490ddd7798ad6fecef14024"
+  },
+  {
+    "source": "outputs/model_validation/20261018_model_register/Declared_Input_Lists.csv",
+    "copy": "evidence/historical_input_lists.csv",
+    "sha256": "5dc9215a93822246a23eb64871005cdd8c2e79b48c550a1d3e50b5c6e8d1fae4"
+  },
+  {
+    "source": "config/cp2_planning_v1.json",
+    "copy": "evidence/planning_protocol.json",
+    "sha256": "40452b490325bfef55d4a262a05ee4b3b99701c056106a61540cd9bfd2ea9d58"
+  },
+  {
+    "source": "outputs/model_validation/20261028_probability_calibration/results.json",
+    "copy": "evidence/probability_calibration_results.json",
+    "sha256": "773c2aa092145dc2c19aea9a97fef99207bca25c18f9dd7c819b606262872153"
+  },
+  {
+    "source": "outputs/model_validation/20261028_probability_calibration/validation_metrics.csv",
+    "copy": "evidence/probability_calibration_validation.csv",
+    "sha256": "c4077aa5e810b9ae274ee2146427bc8ca4fd796229d25d706438c6b08da0de4c"
+  },
+  {
+    "source": "outputs/model_validation/20261028_probability_calibration/assessment_metrics.csv",
+    "copy": "evidence/probability_calibration_assessment.csv",
+    "sha256": "a079df80d41647448fbedd80300124d533939e9dd572099d20da8996184a7b68"
+  },
+  {
+    "source": "outputs/cp2-v2/model_corrected_v5/selected_ap_predictions_private.csv",
+    "source_sha256": "6c16e2c47ad762c18cf9b9429baac13b8af594f1c86aedbc3f7afee0df605d15",
+    "copy": "evidence/return_test_predictions.csv",
+    "sha256": "c5242178f6501488e9b1c0ccc64638958da4e3e6b3a3c59b1c40529a85136bd9",
+    "projection": "Only outcome, probability and threshold; no identifiers"
+  },
+  {
+    "source": "dbt/models/sales.sql",
+    "copy": "evidence/sql/sales.sql",
+    "sha256": "f513c15a2e75a5de07e5edaee3ba468d027ca863a5001e365810af7cd203f1d3"
+  },
+  {
+    "source": "dbt/models/payments.sql",
+    "copy": "evidence/sql/payments.sql",
+    "sha256": "18eda54a30944569ad1c8e0c77dee640eb35bb0268e957ae006a0935ff919449"
+  },
+  {
+    "source": "dbt/models/recurring_payments.sql",
+    "copy": "evidence/sql/recurring_payments.sql",
+    "sha256": "18a9b3502add492f25b6166e391db0ab22eeac091254ce3830b3ff9e4e3a2702"
+  },
+  {
+    "source": "dbt/models/calendar_events.sql",
+    "copy": "evidence/sql/calendar_events.sql",
+    "sha256": "632d02e1f02186287f57fecb73cb8eca0ee6771f454108b9c75028ee14dfb89b"
+  },
+  {
+    "source": "dbt/models/calendar_event_matches.sql",
+    "copy": "evidence/sql/calendar_event_matches.sql",
+    "sha256": "6593b0a2903896f1ce533067354c0dbd8fb3e0138d931ea3fac02cffcabc1baa"
+  },
+  {
+    "source": "dbt/models/calendar_event_weather.sql",
+    "copy": "evidence/sql/calendar_event_weather.sql",
+    "sha256": "779f076fbf184521c91977beaf7a951fa2ae9e3fa991338bd89ff14bcd39eb03"
+  },
+  {
+    "source": "dbt/models/analytics_ml/warranty_callback_fixed_horizon_dataset.sql",
+    "copy": "evidence/sql/analytics_ml/warranty_callback_fixed_horizon_dataset.sql",
+    "sha256": "c536f3f87e467870700609aabc58315c469a5152f18c87fefecf0af1f3d76b36"
+  },
+  {
+    "source": "scripts/compare_callback_candidates_v2.py",
+    "source_sha256": "82efb921332b70366fbe9ff6f2179191a49a0d966184f94ff20d3cb9a8b8acc4",
+    "copy": "evidence/code/compare_callback_candidates_v2.py",
+    "sha256": "27330235e2142a0d58daa0f09dc96dca1d41e3470de4e06d7e209413bfda71a5",
+    "projection": "Production function excerpts; not a standalone module"
+  },
+  {
+    "source": "scripts/benchmark_warranty_models.py",
+    "source_sha256": "b2fc7f588c4cd98059203b6058376e21ce8af2e0cbe55c47d4628228182bd06d",
+    "copy": "evidence/code/benchmark_warranty_models.py",
+    "sha256": "6bc597bed6bda5f7e5c828da3bb936917376d2a3a0fd0565862f776d96b2c17b",
+    "projection": "Production function excerpts; not a standalone module"
+  }
+]

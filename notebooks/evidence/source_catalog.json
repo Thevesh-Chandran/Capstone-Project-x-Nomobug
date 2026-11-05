@@ -1,0 +1,66 @@
+[
+  {
+    "predictor": "Nearby food outlets",
+    "source": "Geoapify Places / OpenStreetMap",
+    "url": "https://apidocs.geoapify.com/docs/places/",
+    "status": "Live collection against archived environmental locations; summary saved separately",
+    "time_limit": "Current map snapshot, opening/closing history not established",
+    "next": "Spatial precision and duplicate-business review; historical snapshots or prospective candidate data"
+  },
+  {
+    "predictor": "Building construction year",
+    "source": "OpenStreetMap building date tags via Geoapify",
+    "url": "https://wiki.openstreetmap.org/wiki/Building_attributes",
+    "status": "100-location date-tag coverage check; summary saved separately",
+    "time_limit": "Business opening date must not be mistaken for construction date",
+    "next": "Verify actual building identity and construction date from authoritative property/owner records"
+  },
+  {
+    "predictor": "Past pest reports",
+    "source": "MOH / MYSA iDengue",
+    "url": "https://idengue.mysa.gov.my/pengenalan.html",
+    "status": "Official mosquito/dengue context source identified; no general building pest-history dataset verified",
+    "time_limit": "Dengue cases are not cockroach, rodent or general infestation labels",
+    "next": "Validate access to dated historical localities and mosquito-specific scope; no all-pest substitution"
+  },
+  {
+    "predictor": "Sewage treatment plants",
+    "source": "IWK official facilities/contact addresses",
+    "url": "https://iwk.com.my/my/contact_us",
+    "status": "Named facility addresses found; office/payment-counter addresses must be excluded",
+    "time_limit": "Inventory completeness and facility operating dates unverified",
+    "next": "Verify facility geometry and operating dates before constructing a distance feature"
+  },
+  {
+    "predictor": "Sewage assets",
+    "source": "IWK Indah Geoportal",
+    "url": "https://igis.iwk.com.my/indahgeoportal",
+    "status": "Official asset source, paid access advertised; no purchase made",
+    "time_limit": "License, data dates and access require review",
+    "next": "Use approved obtainable data or verified public facility subset with clearly limited coverage"
+  },
+  {
+    "predictor": "Drinking-water treatment plants",
+    "source": "Air Selangor Sustainability Report 2022",
+    "url": "https://hydrohub.airselangor.com/content/uploads/2023/07/Air-Selangor-Sustainability-Report-2022.pdf",
+    "status": "Official historical named inventory and regional map found (34 named plants)",
+    "time_limit": "Not a ready customer-linked coordinate dataset; sewage and drinking-water plants differ",
+    "next": "Verify individual plant coordinates, reference period and operational status"
+  },
+  {
+    "predictor": "Restaurant locations",
+    "source": "MyGeoMap official REST layer",
+    "url": "https://nav.mygeomap.gov.my/arcgis/rest/services/Geocode/AdminAgency_1MM_Template_Pusat_Komuniti/MapServer/layers",
+    "status": "Metadata discovered; direct web retrieval timed out",
+    "time_limit": "Restaurant existence dates and reuse conditions not verified",
+    "next": "Do not replace history with undated POI counts"
+  },
+  {
+    "predictor": "Food, facilities and building dates",
+    "source": "Overpass OSM API",
+    "url": "https://overpass-api.de/api/interpreter",
+    "status": "Direct bounded POST failed 502; mirror 500; GET probes returned 406/429",
+    "time_limit": "No usable download; no false zero coverage recorded",
+    "next": "Retry a public historical-snapshot service when available; retain failed-request evidence"
+  }
+]

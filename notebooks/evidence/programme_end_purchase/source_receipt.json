@@ -1,0 +1,20 @@
+{
+  "release": "cp2r_20261027220023217d5b",
+  "observation_end": "2026-10-27",
+  "queries": [
+    {
+      "name": "events",
+      "query": "SELECT programme_id,sales_record_id,event_date_local,event_category,session_current,session_total,paid_programme_stage,effective_paid_sessions,warranty_claim_candidate,calendar_pest_text_category,prior_7d_precipitation_mm,prior_14d_precipitation_mm,prior_7d_relative_humidity_mean_pct FROM `profound-keel-500007-s4.cp2r_20261027220023217d5b_gold.calendar_programme_service_facts` WHERE event_date_local <= DATE '2026-10-27' ",
+      "job_id": "6ccb0548-16c2-479c-a649-b9e19208abd1",
+      "bytes": 813745,
+      "rows": 8074
+    },
+    {
+      "name": "programmes",
+      "query": "SELECT programme_id,effective_paid_sessions,programme_first_sale_date,residential_programme,has_cancelled_sale FROM `profound-keel-500007-s4.cp2r_20261027220023217d5b_gold.service_programme_facts`",
+      "job_id": "1e2d1424-76bb-42d7-8ac2-bb7b41859904",
+      "bytes": 82657,
+      "rows": 2537
+    }
+  ]
+}

@@ -1,0 +1,181 @@
+<!doctype html><html><meta charset="utf-8"><title>Data Sources</title><style>body{max-width:1120px;margin:45px auto;padding:0 28px;font:16px/1.7 Arial;color:#1e293b;background:#f8fafc}h1{font-size:34px;color:#0f172a}h2{margin-top:52px;padding-top:22px;border-top:3px solid #2563eb;color:#172554}h3{margin-top:28px}section{background:white;padding:16px 24px;margin:15px 0;border:1px solid #e2e8f0;border-radius:10px}table{border-collapse:collapse;font-size:12px;display:block;overflow:auto}td,th{padding:9px;border-bottom:1px solid #e2e8f0;text-align:left}th{background:#eff6ff}img{max-width:100%;height:auto}pre{font:12px/1.6 Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;background:#f1f5f9}details{margin:14px 0}summary{cursor:pointer;color:#2563eb}code{font-size:.88em}a{color:#1d4ed8}</style><body>
+<section>
+<h1>Data Sources</h1>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>from pathlib import Path
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
+BASE = Path.cwd()
+if not (BASE / &quot;evidence&quot;).exists():
+    BASE = BASE / &quot;notebooks&quot; 
+assert (BASE / &quot;evidence&quot;).is_dir(), &quot;Open from the project root or notebooks.&quot;
+EVIDENCE = BASE / &quot;evidence&quot;
+def read_json(name):
+    return json.loads((EVIDENCE / name).read_text(encoding=&quot;utf-8-sig&quot;))
+pd.set_option(&quot;display.max_colwidth&quot;, 90)
+plt.rcParams.update({&quot;figure.figsize&quot;: (10, 4.5), &quot;axes.spines.top&quot;: False,
+                     &quot;axes.spines.right&quot;: False, &quot;font.size&quot;: 11})
+</pre></details>
+</section>
+<section>
+<h2>Source records</h2>
+<p>The source tabs have different grains. Joining their rows and summing everything would duplicate sales or visits. Recorded sales are package prices, not profit or settled cash. The PAYMENTS tab is not sufficiently maintained to act as the payment-tracking authority.</p>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>sources = pd.DataFrame([
+    [&quot;Sales&quot;, &quot;One sale/package record&quot;, &quot;Package, price, customer and service linkage&quot;],
+    [&quot;Commercial Clients&quot;, &quot;One source client/contract record&quot;, &quot;Commercial context and contract matching&quot;],
+    [&quot;Calendar&quot;, &quot;One event in a particular source snapshot&quot;, &quot;Bookings, cancellations, service stages and recorded returns&quot;],
+    [&quot;Recurring Payments&quot;, &quot;One tracked contract, with reminder-date columns&quot;, &quot;Reminder dates and recorded cumulative paid/balance amounts&quot;],
+    [&quot;Payments&quot;, &quot;One recorded payment entry&quot;, &quot;Coverage/reconciliation checks; not reliable current paid status&quot;],
+    [&quot;Refund&quot;, &quot;One source refund record&quot;, &quot;Refunds shown separately from sales&quot;],
+    [&quot;Weather and geography&quot;, &quot;Location/date or mapped feature&quot;, &quot;Environmental predictors with availability limits&quot;]
+], columns=[&quot;Source&quot;, &quot;One row means&quot;, &quot;Use&quot;])
+display(sources)
+columns = pd.read_csv(EVIDENCE / &quot;source_column_dictionary.csv&quot;)
+display(columns.groupby(&quot;source_tab&quot;, as_index=False).size().rename(columns={&quot;size&quot;:&quot;Documented columns&quot;}))</pre></details>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Source</th>
+      <th>One row means</th>
+      <th>Use</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Sales</td>
+      <td>One sale/package record</td>
+      <td>Package, price, customer and service linkage</td>
+    </tr>
+    <tr>
+      <td>Commercial Clients</td>
+      <td>One source client/contract record</td>
+      <td>Commercial context and contract matching</td>
+    </tr>
+    <tr>
+      <td>Calendar</td>
+      <td>One event in a particular source snapshot</td>
+      <td>Bookings, cancellations, service stages and recorded returns</td>
+    </tr>
+    <tr>
+      <td>Recurring Payments</td>
+      <td>One tracked contract, with reminder-date columns</td>
+      <td>Reminder dates and recorded cumulative paid/balance amounts</td>
+    </tr>
+    <tr>
+      <td>Payments</td>
+      <td>One recorded payment entry</td>
+      <td>Coverage/reconciliation checks; not reliable current paid status</td>
+    </tr>
+    <tr>
+      <td>Refund</td>
+      <td>One source refund record</td>
+      <td>Refunds shown separately from sales</td>
+    </tr>
+    <tr>
+      <td>Weather and geography</td>
+      <td>Location/date or mapped feature</td>
+      <td>Environmental predictors with availability limits</td>
+    </tr>
+  </tbody>
+</table>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>source_tab</th>
+      <th>Documented columns</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>B2B FOLLOW UP</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <td>PAYMENTS</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <td>SALES</td>
+      <td>43</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+<section>
+<h2>External data</h2>
+<p>The following register records identified sources and their limits. Identified or downloaded does not automatically mean retained in the frozen model. Actual building age is unavailable; neighbourhood settlement age is a different proxy. Online silence does not mean a building has no pest history.</p>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>external = pd.DataFrame(read_json(&quot;source_catalog.json&quot;))
+display(external[[&quot;predictor&quot;, &quot;source&quot;, &quot;status&quot;, &quot;time_limit&quot;]])</pre></details>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>predictor</th>
+      <th>source</th>
+      <th>status</th>
+      <th>time_limit</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Nearby food outlets</td>
+      <td>Geoapify Places / OpenStreetMap</td>
+      <td>Live collection against archived environmental locations; summary saved separately</td>
+      <td>Current map snapshot, opening/closing history not established</td>
+    </tr>
+    <tr>
+      <td>Building construction year</td>
+      <td>OpenStreetMap building date tags via Geoapify</td>
+      <td>100-location date-tag coverage check; summary saved separately</td>
+      <td>Business opening date must not be mistaken for construction date</td>
+    </tr>
+    <tr>
+      <td>Past pest reports</td>
+      <td>MOH / MYSA iDengue</td>
+      <td>Official mosquito/dengue context source identified; no general building pest-history dataset verified</td>
+      <td>Dengue cases are not cockroach, rodent or general infestation labels</td>
+    </tr>
+    <tr>
+      <td>Sewage treatment plants</td>
+      <td>IWK official facilities/contact addresses</td>
+      <td>Named facility addresses found; office/payment-counter addresses must be excluded</td>
+      <td>Inventory completeness and facility operating dates unverified</td>
+    </tr>
+    <tr>
+      <td>Sewage assets</td>
+      <td>IWK Indah Geoportal</td>
+      <td>Official asset source, paid access advertised; no purchase made</td>
+      <td>License, data dates and access require review</td>
+    </tr>
+    <tr>
+      <td>Drinking-water treatment plants</td>
+      <td>Air Selangor Sustainability Report 2022</td>
+      <td>Official historical named inventory and regional map found (34 named plants)</td>
+      <td>Not a ready customer-linked coordinate dataset; sewage and drinking-water plants differ</td>
+    </tr>
+    <tr>
+      <td>Restaurant locations</td>
+      <td>MyGeoMap official REST layer</td>
+      <td>Metadata discovered; direct web retrieval timed out</td>
+      <td>Restaurant existence dates and reuse conditions not verified</td>
+    </tr>
+    <tr>
+      <td>Food, facilities and building dates</td>
+      <td>Overpass OSM API</td>
+      <td>Direct bounded POST failed 502; mirror 500; GET probes returned 406/429</td>
+      <td>No usable download; no false zero coverage recorded</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+<section>
+<h2>Warehouse layers</h2>
+<p><code>bronze</code>: immutable source snapshots. <code>silver</code>: cleaned and linked records. <code>gold</code>: approved management views. <code>analytics_ml</code>: historical research tables. <code>audit</code>: pipeline and collection evidence. <code>quality</code>: data checks.</p>
+<p>Source extraction: <code>scripts/load_operational_bronze.py</code>, <code>scripts/load_calendar_bronze.py</code>. Live reporting entry point: <code>scripts/cp2_reporting_release.py</code>. See <code>planning/BIGQUERY_START_HERE.md</code> and the live warehouse catalogue in <code>project_guide</code>.</p>
+<p>Credentials are not needed to read this notebook. Live extraction requires the project&#x27;s approved read-only Google source access.</p>
+</section></body></html>

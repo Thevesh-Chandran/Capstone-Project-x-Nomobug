@@ -1,0 +1,57 @@
+{
+  "source_sha256": "4e183675359c376fdd745a87c88797631803df1931be3ff9821189c94259a4ba",
+  "variants": {
+    "Original commercial model": [
+      "sessions",
+      "tbs_units",
+      "trbs_units",
+      "includes_car",
+      "misting",
+      "fogging",
+      "service_family",
+      "premise",
+      "pest",
+      "district"
+    ],
+    "Add Calendar area": [
+      "sessions",
+      "tbs_units",
+      "trbs_units",
+      "includes_car",
+      "misting",
+      "fogging",
+      "service_family",
+      "premise",
+      "pest",
+      "district",
+      "area_sqft"
+    ],
+    "Add Calendar area and floors": [
+      "sessions",
+      "tbs_units",
+      "trbs_units",
+      "includes_car",
+      "misting",
+      "fogging",
+      "service_family",
+      "premise",
+      "pest",
+      "district",
+      "area_sqft",
+      "floors_mentioned"
+    ]
+  },
+  "split": {
+    "validation_start": "2026-04-09",
+    "test_start": "2026-08-01",
+    "rule": "60th/80th percentile sale dates; customer groups disjoint, never choose split by score"
+  },
+  "fixed_model": "Previously selected gradient boosting, log price per session; same settings; numeric median imputation",
+  "selection": "Lowest validation MAE; assessment only after selection",
+  "limitations": [
+    "Adaptive historical follow-up on inspected periods",
+    "Sale-day-end timestamp is a permissive screen, not proof that details were known before quotation",
+    "No later descriptions, unitless dimensions, address floor ordinals or conflicting areas used",
+    "No production or frozen model changes"
+  ]
+}
