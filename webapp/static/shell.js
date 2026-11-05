@@ -2,6 +2,7 @@
 /* Sidebar navigation and page title, shared by the main portal and the heatmap page. */
 (function () {
   const I = {
+    overview: '<path d="M3 13h4v7H3zM10 9h4v11h-4zM17 4h4v16h-4z"/>',
     today: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
     home: '<path d="M9 6h11M9 12h11M9 18h11"/><path d="m3.5 6 1 1 2-2M3.5 12l1 1 2-2M3.5 18l1 1 2-2"/>',
     payments: '<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h3"/>',
@@ -22,7 +23,9 @@
   };
   // Operational tools stay prominent; source browsing and research are secondary.
   const NAV = [
+    { label: 'Management', views: [['overview', 'Management overview']] },
     {
+      label: 'Daily work',
       views: [
         ['today', 'Workspace'],
         ['returns', 'Service follow-up'],
@@ -32,7 +35,7 @@
       label: 'Supporting tools',
       views: [
         ['home', 'Payment reminders'],
-        ['plan', 'Booking calendar'],
+        ['plan', 'Bookings & workload'],
         ['/maps', 'Sales & return maps', 'maps'],
         ['customers', 'Customer history'],
       ],
@@ -80,7 +83,8 @@
         const a = document.createElement('a');
         a.className = 'side-link';
         a.dataset.route = route;
-        a.href = route.startsWith('/') ? route : (isMaps ? '/#' : '#') + route;
+        const alias = Object.keys(window.CP2_ALIAS || {}).find(k => window.CP2_ALIAS[k] === route);
+        a.href = route.startsWith('/') ? route : (isMaps ? '/#' : '#') + (alias || route);
         a.innerHTML = `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${I[icon || route]}</svg>`;
         const sp = document.createElement('span');
         sp.textContent = text;
@@ -91,7 +95,7 @@
     });
   }
   function render(route) {
-    if (route === 'decisions') route = 'today';
+    if (route === 'decisions') route = 'overview';
     const t = TITLES[route] || TITLES.today;
     document.querySelectorAll('.side-link').forEach(a => {
       const on = a.dataset.route === route;
@@ -116,9 +120,9 @@
   window.onRoute = (route, ready) => {
     render(route);
     window.scrollTo({ top: 0, behavior: 'instant' });
-    if (ready && window.loadStage) window.loadStage(route === 'decisions' ? 'today' : route);
+    if (ready && window.loadStage) window.loadStage(route === 'decisions' ? 'overview' : route);
   };
-  render(isMaps ? '/maps' : location.hash.slice(1) || 'today');
+  render(isMaps ? '/maps' : (window.cp2Page ? window.cp2Page() : location.hash.slice(1)) || 'overview');
   if (isMaps) {
     const lo = $('logout');
     if (lo)

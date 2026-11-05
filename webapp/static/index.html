@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nomobug</title><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script><script defer src="/tools.js"></script><script defer src="/workspace.js"></script><script defer src="/booking.js"></script><script defer src="/stages.js"></script><script defer src="/shell.js"></script></head><body>
-<aside class="side" aria-label="Main navigation"><a class="side-brand" href="#today"><span class="logo"><img src="/nomobug-logo.png" alt="Nomobug"></span></a>
+<aside class="side" aria-label="Main navigation"><a class="side-brand" href="#overview"><span class="logo"><img src="/nomobug-logo.png" alt="Nomobug"></span></a>
 <nav class="side-nav" aria-label="Main navigation"></nav>
 <div class="side-foot"><small id="snapshot-date">Loading records</small><button id="logout" class="side-signout" type="button">Sign out</button></div></aside>
 <main class="main"><span id="breadcrumb" class="sr-only"></span>
@@ -8,9 +8,10 @@
 <section id="login" hidden><div class="login"><form id="login-form" class="login-form"><span class="logo login-logo"><img src="/nomobug-logo.png" alt="Nomobug"></span><h1>Staff sign in</h1>
 <label for="login-username">Username</label><input id="login-username" name="username" autocomplete="username" required>
 <label for="access-code">Password</label><input id="access-code" type="password" autocomplete="current-password" required>
-<button class="primary btn-block">Sign in</button><p id="login-message" role="alert"></p></form><p class="login-foot">Customer records in this portal are confidential.</p></div></section>
+<button class="primary btn-block">Sign in</button><p id="login-message" role="alert"></p></form><div class="login-aside"><strong>Staff workspace</strong><span>Service follow-up, payment reminders, bookings and customer history in one place.</span></div><p class="login-foot">Customer records in this portal are confidential.</p></div></section>
 <div id="workspace">
 <header class="page-header" id="page-header"></header>
+<section data-view="overview" hidden class="stage-view" id="view-overview"><div class="st-loading"><span></span><span></span><span></span></div></section>
 <section data-view="today" hidden class="stage-view" id="view-today"><div class="st-loading"><span></span><span></span><span></span></div></section>
 <section data-view="returns" hidden class="stage-view" id="view-returns"><div class="st-loading"><span></span><span></span><span></span></div></section>
 <section data-view="risk" hidden class="stage-view" id="view-risk"><div class="st-loading"><span></span><span></span><span></span></div></section>

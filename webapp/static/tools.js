@@ -1,4 +1,6 @@
 'use strict';
+// Colours come from the stylesheet's tokens, so charts follow the theme.
+const tok = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 let planningData, planningPending, paymentData;
 let queueView = 'all';
 const customerForm = $('customer-search');
@@ -262,14 +264,14 @@ function modelBars(target, rows, description) {
   const max = Math.max(1, ...rows.map(r => r.value));
   rows.forEach((r, i) => {
     const y = 6 + i * 40;
-    svg.append(svgNode('text', { x: 0, y: y + 17, fill: '#262626', 'font-size': 16 }, r.label));
+    svg.append(svgNode('text', { x: 0, y: y + 17, fill: tok('--color-ink-2'), 'font-size': 16 }, r.label));
     svg.append(
       svgNode('rect', { x: 275, y: y + 4, width: (500 * r.value) / max, height: 16, rx: 4, fill: r.color }),
     );
     svg.append(
       svgNode(
         'text',
-        { x: 285 + (500 * r.value) / max, y: y + 16, fill: '#0a0a0a', 'font-size': 16, 'font-weight': 600 },
+        { x: 285 + (500 * r.value) / max, y: y + 16, fill: tok('--color-ink'), 'font-size': 16, 'font-weight': 600 },
         number(r.value),
       ),
     );
@@ -308,9 +310,9 @@ function renderModelVisuals(r) {
     modelBars(
       returns,
       [
-        { label: 'Actual returns, found', value: e.threshold_TP, color: '#13A38A' },
-        { label: 'Actual returns, missed', value: e.threshold_FN, color: '#E5604E' },
-        { label: 'Predicted returns, false alerts', value: e.threshold_FP, color: '#F29D12' },
+        { label: 'Actual returns, found', value: e.threshold_TP, color: tok('--chart-actual') },
+        { label: 'Actual returns, missed', value: e.threshold_FN, color: tok('--chart-miss') },
+        { label: 'Predicted returns, false alerts', value: e.threshold_FP, color: tok('--chart-rule') },
       ],
       'Will a paid service have a recorded pest-related return within 30 days? Earlier test: ' +
         e.rows +
@@ -336,9 +338,9 @@ function renderModelVisuals(r) {
     modelBars(
       research,
       [
-        { label: 'Returns detected', value: b.TP, color: '#13A38A' },
-        { label: 'Returns missed', value: b.FN, color: '#E5604E' },
-        { label: 'False alerts', value: b.FP, color: '#F29D12' },
+        { label: 'Returns detected', value: b.TP, color: tok('--chart-actual') },
+        { label: 'Returns missed', value: b.FN, color: tok('--chart-miss') },
+        { label: 'False alerts', value: b.FP, color: tok('--chart-rule') },
       ],
       'Will a residential programme have a recorded pest return within 60 days after its final paid service?',
     );
@@ -366,13 +368,13 @@ function renderModelVisuals(r) {
     modelBars(
       repeat,
       [
-        { label: 'Actual repeat buyers, found', value: p.cases_in_review_list, color: '#13A38A' },
+        { label: 'Actual repeat buyers, found', value: p.cases_in_review_list, color: tok('--chart-actual') },
         {
           label: 'Actual repeat buyers, missed',
           value: p.positive_customers - p.cases_in_review_list,
-          color: '#E5604E',
+          color: tok('--chart-miss'),
         },
-        { label: 'Listed customers, did not repeat', value: p.false_alerts_in_review_list, color: '#F29D12' },
+        { label: 'Listed customers, did not repeat', value: p.false_alerts_in_review_list, color: tok('--chart-rule') },
       ],
       'Who might buy again within 90 days? Historical test: ' +
         p.customers +
@@ -436,18 +438,18 @@ function forecastTrend(target, rows, label) {
     const v = (max * i) / 4,
       yy = y(v);
     svg.append(
-      svgNode('line', { x1: left, y1: yy, x2: width - right, y2: yy, stroke: '#ececec' }),
+      svgNode('line', { x1: left, y1: yy, x2: width - right, y2: yy, stroke: tok('--color-rule') }),
       svgNode(
         'text',
-        { x: left - 8, y: yy + 4, 'text-anchor': 'end', fill: '#525252', 'font-size': 12 },
+        { x: left - 8, y: yy + 4, 'text-anchor': 'end', fill: tok('--color-muted'), 'font-size': 12 },
         number(v),
       ),
     );
   }
   for (const [key, color, dash] of [
-    ['actual', '#13A38A', false],
-    ['selected', '#2F74E6', false],
-    ['baseline', '#F29D12', true],
+    ['actual', tok('--chart-actual'), false],
+    ['selected', tok('--chart-model'), false],
+    ['baseline', tok('--chart-rule'), true],
   ]) {
     const attrs = {
       points: rows.map((r, i) => `${x(i)},${y(r[key])}`).join(' '),
@@ -466,7 +468,7 @@ function forecastTrend(target, rows, label) {
           x: x(i),
           y: height - 10,
           'text-anchor': k === 0 ? 'start' : k === 2 ? 'end' : 'middle',
-          fill: '#525252',
+          fill: tok('--color-muted'),
           'font-size': 12,
         },
         date(rows[i].origin),
@@ -476,9 +478,9 @@ function forecastTrend(target, rows, label) {
   target.append(svg);
   const legend = el('div', undefined, 'forecast-legend');
   [
-    ['Recorded', '#13A38A'],
-    ['Forecast', '#2F74E6'],
-    ['Simple baseline', '#F29D12'],
+    ['Recorded', tok('--chart-actual')],
+    ['Forecast', tok('--chart-model')],
+    ['Simple baseline', tok('--chart-rule')],
   ].forEach(([name, color]) => {
     const item = el('span', name);
     item.style.borderColor = color;
