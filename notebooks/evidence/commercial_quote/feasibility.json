@@ -1,0 +1,30 @@
+{
+  "scope": "Commercial only; home pricing excluded by owner confirmation",
+  "rows": 407,
+  "split": {
+    "validation_start": "2026-04-09",
+    "test_start": "2026-08-01",
+    "rule": "60th/80th percentile sale dates; customer groups disjoint, never choose split by score"
+  },
+  "samples": {
+    "training": {
+      "rows": 213,
+      "customers": 186,
+      "from": "2024-08-01",
+      "to": "2026-04-07"
+    },
+    "validation": {
+      "rows": 75,
+      "customers": 72,
+      "from": "2026-04-09",
+      "to": "2026-07-31"
+    },
+    "assessment": {
+      "rows": 82,
+      "customers": 78,
+      "from": "2026-08-01",
+      "to": "2026-10-27"
+    }
+  },
+  "independence": "Adaptive historical research; broader assessment period already inspected; no pristine final test claim"
+}

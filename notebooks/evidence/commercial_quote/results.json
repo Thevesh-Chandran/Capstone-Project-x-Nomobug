@@ -1,0 +1,83 @@
+{
+  "selected": "Gradient boosting / commercial_requirements / log_per_session",
+  "raw_inputs": [
+    "sessions",
+    "tbs_units",
+    "trbs_units",
+    "includes_car",
+    "misting",
+    "fogging",
+    "service_family",
+    "premise",
+    "pest",
+    "district"
+  ],
+  "input_count": 10,
+  "training_rows": 213,
+  "validation_rows": 75,
+  "test_rows": 82,
+  "final_fit_rows": 288,
+  "test": {
+    "rows": 82,
+    "mae_rm": 201.786517531203,
+    "mse_rm_squared": 191017.88895877666,
+    "rmse_rm": 437.05593344419503,
+    "r_squared": 0.7917164360897553,
+    "wape": 0.192083936262899,
+    "median_absolute_percentage_error": 0.06073762038816695,
+    "within_20_percent": 0.8048780487804879,
+    "median_absolute_error_rm": 52.92031173726059
+  },
+  "baseline": {
+    "rows": 82,
+    "mae_rm": 271.4146341463415,
+    "mse_rm_squared": 342461.31707317074,
+    "rmse_rm": 585.2019455480055,
+    "r_squared": 0.6265843790327421,
+    "wape": 0.25836409649183906,
+    "median_absolute_percentage_error": 0.06779661016949153,
+    "within_20_percent": 0.7073170731707317,
+    "median_absolute_error_rm": 55.5
+  },
+  "mae_reduction": 0.25653781283435273,
+  "bootstrap_MAE_improvement_rm_95": [
+    9.642756495440173,
+    145.20941240600607
+  ],
+  "segments": {
+    "COMMERCIAL": {
+      "model": {
+        "rows": 82,
+        "mae_rm": 201.786517531203,
+        "mse_rm_squared": 191017.88895877666,
+        "rmse_rm": 437.05593344419503,
+        "r_squared": 0.7917164360897553,
+        "wape": 0.192083936262899,
+        "median_absolute_percentage_error": 0.06073762038816695,
+        "within_20_percent": 0.8048780487804879,
+        "median_absolute_error_rm": 52.92031173726059
+      },
+      "baseline": {
+        "rows": 82,
+        "mae_rm": 271.4146341463415,
+        "mse_rm_squared": 342461.31707317074,
+        "rmse_rm": 585.2019455480055,
+        "r_squared": 0.6265843790327421,
+        "wape": 0.25836409649183906,
+        "median_absolute_percentage_error": 0.06779661016949153,
+        "within_20_percent": 0.7073170731707317,
+        "median_absolute_error_rm": 55.5
+      }
+    }
+  },
+  "passed_research_gate": true,
+  "deployed": false,
+  "limitations": [
+    "Recorded sold price is a quotation benchmark, not a mandated price or profit estimate.",
+    "Exact building size, verified infestation severity and actual treatment cost are unavailable.",
+    "Package and customer fields come from a later snapshot; historical corrections cannot be fully reconstructed.",
+    "Historical periods were previously inspected; new future quotations are needed to confirm reliability.",
+    "Adaptive historical research; broader assessment period already inspected; no pristine final test claim"
+  ],
+  "scope": "Commercial quotation benchmark only; residential prices are fixed"
+}

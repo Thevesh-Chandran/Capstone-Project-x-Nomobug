@@ -1,0 +1,25 @@
+{
+  "snapshot_calendar_rows": 11959,
+  "events_with_one_explicit_area": 490,
+  "commercial_study_sales": 407,
+  "commercial_sales_with_linked_area": 99,
+  "commercial_sales_with_consistent_timestamp_eligible_area": 68,
+  "commercial_sales_with_eligible_floor_count": 3,
+  "partitions": {
+    "training": {
+      "rows": 213,
+      "known_area": 50,
+      "known_floors": 3
+    },
+    "validation": {
+      "rows": 75,
+      "known_area": 7,
+      "known_floors": 0
+    },
+    "assessment": {
+      "rows": 82,
+      "known_area": 7,
+      "known_floors": 0
+    }
+  }
+}

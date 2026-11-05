@@ -1,0 +1,71 @@
+<!doctype html><html><meta charset="utf-8"><title>Nomobug Capstone Project</title><style>body{max-width:1120px;margin:45px auto;padding:0 28px;font:16px/1.7 Arial;color:#1e293b;background:#f8fafc}h1{font-size:34px;color:#0f172a}h2{margin-top:52px;padding-top:22px;border-top:3px solid #2563eb;color:#172554}h3{margin-top:28px}section{background:white;padding:16px 24px;margin:15px 0;border:1px solid #e2e8f0;border-radius:10px}table{border-collapse:collapse;font-size:12px;display:block;overflow:auto}td,th{padding:9px;border-bottom:1px solid #e2e8f0;text-align:left}th{background:#eff6ff}img{max-width:100%;height:auto}pre{font:12px/1.6 Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;background:#f1f5f9}details{margin:14px 0}summary{cursor:pointer;color:#2563eb}code{font-size:.88em}a{color:#1d4ed8}</style><body>
+<section>
+<h1>Nomobug Capstone Project</h1>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>from pathlib import Path
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
+BASE = Path.cwd()
+if not (BASE / &quot;evidence&quot;).exists():
+    BASE = BASE / &quot;notebooks&quot; 
+assert (BASE / &quot;evidence&quot;).is_dir(), &quot;Open from the project root or notebooks.&quot;
+EVIDENCE = BASE / &quot;evidence&quot;
+def read_json(name):
+    return json.loads((EVIDENCE / name).read_text(encoding=&quot;utf-8-sig&quot;))
+pd.set_option(&quot;display.max_colwidth&quot;, 90)
+plt.rcParams.update({&quot;figure.figsize&quot;: (10, 4.5), &quot;axes.spines.top&quot;: False,
+                     &quot;axes.spines.right&quot;: False, &quot;font.size&quot;: 11})
+</pre></details>
+</section>
+<section>
+<h2>Project purpose</h2>
+<p>Connect Sales, Calendar, contract reminder records and environmental context to management reporting, customer follow-up and experimentally evaluated predictions.</p>
+<h2>Reading order</h2>
+<p>1. <strong>Data Sources</strong> — what each source records and what one row means. 2. <strong>Data Cleaning</strong> — how types, duplicate records, dates and service links are treated. 3. <strong>Outcome Labels and Partitions</strong> — what is predicted and which records are used for fitting, validation and assessment. 4. <strong>Predictors</strong> — every input, its meaning, observed association and removal-test evidence. 5. <strong>Pest Return Model</strong> — configuration, training code and historical classification results. 6. <strong>Weekly Planning Models</strong> — separate booking and appointment-hour forecasts. 7. <strong>Model Experiments</strong> — historical alternatives, inputs and results.</p>
+<p>These notebooks replay pinned aggregate evidence. They do not train a new model, change its weights or manufacture future results. Production source commands and code paths are identified in the relevant chapter. The source snapshots remain private in the project.</p>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>m = read_json(&quot;model_configuration.json&quot;)
+display(pd.DataFrame([
+    {&quot;Model&quot;: &quot;Pest-related return&quot;, &quot;Question&quot;: &quot;Recorded return within 30 days after a paid service?&quot;, &quot;Inputs&quot;: 93, &quot;Status&quot;: &quot;Frozen experimental model&quot;},
+    {&quot;Model&quot;: &quot;Bookings&quot;, &quot;Question&quot;: &quot;How many Calendar bookings over the next two weeks?&quot;, &quot;Inputs&quot;: 36, &quot;Status&quot;: &quot;Historical candidate; separate live test&quot;},
+    {&quot;Model&quot;: &quot;Appointment hours&quot;, &quot;Question&quot;: &quot;How many booked team-hours next week?&quot;, &quot;Inputs&quot;: 32, &quot;Status&quot;: &quot;Historical candidate; separate live test&quot;}
+]))</pre></details>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Model</th>
+      <th>Question</th>
+      <th>Inputs</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Pest-related return</td>
+      <td>Recorded return within 30 days after a paid service?</td>
+      <td>93</td>
+      <td>Frozen experimental model</td>
+    </tr>
+    <tr>
+      <td>Bookings</td>
+      <td>How many Calendar bookings over the next two weeks?</td>
+      <td>36</td>
+      <td>Historical candidate; separate live test</td>
+    </tr>
+    <tr>
+      <td>Appointment hours</td>
+      <td>How many booked team-hours next week?</td>
+      <td>32</td>
+      <td>Historical candidate; separate live test</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+<section>
+<h2>Project files</h2>
+<p>Open <code>FILE_GUIDE.html</code> at the project root for the searchable file catalogue. <code>notebooks</code> contains this reading series. <code>scripts</code> contains executable processing and model code. <code>dbt/models</code> contains cleaning and reporting SQL. <code>config</code> contains rules, protocols and frozen pointers. <code>outputs</code> contains dated evidence; it is not a list of current models.</p>
+<p>The website is an operational interface. Looker Studio is the management dashboard. Neither a Calendar booking nor a green reminder-date cell proves a completed treatment or a payment.</p>
+</section></body></html>

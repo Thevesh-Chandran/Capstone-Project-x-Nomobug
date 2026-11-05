@@ -1,0 +1,71 @@
+{
+  "declared_at_utc": "2026-11-01T15:18:58.610637+00:00",
+  "source_sha256": "4e183675359c376fdd745a87c88797631803df1931be3ff9821189c94259a4ba",
+  "split": {
+    "validation_start": "2026-04-09",
+    "test_start": "2026-08-01",
+    "rule": "60th/80th percentile sale dates; customer groups disjoint, never choose split by score"
+  },
+  "variants": {
+    "Recorded requirements": [
+      "sessions",
+      "tbs_units",
+      "trbs_units",
+      "includes_car",
+      "misting",
+      "fogging",
+      "service_family",
+      "premise",
+      "pest",
+      "district"
+    ],
+    "Requirements and size": [
+      "sessions",
+      "tbs_units",
+      "trbs_units",
+      "includes_car",
+      "misting",
+      "fogging",
+      "service_family",
+      "premise",
+      "pest",
+      "district",
+      "log_area_sqft",
+      "area_missing",
+      "floors_mentioned",
+      "floors_missing"
+    ],
+    "Requirements size and business type": [
+      "sessions",
+      "tbs_units",
+      "trbs_units",
+      "includes_car",
+      "misting",
+      "fogging",
+      "service_family",
+      "premise",
+      "pest",
+      "district",
+      "log_area_sqft",
+      "area_missing",
+      "floors_mentioned",
+      "floors_missing",
+      "business_type"
+    ]
+  },
+  "families": [
+    "Gradient boosting",
+    "Ridge",
+    "Extra Trees"
+  ],
+  "target": "Log price per session, transformed back to total RM",
+  "selection": "Lowest validation MAE; tie prefers fewer inputs; no assessment tuning",
+  "comparison": "Same customer-disjoint training 213 / validation 75 / assessment 82",
+  "limitations": [
+    "Adaptive historical research on already inspected months",
+    "Description timestamps only screen availability by sale-day end, not exact quotation time",
+    "Building size is not automatically confirmed treatment area",
+    "Missing area remains unknown; imputation is fitted on training only"
+  ],
+  "deployment": false
+}

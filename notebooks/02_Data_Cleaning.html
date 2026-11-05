@@ -1,0 +1,226 @@
+<!doctype html><html><meta charset="utf-8"><title>Data Cleaning</title><style>body{max-width:1120px;margin:45px auto;padding:0 28px;font:16px/1.7 Arial;color:#1e293b;background:#f8fafc}h1{font-size:34px;color:#0f172a}h2{margin-top:52px;padding-top:22px;border-top:3px solid #2563eb;color:#172554}h3{margin-top:28px}section{background:white;padding:16px 24px;margin:15px 0;border:1px solid #e2e8f0;border-radius:10px}table{border-collapse:collapse;font-size:12px;display:block;overflow:auto}td,th{padding:9px;border-bottom:1px solid #e2e8f0;text-align:left}th{background:#eff6ff}img{max-width:100%;height:auto}pre{font:12px/1.6 Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;padding:14px;background:#f1f5f9}details{margin:14px 0}summary{cursor:pointer;color:#2563eb}code{font-size:.88em}a{color:#1d4ed8}</style><body>
+<section>
+<h1>Data Cleaning</h1>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>from pathlib import Path
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
+BASE = Path.cwd()
+if not (BASE / &quot;evidence&quot;).exists():
+    BASE = BASE / &quot;notebooks&quot; 
+assert (BASE / &quot;evidence&quot;).is_dir(), &quot;Open from the project root or notebooks.&quot;
+EVIDENCE = BASE / &quot;evidence&quot;
+def read_json(name):
+    return json.loads((EVIDENCE / name).read_text(encoding=&quot;utf-8-sig&quot;))
+pd.set_option(&quot;display.max_colwidth&quot;, 90)
+plt.rcParams.update({&quot;figure.figsize&quot;: (10, 4.5), &quot;axes.spines.top&quot;: False,
+                     &quot;axes.spines.right&quot;: False, &quot;font.size&quot;: 11})
+</pre></details>
+</section>
+<section>
+<h2>Transformation sequence</h2>
+<p>Source snapshots → parse values and dates → classify Calendar events → match services to sales/programmes → attach location and weather → derive outcome windows and predictors → validate and publish.</p>
+<p>The production transformations are SQL/dbt and Python scripts. This chapter contains their exact SQL and archived model-input checks, rather than a second implementation with different rules.</p>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>cleaning = pd.DataFrame([
+    [&quot;Money and dates&quot;, &quot;Keep original values; parse analytical types; preserve invalid/missing values&quot;, &quot;dbt/models/sales.sql; payments.sql; recurring_payments.sql&quot;],
+    [&quot;Calendar classification&quot;, &quot;Separate cancelled, administrative, parked, scheduled and corrective-return events&quot;, &quot;dbt/models/calendar_events.sql&quot;],
+    [&quot;Temporary placeholders&quot;, &quot;Use exact owner-confirmed event and time; never classify every Sunday as parked&quot;, &quot;scripts/calendar_appointment_policy.py&quot;],
+    [&quot;Programme linkage&quot;, &quot;Link confirmed 1x + Upsell 2x or combined programmes; preserve separate sale rows&quot;, &quot;scripts/service_programme_policy.py; dbt/models/calendar_event_matches.sql&quot;],
+    [&quot;Payment reminders&quot;, &quot;Dates are reminders; green only means the date passed; paid totals come from recorded amounts&quot;, &quot;scripts/sales_payment_rules.py&quot;],
+    [&quot;Location matching&quot;, &quot;Queue ambiguous addresses; do not replace missing precise locations with a false exact point&quot;, &quot;scripts/cp2_geocoding.py&quot;],
+    [&quot;Time availability&quot;, &quot;Only attach information available by prediction time&quot;, &quot;scripts/callback_live_features.py; callback_live_weather.py&quot;]
+], columns=[&quot;Step&quot;, &quot;Rule&quot;, &quot;Implementation&quot;])
+display(cleaning)</pre></details>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Step</th>
+      <th>Rule</th>
+      <th>Implementation</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Money and dates</td>
+      <td>Keep original values; parse analytical types; preserve invalid/missing values</td>
+      <td>dbt/models/sales.sql; payments.sql; recurring_payments.sql</td>
+    </tr>
+    <tr>
+      <td>Calendar classification</td>
+      <td>Separate cancelled, administrative, parked, scheduled and corrective-return events</td>
+      <td>dbt/models/calendar_events.sql</td>
+    </tr>
+    <tr>
+      <td>Temporary placeholders</td>
+      <td>Use exact owner-confirmed event and time; never classify every Sunday as parked</td>
+      <td>scripts/calendar_appointment_policy.py</td>
+    </tr>
+    <tr>
+      <td>Programme linkage</td>
+      <td>Link confirmed 1x + Upsell 2x or combined programmes; preserve separate sale rows</td>
+      <td>scripts/service_programme_policy.py; dbt/models/calendar_event_matches.sql</td>
+    </tr>
+    <tr>
+      <td>Payment reminders</td>
+      <td>Dates are reminders; green only means the date passed; paid totals come from recorded amounts</td>
+      <td>scripts/sales_payment_rules.py</td>
+    </tr>
+    <tr>
+      <td>Location matching</td>
+      <td>Queue ambiguous addresses; do not replace missing precise locations with a false exact point</td>
+      <td>scripts/cp2_geocoding.py</td>
+    </tr>
+    <tr>
+      <td>Time availability</td>
+      <td>Only attach information available by prediction time</td>
+      <td>scripts/callback_live_features.py; callback_live_weather.py</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+<section>
+<h2>Sales transformation</h2>
+<p>The following is copied from the actual dbt model. The full file is retained in <code>evidence/sql/sales.sql</code>; source hashes are listed in <code>source_manifest.json</code>.</p>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>sales_sql = (EVIDENCE / &quot;sql/sales.sql&quot;).read_text(encoding=&quot;utf-8-sig&quot;)
+print(&quot;\n&quot;.join(sales_sql.splitlines()[:65]))</pre></details>
+<pre>{{ config(tags=[&#x27;operational&#x27;]) }}
+with prepared as (
+    select *,
+        {{ sales_reference_array(&#x27;source_column_007&#x27;) }} as parsed_sales_ids,
+        {{ rm_decimal(&#x27;source_column_028&#x27;) }} as sale_total_rm
+    from {{ source(&#x27;operational_bronze&#x27;, &#x27;sales&#x27;) }}
+)
+select *,
+    {{ sales_remaining_raw_aliases() }}
+    &#x27;{{ source(&quot;operational_bronze&quot;, &quot;sales&quot;).identifier }}&#x27; as snapshot_table,
+    concat(&#x27;{{ source(&quot;operational_bronze&quot;, &quot;sales&quot;).identifier }}&#x27;, &#x27;:&#x27;, cast(source_sheet_row as string)) as sales_row_id,
+    source_column_007 as customer_id_raw,
+    case when array_length(parsed_sales_ids) = 1 then parsed_sales_ids[offset(0)] end as sales_record_id,
+    trim(source_column_007) != &#x27;&#x27; as id_present_candidate,
+    trim(source_column_007) != &#x27;&#x27; and array_length(parsed_sales_ids) != 1 as id_needs_review,
+    trim(source_column_028) != &#x27;&#x27; and sale_total_rm is null as total_needs_review,
+    regexp_contains(upper(source_column_008), r&#x27;\b(?:OLD|RETURNING)\b&#x27;) as recorded_returning_client,
+    source_column_008 as acquisition_relationship_raw,
+    source_column_010 as phone_raw,
+    source_column_004 as closed_date_raw,
+    source_column_030 as deposit_invoice_raw,
+    source_column_032 as balance_invoice_raw
+-- CUSTOMER ID identifies a sale, NOT a person. Neither #VALUE! column is mapped yet.
+from prepared
+</pre>
+</section>
+<section>
+<h2>Calendar transformation</h2>
+<p>Cancellation and administrative rules take priority. A moved temporary placeholder expires its exact-slot override. A rescheduled event is not an additional completed paid visit. Event identity is retained independently of changing source row numbers.</p>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>calendar_sql = (EVIDENCE / &quot;sql/calendar_events.sql&quot;).read_text(encoding=&quot;utf-8-sig&quot;)
+print(&quot;\n&quot;.join(calendar_sql.splitlines()[:48]))</pre></details>
+<pre>{{ config(tags=[&#x27;calendar&#x27;]) }}
+with raw_events as (
+    select *,
+        upper(coalesce(summary, &#x27;&#x27;)) as summary_upper,
+        safe_cast(regexp_extract(summary, r&#x27;\b(\d{1,2})\s*/\s*\d{1,2}\b&#x27;) as int64) as session_current,
+        safe_cast(regexp_extract(summary, r&#x27;\b\d{1,2}\s*/\s*(\d{1,2})\b&#x27;) as int64) as session_total
+    from {{ source(&#x27;calendar_bronze&#x27;, &#x27;events&#x27;) }}
+), classified as (
+    select *,
+        {{ calendar_event_category(&#x27;summary_upper&#x27;, &#x27;status&#x27;, &#x27;session_current&#x27;, &#x27;session_total&#x27;) }}
+            as rule_event_category,
+        {{ calendar_event_category(&#x27;summary_upper&#x27;, &#x27;status&#x27;, &#x27;session_current&#x27;, &#x27;session_total&#x27;, false) }}
+            as non_claim_event_category
+    from raw_events
+), reviewed as (
+    select c.*,
+        r.review_id as warranty_label_review_id,
+        r.review_label as warranty_label_review_status,
+        r.reviewed_at as warranty_label_reviewed_at,
+        case
+            -- Cancellation/admin rules still control operational eligibility.
+            when c.rule_event_category in (&#x27;cancelled&#x27;, &#x27;administrative&#x27;) then c.rule_event_category
+            when a.event_identity_hash is not null then &#x27;placeholder&#x27;
+            when r.review_label = &#x27;Confirmed warranty claim&#x27; then &#x27;warranty&#x27;
+            when r.review_label = &#x27;Not a warranty claim&#x27; then c.non_claim_event_category
+            when r.review_label = &#x27;Unclear&#x27; then &#x27;label_unresolved&#x27;
+            else c.rule_event_category
+        end as event_category
+    from classified c
+    left join {{ ref(&#x27;calendar_warranty_review_overrides&#x27;) }} r
+      on r.event_identity_hash = to_hex(sha256(concat(c.calendar_id, &#x27;|&#x27;, c.event_id)))
+     and r.event_id = c.event_id
+    -- An owner review binds an exact identity AND its original temporary slot.
+    -- Weekday is never evidence. Moving the event automatically expires this review.
+    left join {{ ref(&#x27;calendar_appointment_overrides&#x27;) }} a
+      on a.event_identity_hash = lower(to_hex(sha256(concat(c.calendar_id, &#x27;|&#x27;, c.event_id))))
+     and safe_cast(c.start_raw as timestamp) = safe_cast(a.expected_start_at_utc as timestamp)
+     and safe_cast(c.end_raw as timestamp) = safe_cast(a.expected_end_at_utc as timestamp)
+     and a.appointment_state = &#x27;awaiting_client_date&#x27;
+)
+select
+    calendar_event_row,
+    calendar_name,
+    calendar_id,
+    event_id,
+    ical_uid,
+    status,
+    event_type,
+</pre>
+</section>
+<section>
+<h2>Archived model-input checks</h2>
+<p>These are the recorded checks on the 5,695-row frozen-refit input, not a fresh audit of today&#x27;s Google records. Two weather-date values were missing; missing coverage is retained as a limitation.</p>
+</section>
+<section>
+<details><summary>Show Python code</summary><pre>checks = read_json(&quot;source_checks.json&quot;)
+display(pd.DataFrame([{&quot;Check&quot;:k.replace(&quot;_&quot;,&quot; &quot;), &quot;Recorded count&quot;:v} for k,v in checks.items()]))
+assert checks[&quot;duplicate_service_keys&quot;] == 0
+assert checks[&quot;unresolved_labels&quot;] == 0
+assert checks[&quot;non_30_day_windows&quot;] == 0
+assert checks[&quot;outcomes_after_observation&quot;] == 0
+assert checks[&quot;weather_on_or_after_service&quot;] == 0</pre></details>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Check</th>
+      <th>Recorded count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>unresolved labels</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>duplicate service keys</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>non 30 day windows</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>outcomes after observation</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>weather on or after service</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>weather latest date missing</td>
+      <td>2</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+<section>
+<h2>Reproduce from the private input</h2>
+<p>From the project root, <code>python -m scripts.build_supervisor_model_review</code> reloads the hash-pinned input, calls <code>benchmark_warranty_models.load_dataset_input</code> and <code>compare_callback_candidates_v2.prepare_input</code>, and computes these aggregate checks. It writes review artifacts only; it does not publish or retrain.</p>
+<p>Production SQL checks run through <code>scripts/cp2_reporting_release.py</code>; run its help before using release options. Do not run every script in the folder: some publish, renew credentials or evaluate an experiment once.</p>
+</section></body></html>

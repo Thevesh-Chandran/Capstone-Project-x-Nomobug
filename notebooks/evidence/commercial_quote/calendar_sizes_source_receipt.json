@@ -1,0 +1,6 @@
+{
+  "query": "SELECT e.calendar_event_row,e.event_id,e.description,e.start_raw,e.created_raw,e.updated_raw,m.matched_sales_record_id AS sale_id,m.match_status,m.sales_match_count FROM `profound-keel-500007-s4.bronze.calendar_events_533fc02300575631f06844bba3957252451e430e0c852ba22382e9bc9240c161` e JOIN `profound-keel-500007-s4.cp2r_20261027220023217d5b_silver.calendar_event_matches` m USING(calendar_event_row)",
+  "job_id": "a2785841-e378-4c97-badd-db22841c511d",
+  "bytes": 6955761,
+  "snapshot": "20261027220023217d5b"
+}
