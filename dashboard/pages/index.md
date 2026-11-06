@@ -133,4 +133,3 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   </div>
 </div>
 
-<p class="note">Sales are recorded package prices, not cash received or profit. Model figures are estimates. Source data last extracted <Value data={freshness} column=latest fmt="d mmm yyyy h:mm"/> UTC.</p>
