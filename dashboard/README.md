@@ -3,7 +3,7 @@
 Open-source [Evidence](https://evidence.dev) site on the BigQuery `predictions` and `gold` datasets.
 
 - Live (Google sign-in, same people as the portal): https://cp2-dashboard-964813222593.asia-southeast1.run.app
-- Pages: `pages/*.md` (Overview, Service follow-up, Bookings & staffing, Sales & areas, Payments)
+- Pages: `pages/*.md` (Overview, Service follow-up, Bookings & staffing, Sales & customers, Maps & patterns, Services & warranty, Payments)
 - Queries: `sources/nomobug/*.sql`; colours: `evidence.config.yaml` (website palette)
 
 ## Run locally
