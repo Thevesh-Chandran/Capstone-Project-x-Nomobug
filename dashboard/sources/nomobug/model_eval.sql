@@ -1,1 +1,1 @@
-select method, chosen, test_period, services, returns, auc, auc_low, auc_high, capture_20, expected_returns, recorded_returns from `profound-keel-500007-s4.predictions.model_evaluation`
+select method, chosen, test_period, services, returns, auc, ap, capture_10, capture_20, capture_30, precision_10, precision_20, precision_30, base_rate, gain_vs_rule_low, gain_vs_rule, gain_vs_rule_high, auc_low, auc_high, expected_returns, recorded_returns from `profound-keel-500007-s4.predictions.model_evaluation`

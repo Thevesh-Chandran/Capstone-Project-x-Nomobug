@@ -3,6 +3,30 @@ title: Services & warranty
 sidebar_position: 6
 ---
 
+```sql model_cmp
+select regexp_replace(method, ' [(]chosen[)]', '') || case when chosen then ' (used)' else '' end as method,
+       chosen, auc, ap, capture_10, capture_20, capture_30, precision_20
+from nomobug.model_eval order by chosen desc, capture_20 desc
+```
+
+```sql model_kpi
+select max(case when chosen then auc end) as auc,
+       max(case when chosen then auc_low end) as auc_low, max(case when chosen then auc_high end) as auc_high,
+       max(case when chosen then capture_20 end) as capture_20,
+       max(case when chosen then precision_20 end) as precision_20,
+       max(case when chosen then base_rate end) as base_rate,
+       max(case when chosen then gain_vs_rule end) as gain,
+       max(case when chosen then gain_vs_rule_low end) as gain_low, max(case when chosen then gain_vs_rule_high end) as gain_high,
+       max(case when chosen then services end) as services, max(case when chosen then returns end) as returns,
+       max(case when chosen then test_period end) as test_period,
+       max(case when chosen then expected_returns end) as expected_returns, max(case when chosen then recorded_returns end) as recorded_returns
+from nomobug.model_eval
+```
+
+```sql model_inp
+select label as input, odds_multiplier, direction from nomobug.model_inputs order by abs(log_odds) desc
+```
+
 ```sql difficulty
 with d as (
   select
@@ -151,5 +175,59 @@ from ${difficulty}
     </DataTable>
   </div>
 </div>
+
+
+## How the return-visit model performs
+
+<p class="note">Tested once on <Value data={model_kpi} column=services fmt="#,##0"/> later services (<Value data={model_kpi} column=test_period/>) that the model never saw while it was built; <Value data={model_kpi} column=returns fmt="#,##0"/> of them had a recorded return visit.</p>
+
+<div class="kpis">
+  <BigValue data={model_kpi} value=capture_20 title="Returns reached by calling the top 20%" fmt=pct0/>
+  <BigValue data={model_kpi} value=precision_20 title="Hit rate in the top 20%" fmt=pct0/>
+  <BigValue data={model_kpi} value=base_rate title="Hit rate if called at random" fmt=pct0/>
+  <BigValue data={model_kpi} value=auc title="Ranking score (AUC)" fmt="0.00"/>
+</div>
+
+<div class="card">
+    <h3>The model against simpler options</h3>
+    <p class="sub">Same test services for every method. Reached = share of all return visits found by calling that share of services.</p>
+    <DataTable data={model_cmp} rowShading=false>
+      <Column id=method title="Method"/>
+      <Column id=capture_10 title="Reached, top 10%" fmt=pct0/>
+      <Column id=capture_20 title="Reached, top 20%" fmt=pct0 contentType=bar barColor="#DCDDF4"/>
+      <Column id=capture_30 title="Reached, top 30%" fmt=pct0/>
+      <Column id=precision_20 title="Hit rate, top 20%" fmt=pct0/>
+      <Column id=auc title="AUC" fmt="0.00"/>
+      <Column id=ap title="Avg precision" fmt="0.00"/>
+    </DataTable>
+</div>
+
+<div class="card">
+    <h3>What the model looks at</h3>
+    <p class="sub">How much each input changes the odds of a return visit (1.0 = no change; above 1 raises it, below 1 lowers it)</p>
+    <DataTable data={model_inp} rowShading=false rows=13>
+      <Column id=input title="Input"/>
+      <Column id=odds_multiplier title="Odds multiplier" fmt="0.00" contentType=colorscale colorScale={['#2E9CB8','#FFFFFF','#D9577A']} colorMid=1/>
+      <Column id=direction title="Effect"/>
+    </DataTable>
+</div>
+
+<Details title="What these numbers mean">
+
+**Returns reached (capture).** If staff call the highest-scoring 20% of recent services, this is the share of all return visits that would be among those calls. The model reaches <Value data={model_kpi} column=capture_20 fmt=pct0/>; calling at random reaches about 20% by definition. Higher is better.
+
+**Hit rate (precision).** Of the services in the top 20%, the share that really had a return visit: <Value data={model_kpi} column=precision_20 fmt=pct0/>, against <Value data={model_kpi} column=base_rate fmt=pct0/> for a random call. It shows how much less time is spent on calls that turn out fine.
+
+**Gain over the simple rule.** The best simple rule (call every final service of a home programme) is the bar to beat. At the top 20% the model reaches <Value data={model_kpi} column=gain fmt=pct0/> more of the returns, with a likely range of <Value data={model_kpi} column=gain_low fmt=pct0/> to <Value data={model_kpi} column=gain_high fmt=pct0/> points.
+
+**AUC (ranking score).** Pick one service that had a return visit and one that did not; AUC is how often the model scores the first one higher. 0.5 is a coin toss and 1.0 is perfect. The model scores <Value data={model_kpi} column=auc fmt="0.00"/> (likely range <Value data={model_kpi} column=auc_low fmt="0.00"/> to <Value data={model_kpi} column=auc_high fmt="0.00"/>).
+
+**Average precision.** A single summary of the hit rate across every possible cut-off, useful when returns are rare. Random order scores about the return rate itself.
+
+**Odds multiplier.** For an input that is yes or no, how many times the odds of a return visit change when it is yes, holding the other inputs fixed; for a number, per unit (per day, per doubling of price). It describes the records, not what causes pests to come back.
+
+**Totals.** Across the test the model expected <Value data={model_kpi} column=expected_returns fmt="#,##0"/> return visits and <Value data={model_kpi} column=recorded_returns fmt="#,##0"/> were recorded, so use it to rank customers and keep a buffer when planning hours.
+
+</Details>
 
 <p class="note">Weather is matched to each service's location and shows association only; rain does not prove it caused the pests to come back. Small groups are hidden to avoid misleading percentages.</p>
