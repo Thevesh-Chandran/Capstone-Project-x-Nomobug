@@ -35,12 +35,22 @@ from nomobug.backtest
 ```sql team_weekly
 select * replace (trim(case when team ilike 'REPLACEMENT%' then 'Replacement' else regexp_replace(regexp_replace(team, '^TEAM ', ''), ' *[(].*[)]', '') end) as team)
 from nomobug.team_weekly
-where team <> 'SALES TEAM' and week >= current_date - interval 12 week
+where team <> 'SALES TEAM' and week >= current_date - interval 26 week
+order by week
+```
+
+```sql teams
+select distinct team from ${team_weekly} order by 1
+```
+
+```sql team_view
+select * from ${team_weekly}
+where team in ${inputs.bk_team.value} and week >= current_date - (${inputs.bk_weeks} * 7)
 order by week
 ```
 
 ```sql team_total
-select team, sum(bookings) as bookings from ${team_weekly} group by 1 order by 2 desc
+select team, sum(bookings) as bookings from ${team_view} group by 1 order by 2 desc
 ```
 
 <div class="hero">
@@ -80,15 +90,24 @@ select team, sum(bookings) as bookings from ${team_weekly} group by 1 order by 2
   <LineChart data={backtest_long} x=period_start y=bookings series=series xFmt="d mmm" seriesOrder={['Actual','Model forecast','Simple average']} colorPalette={['#2A2F3D','#5B63C9','#D97E45']} chartAreaHeight=240 markers=true/>
 </div>
 
+<div class="card filters">
+<Dropdown name=bk_team data={teams} value=team title="Team" multiple=true selectAllByDefault=true/>
+<ButtonGroup name=bk_weeks title="Weeks shown">
+  <ButtonGroupItem valueLabel="4 weeks" value=4/>
+  <ButtonGroupItem valueLabel="12 weeks" value=12 default/>
+  <ButtonGroupItem valueLabel="26 weeks" value=26/>
+</ButtonGroup>
+</div>
+
 <div class="row2">
   <div class="card">
     <h3>Bookings per team</h3>
-    <p class="sub">Last 12 weeks, field teams</p>
-    <BarChart data={team_weekly} x=week y=bookings series=team type=stacked xFmt="d mmm" chartAreaHeight=220/>
+    <p class="sub">Selected teams and weeks</p>
+    <BarChart data={team_view} x=week y=bookings series=team type=stacked xFmt="d mmm" chartAreaHeight=220/>
   </div>
   <div class="card">
-    <h3>Team share, last 12 weeks</h3>
-    <p class="sub">Total recorded bookings per team</p>
+    <h3>Team share</h3>
+    <p class="sub">Total recorded bookings per team, selected weeks</p>
     <BarChart data={team_total} x=team y=bookings swapXY=true colorPalette={['#2E9CB8']} chartAreaHeight=220 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...team_total.map(d => d.bookings ?? 0)) * 1.25}/>
   </div>
 </div>

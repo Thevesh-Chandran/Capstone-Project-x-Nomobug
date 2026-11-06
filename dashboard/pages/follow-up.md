@@ -3,6 +3,19 @@ title: Service follow-up
 sidebar_position: 2
 ---
 
+```sql model_eval
+select
+  max(case when chosen then services end) as services,
+  max(case when chosen then returns end) as returns,
+  max(case when chosen then test_period end) as test_period,
+  max(case when chosen then auc end) as auc,
+  max(case when chosen then capture_20 end) as capture_score,
+  max(case when method like 'Rule%' then capture_20 end) as capture_rule,
+  max(case when method like 'Random%' then capture_20 end) as capture_random,
+  1 - max(case when chosen then expected_returns / nullif(recorded_returns, 0) end) as undercount
+from nomobug.model_eval
+```
+
 ```sql headline
 select * from nomobug.headline
 ```
@@ -17,11 +30,19 @@ select case
     when chance_of_return >= 0.2 then 1 when chance_of_return >= 0.1 then 2
     when chance_of_return >= 0.05 then 3 else 4 end as band_order,
   count(*) as services
-from nomobug.risk_scores group by 1, 2 order by band_order
+from nomobug.risk_scores where coalesce(premise_type, 'Unknown') in ${inputs.fu_premise.value} group by 1, 2 order by band_order
+```
+
+```sql fu_premises
+select distinct coalesce(premise_type, 'Unknown') as premise from nomobug.risk_scores order by 1
+```
+
+```sql months_all
+select * from nomobug.service_monthly where month < date_trunc('month', current_date) order by month
 ```
 
 ```sql service_monthly
-select * from nomobug.service_monthly where month < date_trunc('month', current_date) order by month
+select * from ${months_all} where month between '${inputs.fu_period.start}' and '${inputs.fu_period.end}' order by month
 ```
 
 <div class="hero">
@@ -29,6 +50,12 @@ select * from nomobug.service_monthly where month < date_trunc('month', current_
   <p>Each recent service gets a chance of a pest-related return visit within 30 days. Call the highest first. These are model estimates for ranking calls, not confirmed problems.</p>
   <span class="chip">The call list and call results are below</span>
 </div>
+
+<div class="card filters">
+<Dropdown name=fu_premise data={fu_premises} value=premise title="Premise" multiple=true selectAllByDefault=true/>
+<DateRange name=fu_period data={months_all} dates=month defaultValue="All Time" title="Period for return visits"/>
+</div>
+
 
 <div class="kpis">
   <BigValue data={headline} value=customers_to_call title="Customers to call this week"/>
@@ -52,5 +79,5 @@ select * from nomobug.service_monthly where month < date_trunc('month', current_
 </div>
 
 <Details title="How reliable is this model?">
-On past data (1,270 services, 108 recorded returns) the model ranked real return visits above other services 81% of the time (AUC 0.81). The top 20% of services held 62% of returns, against 21% if picked at random. Monthly totals ran about 17% low, so plan with a buffer. Full method: Return visits & models page.
+Tested once on <Value data={model_eval} column=services fmt="#,##0"/> later services (<Value data={model_eval} column=test_period/>) with <Value data={model_eval} column=returns fmt="#,##0"/> recorded return visits, the model ranked real return visits above other services <Value data={model_eval} column=auc fmt=pct0/> of the time. Calling the top 20% of services reaches <Value data={model_eval} column=capture_score fmt=pct0/> of returns, against <Value data={model_eval} column=capture_rule fmt=pct0/> for the best simple rule and <Value data={model_eval} column=capture_random fmt=pct0/> picked at random. Its totals ran <Value data={model_eval} column=undercount fmt=pct0/> low, so plan with a buffer. Full method: Return visits & models page.
 </Details>

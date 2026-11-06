@@ -14,6 +14,14 @@ where month >= date_trunc('month', current_date - interval 12 month)
 order by month
 ```
 
+```sql months_all
+select * from nomobug.sales_monthly where month < date_trunc('month', current_date) order by month
+```
+
+```sql sales_period
+select * from ${months_all} where month between '${inputs.period.start}' and '${inputs.period.end}' order by month
+```
+
 ```sql sales_kpi
 select
   sum(case when month >= date_trunc('month', current_date - interval 12 month) and month < date_trunc('month', current_date) then sales_rm end) as last_12m_rm,
@@ -28,17 +36,21 @@ order by m.month
 ```
 
 ```sql backtest
-select period_start, actual_bookings from nomobug.backtest order by period_start
+select period_start, actual_bookings from nomobug.backtest
+where period_start between '${inputs.period.start}' and '${inputs.period.end}' order by period_start
 ```
 
 ```sql top_areas
 select regexp_replace(coalesce(nullif(split_part(district, ' / ', 2), ''), district), '^W\.P\. ', '') as area,
-       sales_rm, sales
-from nomobug.area_sales order by sales_rm desc limit 6
+       sum(sales_rm) as sales_rm, sum(sales) as sales
+from nomobug.sales_detail where district <> 'Unassigned' and month between '${inputs.period.start}' and '${inputs.period.end}'
+group by 1 order by 2 desc limit 6
 ```
 
 ```sql pest_top
-select pest_group, sales_rm from nomobug.pest_groups order by sales_rm desc limit 6
+select pest as pest_group, sum(sales_rm) as sales_rm from nomobug.sales_detail
+where pest <> 'Unspecified' and month between '${inputs.period.start}' and '${inputs.period.end}'
+group by 1 order by 2 desc limit 6
 ```
 
 ```sql freshness
@@ -50,6 +62,11 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   <p>Where the business stands, what the models expect, and what to do this week.</p>
   <span class="chip">Data as of <Value data={headline} column=as_of fmt="d mmm yyyy"/></span>
 </div>
+
+<div class="card filters">
+<DateRange name=period data={months_all} dates=month defaultValue="Last 12 Months" title="Period for the charts below"/>
+</div>
+
 
 <div class="kpis">
   <BigValue data={sales_kpi2} value=last_12m_rm title="Sales, last 12 months" fmt='"RM"#,##0' comparison=vs_prior comparisonFmt=pct0 comparisonTitle="vs previous 12 months" sparkline=month sparklineType=bar sparklineColor="#4C55B8"/>
@@ -86,8 +103,8 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 <div class="row2">
   <div class="card">
     <h3>Sales by month</h3>
-    <p class="sub">Recorded package sales, last 12 full months</p>
-    <BarChart data={sales_monthly} x=month y=sales_rm yFmt='"RM"#,##0' xFmt="mmm" colorPalette={['#5B63C9']} chartAreaHeight=220 labels=false/>
+    <p class="sub">Recorded package sales, selected period</p>
+    <BarChart data={sales_period} x=month y=sales_rm yFmt='"RM"#,##0' xFmt="mmm" colorPalette={['#5B63C9']} chartAreaHeight=220 labels=false/>
   </div>
   <div class="card">
     <h3>Bookings per fortnight</h3>
@@ -99,7 +116,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 <div class="row2">
   <div class="card">
     <h3>Top areas</h3>
-    <p class="sub">Sales in the last 12 months, areas with a known district</p>
+    <p class="sub">Selected period, areas with a known district</p>
     <DataTable data={top_areas} rowShading=false>
       <Column id=area title="Area"/>
       <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#DCDDF4"/>
@@ -108,7 +125,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   </div>
   <div class="card">
     <h3>What customers buy</h3>
-    <p class="sub">Sales by pest group, all recorded</p>
+    <p class="sub">Sales by pest group, selected period</p>
     <DataTable data={pest_top} rowShading=false>
       <Column id=pest_group title="Pest group"/>
       <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#DCDDF4"/>

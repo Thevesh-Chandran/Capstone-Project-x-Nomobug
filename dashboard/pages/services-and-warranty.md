@@ -21,7 +21,11 @@ select coalesce(nullif(pest, ''), 'Other') as pest, sum(visits) as visits, sum(r
 from d group by 1 having sum(visits) >= 30 order by visits desc
 ```
 
-```sql fit
+```sql sw_months
+select distinct month from nomobug.recurrence where month < date_trunc('month', current_date) order by 1
+```
+
+```sql fit_all
 with f as (
   select
     case when lower(pest_type) like '%anai%' then 'Termite'
@@ -42,13 +46,22 @@ from f where package in (select package from f group by 1 having sum(visits) >= 
 group by 1, 2 having sum(visits) >= 15 order by packages desc
 ```
 
+```sql sw_pests
+select distinct pest from ${fit_all} order by 1
+```
+
+```sql fit
+select * from ${fit_all} where pest in ${inputs.sw_pest.value} order by packages desc
+```
+
 ```sql weather
 select month,
   max(case when event_group = 'recorded_warranty_signal' then events end) as return_visits,
   max(case when event_group = 'other_scheduled_service_entry' then events end) as other_visits,
   max(case when event_group = 'other_scheduled_service_entry' then rain_7d_mm end) as rain_7d_mm,
   max(case when event_group = 'other_scheduled_service_entry' then humidity_7d end) as humidity_7d
-from nomobug.weather_monthly where month < date_trunc('month', current_date) group by 1 order by 1
+from nomobug.weather_monthly where month < date_trunc('month', current_date)
+  and month between '${inputs.sw_period.start}' and '${inputs.sw_period.end}' group by 1 order by 1
 ```
 
 ```sql weather2
@@ -62,7 +75,8 @@ select month,
               when 'manual_review_confirmed_claim' then 'Owner-confirmed'
               else reason end as reason,
   returns
-from nomobug.recurrence where month < date_trunc('month', current_date) order by month
+from nomobug.recurrence where month < date_trunc('month', current_date)
+  and month between '${inputs.sw_period.start}' and '${inputs.sw_period.end}' order by month
 ```
 
 ```sql kpi
@@ -76,6 +90,12 @@ from ${difficulty}
   <p>Which treatments lead to more return visits, how packages compare, and whether rainfall moves with returns. These are observed patterns, not causes.</p>
   <span class="chip">Return visits = warranty claims when pests come back</span>
 </div>
+
+<div class="card filters">
+<DateRange name=sw_period data={sw_months} dates=month defaultValue="All Time" title="Period for the monthly charts"/>
+<Dropdown name=sw_pest data={sw_pests} value=pest title="Pest (package fit and package mix)" multiple=true selectAllByDefault=true/>
+</div>
+
 
 <div class="kpis">
   <BigValue data={kpi} value=visits title="Service visits analysed" fmt="#,##0"/>
