@@ -4476,3 +4476,25 @@ body[data-report="on"] #workspace > section > .page-head:has(button, .secondary)
   .main, #workspace, .page-report, .report-view { min-width: 0; max-width: 100%; }
   .report-frame, .page-report .report-frame, .report-view .report-frame { width: 100% !important; margin: 0 !important; }
 }
+
+/* sidebar: fits without scrollbars on a laptop screen, labels on one line */
+.side { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; }
+.side::-webkit-scrollbar { display: none; }
+.side-link span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.side-group + .side-group { margin-top: var(--space-sm); }
+.side-link { min-height: 34px; }
+.side-label { padding-bottom: var(--space-3xs); }
+
+/* no footnotes: caveats live in the report, not under every list */
+.desk-footnote, .block-note, .map-guide, .coverage-details { display: none !important; }
+.map-source { font-size: var(--text-xs); color: var(--color-muted); margin-top: var(--space-sm); }
+/* spacing on the shared scale: summary, then the action band, then the tool */
+.page-report { margin: 0; }
+.act-head { margin: var(--space-md) 0 var(--space-md) !important; }
+body[data-report="on"] #workspace > section > .page-head:has(button, .secondary),
+body[data-report="on"] #workspace .desk-page-head {
+  position: relative; margin-top: calc(-1 * (var(--space-2xl) + var(--space-xl))) !important; margin-bottom: var(--space-xl) !important;
+  min-height: var(--space-2xl); padding-right: var(--space-lg); display: flex; align-items: center; justify-content: flex-end; pointer-events: none;
+}
+body[data-report="on"] #workspace > section > .page-head:has(button, .secondary) > *,
+body[data-report="on"] #workspace .desk-page-head > * { pointer-events: auto; }

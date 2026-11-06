@@ -164,12 +164,6 @@ function renderDesk(r) {
   const list = el('div', undefined, 'desk-task-list');
   inbox.append(list);
   renderDeskTasks(r, list);
-  const note = el(
-    'p',
-    'Review status is a staff record. It does not change payment balances or send a message.',
-    'desk-footnote',
-  );
-  inbox.append(note);
   layout.append(rail, inbox);
   deskRoot.append(layout);
 }

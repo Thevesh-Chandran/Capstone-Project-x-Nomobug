@@ -49,7 +49,7 @@
     {
       label: 'Predictions',
       views: [
-        ['models', 'Return visits & models'],
+        ['models', 'Return-visit model'],
         ['status', 'Technical evidence'],
       ],
     },

@@ -230,4 +230,3 @@ from ${difficulty}
 
 </Details>
 
-<p class="note">Weather is matched to each service's location and shows association only; rain does not prove it caused the pests to come back. Small groups are hidden to avoid misleading percentages.</p>

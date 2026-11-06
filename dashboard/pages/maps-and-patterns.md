@@ -106,4 +106,3 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
   <BarChart data={busiest} x=day y=bookings sort=false colorPalette={['#2E9CB8']} chartAreaHeight=200 labels=true/>
 </div>
 
-<p class="note">Return visits are warranty claims booked in the calendar when pests come back after a treatment. Areas with few visits can show extreme shares by chance.</p>
