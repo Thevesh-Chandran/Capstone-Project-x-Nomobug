@@ -1,0 +1,1 @@
+select calendar_name as team, day_of_week_number as dow, count(distinct service_date) as days, sum(scheduled_event_rows) as bookings, sum(warranty_claim_event_rows) as return_visits from `profound-keel-500007-s4.gold.dashboard_scheduling_capacity` where service_date >= date_sub(current_date('Asia/Kuala_Lumpur'), interval 26 week) group by 1, 2

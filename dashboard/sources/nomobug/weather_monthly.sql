@@ -1,0 +1,1 @@
+select date(service_month) as month, event_group, scheduled_event_rows as events, avg_prior_7d_precipitation_mm as rain_7d_mm, avg_prior_7d_relative_humidity_pct as humidity_7d from `profound-keel-500007-s4.gold.dashboard_weather_monthly` order by 1

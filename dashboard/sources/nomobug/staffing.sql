@@ -1,0 +1,1 @@
+select cast(week_start as date) as week_start, cast(week_end as date) as week_end, expected_hours, already_booked_hours, hours_to_keep_open, buffer_hours, suggested_staff_hours, suggested_action from `profound-keel-500007-s4.predictions.staffing_plan`

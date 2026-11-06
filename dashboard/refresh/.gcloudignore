@@ -1,0 +1,7 @@
+# Source upload for the refresh image: code only, never built data or modules.
+node_modules/
+build/
+.evidence/
+.svelte-kit/
+sources/**/*.parquet
+static/data/

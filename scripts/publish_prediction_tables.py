@@ -31,6 +31,7 @@ DATASET = 'predictions'
 LOCATION = 'asia-southeast1'
 CALL_LIST_SIZE = 10  # matches the portal's default weekly plan
 PLANNING = ROOT / 'webapp/models/planning_v1.json'
+RETURN_RISK = ROOT / 'webapp/models/return_risk_v1.json'
 
 
 def risk_rows(predictors: dict, as_of: date) -> list[dict]:
@@ -100,9 +101,31 @@ def forecast_rows(forecast: dict, models: dict) -> tuple[list[dict], list[dict],
     return fc, backtest, plan
 
 
+def evaluation_rows(path: Path = RETURN_RISK) -> list[dict]:
+    """The frozen return-visit score's one-time test result, one row per method compared."""
+    if not path.exists():
+        return []
+    ev = json.loads(path.read_text(encoding='utf-8')).get('evaluation') or {}
+    cal = ev.get('calibration') or []
+    expected = sum(b['services'] * b['predicted'] for b in cal) if cal else None
+    actual = sum(b['services'] * b['actual'] for b in cal) if cal else None
+    lo, hi = (ev.get('auc_ci') or [None, None])[:2]
+    rows = []
+    for method, m in (ev.get('compare') or {}).items():
+        rows.append({
+            'method': method, 'chosen': method.endswith('(chosen)'),
+            'test_period': ev.get('period'), 'services': ev.get('services'), 'returns': ev.get('returns'),
+            'auc': m.get('auc'), 'capture_10': m.get('capture_10'), 'capture_20': m.get('capture_20'), 'capture_30': m.get('capture_30'),
+            'auc_low': lo, 'auc_high': hi,
+            'expected_returns': expected, 'recorded_returns': actual,
+        })
+    return rows
+
+
 def build(predictors: dict | None, forecast: dict | None, as_of: date) -> dict[str, list[dict]]:
     models = {m['id']: m for m in json.loads(PLANNING.read_text(encoding='utf-8'))['models']}
-    tables = {'return_risk_scores': risk_rows(predictors, as_of) if predictors else None}
+    tables = {'return_risk_scores': risk_rows(predictors, as_of) if predictors else None,
+              'model_evaluation': evaluation_rows() or None}
     if forecast:
         tables['booking_forecast'], tables['forecast_backtest'], tables['staffing_plan'] = forecast_rows(forecast, models)
     return {k: v for k, v in tables.items() if v is not None}
@@ -133,6 +156,28 @@ using (sales_record_id)
 """
 
 
+P = f'`{PROJECT}.{DATASET}'
+ACCURACY_VIEW = f"""
+create or replace view {P}.booking_forecast_accuracy` as
+select date(period_start) as period_start, actual as actual_bookings, model_forecast as model_forecast_bookings,
+       simple_average as simple_average_bookings
+from {P}.forecast_backtest` where forecast_id = 'booking_entries_h2'
+"""
+HEADLINE_VIEW = f"""
+create or replace view {P}.headline` as select
+  (select round(sum(chance_of_return), 1) from {P}.return_risk_scores`) as expected_returns_open,
+  (select countif(suggested_action = 'Call this week') from {P}.return_risk_scores`) as customers_to_call,
+  (select count(*) from {P}.return_risk_scores`) as services_open,
+  (select max(chance_of_return) from {P}.return_risk_scores`) as top_chance,
+  (select round(prediction) from {P}.booking_forecast` where forecast_id = 'booking_entries_h2') as bookings_next_2_weeks,
+  (select concat(cast(round(likely_low) as string), ' to ', cast(round(likely_high) as string))
+     from {P}.booking_forecast` where forecast_id = 'booking_entries_h2') as bookings_likely_range,
+  (select round(suggested_staff_hours) from {P}.staffing_plan` limit 1) as staff_hours_next_week,
+  (select round(hours_to_keep_open) from {P}.staffing_plan` limit 1) as hours_to_keep_open,
+  (select max(as_of) from {P}.return_risk_scores`) as as_of
+"""
+
+
 def load(tables: dict[str, list[dict]], client=None) -> dict:
     from google.cloud import bigquery
     client = client or bigquery.Client(project=PROJECT, location=LOCATION)
@@ -151,6 +196,9 @@ def load(tables: dict[str, list[dict]], client=None) -> dict:
         counts[name] = len(rows)
     if 'return_risk_scores' in tables and tables['return_risk_scores']:
         client.query(CALL_LIST_VIEW).result()
+    if {'return_risk_scores', 'booking_forecast', 'staffing_plan'} <= set(tables):
+        for sql in (ACCURACY_VIEW, HEADLINE_VIEW):
+            client.query(sql).result()
     return {'status': 'PUBLISHED', 'dataset': DATASET, 'rows': counts, 'loaded_at': stamp}
 
 

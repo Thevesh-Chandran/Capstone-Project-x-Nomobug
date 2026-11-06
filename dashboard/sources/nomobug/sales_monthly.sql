@@ -1,0 +1,1 @@
+select date(closed_month) as month, sum(recorded_package_face_value_rm) as sales_rm, sum(countable_package_rows) as packages from `profound-keel-500007-s4.gold.sales_monthly_recorded` where closed_month is not null group by 1 order by 1
