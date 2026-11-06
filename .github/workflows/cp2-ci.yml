@@ -20,7 +20,7 @@ jobs:
           python-version: '3.14'
           cache: pip
       - name: Install project dependencies
-        run: python -m pip install -r requirements-ci.txt
+        run: python -m pip install -r deploy/requirements-ci.txt
       - name: Python tests
         run: python -m pytest tests -q
       - name: Parse dbt without warehouse access
@@ -38,14 +38,14 @@ jobs:
       - name: Add an empty district boundary file (the real one is private)
         run: mkdir -p data/processed/boundaries && echo '{"type":"FeatureCollection","features":[]}' > data/processed/boundaries/dosm_districts.geojson
       - name: Build private-data-free image
-        run: docker build --tag cp2-reporting:ci .
+        run: docker build -f deploy/Dockerfile --tag cp2-reporting:ci .
       - name: Check entry point without Google access
         run: docker run --rm --entrypoint python cp2-reporting:ci -m scripts.cp2_reporting_release --help
       - name: Build prospective collector image
-        run: docker build -f Dockerfile.collector --tag cp2-collector:ci .
+        run: docker build -f deploy/Dockerfile.collector --tag cp2-collector:ci .
       - name: Check prospective collector import without Google access
         run: docker run --rm --entrypoint python cp2-collector:ci -c 'from scripts import cp2_cloud_collector; assert cp2_cloud_collector.PROJECT'
       - name: Build staff website image
-        run: docker build -f Dockerfile.web --tag cp2-portal:ci .
+        run: docker build -f deploy/Dockerfile.web --tag cp2-portal:ci .
       - name: Check website imports without Google access
         run: docker run --rm --entrypoint python cp2-portal:ci -c 'from webapp.server import Portal; from webapp import storage'

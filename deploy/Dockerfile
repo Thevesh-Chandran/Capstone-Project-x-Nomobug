@@ -5,7 +5,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
-COPY requirements-reporting.txt requirements-collector.txt /app/
+COPY deploy/requirements-reporting.txt deploy/requirements-collector.txt /app/
 RUN python -m pip install --no-cache-dir -r requirements-collector.txt \
     && useradd --uid 10001 --create-home --shell /usr/sbin/nologin cp2 \
     && mkdir -p /app/outputs \

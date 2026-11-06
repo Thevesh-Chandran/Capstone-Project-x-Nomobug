@@ -9,8 +9,8 @@ ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'outputs/address_review/20261017'
 
 def main():
-    names={'Dockerfile','requirements-reporting.txt'}
-    docker=(ROOT/'Dockerfile').read_text()
+    names={'deploy/Dockerfile','deploy/requirements-reporting.txt'}
+    docker=(ROOT/'deploy/Dockerfile').read_text()
     names.update(re.findall(r'scripts/[a-zA-Z0-9_]+\.py',docker))
     for directory in ['dbt','webapp']:
         for p in (ROOT/directory).rglob('*'):
@@ -29,7 +29,7 @@ def main():
     session=AuthorizedSession(google.auth.default(scopes=['https://www.googleapis.com/auth/cloud-platform'])[0])
     bucket='profound-keel-500007-s4_cloudbuild';obj='source/cp2-address-field-fix-'+uuid.uuid4().hex+'.tar.gz'
     response=session.post(f'https://storage.googleapis.com/upload/storage/v1/b/{bucket}/o',params={'uploadType':'media','name':obj,'ifGenerationMatch':'0'},data=archive.read_bytes(),headers={'Content-Type':'application/gzip'},timeout=90);response.raise_for_status()
-    spec=yaml.safe_load((ROOT/'cloudbuild.reporting.yaml').read_text());spec['source']={'storageSource':{'bucket':bucket,'object':obj}}
+    spec=yaml.safe_load((ROOT/'deploy/cloudbuild.reporting.yaml').read_text());spec['source']={'storageSource':{'bucket':bucket,'object':obj}}
     response=session.post('https://cloudbuild.googleapis.com/v1/projects/profound-keel-500007-s4/locations/global/builds',json=spec,timeout=60);response.raise_for_status()
     d=response.json();build=d.get('metadata',{}).get('build',{})
     receipt={'operation':d['name'],'build_id':build.get('id'),'status':build.get('status'),'source_sha256':hashlib.sha256(archive.read_bytes()).hexdigest(),'file_count':len(names)}

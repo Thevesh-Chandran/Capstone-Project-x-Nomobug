@@ -1,6 +1,6 @@
 steps:
   - name: gcr.io/cloud-builders/docker
-    args: [build, -f, Dockerfile.oauth-info, -t, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/info:$BUILD_ID', .]
+    args: [build, -f, deploy/Dockerfile.oauth-info, -t, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/info:$BUILD_ID', .]
   - name: gcr.io/cloud-builders/docker
     args: [run, --rm, --entrypoint, python, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/info:$BUILD_ID', -c, 'import server; assert set(server.PAGES.values()) == {"index.html", "privacy.html", "usage.html"}; assert all((server.ROOT / p).is_file() for p in server.PAGES.values()); print("Static information pages only; no customer API")']
 images:

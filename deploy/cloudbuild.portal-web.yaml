@@ -1,6 +1,6 @@
 steps:
   - name: gcr.io/cloud-builders/docker
-    args: [build, -f, Dockerfile.web, -t, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/portal:$BUILD_ID', .]
+    args: [build, -f, deploy/Dockerfile.web, -t, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/portal:$BUILD_ID', .]
   - name: gcr.io/cloud-builders/docker
     args: [run, --rm, --entrypoint, python, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/portal:$BUILD_ID', -c, 'from webapp import booking; assert len(booking.policy()["teams"]) == 6; from webapp.server import Portal; from webapp import storage, predictions; predictions.repeat_ranking([]); print("portal and packaged model smoke passed")']
 images:

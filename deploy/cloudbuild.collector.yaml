@@ -3,7 +3,7 @@ steps:
     args:
       - build
       - -f
-      - Dockerfile.collector
+      - deploy/Dockerfile.collector
       - -t
       - asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/collector:$BUILD_ID
       - .
