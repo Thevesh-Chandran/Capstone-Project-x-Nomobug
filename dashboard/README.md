@@ -29,8 +29,7 @@ npm run dev
   then `gcloud run jobs update cp2-dashboard-refresh --region=asia-southeast1 --image=<new image>`.
 
 Accounts: `cp2-dashboard-refresh` (BigQuery read, job user, write to the dashboard bucket, may start its own job);
-`cp2-portal-runtime` (read the dashboard bucket). The separate `cp2-dashboard` nginx service was deleted on 6 November 2026;
-`refresh/Dockerfile.serve` and `nginx.conf` are kept only as history.
+`cp2-portal-runtime` (read the dashboard bucket). The separate `cp2-dashboard` nginx service was deleted on 6 November 2026.
 
 ## Privacy
 

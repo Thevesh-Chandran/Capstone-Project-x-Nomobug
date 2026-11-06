@@ -1,6 +1,0 @@
-# Upload only what the image needs.
-**
-!Dockerfile
-!nginx.conf
-!build/
-!build/**
