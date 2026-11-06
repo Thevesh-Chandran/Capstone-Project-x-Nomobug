@@ -1,6 +1,6 @@
 steps:
   - name: gcr.io/cloud-builders/docker
-    args: [build, -f, Dockerfile, -t, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/release:$BUILD_ID', .]
+    args: [build, -f, deploy/Dockerfile, -t, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/release:$BUILD_ID', .]
   - name: gcr.io/cloud-builders/docker
     args: [run, --rm, --entrypoint, python, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/release:$BUILD_ID', -c, 'from webapp import booking; assert len(booking.policy()["teams"]) == 6; from scripts import cp2_reporting_release, cp2_geocoding, callback_live_features, publish_return_risk_predictors, publish_prediction_tables; from scripts.compare_callback_candidates_v2 import add_contract_policy_feature; assert callable(add_contract_policy_feature); from scripts.cp2_collection_policy import load; from pathlib import Path; assert load(Path("/app")); from scripts.calendar_appointment_policy import load_policy; load_policy(); assert cp2_geocoding.address_key("No 18 Jalan P8G1, Presint 8, Putrajaya"); assert cp2_geocoding.clean_sales_address("B South Service Apartments, Bangsar South"); assert cp2_geocoding.address_key("G-62, Jalan SG Prima 3/1, Prima Sri Gombak", explicit_address_field=True); print("reporting, explicit Sales addresses and appointment policy smoke passed")']
 images:
