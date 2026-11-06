@@ -1,0 +1,6 @@
+name: nomobug
+type: bigquery
+options:
+  project_id: profound-keel-500007-s4
+  location: asia-southeast1
+  authenticator: gcloud-cli

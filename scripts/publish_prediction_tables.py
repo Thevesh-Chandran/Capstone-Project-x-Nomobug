@@ -133,6 +133,28 @@ using (sales_record_id)
 """
 
 
+P = f'`{PROJECT}.{DATASET}'
+ACCURACY_VIEW = f"""
+create or replace view {P}.booking_forecast_accuracy` as
+select date(period_start) as period_start, actual as actual_bookings, model_forecast as model_forecast_bookings,
+       simple_average as simple_average_bookings
+from {P}.forecast_backtest` where forecast_id = 'booking_entries_h2'
+"""
+HEADLINE_VIEW = f"""
+create or replace view {P}.headline` as select
+  (select round(sum(chance_of_return), 1) from {P}.return_risk_scores`) as expected_returns_open,
+  (select countif(suggested_action = 'Call this week') from {P}.return_risk_scores`) as customers_to_call,
+  (select count(*) from {P}.return_risk_scores`) as services_open,
+  (select max(chance_of_return) from {P}.return_risk_scores`) as top_chance,
+  (select round(prediction) from {P}.booking_forecast` where forecast_id = 'booking_entries_h2') as bookings_next_2_weeks,
+  (select concat(cast(round(likely_low) as string), ' to ', cast(round(likely_high) as string))
+     from {P}.booking_forecast` where forecast_id = 'booking_entries_h2') as bookings_likely_range,
+  (select round(suggested_staff_hours) from {P}.staffing_plan` limit 1) as staff_hours_next_week,
+  (select round(hours_to_keep_open) from {P}.staffing_plan` limit 1) as hours_to_keep_open,
+  (select max(as_of) from {P}.return_risk_scores`) as as_of
+"""
+
+
 def load(tables: dict[str, list[dict]], client=None) -> dict:
     from google.cloud import bigquery
     client = client or bigquery.Client(project=PROJECT, location=LOCATION)
@@ -151,6 +173,9 @@ def load(tables: dict[str, list[dict]], client=None) -> dict:
         counts[name] = len(rows)
     if 'return_risk_scores' in tables and tables['return_risk_scores']:
         client.query(CALL_LIST_VIEW).result()
+    if {'return_risk_scores', 'booking_forecast', 'staffing_plan'} <= set(tables):
+        for sql in (ACCURACY_VIEW, HEADLINE_VIEW):
+            client.query(sql).result()
     return {'status': 'PUBLISHED', 'dataset': DATASET, 'rows': counts, 'loaded_at': stamp}
 
 

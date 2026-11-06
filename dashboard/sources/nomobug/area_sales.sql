@@ -1,0 +1,1 @@
+select district, sum(sales_rm) as sales_rm, sum(sale_rows) as sales from `profound-keel-500007-s4.gold.area_sales` where district is not null and district != 'Unassigned' and date(month_start) >= date_sub(current_date('Asia/Kuala_Lumpur'), interval 12 month) group by 1 order by 2 desc

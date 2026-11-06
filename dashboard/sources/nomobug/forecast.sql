@@ -1,0 +1,1 @@
+select forecast_id, title, unit, cast(period_start as date) as period_start, cast(period_end as date) as period_end, prediction, likely_low, likely_high, simple_average, already_booked, typical_error from `profound-keel-500007-s4.predictions.booking_forecast`
