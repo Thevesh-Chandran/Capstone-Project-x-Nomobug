@@ -1,0 +1,42 @@
+plugins:
+  components:
+    "@evidence-dev/core-components": {}
+  datasources:
+    "@evidence-dev/bigquery": {}
+
+appearance:
+  default: light
+  switcher: false
+
+# Colours from the Nomobug website (webapp/static/style.css tokens)
+theme:
+  colors:
+    primary:
+      light: "#2C6BE7"
+      dark: "#6B9BFF"
+    accent:
+      light: "#009778"
+      dark: "#3FBF8A"
+    base:
+      light: "#FFFFFF"
+      dark: "#0F141D"
+    info:
+      light: "#2C6BE7"
+      dark: "#6B9BFF"
+    positive:
+      light: "#0F8A5F"
+      dark: "#3FBF8A"
+    warning:
+      light: "#E78C08"
+      dark: "#E0A84A"
+    negative:
+      light: "#E24A3F"
+      dark: "#F07167"
+  colorPalettes:
+    default:
+      light: ["#2C6BE7", "#009778", "#E78C08", "#E24A3F", "#8B54D4", "#B1B8C1"]
+      dark: ["#6B9BFF", "#3FBF8A", "#E0A84A", "#F07167", "#B48CF0", "#7C8594"]
+  colorScales:
+    default:
+      light: ["#E3F3FF", "#2C6BE7"]
+      dark: ["#1A2436", "#6B9BFF"]
