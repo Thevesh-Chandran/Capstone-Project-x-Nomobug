@@ -4,7 +4,7 @@ sidebar_position: 5
 ---
 
 ```sql areas
-select area_cell, lat, lng, services, sales_records, return_visits,
+select area_cell, place, lat, lng, services, sales_records, return_visits,
        return_share,
        case when services >= 20 then 'Enough visits to compare' else 'Few visits' end as volume
 from nomobug.spatial_area
@@ -18,7 +18,7 @@ from nomobug.spatial_area
 ```
 
 ```sql top_return_areas
-select area_cell, services, return_visits, return_share
+select place, services, return_visits, return_share
 from nomobug.spatial_area where services >= 20
 order by return_share desc limit 10
 ```
@@ -54,8 +54,8 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
 <div class="card">
   <h3>Service areas</h3>
   <p class="sub">Bubble size = services; colour = share of visits that were returns. Hover an area for its figures.</p>
-  <BubbleMap data={areas} lat=lat long=lng size=services value=return_share valueFmt=pct0 pointName=area_cell colorPalette={['#9EC5FE','#E78C08','#E24A3F']} max=0.4 height=460 maxSize=28 startingLat=3.1 startingLong=101.62 startingZoom=10 basemap={`https://tile.openstreetmap.org/{z}/{x}/{y}.png`} attribution='© OpenStreetMap contributors' tooltipType=hover tooltip={[
-    {id: 'area_cell', showColumnName: false, valueClass: 'font-bold'},
+  <BubbleMap data={areas} lat=lat long=lng size=services value=return_share valueFmt=pct0 pointName=place colorPalette={['#9EC5FE','#E78C08','#E24A3F']} max=0.4 height=460 maxSize=28 startingLat=3.1 startingLong=101.62 startingZoom=10 basemap={`https://tile.openstreetmap.org/{z}/{x}/{y}.png`} attribution='© OpenStreetMap contributors' tooltipType=hover tooltip={[
+    {id: 'place', showColumnName: false, valueClass: 'font-bold'},
     {id: 'services', title: 'Services'},
     {id: 'return_visits', title: 'Return visits'},
     {id: 'return_share', title: 'Return share', fmt: 'pct0'}
@@ -70,9 +70,9 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
   </div>
   <div class="card">
     <h3>Areas with the highest return share</h3>
-    <p class="sub">Areas with at least 20 services; find each cell on the map above by hovering</p>
+    <p class="sub">Areas with at least 20 services; hover the map above to find each one</p>
     <DataTable data={top_return_areas} rowShading=false rows=10>
-      <Column id=area_cell title="Map cell"/>
+      <Column id=place title="Area"/>
       <Column id=services title="Services"/>
       <Column id=return_visits title="Returns"/>
       <Column id=return_share title="Return share" fmt=pct0 contentType=bar barColor="#F6B8B3"/>
