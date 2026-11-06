@@ -21,31 +21,38 @@
     areas:
       '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/>',
   };
+  // Report pages are dashboard pages shown inside the website (route -> dashboard page).
+  // Only the overview is a report on its own; every other page shows its dashboard section
+  // on top and the website's actions or predictions underneath (see CP2_PAGE_REPORT).
+  window.CP2_REPORTS = { 'r-overview': '' };
+  window.CP2_PAGE_REPORT = {
+    returns: 'follow-up',
+    home: 'payments',
+    plan: 'bookings',
+    customers: 'sales-and-areas',
+    models: 'services-and-warranty',
+    '/maps': 'maps-and-patterns',
+  };
   // Operational tools stay prominent; source browsing and research are secondary.
   const NAV = [
-    // Overview, workspace summary and bookings forecast moved to the Evidence
-    // dashboard (Reporting below); the website keeps the tools that act on records.
+    { label: '', views: [['r-overview', 'Overview', 'overview']] },
     {
       label: 'Daily work',
       views: [
         ['returns', 'Service follow-up'],
-        ['home', 'Payment reminders'],
+        ['home', 'Payments'],
         ['plan', 'Bookings & workload'],
-        ['customers', 'Customer history'],
+        ['customers', 'Sales & customers'],
       ],
     },
-    {
-      label: 'Tools',
-      views: [['/maps', 'Sales & return maps', 'maps']],
-    },
+    { label: 'Areas', views: [['/maps', 'Maps & patterns', 'maps']] },
     {
       label: 'Predictions',
       views: [
-        ['models', 'Prediction models'],
+        ['models', 'Return visits & models'],
         ['status', 'Technical evidence'],
       ],
     },
-    { label: 'Reporting', views: [['dashboard', 'Business dashboard']] },
   ];
   const TITLES = {};
   NAV.forEach(gp => gp.views.forEach(([r, t]) => (TITLES[r] = t)));
@@ -64,6 +71,7 @@
     },
     { ...TITLES },
   );
+  window.CP2_TITLES = TITLES;
   const $ = id => document.getElementById(id);
   const isMaps = location.pathname === '/maps';
   function build() {
@@ -118,6 +126,16 @@
     }
   }
   build();
+  // Dashboard sections grow with their content so the page scrolls as one.
+  setInterval(() => {
+    document.querySelectorAll('.report-frame').forEach(f => {
+      try {
+        const d = f.contentDocument;
+        const h = d && d.body && Math.max(d.documentElement.scrollHeight, d.body.scrollHeight);
+        if (h && f.offsetParent && Math.abs(f.offsetHeight - h) > 4) f.style.height = h + 'px';
+      } catch (e) {}
+    });
+  }, 400);
   window.onRoute = (route, ready) => {
     render(route);
     window.scrollTo({ top: 0, behavior: 'instant' });

@@ -4408,3 +4408,175 @@ body[data-route="overview"] .page-header {
     display: none;
   }
 }
+
+/* ===== Dashboard look (6 Nov 2026): the website follows the Evidence dashboard design ===== */
+:root {
+  --nbd-paper: #f3f7fa;
+  --nbd-card: #ffffff;
+  --nbd-line: #e3e9f0;
+  --nbd-ink: #1b2433;
+  --nbd-muted: #5b6474;
+  --nbd-blue: #2c6be7;
+  --nbd-blue-soft: #e3edfd;
+}
+body,
+.main {
+  background: var(--nbd-paper);
+  color: var(--nbd-ink);
+}
+/* light sidebar with a blue active pill, as in the dashboard */
+.side {
+  background: #ffffff !important;
+  border-right: 1px solid var(--nbd-line);
+  color: var(--nbd-ink);
+}
+.side::before,
+.side::after {
+  display: none !important;
+}
+.side-label {
+  color: #8a94a3 !important;
+  letter-spacing: 0.02em;
+}
+.side-link {
+  color: var(--nbd-muted) !important;
+}
+.side-link .ico {
+  color: #8a94a3 !important;
+}
+.side-link:hover {
+  background: #eef3f9 !important;
+  color: var(--nbd-ink) !important;
+}
+.side-link.active {
+  background: var(--nbd-blue-soft) !important;
+  color: #1f55c4 !important;
+}
+.side-link.active .ico {
+  color: #1f55c4 !important;
+}
+.side-foot,
+.side-foot * {
+  color: var(--nbd-muted);
+}
+.side-foot button {
+  background: #fff;
+  border: 1px solid var(--nbd-line);
+  color: var(--nbd-ink);
+}
+/* page title as the dashboard's gradient hero */
+.page-header {
+  background: linear-gradient(120deg, #0f141d 0%, #1c2a48 55%, #2c6be7 130%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 26px 30px;
+  margin: 0 0 20px;
+  box-shadow: 0 8px 24px rgba(15, 20, 29, 0.12);
+}
+.page-header h1 {
+  color: #fff !important;
+  margin: 0;
+  font-size: 26px;
+}
+@media (min-width: 901px) {
+  #workspace > section > .page-head:has(button, .secondary),
+  #workspace .desk-page-head {
+    margin-top: -78px;
+    padding-right: 24px;
+  }
+}
+/* cards */
+.panel,
+.block,
+.stage-view > section,
+.metrics,
+.kpis > * {
+  border-radius: 14px;
+  border-color: var(--nbd-line);
+  box-shadow: 0 1px 2px rgba(15, 20, 29, 0.04);
+}
+.primary,
+button.primary,
+a.primary {
+  background: var(--nbd-blue) !important;
+  border-color: var(--nbd-blue) !important;
+  color: #fff !important;
+}
+/* report pages: the dashboard draws its own hero, so the website title bar is hidden */
+body[data-route^="r-"] .page-header,
+body[data-route^="r-"] #global-status:empty {
+  display: none;
+}
+.report-view {
+  margin: -8px -8px 0;
+}
+.report-frame {
+  display: block;
+  width: 100%;
+  min-height: 80vh;
+  border: 0;
+  background: transparent;
+}
+/* intro block of tool pages styled as the dashboard hero */
+.stage-view > :first-child {
+  background: linear-gradient(120deg, #0f141d 0%, #1c2a48 55%, #2c6be7 130%) !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 8px 24px rgba(15, 20, 29, 0.12) !important;
+}
+.stage-view > :first-child h2,
+.stage-view > :first-child h3,
+.stage-view > :first-child p,
+.stage-view > :first-child .side-text {
+  color: #fff !important;
+}
+.stage-view > :first-child p {
+  opacity: 0.88;
+}
+.stage-view > :first-child a {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+/* hybrid pages: dashboard view on top, actions underneath */
+.page-report {
+  margin: 0 0 8px;
+}
+.page-report .report-frame {
+  min-height: 420px;
+}
+.act-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 16px;
+  font-size: 20px;
+  font-weight: 650;
+  color: var(--nbd-ink);
+}
+.act-head::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--nbd-line);
+}
+body[data-report="on"] .page-header,
+body[data-report="on"] .stage-view > :first-child {
+  display: none;
+}
+body[data-report="on"] #workspace > section > .page-head:has(button, .secondary),
+body[data-report="on"] #workspace .desk-page-head {
+  margin-top: 0 !important;
+}
+/* the dashboard section carries the page title, so the maps page drops its own banner */
+.maps-page:has(.page-report) .page-header {
+  display: none;
+}
+/* line the dashboard section up with the website cards below it */
+@media (min-width: 768px) {
+  .page-report .report-frame {
+    width: calc(100% + 96px);
+    margin: -16px -48px 0;
+  }
+}

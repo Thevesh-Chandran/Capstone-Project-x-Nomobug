@@ -40,3 +40,7 @@ theme:
     default:
       light: ["#E3F3FF", "#2C6BE7"]
       dark: ["#1A2436", "#6B9BFF"]
+
+# Served inside the staff website at /dashboard (same sign-in, one menu)
+deployment:
+  basePath: /dashboard

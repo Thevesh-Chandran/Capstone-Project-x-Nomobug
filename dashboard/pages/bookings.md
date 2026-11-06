@@ -33,7 +33,7 @@ from nomobug.backtest
 ```
 
 ```sql team_weekly
-select * replace (trim(case when team ilike 'REPLACEMENT%' then 'Replacement' else regexp_replace(regexp_replace(team, '^TEAM ', ''), ' *\(.*\)', '') end) as team)
+select * replace (trim(case when team ilike 'REPLACEMENT%' then 'Replacement' else regexp_replace(regexp_replace(team, '^TEAM ', ''), ' *[(].*[)]', '') end) as team)
 from nomobug.team_weekly
 where team <> 'SALES TEAM' and week >= current_date - interval 12 week
 order by week

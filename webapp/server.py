@@ -4,6 +4,8 @@ Only fixed aggregate queries and saved evaluation results are exposed. The
 pest-return collector and separate weekly planning job own their prediction logs.
 """
 from __future__ import annotations
+from urllib.parse import unquote
+import mimetypes
 import argparse
 import html
 import base64
@@ -151,16 +153,16 @@ def handler_for(portal):
     class Handler(BaseHTTPRequestHandler):
         server_version='NomobugPortal'
         def log_message(self, *_):pass # No URLs, questions, cookie or source content in access logs.
-        def headers_secure(self):
+        def headers_secure(self,csp=None):
             self.send_header('Cache-Control','no-store')
             self.send_header('X-Content-Type-Options','nosniff')
             self.send_header('Referrer-Policy','no-referrer')
             assets = dashboard_asset_origin() if urlsplit(self.path).path == '/reports' else ''
             extra = ' '+assets if assets else ''
-            self.send_header('Content-Security-Policy',f"default-src 'self'; script-src 'self'{extra}; style-src 'self'{extra}; img-src 'self' data:; connect-src 'self'; frame-src https://datastudio.google.com https://lookerstudio.google.com https://calendar.google.com; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
-        def respond(self,status,body,ctype='application/json; charset=utf-8',cookie=None):
+            self.send_header('Content-Security-Policy',csp or f"default-src 'self'; script-src 'self'{extra}; style-src 'self'{extra}; img-src 'self' data:; connect-src 'self'; frame-src 'self' https://datastudio.google.com https://lookerstudio.google.com https://calendar.google.com; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
+        def respond(self,status,body,ctype='application/json; charset=utf-8',cookie=None,csp=None):
             raw=json.dumps(body,default=data.json_default,allow_nan=False).encode() if isinstance(body,(dict,list)) else body
-            self.send_response(status);self.headers_secure();self.send_header('Content-Type',ctype)
+            self.send_response(status);self.headers_secure(csp);self.send_header('Content-Type',ctype)
             if cookie:self.send_header('Set-Cookie',cookie)
             self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw)
         def host_ok(self):
@@ -182,6 +184,22 @@ def handler_for(portal):
             result=workspace.build(value,snapshot,planning.load(portal.folder),log,week=week)
             result.update(action_revision=generation,log_available=available)
             return result
+        def dashboard_file(self,path):
+            # Evidence dashboard build, rebuilt daily into the mounted bucket folder. Signed-in users only.
+            root=Path(os.environ.get('CP2_DASHBOARD_DIR','')).resolve() if os.environ.get('CP2_DASHBOARD_DIR') else None
+            if not root or not root.is_dir():return self.respond(503,{'error':'Reports are not available right now'})
+            rel=unquote(path[len('/dashboard'):]).lstrip('/')
+            for cand in (rel, rel.rstrip('/')+'/index.html' if rel else 'index.html', rel.rstrip('/')+'.html'):
+                p=(root/cand).resolve()
+                if p.is_file() and (p==root or root in p.parents):break
+            else:return self.respond(404,{'error':'Report page not found'})
+            mime=mimetypes.guess_type(p.name)[0] or 'application/octet-stream'
+            if mime.startswith('text/') or mime in ('application/javascript','application/json'):mime+='; charset=utf-8'
+            if p.suffix=='.wasm':mime='application/wasm'
+            csp=("default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; worker-src 'self' blob:; "
+                 "style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.org; font-src 'self' data:; "
+                 "connect-src 'self' blob: data:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'")
+            return self.respond(200,p.read_bytes(),mime,csp=csp)
         def do_GET(self):
             if not self.host_ok():return self.respond(403,{'error':'Host not allowed'})
             path=urlsplit(self.path).path
@@ -202,6 +220,7 @@ def handler_for(portal):
                 if path=='/maps':
                     self.send_response(302);self.headers_secure();self.send_header('Location','/');self.send_header('Content-Length','0');self.end_headers();return
                 return self.respond(401,{'error':'Sign in to the staff portal'})
+            if path=='/dashboard' or path.startswith('/dashboard/'):return self.dashboard_file(path)
             if path=='/reports':
                 origin=dashboard_asset_origin()
                 if not origin:return self.respond(503,{'error':'Reporting assets are not configured'})

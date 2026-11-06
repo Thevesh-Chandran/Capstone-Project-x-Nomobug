@@ -25,7 +25,7 @@ order by return_share desc limit 10
 
 ```sql workload
 select
-  case when team ilike 'REPLACEMENT%' then 'Replacement' else trim(regexp_replace(regexp_replace(team, '^TEAM ', ''), ' *\(.*\)', '')) end as team,
+  case when team ilike 'REPLACEMENT%' then 'Replacement' else trim(regexp_replace(regexp_replace(team, '^TEAM ', ''), ' *[(].*[)]', '')) end as team,
   ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][cast(dow as integer)] as day,
   cast(dow as integer) as dow,
   bookings, round(bookings / nullif(days, 0), 1) as per_day, return_visits
@@ -41,7 +41,7 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
 <div class="hero">
   <h1>Maps & patterns</h1>
   <p>Where services happen and where return visits cluster, and how bookings spread across teams and days. Areas are grouped cells, never individual customer addresses.</p>
-  <span class="chip">For the interactive heat map and custom radius tool, use the website → Sales & return maps</span>
+  <span class="chip">The interactive heat map and radius tool are below</span>
 </div>
 
 <div class="kpis">
@@ -86,4 +86,4 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
   <BarChart data={busiest} x=day y=bookings sort=false colorPalette={['#009778']} chartAreaHeight=200 labels=true/>
 </div>
 
-<p class="note">Return visits are calendar entries marked as warranty or return visits; they are not proof of pest recurrence. Areas with few visits can show extreme shares by chance.</p>
+<p class="note">Return visits are warranty claims booked in the calendar when pests come back after a treatment. Areas with few visits can show extreme shares by chance.</p>

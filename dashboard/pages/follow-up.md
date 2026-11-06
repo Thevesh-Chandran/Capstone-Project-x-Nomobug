@@ -7,21 +7,6 @@ sidebar_position: 2
 select * from nomobug.headline
 ```
 
-```sql call_list
-select
-  risk_rank, customer_name, service_date, call_from,
-  chance_of_return, reason_1 as main_reason, suggested_action,
-  cast(service_number as integer) || ' of ' || cast(programme_services as integer) as service, premise_type
-from nomobug.call_list
-where suggested_action like '${inputs.action}'
-  and coalesce(premise_type, '') like '${inputs.premise.value}'
-order by risk_rank
-```
-
-```sql premises
-select distinct premise_type from nomobug.call_list where premise_type is not null order by 1
-```
-
 ```sql bands
 select case
     when chance_of_return >= 0.2 then '20% or more'
@@ -32,7 +17,7 @@ select case
     when chance_of_return >= 0.2 then 1 when chance_of_return >= 0.1 then 2
     when chance_of_return >= 0.05 then 3 else 4 end as band_order,
   count(*) as services
-from nomobug.call_list group by 1, 2 order by band_order
+from nomobug.risk_scores group by 1, 2 order by band_order
 ```
 
 ```sql service_monthly
@@ -42,7 +27,7 @@ select * from nomobug.service_monthly where month < date_trunc('month', current_
 <div class="hero">
   <h1>Who to call this week</h1>
   <p>Each recent service gets a chance of a pest-related return visit within 30 days. Call the highest first. These are model estimates for ranking calls, not confirmed problems.</p>
-  <span class="chip">Record call results on the website's Service follow-up page</span>
+  <span class="chip">The call list and call results are below</span>
 </div>
 
 <div class="kpis">
@@ -52,32 +37,6 @@ select * from nomobug.service_monthly where month < date_trunc('month', current_
   <BigValue data={headline} value=services_open title="Recent services tracked"/>
 </div>
 
-<div class="card">
-  <h3>Call list</h3>
-  <p class="sub">Ranked by chance of a return visit. Filter by action or premise type.</p>
-
-<ButtonGroup name=action>
-  <ButtonGroupItem valueLabel="Call this week" value="Call this week" default/>
-  <ButtonGroupItem valueLabel="Call if time allows" value="Call if time allows"/>
-  <ButtonGroupItem valueLabel="Past the call window" value="Past the call window"/>
-  <ButtonGroupItem valueLabel="All" value="%"/>
-</ButtonGroup>
-
-<Dropdown data={premises} name=premise value=premise_type title="Premise">
-  <DropdownOption value="%" valueLabel="All premises"/>
-</Dropdown>
-
-<DataTable data={call_list} search=true rows=10 rowShading=false>
-  <Column id=risk_rank title="#"/>
-  <Column id=customer_name title="Customer"/>
-  <Column id=service title="Service"/>
-  <Column id=premise_type title="Premise"/>
-  <Column id=service_date title="Serviced" fmt="d mmm"/>
-  <Column id=chance_of_return title="Chance" fmt=pct0 contentType=bar barColor="#9DC3FA"/>
-  <Column id=main_reason title="Why"/>
-  <Column id=call_from title="Call from" fmt="d mmm"/>
-</DataTable>
-</div>
 
 <div class="row2">
   <div class="card">
@@ -93,5 +52,5 @@ select * from nomobug.service_monthly where month < date_trunc('month', current_
 </div>
 
 <Details title="How reliable is this model?">
-On past data (1,270 services, 108 recorded returns) the model ranked real return visits above other services 81% of the time (AUC 0.81). The top 20% of services held 62% of returns, against 21% if picked at random. Monthly totals ran about 17% low, so plan with a buffer. Full method: website → Prediction models.
+On past data (1,270 services, 108 recorded returns) the model ranked real return visits above other services 81% of the time (AUC 0.81). The top 20% of services held 62% of returns, against 21% if picked at random. Monthly totals ran about 17% low, so plan with a buffer. Full method: Return visits & models page.
 </Details>

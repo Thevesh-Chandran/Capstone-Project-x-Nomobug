@@ -122,13 +122,4 @@ group by 1 order by 2 desc
   </div>
 </div>
 
-<div class="card">
-  <h3>Upcoming reminders</h3>
-  <p class="sub">Next dates first</p>
-  <DataTable data={upcoming} rows=10 rowShading=false>
-    <Column id=reminder_date title="Reminder date" fmt="ddd d mmm yyyy"/>
-    <Column id=days_away title="Days away" contentType=colorscale colorScale={['#C3E0FD','#F3F7FA']}/>
-    <Column id=billing_arrangement title="Arrangement"/>
-    <Column id=reminders title="Reminders"/>
-  </DataTable>
-</div>
+
