@@ -1,7 +1,7 @@
 FROM python:3.14-slim
 WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2
-COPY requirements-planning.txt ./
+COPY deploy/requirements-planning.txt ./
 RUN pip install --no-cache-dir -r requirements-planning.txt \
     && useradd --uid 10004 --create-home --shell /usr/sbin/nologin planner
 COPY scripts/cp2_planning_job.py scripts/planning_engine.py scripts/load_calendar_bronze.py /app/scripts/

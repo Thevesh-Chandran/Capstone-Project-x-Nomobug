@@ -1,6 +1,6 @@
 steps:
   - name: gcr.io/cloud-builders/docker
-    args: [build, -f, Dockerfile.planning, -t, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/planning:$BUILD_ID', .]
+    args: [build, -f, deploy/Dockerfile.planning, -t, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/planning:$BUILD_ID', .]
   - name: gcr.io/cloud-builders/docker
     args: [run, --rm, --entrypoint, python, 'asia-southeast1-docker.pkg.dev/profound-keel-500007-s4/cp2-reporting/planning:$BUILD_ID', -c, 'from scripts.cp2_planning_job import due_origin; from scripts import planning_engine; assert planning_engine.SEED==20261021; print("planning image smoke passed")']
 images:

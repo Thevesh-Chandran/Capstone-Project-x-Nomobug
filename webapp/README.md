@@ -20,7 +20,7 @@ The map keeps unlocated records in overall totals. Its model layer uses 85 locat
 
 ## Development
 
-`Dockerfile.web` builds the website (Cloud Build runs it; no local Docker needed). The retired Ollama assistant files are in `archive/retired_ollama/`. `cloudbuild.portal-web.yaml` builds the hosted website and runs a container import smoke check.
+`deploy/Dockerfile.web` builds the website (Cloud Build runs it; no local Docker needed). The retired Ollama assistant files are in `archive/retired_ollama/`. `cloudbuild.portal-web.yaml` builds the hosted website and runs a container import smoke check.
 
 Runtime snapshots are private mounted/downloaded data, never image contents. The website runtime identity reads approved snapshots. Every BigQuery refresh query is capped at 100 MiB, and failed refreshes preserve the last good snapshot. Customer endpoints reject mixed releases.
 

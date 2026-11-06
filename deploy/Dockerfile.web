@@ -1,6 +1,6 @@
 FROM python:3.12-slim
 WORKDIR /app
-COPY requirements-web.txt ./
+COPY deploy/requirements-web.txt ./
 RUN pip install --no-cache-dir -r requirements-web.txt \
     && useradd --uid 10003 --create-home --shell /usr/sbin/nologin portal \
     && mkdir -p /var/lib/cp2-portal /app/config \
