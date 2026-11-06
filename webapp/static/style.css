@@ -4471,3 +4471,8 @@ body[data-report="on"] #workspace > section > .page-head:has(button, .secondary)
 .access-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-sm); margin: var(--space-md) 0; }
 .access-form label { display: grid; gap: var(--space-2xs); font-size: var(--text-sm); color: var(--color-muted); min-width: min(100%, 22rem); }
 .access-panel table td:last-child { text-align: right; }
+/* phones: the summary frame and the page sheet never run wider than the screen */
+@media (max-width: 767px) {
+  .main, #workspace, .page-report, .report-view { min-width: 0; max-width: 100%; }
+  .report-frame, .page-report .report-frame, .report-view .report-frame { width: 100% !important; margin: 0 !important; }
+}
