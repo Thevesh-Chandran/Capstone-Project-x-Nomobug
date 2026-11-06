@@ -95,10 +95,16 @@ class Portal:
                     return int(expiry)>time.time() and hmac.compare_digest(sig,expected)
                 except (ValueError,TypeError):return False
         return False
+    def iap_email(self,assertion):
+        """The verified Google account email behind an IAP assertion, or None."""
+        claims=self.iap_claims(assertion)
+        return claims.get('email') if claims else None
     def iap_authenticated(self,assertion):
-        if not assertion:return False
+        return self.iap_claims(assertion) is not None
+    def iap_claims(self,assertion):
+        if not assertion:return None
         audience=os.environ.get('CP2_IAP_AUDIENCE','')
-        if not audience:return False
+        if not audience:return None
         try:
             from google.auth.transport.requests import Request
             from google.oauth2 import id_token
@@ -110,9 +116,10 @@ class Portal:
                     self.iap_request=Request(session=CacheControl(requests.Session()))
                 claims=id_token.verify_token(assertion,self.iap_request,audience=audience,
                     certs_url='https://www.gstatic.com/iap/verify/public_key')
-            return claims.get('iss')=='https://cloud.google.com/iap' and bool(claims.get('sub'))
+            ok=claims.get('iss')=='https://cloud.google.com/iap' and bool(claims.get('sub'))
+            return claims if ok else None
         except Exception:
-            return False
+            return None
     def state(self):
         uri=os.environ.get('CP2_PORTAL_GCS_URI')
         if uri and (not self.last_storage_check or time.monotonic()-self.last_storage_check>300):
@@ -270,6 +277,12 @@ def handler_for(portal):
                     return self.respond(200,payload(business,snapshot,evaluated,boundaries))
                 except (FileNotFoundError,ValueError,KeyError,TypeError):
                     return self.respond(503,{'error':'Map sources are unavailable. The last reporting release remains intact.'})
+            if path=='/api/access':
+                from webapp import access
+                who=portal.iap_email(self.headers.get('X-Goog-IAP-JWT-Assertion'))
+                if not access.is_admin(who):return self.respond(403,{'error':'Only the owner account can manage access'})
+                try:return self.respond(200,{'members':access.members(),'owners':sorted(access.admins()),'you':who})
+                except Exception as e:return self.respond(503,{'error':str(e)})
             if path=='/api/state':return self.respond(200,portal.state())
             if path=='/api/analytics':
                 loaded=self.business_data()
@@ -364,6 +377,15 @@ def handler_for(portal):
                 if not isinstance(payload,dict):raise ValueError()
             except (ValueError,json.JSONDecodeError):return self.respond(400,{'error':'Invalid request'})
             path=urlsplit(self.path).path
+            if path=='/api/access':
+                from webapp import access
+                if not portal.authenticated(self.headers.get('Cookie'),self.headers.get('X-Goog-IAP-JWT-Assertion')):
+                    return self.respond(401,{'error':'Sign in to the staff portal'})
+                who=portal.iap_email(self.headers.get('X-Goog-IAP-JWT-Assertion'))
+                if not access.is_admin(who):return self.respond(403,{'error':'Only the owner account can manage access'})
+                try:return self.respond(200,{'members':access.change(str(payload.get('action','')),str(payload.get('email','')),who)})
+                except ValueError as e:return self.respond(400,{'error':str(e)})
+                except Exception as e:return self.respond(503,{'error':str(e)})
             if path=='/api/login':
                 with portal.login_lock:
                     portal.login_attempts=[t for t in portal.login_attempts if time.monotonic()-t<60]

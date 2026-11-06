@@ -364,6 +364,78 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {}
   });
 });
+// Owner-only: who can sign in (Google IAP access list for this website).
+async function accessCall(method, body) {
+  const r = await fetch('/api/access', {
+    method,
+    credentials: 'same-origin',
+    headers: body ? { 'Content-Type': 'application/json' } : {},
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const v = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(v.error || 'Access list is unavailable right now');
+  return v;
+}
+function drawAccess(v) {
+  const host = $('access-list');
+  if (!host) return;
+  const owners = new Set((v.owners || []).map(x => x.toLowerCase()));
+  const t = el('table');
+  const head = el('tr');
+  ['Google account', ''].forEach(h => head.append(el('th', h)));
+  t.append(head);
+  (v.members || []).forEach(m => {
+    const tr = el('tr');
+    tr.append(el('td', m + (owners.has(m.toLowerCase()) ? ' (owner)' : '')));
+    const td = el('td');
+    if (!owners.has(m.toLowerCase())) {
+      const b = el('button', 'Remove', 'secondary');
+      b.type = 'button';
+      b.addEventListener('click', async () => {
+        if (!confirm('Remove access for ' + m + '?')) return;
+        b.disabled = true;
+        try {
+          drawAccess({ ...v, members: (await accessCall('POST', { action: 'remove', email: m })).members });
+          $('access-note').textContent = m + ' can no longer sign in.';
+        } catch (e) {
+          $('access-note').textContent = e.message;
+          b.disabled = false;
+        }
+      });
+      td.append(b);
+    }
+    tr.append(td);
+    t.append(tr);
+  });
+  host.replaceChildren(t);
+}
+async function loadAccess() {
+  try {
+    const v = await accessCall('GET');
+    document.querySelectorAll('[data-owner-only]').forEach(n => (n.hidden = false));
+    window.cp2Access = v;
+    drawAccess(v);
+  } catch (e) {
+    if ($('access-note')) $('access-note').textContent = e.message;
+  }
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const form = $('access-form');
+  if (!form) return;
+  form.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const email = $('access-email').value.trim();
+    $('access-note').textContent = 'Adding ' + email + '...';
+    try {
+      const v = await accessCall('POST', { action: 'add', email });
+      drawAccess({ ...(window.cp2Access || {}), members: v.members });
+      $('access-note').textContent = email + ' can now sign in. It can take a minute to start working.';
+      $('access-email').value = '';
+    } catch (e) {
+      $('access-note').textContent = e.message;
+    }
+  });
+});
 function navigate() {
   const pages = [
     'overview',
@@ -381,6 +453,7 @@ function navigate() {
     'areas',
     'status',
     ...Object.keys(window.CP2_REPORTS || {}),
+    'access',
   ];
   // Service follow-up is the landing page; the overview now lives in the dashboard.
   let page = window.cp2Page() || 'returns';
@@ -426,6 +499,7 @@ async function load() {
     $('logout').textContent = state.system?.auth_mode === 'iap' ? 'Switch Google account' : 'Sign out';
     render();
     navigate();
+    loadAccess();
     try {
       boundaries = await api('/api/area/boundaries');
       drawMap();
