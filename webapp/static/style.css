@@ -4466,3 +4466,8 @@ body[data-report="on"] #workspace > section > .page-head:has(button, .secondary)
 .maps-page:has(.page-report) .page-header { display: none; }
 @media (max-width: 900px) { .main { margin-top: 0; margin-right: 0; margin-bottom: 0; border-radius: 0; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
+
+/* owner-only access page */
+.access-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-sm); margin: var(--space-md) 0; }
+.access-form label { display: grid; gap: var(--space-2xs); font-size: var(--text-sm); color: var(--color-muted); min-width: min(100%, 22rem); }
+.access-panel table td:last-child { text-align: right; }
