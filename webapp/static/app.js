@@ -306,8 +306,9 @@ function navigate() {
     'areas',
     'status',
   ];
-  let page = window.cp2Page() || 'overview';
-  if (!pages.includes(page)) page = 'overview';
+  // Service follow-up is the landing page; the overview now lives in the dashboard.
+  let page = window.cp2Page() || 'returns';
+  if (!pages.includes(page)) page = 'returns';
   document.querySelectorAll('[data-view]').forEach(n => (n.hidden = n.dataset.view !== page));
   document
     .querySelectorAll('[data-page]')

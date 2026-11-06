@@ -23,22 +23,19 @@
   };
   // Operational tools stay prominent; source browsing and research are secondary.
   const NAV = [
-    { label: 'Management', views: [['overview', 'Management overview']] },
+    // Overview, workspace summary and bookings forecast moved to the Evidence
+    // dashboard (Reporting below); the website keeps the tools that act on records.
     {
       label: 'Daily work',
       views: [
-        ['today', 'Workspace'],
         ['returns', 'Service follow-up'],
+        ['home', 'Payment reminders'],
+        ['customers', 'Customer history'],
       ],
     },
     {
-      label: 'Supporting tools',
-      views: [
-        ['home', 'Payment reminders'],
-        ['plan', 'Bookings & workload'],
-        ['/maps', 'Sales & return maps', 'maps'],
-        ['customers', 'Customer history'],
-      ],
+      label: 'Tools',
+      views: [['/maps', 'Sales & return maps', 'maps']],
     },
     {
       label: 'Predictions',
@@ -55,6 +52,9 @@
   Object.assign(
     TITLES,
     {
+      overview: 'Management overview',
+      today: 'Workspace',
+      plan: 'Bookings & workload',
       performance: 'Performance',
       payments: 'Payments',
       business: 'Areas',
@@ -95,7 +95,7 @@
     });
   }
   function render(route) {
-    if (route === 'decisions') route = 'overview';
+    if (route === 'decisions') route = 'returns';
     const t = TITLES[route] || TITLES.today;
     document.querySelectorAll('.side-link').forEach(a => {
       const on = a.dataset.route === route;
@@ -120,9 +120,9 @@
   window.onRoute = (route, ready) => {
     render(route);
     window.scrollTo({ top: 0, behavior: 'instant' });
-    if (ready && window.loadStage) window.loadStage(route === 'decisions' ? 'overview' : route);
+    if (ready && window.loadStage) window.loadStage(route === 'decisions' ? 'returns' : route);
   };
-  render(isMaps ? '/maps' : (window.cp2Page ? window.cp2Page() : location.hash.slice(1)) || 'overview');
+  render(isMaps ? '/maps' : (window.cp2Page ? window.cp2Page() : location.hash.slice(1)) || 'returns');
   if (isMaps) {
     const lo = $('logout');
     if (lo)
