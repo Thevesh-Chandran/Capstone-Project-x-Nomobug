@@ -35,6 +35,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
+      - name: Add an empty district boundary file (the real one is private)
+        run: mkdir -p data/processed/boundaries && echo '{"type":"FeatureCollection","features":[]}' > data/processed/boundaries/dosm_districts.geojson
       - name: Build private-data-free image
         run: docker build --tag cp2-reporting:ci .
       - name: Check entry point without Google access
