@@ -53,9 +53,9 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 
 <div class="kpis">
   <BigValue data={sales_kpi2} value=last_12m_rm title="Sales, last 12 months" fmt='"RM"#,##0' comparison=vs_prior comparisonFmt=pct0 comparisonTitle="vs previous 12 months" sparkline=month sparklineType=bar sparklineColor="#2C6BE7"/>
-  <BigValue data={headline} value=bookings_next_2_weeks title="Bookings expected, next 2 weeks" fmt="#,##0" link="/bookings"/>
-  <BigValue data={headline} value=customers_to_call title="Customers to call this week" link="/follow-up"/>
-  <BigValue data={headline} value=staff_hours_next_week title="Staff hours, next week" fmt="#,##0" link="/bookings"/>
+  <BigValue data={headline} value=bookings_next_2_weeks title="Bookings expected, next 2 weeks" fmt="#,##0"/>
+  <BigValue data={headline} value=customers_to_call title="Customers to call this week"/>
+  <BigValue data={headline} value=staff_hours_next_week title="Staff hours, next week" fmt="#,##0"/>
 </div>
 
 ## This week: what to do
@@ -65,19 +65,19 @@ select max(extracted_at_utc) as latest from nomobug.freshness
     <div class="label">Service follow-up</div>
     <div class="big">Call <Value data={headline} column=customers_to_call/> customers</div>
     <p>Most likely to need a return visit. Top chance <Value data={headline} column=top_chance fmt=pct0/>.</p>
-    <a href="/follow-up">Open the call list →</a>
+    <a class="go" data-to="returns" role="link" tabindex="0">Open the call list →</a>
   </div>
   <div class="action green">
     <div class="label">Staffing</div>
     <div class="big">Staff about <Value data={headline} column=staff_hours_next_week fmt="#,##0"/> hours</div>
     <p>Keep <Value data={headline} column=hours_to_keep_open fmt="#,##0"/> hours open for new bookings next week.</p>
-    <a href="/bookings">See the staffing plan →</a>
+    <a class="go" data-to="plan" role="link" tabindex="0">See the staffing plan →</a>
   </div>
   <div class="action amber">
     <div class="label">Bookings</div>
     <div class="big">About <Value data={headline} column=bookings_next_2_weeks fmt="#,##0"/> bookings</div>
     <p>Expected in the next two weeks, likely <Value data={headline} column=bookings_likely_range/>.</p>
-    <a href="/bookings">See the forecast →</a>
+    <a class="go" data-to="plan" role="link" tabindex="0">See the forecast →</a>
   </div>
 </div>
 

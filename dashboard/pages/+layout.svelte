@@ -6,6 +6,19 @@
 	// Management viewers never need the SQL panels.
 	showQueries.set(false);
 	export let data;
+	import { onMount } from 'svelte';
+	// Buttons such as "Open the call list" open the matching website page (the part with the actions).
+	onMount(() => {
+		const go = (e) => {
+			const a = e.target.closest && e.target.closest('[data-to]');
+			if (!a || (e.type === 'keydown' && e.key !== 'Enter')) return;
+			e.preventDefault();
+			try { window.top.location.hash = a.dataset.to; } catch (err) { window.location.href = '/#' + a.dataset.to; }
+		};
+		document.addEventListener('click', go);
+		document.addEventListener('keydown', go);
+		return () => { document.removeEventListener('click', go); document.removeEventListener('keydown', go); };
+	});
 </script>
 
 <EvidenceDefaultLayout
@@ -211,4 +224,5 @@
 	:global(aside a) { text-transform: none !important; border-radius: 8px; padding: 0.3rem 0.75rem !important; font-size: 0.9rem; }
 	:global(aside a.text-primary) { background: #e3edfd; color: #1f55c4 !important; font-weight: 600; }
 	:global(aside a:hover) { background: #eaf0f6; text-decoration: none !important; }
+	:global(a.go) { cursor: pointer; }
 </style>

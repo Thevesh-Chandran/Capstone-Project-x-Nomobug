@@ -4580,3 +4580,30 @@ body[data-report="on"] #workspace .desk-page-head {
     margin: -16px -48px 0;
   }
 }
+
+/* clear split: summary above (view only), actions below in a marked band */
+.act-head {
+  display: block !important;
+  margin: 24px 0 18px !important;
+  padding: 16px 20px 16px 24px;
+  background: #fff;
+  border: 1px solid var(--nbd-line);
+  border-left: 6px solid var(--nbd-blue);
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(15, 20, 29, 0.04);
+}
+.act-head::after {
+  display: none !important;
+}
+.act-head strong {
+  display: block;
+  font-size: 19px;
+  color: var(--nbd-ink);
+}
+.act-head span {
+  display: block;
+  margin-top: 2px;
+  font-size: 13.5px;
+  font-weight: 400;
+  color: var(--nbd-muted);
+}

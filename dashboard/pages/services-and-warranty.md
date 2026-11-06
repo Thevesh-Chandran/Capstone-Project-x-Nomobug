@@ -74,7 +74,7 @@ from ${difficulty}
 <div class="hero">
   <h1>Services & warranty</h1>
   <p>Which treatments lead to more return visits, how packages compare, and whether rainfall moves with returns. These are observed patterns, not causes.</p>
-  <span class="chip">Return visits = calendar entries for warranty or follow-up visits</span>
+  <span class="chip">Return visits = warranty claims when pests come back</span>
 </div>
 
 <div class="kpis">
@@ -125,4 +125,4 @@ from ${difficulty}
   </div>
 </div>
 
-<p class="note">Weather is matched to each service's location and shows association only; rain does not prove a treatment failed. Small groups are hidden to avoid misleading percentages.</p>
+<p class="note">Weather is matched to each service's location and shows association only; rain does not prove it caused the pests to come back. Small groups are hidden to avoid misleading percentages.</p>
