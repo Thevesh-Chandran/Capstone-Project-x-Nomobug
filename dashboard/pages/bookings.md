@@ -77,7 +77,7 @@ select team, sum(bookings) as bookings from ${team_weekly} group by 1 order by 2
 <div class="card">
   <h3>Forecast vs actual bookings</h3>
   <p class="sub">Two-week booking forecasts on past weeks, against what was actually booked</p>
-  <LineChart data={backtest_long} x=period_start y=bookings series=series xFmt="d mmm" seriesOrder={['Actual','Model forecast','Simple average']} colorPalette={['#0F141D','#2C6BE7','#E78C08']} chartAreaHeight=240 markers=true/>
+  <LineChart data={backtest_long} x=period_start y=bookings series=series xFmt="d mmm" seriesOrder={['Actual','Model forecast','Simple average']} colorPalette={['#2A2F3D','#5B63C9','#D97E45']} chartAreaHeight=240 markers=true/>
 </div>
 
 <div class="row2">
@@ -89,7 +89,7 @@ select team, sum(bookings) as bookings from ${team_weekly} group by 1 order by 2
   <div class="card">
     <h3>Team share, last 12 weeks</h3>
     <p class="sub">Total recorded bookings per team</p>
-    <BarChart data={team_total} x=team y=bookings swapXY=true colorPalette={['#2C6BE7']} chartAreaHeight=220 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...team_total.map(d => d.bookings ?? 0)) * 1.25}/>
+    <BarChart data={team_total} x=team y=bookings swapXY=true colorPalette={['#2E9CB8']} chartAreaHeight=220 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...team_total.map(d => d.bookings ?? 0)) * 1.25}/>
   </div>
 </div>
 

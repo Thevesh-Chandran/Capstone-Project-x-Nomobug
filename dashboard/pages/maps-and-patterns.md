@@ -54,7 +54,7 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
 <div class="card">
   <h3>Service areas</h3>
   <p class="sub">Bubble size = services; colour = share of visits that were returns. Hover an area for its figures.</p>
-  <BubbleMap data={areas} lat=lat long=lng size=services value=return_share valueFmt=pct0 pointName=place colorPalette={['#9EC5FE','#E78C08','#E24A3F']} max=0.4 height=460 maxSize=28 startingLat=3.1 startingLong=101.62 startingZoom=10 basemap={`https://tile.openstreetmap.org/{z}/{x}/{y}.png`} attribution='© OpenStreetMap contributors' tooltipType=hover tooltip={[
+  <BubbleMap data={areas} lat=lat long=lng size=services value=return_share valueFmt=pct0 pointName=place colorPalette={['#A3A8E6','#E8A46A','#E24A3F']} max=0.4 height=460 maxSize=28 startingLat=3.1 startingLong=101.62 startingZoom=10 basemap={`https://tile.openstreetmap.org/{z}/{x}/{y}.png`} attribution='© OpenStreetMap contributors' tooltipType=hover tooltip={[
     {id: 'place', showColumnName: false, valueClass: 'font-bold'},
     {id: 'services', title: 'Services'},
     {id: 'return_visits', title: 'Return visits'},
@@ -66,7 +66,7 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
   <div class="card">
     <h3>Bookings by team and day</h3>
     <p class="sub">Average bookings per working day, last 26 weeks</p>
-    <Heatmap data={workload} x=day y=team value=per_day xSort=dow colorScale={['#F3F7FA','#2C6BE7']} valueLabels=true chartAreaHeight=240/>
+    <Heatmap data={workload} x=day y=team value=per_day xSort=dow colorScale={['#EEF0FB','#5B63C9']} valueLabels=true chartAreaHeight=240/>
   </div>
   <div class="card">
     <h3>Areas with the highest return share</h3>
@@ -75,7 +75,7 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
       <Column id=place title="Area"/>
       <Column id=services title="Services"/>
       <Column id=return_visits title="Returns"/>
-      <Column id=return_share title="Return share" fmt=pct0 contentType=bar barColor="#F6B8B3"/>
+      <Column id=return_share title="Return share" fmt=pct0 contentType=bar barColor="#F3C5D1"/>
     </DataTable>
   </div>
 </div>
@@ -83,7 +83,7 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
 <div class="card">
   <h3>Busiest days</h3>
   <p class="sub">Total bookings by day of week, all field teams, last 26 weeks</p>
-  <BarChart data={busiest} x=day y=bookings sort=false colorPalette={['#009778']} chartAreaHeight=200 labels=true/>
+  <BarChart data={busiest} x=day y=bookings sort=false colorPalette={['#2E9CB8']} chartAreaHeight=200 labels=true/>
 </div>
 
 <p class="note">Return visits are warranty claims booked in the calendar when pests come back after a treatment. Areas with few visits can show extreme shares by chance.</p>

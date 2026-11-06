@@ -138,32 +138,32 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
     <DataTable data={top_packages} rowShading=false rows=10>
       <Column id=package title="Package"/>
       <Column id=sales title="Sold"/>
-      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#C3E0FD"/>
+      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#DCDDF4"/>
       <Column id=avg_rm title="Average" fmt='"RM"#,##0'/>
     </DataTable>
   </div>
   <div class="card">
     <h3>Sales by area</h3>
     <p class="sub">Top 12 areas with a known district</p>
-    <BarChart data={by_area} x=area y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#2C6BE7']} chartAreaHeight=300 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...by_area.map(d => d.sales_rm ?? 0)) * 1.25}/>
+    <BarChart data={by_area} x=area y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#5B63C9']} chartAreaHeight=300 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...by_area.map(d => d.sales_rm ?? 0)) * 1.25}/>
   </div>
 </div>
 
 <div class="row3">
   <div class="card">
     <h3>Residential vs commercial</h3>
-    <BarChart data={by_premise} x=premise y=sales_rm yFmt='"RM"#,##0' colorPalette={['#009778']} chartAreaHeight=200 labels=true/>
+    <BarChart data={by_premise} x=premise y=sales_rm yFmt='"RM"#,##0' colorPalette={['#3FA27A']} chartAreaHeight=200 labels=true/>
   </div>
   <div class="card">
     <h3>New vs returning clients</h3>
-    <BarChart data={client_mix} x=client_type y=sales_rm yFmt='"RM"#,##0' colorPalette={['#8B54D4']} chartAreaHeight=200 labels=true/>
+    <BarChart data={client_mix} x=client_type y=sales_rm yFmt='"RM"#,##0' colorPalette={['#D9577A']} chartAreaHeight=200 labels=true/>
   </div>
 
   <div class="card">
     <h3>Pests treated</h3>
     <DataTable data={pests} rowShading=false rows=8>
       <Column id=pest title="Pest" wrap=true/>
-      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#F8D9A8"/>
+      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#F4D9C6"/>
     </DataTable>
   </div>
 </div>
@@ -184,7 +184,7 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
   <div class="card">
     <h3>How customers pay</h3>
     <p class="sub">Billing arrangement, selected filters</p>
-    <BarChart data={billing_mix} x=billing y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#2C6BE7']} chartAreaHeight=200 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...billing_mix.map(d => d.sales_rm ?? 0)) * 1.25}/>
+    <BarChart data={billing_mix} x=billing y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#B8901A']} chartAreaHeight=200 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...billing_mix.map(d => d.sales_rm ?? 0)) * 1.25}/>
   </div>
 </div>
 
@@ -194,7 +194,7 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
   <DataTable data={salespeople} rowShading=false rows=10>
     <Column id=salesperson title="Salesperson"/>
     <Column id=sales title="Sales"/>
-    <Column id=sales_rm title="Sales value" fmt='"RM"#,##0' contentType=bar barColor="#C3E0FD"/>
+    <Column id=sales_rm title="Sales value" fmt='"RM"#,##0' contentType=bar barColor="#DCDDF4"/>
     <Column id=avg_rm title="Average" fmt='"RM"#,##0'/>
     <Column id=median_days_to_close title="Days to close" fmt="#,##0"/>
   </DataTable>

@@ -91,20 +91,27 @@ from ${difficulty}
     <DataTable data={difficulty} rowShading=false>
       <Column id=pest title="Pest mix" wrap=true/>
       <Column id=visits title="Visits" fmt="#,##0"/>
-      <Column id=return_share title="Return share" fmt=pct0 contentType=bar barColor="#F6B8B3"/>
+      <Column id=return_share title="Return share" fmt=pct0 contentType=bar barColor="#F3C5D1"/>
     </DataTable>
   </div>
   <div class="card">
     <h3>Package fit: return share</h3>
     <p class="sub">Pest × package, combinations with 15+ visits. Darker = more return visits.</p>
-    <Heatmap data={fit} x=package y=pest value=return_share valueFmt=pct0 colorScale={['#F3F7FA','#E78C08','#E24A3F']} valueLabels=true chartAreaHeight=260/>
+    <Heatmap data={fit} x=package y=pest value=return_share valueFmt=pct0 colorScale={['#FBEFF2','#D9577A']} valueLabels=true chartAreaHeight=260/>
   </div>
 </div>
 
-<div class="card">
-  <h3>Rainfall and return visits</h3>
-  <p class="sub">Monthly return-visit share (bars) and average rainfall in the 7 days before services (line). Weather data runs to the last loaded month.</p>
-  <BarChart data={weather2} x=month y="Return-visit share" yFmt=pct0 y2="Rain before visits (mm)" y2SeriesType=line y2Fmt='#,##0.0" mm"' xFmt="mmm yy" colorPalette={['#2C6BE7','#009778']} chartAreaHeight=240/>
+<div class="row2">
+  <div class="card">
+    <h3>Return-visit share by month</h3>
+    <p class="sub">Share of visits that were return visits</p>
+    <BarChart data={weather2} x=month y="Return-visit share" yFmt=pct0 xFmt="mmm yy" colorPalette={['#D9577A']} chartAreaHeight=220/>
+  </div>
+  <div class="card">
+    <h3>Rain before visits</h3>
+    <p class="sub">Average rainfall in the 7 days before services, mm. Weather data runs to the last loaded month.</p>
+    <LineChart data={weather2} x=month y="Rain before visits (mm)" yFmt='#,##0.0' xFmt="mmm yy" colorPalette={['#2E9CB8']} chartAreaHeight=220 markers=true/>
+  </div>
 </div>
 
 <div class="row2">
@@ -120,7 +127,7 @@ from ${difficulty}
       <Column id=pest title="Pest"/>
       <Column id=package title="Package"/>
       <Column id=packages title="Packages"/>
-      <Column id=return_share title="Return share" fmt=pct0 contentType=colorscale colorScale={['#FFFFFF','#E24A3F']}/>
+      <Column id=return_share title="Return share" fmt=pct0 contentType=colorscale colorScale={['#FFFFFF','#D9577A']}/>
     </DataTable>
   </div>
 </div>

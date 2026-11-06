@@ -1,8 +1,21 @@
-/* Hallmark · shape: app screen · genre: modern-minimal · theme: brand (Nomobug Clear: the owner's black brand, light blue cards, a colour per chart series) · redesign: full
- * nav: dark sidebar shell · signature: the weekly follow-up list · states: loading, empty, error, stale, full
- * axes: light/sans/cool · posture: restrained · contrast: pass · v2.0.0 */
+/* Hallmark · shape: app screen · genre: modern-minimal · theme: Dusk (by request; dealt 1/3, seed pest-control-operations-tool-small-ede0·db791fc4·2026-11-06·r0) · redesign: restyle
+ * nav: kept sidebar shell on slate · signature: the weekly call list under its summary, on a bone well · states: loading, empty, error, stale, full · dusk: fog/periwinkle-apricot/well
+ * axes: dark/grotesk-sans/cool · posture: committed · contrast: pass · v2.0.0 */
 /* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: S, the page order is kept so staff find tools where they were */
-/* Charts keep distinct series colours at the owner's request. */
+/* Hallmark · waive 3 · .booking-calendar-event and .calendar-key keep a left stripe · the stripe is the team colour key the booking calendar reads */
+/* Charts keep distinct series colours at the owner's request. App screens sit on one bone well inside the slate shell (Dusk wells carry light surfaces). */
+@font-face {
+  font-family: "Wix Madefor Display";
+  src: url("/wix-madefor-display.woff2") format("woff2-variations"), url("/wix-madefor-display.woff2") format("woff2");
+  font-weight: 400 800;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Wix Madefor Text";
+  src: url("/wix-madefor-text.woff2") format("woff2-variations"), url("/wix-madefor-text.woff2") format("woff2");
+  font-weight: 400 800;
+  font-display: swap;
+}
 @font-face {
   font-family: "Archivo";
   src: url("/archivo.woff2") format("woff2-variations"), url("/archivo.woff2") format("woff2");
@@ -17,11 +30,13 @@
   --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px;
   --text-xs: 0.75rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.2rem; --text-xl: 1.44rem; --text-2xl: 1.728rem; --text-3xl: 2.074rem;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --dur-micro: 120ms; --dur-short: 220ms;
-  /* Nomobug Clear: cool off-white page, white cards, near-black brand, one blue for actions */
-  --color-paper: oklch(97.4% 0.006 250); --color-paper-2: oklch(94.6% 0.01 250); --color-paper-3: oklch(100% 0 0);
-  --color-ink: oklch(19% 0.02 262); --color-ink-2: oklch(30% 0.02 262); --color-muted: oklch(48% 0.018 260);
-  --color-rule: oklch(90.5% 0.01 255); --color-ink-rule: oklch(34% 0.02 262);
-  --color-accent: oklch(53% 0.2 262); --color-accent-2: oklch(84% 0.13 85); --color-accent-ink: oklch(100% 0 0); --color-focus: oklch(53% 0.2 262);
+  /* Dusk: slate shell, bone wells for the working surface, periwinkle for done and the action, apricot for open or owed */
+  --color-paper: oklch(95.5% 0.008 75); --color-paper-2: oklch(92% 0.010 75); --color-paper-3: oklch(99.5% 0.003 75);
+  --color-shell: oklch(17.5% 0.014 268); --color-shell-2: oklch(21% 0.016 268); --color-shell-ink: oklch(96% 0.006 75); --color-shell-muted: oklch(70% 0.016 262); --color-shell-rule: oklch(30% 0.016 266);
+  --color-ink: oklch(21% 0.016 268); --color-ink-2: oklch(30% 0.016 268); --color-muted: oklch(47% 0.016 265);
+  --color-rule: oklch(87.5% 0.009 75); --color-ink-rule: oklch(30% 0.016 266);
+  --color-accent: oklch(44% 0.13 274); --color-accent-2: oklch(83% 0.095 62); --color-accent-ink: oklch(99.5% 0.003 75); --color-focus: oklch(55% 0.13 274);
+  --color-signal: oklch(77% 0.10 274); --color-signal-soft: oklch(91% 0.038 274);
   /* The owner's light blue for the large cards, and status colours */
   --color-sky: oklch(95.6% 0.026 245); --color-sky-2: oklch(89.5% 0.05 248);
   --color-good: oklch(44% 0.11 155); --color-good-bg: oklch(95.5% 0.04 155);
@@ -30,13 +45,13 @@
   /* Chart series: one distinct colour per meaning */
   --chart-model: oklch(56% 0.2 262); --chart-rule: oklch(72% 0.16 65); --chart-actual: oklch(60% 0.12 172);
   --chart-miss: oklch(62% 0.19 28); --chart-extra: oklch(57% 0.19 300); --chart-neutral: oklch(78% 0.015 255);
-  /* Faces: Archivo for headings and figures, Instrument Sans for reading */
-  --font-display: "Archivo", ui-sans-serif, system-ui, sans-serif; --font-body: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
-  --radius-card: 14px; --radius-input: 10px; --radius-pill: 999px; --rule-hair: 1px; --rule-bar: 2px;
-  --shadow-card: 0 1px 2px oklch(25% 0.02 262 / 0.05), 0 6px 20px -12px oklch(25% 0.02 262 / 0.18);
+  /* Faces: Wix Madefor Display over Wix Madefor Text (Dusk) */
+  --font-display: "Wix Madefor Display", ui-sans-serif, system-ui, sans-serif; --font-body: "Wix Madefor Text", ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 18px; --radius-input: 10px; --radius-pill: 999px; --rule-hair: 1px; --rule-bar: 2px;
+  --shadow-card: 0 1px 2px oklch(21% 0.016 268 / 0.05);
   --shadow-lift: 0 2px 4px oklch(25% 0.02 262 / 0.06), 0 14px 32px -16px oklch(25% 0.02 262 / 0.25);
-  --shadow-button: 0 1px 2px oklch(30% 0.15 262 / 0.25);
-  --tracking-display: -0.015em; --display-weight: 650;
+  --shadow-button: none;
+  --tracking-display: -0.022em; --display-weight: 500;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html, body { overflow-x: clip; }
@@ -1378,7 +1393,7 @@ body:has(#login:not([hidden])) .main {
   position: absolute;
   inset: 0 auto 0 0;
   width: var(--w, 0%);
-  background: linear-gradient(90deg, var(--sky-2), var(--sky));
+  background: var(--color-signal);
   border-radius: 999px;
   animation: grow 0.8s var(--ease) both;
 }
@@ -2985,7 +3000,7 @@ body:has(#login:not([hidden])) .main {
     display: none;
   }
   .login {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .login:before {
     min-height: 140px;
@@ -4409,201 +4424,45 @@ body[data-route="overview"] .page-header {
   }
 }
 
-/* ===== Dashboard look (6 Nov 2026): the website follows the Evidence dashboard design ===== */
-:root {
-  --nbd-paper: #f3f7fa;
-  --nbd-card: #ffffff;
-  --nbd-line: #e3e9f0;
-  --nbd-ink: #1b2433;
-  --nbd-muted: #5b6474;
-  --nbd-blue: #2c6be7;
-  --nbd-blue-soft: #e3edfd;
-}
-body,
-.main {
-  background: var(--nbd-paper);
-  color: var(--nbd-ink);
-}
-/* light sidebar with a blue active pill, as in the dashboard */
-.side {
-  background: #ffffff !important;
-  border-right: 1px solid var(--nbd-line);
-  color: var(--nbd-ink);
-}
-.side::before,
-.side::after {
-  display: none !important;
-}
-.side-label {
-  color: #8a94a3 !important;
-  letter-spacing: 0.02em;
-}
-.side-link {
-  color: var(--nbd-muted) !important;
-}
-.side-link .ico {
-  color: #8a94a3 !important;
-}
-.side-link:hover {
-  background: #eef3f9 !important;
-  color: var(--nbd-ink) !important;
-}
-.side-link.active {
-  background: var(--nbd-blue-soft) !important;
-  color: #1f55c4 !important;
-}
-.side-link.active .ico {
-  color: #1f55c4 !important;
-}
-.side-foot,
-.side-foot * {
-  color: var(--nbd-muted);
-}
-.side-foot button {
-  background: #fff;
-  border: 1px solid var(--nbd-line);
-  color: var(--nbd-ink);
-}
-/* page title as the dashboard's gradient hero */
-.page-header {
-  background: linear-gradient(120deg, #0f141d 0%, #1c2a48 55%, #2c6be7 130%);
-  color: #fff;
-  border-radius: 16px;
-  padding: 26px 30px;
-  margin: 0 0 20px;
-  box-shadow: 0 8px 24px rgba(15, 20, 29, 0.12);
-}
-.page-header h1 {
-  color: #fff !important;
-  margin: 0;
-  font-size: 26px;
-}
-@media (min-width: 901px) {
-  #workspace > section > .page-head:has(button, .secondary),
-  #workspace .desk-page-head {
-    margin-top: -78px;
-    padding-right: 24px;
-  }
-}
-/* cards */
-.panel,
-.block,
-.stage-view > section,
-.metrics,
-.kpis > * {
-  border-radius: 14px;
-  border-color: var(--nbd-line);
-  box-shadow: 0 1px 2px rgba(15, 20, 29, 0.04);
-}
-.primary,
-button.primary,
-a.primary {
-  background: var(--nbd-blue) !important;
-  border-color: var(--nbd-blue) !important;
-  color: #fff !important;
-}
-/* report pages: the dashboard draws its own hero, so the website title bar is hidden */
-body[data-route^="r-"] .page-header,
-body[data-route^="r-"] #global-status:empty {
-  display: none;
-}
-.report-view {
-  margin: -8px -8px 0;
-}
-.report-frame {
-  display: block;
-  width: 100%;
-  min-height: 80vh;
-  border: 0;
-  background: transparent;
-}
-/* intro block of tool pages styled as the dashboard hero */
-.stage-view > :first-child {
-  background: linear-gradient(120deg, #0f141d 0%, #1c2a48 55%, #2c6be7 130%) !important;
-  color: #fff !important;
-  border: 0 !important;
-  border-radius: 16px !important;
-  box-shadow: 0 8px 24px rgba(15, 20, 29, 0.12) !important;
-}
-.stage-view > :first-child h2,
-.stage-view > :first-child h3,
-.stage-view > :first-child p,
-.stage-view > :first-child .side-text {
-  color: #fff !important;
-}
-.stage-view > :first-child p {
-  opacity: 0.88;
-}
-.stage-view > :first-child a {
-  background: rgba(255, 255, 255, 0.14) !important;
-  color: #fff !important;
-  border-color: transparent !important;
-}
-/* hybrid pages: dashboard view on top, actions underneath */
-.page-report {
-  margin: 0 0 8px;
-}
-.page-report .report-frame {
-  min-height: 420px;
-}
-.act-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 8px 0 16px;
-  font-size: 20px;
-  font-weight: 650;
-  color: var(--nbd-ink);
-}
-.act-head::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--nbd-line);
-}
-body[data-report="on"] .page-header,
-body[data-report="on"] .stage-view > :first-child {
-  display: none;
-}
-body[data-report="on"] #workspace > section > .page-head:has(button, .secondary),
-body[data-report="on"] #workspace .desk-page-head {
-  margin-top: 0 !important;
-}
-/* the dashboard section carries the page title, so the maps page drops its own banner */
-.maps-page:has(.page-report) .page-header {
-  display: none;
-}
-/* line the dashboard section up with the website cards below it */
-@media (min-width: 768px) {
-  .page-report .report-frame {
-    width: calc(100% + 96px);
-    margin: -16px -48px 0;
-  }
-}
-
-/* clear split: summary above (view only), actions below in a marked band */
-.act-head {
-  display: block !important;
-  margin: 24px 0 18px !important;
-  padding: 16px 20px 16px 24px;
-  background: #fff;
-  border: 1px solid var(--nbd-line);
-  border-left: 6px solid var(--nbd-blue);
-  border-radius: 14px;
-  box-shadow: 0 1px 2px rgba(15, 20, 29, 0.04);
-}
-.act-head::after {
-  display: none !important;
-}
-.act-head strong {
-  display: block;
-  font-size: 19px;
-  color: var(--nbd-ink);
-}
-.act-head span {
-  display: block;
-  margin-top: 2px;
-  font-size: 13.5px;
-  font-weight: 400;
-  color: var(--nbd-muted);
-}
+/* ===== Dusk restyle (Hallmark, 6 Nov 2026) ===== */
+html, body { overflow-x: clip; }
+body { background: var(--color-shell); color: var(--color-ink); font-variant-numeric: tabular-nums; caret-color: var(--color-accent); }
+::selection { background: var(--color-signal-soft); color: var(--color-ink); }
+/* the shell: slate sidebar, the page itself one bone well */
+.side { background: var(--color-shell) !important; color: var(--color-shell-ink) !important; border-right: 0; }
+.side::before, .side::after { display: none !important; }
+.side-label { color: var(--color-shell-muted) !important; font-weight: 500; letter-spacing: 0; }
+.side-link { border-radius: var(--radius-input) !important; color: var(--color-shell-muted) !important; font-weight: 500; }
+.side-link .ico { color: currentColor !important; }
+.side-link:hover { background: color-mix(in oklab, var(--color-shell-ink) 6%, transparent) !important; color: var(--color-shell-ink) !important; }
+.side-link.active { background: color-mix(in oklab, var(--color-shell-ink) 10%, transparent) !important; color: var(--color-shell-ink) !important; font-weight: 600; box-shadow: inset 3px 0 0 var(--color-signal); }
+.side-foot, .side-foot * { color: var(--color-shell-muted); }
+.side-foot button { background: color-mix(in oklab, var(--color-shell-ink) 6%, transparent); border: var(--rule-hair) solid var(--color-shell-rule); border-radius: var(--radius-pill); color: var(--color-shell-ink); }
+.main { background: var(--color-paper); border-radius: var(--radius-card); margin-top: var(--space-sm); margin-right: var(--space-sm); margin-bottom: var(--space-sm); min-height: calc(100vh - 2 * var(--space-sm)); }
+/* page titles: a quiet display weight straight on the well, no box */
+.page-header { background: none; color: var(--color-ink); border-radius: 0; box-shadow: none; padding: 0; margin: 0 0 var(--space-lg); border: 0; }
+.page-header h1 { font-family: var(--font-display); font-weight: 500; letter-spacing: var(--tracking-display); line-height: 1.05; font-size: var(--text-3xl); color: var(--color-ink); margin: 0; }
+.stage-view > :first-child { background: none; color: var(--color-ink); border: 0; border-radius: 0; box-shadow: none; }
+/* surfaces: white cards on the bone well */
+.panel, .block, .stage-view > section, .metrics { background: var(--color-paper-3); border: var(--rule-hair) solid var(--color-rule) !important; border-radius: var(--radius-card) !important; box-shadow: var(--shadow-card) !important; }
+th { border-bottom: var(--rule-hair) solid var(--color-rule); font-weight: 500; color: var(--color-muted); }
+td { border-bottom: var(--rule-hair) solid var(--color-rule); }
+/* controls: the periwinkle pill for the one action, ghost pills beside it */
+button, .primary, .secondary, a.primary, a.secondary { border-radius: var(--radius-pill) !important; }
+input, select, textarea { border-radius: var(--radius-input) !important; border: var(--rule-hair) solid var(--color-rule) !important; background: var(--color-paper-3); }
+.primary, button.primary, a.primary { background: var(--color-accent) !important; border: 0 !important; color: var(--color-accent-ink) !important; font-weight: 600; box-shadow: inset 0 1px 0 color-mix(in oklab, var(--color-accent-ink) 30%, transparent) !important; transition: background-color var(--dur-micro) var(--ease-out); }
+.primary:hover, button.primary:hover, a.primary:hover { background: var(--color-ink-2) !important; }
+.secondary, button.secondary, a.secondary { background: var(--color-paper-3); border: var(--rule-hair) solid var(--color-rule); color: var(--color-ink); font-weight: 600; }
+:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+/* the split: summary above, then a slate strip that opens the part you act on */
+.page-report { margin: 0 0 var(--space-xs); }
+.report-frame { display: block; width: 100%; min-height: 420px; border: 0; background: transparent; }
+@media (min-width: 768px) { .report-view .report-frame, .page-report .report-frame { width: calc(100% + 6 * var(--space-md)); margin: calc(-1 * var(--space-md)) calc(-3 * var(--space-md)) 0; } }
+.act-head { display: block; margin: var(--space-lg) 0; padding: var(--space-md) var(--space-lg); background: var(--color-shell); color: var(--color-shell-ink); border-radius: var(--radius-card); }
+.act-head strong { display: block; font-family: var(--font-display); font-weight: 500; font-size: var(--text-xl); letter-spacing: var(--tracking-display); color: var(--color-shell-ink); }
+.act-head span { display: block; margin-top: var(--space-3xs); font-size: var(--text-sm); color: var(--color-shell-muted); }
+body[data-route^="r-"] .page-header, body[data-report="on"] .page-header, body[data-report="on"] .stage-view > :first-child { display: none; }
+body[data-report="on"] #workspace > section > .page-head:has(button, .secondary), body[data-report="on"] #workspace .desk-page-head { margin-top: 0 !important; }
+.maps-page:has(.page-report) .page-header { display: none; }
+@media (max-width: 900px) { .main { margin-top: 0; margin-right: 0; margin-bottom: 0; border-radius: 0; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }

@@ -86,7 +86,7 @@ group by 1 order by 2 desc
   <div class="card">
     <h3>Paid vs still to collect</h3>
     <p class="sub">Recurring contracts by billing arrangement</p>
-    <BarChart data={balance_long} x=billing y=rm series=status type=stacked swapXY=true yFmt='"RM"#,##0' seriesOrder={['Recorded as paid','Still to collect']} colorPalette={['#009778','#E78C08']} chartAreaHeight=220/>
+    <BarChart data={balance_long} x=billing y=rm series=status type=stacked swapXY=true yFmt='"RM"#,##0' seriesOrder={['Recorded as paid','Still to collect']} colorPalette={['#3FA27A','#D97E45']} chartAreaHeight=220/>
   </div>
   <div class="card">
     <h3>Contract balances</h3>
@@ -95,7 +95,7 @@ group by 1 order by 2 desc
       <Column id=billing title="Billing"/>
       <Column id=contracts title="Contracts"/>
       <Column id=paid_rm title="Paid" fmt='"RM"#,##0'/>
-      <Column id=remaining_rm title="To collect" fmt='"RM"#,##0' contentType=bar barColor="#F8D9A8"/>
+      <Column id=remaining_rm title="To collect" fmt='"RM"#,##0' contentType=bar barColor="#F4D9C6"/>
     </DataTable>
   </div>
 </div>
@@ -118,7 +118,7 @@ group by 1 order by 2 desc
   <div class="card">
     <h3>Upcoming by arrangement</h3>
     <p class="sub">All future reminder dates</p>
-    <BarChart data={by_arrangement} x=billing_arrangement y=reminders swapXY=true colorPalette={['#2C6BE7']} chartAreaHeight=240 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...by_arrangement.map(d => d.reminders ?? 0)) * 1.25}/>
+    <BarChart data={by_arrangement} x=billing_arrangement y=reminders swapXY=true colorPalette={['#B8901A']} chartAreaHeight=240 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...by_arrangement.map(d => d.reminders ?? 0)) * 1.25}/>
   </div>
 </div>
 
