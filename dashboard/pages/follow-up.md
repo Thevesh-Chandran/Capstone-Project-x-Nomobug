@@ -42,12 +42,12 @@ select * from nomobug.service_monthly where month < date_trunc('month', current_
   <div class="card">
     <h3>Recent services by chance band</h3>
     <p class="sub">Most services are low risk; a few carry most of the expected returns</p>
-    <BarChart data={bands} x=chance_band y=services sort=false swapXY=true colorPalette={['#2C6BE7']} chartAreaHeight=200 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...bands.map(d => d.services ?? 0)) * 1.25}/>
+    <BarChart data={bands} x=chance_band y=services sort=false swapXY=true colorPalette={['#D9577A']} chartAreaHeight=200 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...bands.map(d => d.services ?? 0)) * 1.25}/>
   </div>
   <div class="card">
     <h3>Return visits actually recorded</h3>
     <p class="sub">Monthly warranty/return visits in the calendar, full months only</p>
-    <AreaChart data={service_monthly} x=month y=return_visits xFmt="mmm yy" colorPalette={['#009778']} chartAreaHeight=200 fillOpacity=0.25/>
+    <AreaChart data={service_monthly} x=month y=return_visits xFmt="mmm yy" colorPalette={['#D9577A']} chartAreaHeight=200 fillOpacity=0.25/>
   </div>
 </div>
 

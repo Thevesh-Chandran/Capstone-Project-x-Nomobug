@@ -211,6 +211,7 @@ def handler_for(portal):
                 mime='application/javascript; charset=utf-8' if name.endswith('.js') else 'text/css; charset=utf-8'
                 return self.respond(200,(STATIC/name).read_bytes(),mime)
             if path=='/archivo.woff2':return self.respond(200,(STATIC/'archivo.woff2').read_bytes(),'font/woff2')
+            if path in ('/wix-madefor-display.woff2','/wix-madefor-text.woff2'):return self.respond(200,(STATIC/path.lstrip('/')).read_bytes(),'font/woff2')
             if path=='/chivo-mono.woff2':return self.respond(200,(STATIC/'chivo-mono.woff2').read_bytes(),'font/woff2')
             if path in ('/','/app.js','/style.css','/instrument-sans.woff2'):
                 name={'/':'index.html','/app.js':'app.js','/style.css':'style.css','/instrument-sans.woff2':'instrument-sans.woff2'}[path]

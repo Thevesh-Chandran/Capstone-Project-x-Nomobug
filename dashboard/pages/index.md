@@ -52,7 +52,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 </div>
 
 <div class="kpis">
-  <BigValue data={sales_kpi2} value=last_12m_rm title="Sales, last 12 months" fmt='"RM"#,##0' comparison=vs_prior comparisonFmt=pct0 comparisonTitle="vs previous 12 months" sparkline=month sparklineType=bar sparklineColor="#2C6BE7"/>
+  <BigValue data={sales_kpi2} value=last_12m_rm title="Sales, last 12 months" fmt='"RM"#,##0' comparison=vs_prior comparisonFmt=pct0 comparisonTitle="vs previous 12 months" sparkline=month sparklineType=bar sparklineColor="#4C55B8"/>
   <BigValue data={headline} value=bookings_next_2_weeks title="Bookings expected, next 2 weeks" fmt="#,##0"/>
   <BigValue data={headline} value=customers_to_call title="Customers to call this week"/>
   <BigValue data={headline} value=staff_hours_next_week title="Staff hours, next week" fmt="#,##0"/>
@@ -65,19 +65,19 @@ select max(extracted_at_utc) as latest from nomobug.freshness
     <div class="label">Service follow-up</div>
     <div class="big">Call <Value data={headline} column=customers_to_call/> customers</div>
     <p>Most likely to need a return visit. Top chance <Value data={headline} column=top_chance fmt=pct0/>.</p>
-    <a class="go" data-to="returns" role="link" tabindex="0">Open the call list →</a>
+    <a class="go" data-to="returns" role="link" tabindex="0">Open the call list</a>
   </div>
   <div class="action green">
     <div class="label">Staffing</div>
     <div class="big">Staff about <Value data={headline} column=staff_hours_next_week fmt="#,##0"/> hours</div>
     <p>Keep <Value data={headline} column=hours_to_keep_open fmt="#,##0"/> hours open for new bookings next week.</p>
-    <a class="go" data-to="plan" role="link" tabindex="0">See the staffing plan →</a>
+    <a class="go" data-to="plan" role="link" tabindex="0">See the staffing plan</a>
   </div>
   <div class="action amber">
     <div class="label">Bookings</div>
     <div class="big">About <Value data={headline} column=bookings_next_2_weeks fmt="#,##0"/> bookings</div>
     <p>Expected in the next two weeks, likely <Value data={headline} column=bookings_likely_range/>.</p>
-    <a class="go" data-to="plan" role="link" tabindex="0">See the forecast →</a>
+    <a class="go" data-to="plan" role="link" tabindex="0">See the forecast</a>
   </div>
 </div>
 
@@ -87,12 +87,12 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   <div class="card">
     <h3>Sales by month</h3>
     <p class="sub">Recorded package sales, last 12 full months</p>
-    <BarChart data={sales_monthly} x=month y=sales_rm yFmt='"RM"#,##0' xFmt="mmm" colorPalette={['#2C6BE7']} chartAreaHeight=220 labels=false/>
+    <BarChart data={sales_monthly} x=month y=sales_rm yFmt='"RM"#,##0' xFmt="mmm" colorPalette={['#5B63C9']} chartAreaHeight=220 labels=false/>
   </div>
   <div class="card">
     <h3>Bookings per fortnight</h3>
     <p class="sub">Bookings recorded in each two-week window</p>
-    <AreaChart data={backtest} x=period_start y=actual_bookings xFmt="d mmm" yMin=0 colorPalette={['#009778']} chartAreaHeight=220 fillOpacity=0.25/>
+    <AreaChart data={backtest} x=period_start y=actual_bookings xFmt="d mmm" yMin=0 colorPalette={['#2E9CB8']} chartAreaHeight=220 fillOpacity=0.25/>
   </div>
 </div>
 
@@ -102,7 +102,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
     <p class="sub">Sales in the last 12 months, areas with a known district</p>
     <DataTable data={top_areas} rowShading=false>
       <Column id=area title="Area"/>
-      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#C3E0FD"/>
+      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#DCDDF4"/>
       <Column id=sales title="Purchases"/>
     </DataTable>
   </div>
@@ -111,7 +111,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
     <p class="sub">Sales by pest group, all recorded</p>
     <DataTable data={pest_top} rowShading=false>
       <Column id=pest_group title="Pest group"/>
-      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#E2D4F7"/>
+      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#DCDDF4"/>
     </DataTable>
   </div>
 </div>
