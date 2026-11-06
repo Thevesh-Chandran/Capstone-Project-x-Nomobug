@@ -4,7 +4,8 @@ Open-source [Evidence](https://evidence.dev) site on the BigQuery `predictions` 
 
 - Shown inside the staff website (one address, one menu): each website page opens with its dashboard section and has its actions below. Served by the website at `/dashboard`, built with `deployment.basePath: /dashboard`.
 - Website: https://cp2-portal-964813222593.asia-southeast1.run.app
-- Pages: `pages/*.md` (Overview, Service follow-up, Bookings & staffing, Sales & customers, Maps & patterns, Services & warranty, Payments)
+- Pages: `pages/*.md` (Overview, Service follow-up, Bookings & staffing, Sales & customers, Maps & patterns, Services & warranty, Payments). Each page has its own filters.
+- Model test figures come from `predictions.model_evaluation`, published by the daily reporting job; no figures are typed into the pages.
 - Queries: `sources/nomobug/*.sql`; colours: `evidence.config.yaml` (website palette)
 
 ## Run locally

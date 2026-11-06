@@ -4466,3 +4466,35 @@ body[data-report="on"] #workspace > section > .page-head:has(button, .secondary)
 .maps-page:has(.page-report) .page-header { display: none; }
 @media (max-width: 900px) { .main { margin-top: 0; margin-right: 0; margin-bottom: 0; border-radius: 0; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
+
+/* owner-only access page */
+.access-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-sm); margin: var(--space-md) 0; }
+.access-form label { display: grid; gap: var(--space-2xs); font-size: var(--text-sm); color: var(--color-muted); min-width: min(100%, 22rem); }
+.access-panel table td:last-child { text-align: right; }
+/* phones: the summary frame and the page sheet never run wider than the screen */
+@media (max-width: 767px) {
+  .main, #workspace, .page-report, .report-view { min-width: 0; max-width: 100%; }
+  .report-frame, .page-report .report-frame, .report-view .report-frame { width: 100% !important; margin: 0 !important; }
+}
+
+/* sidebar: fits without scrollbars on a laptop screen, labels on one line */
+.side { overflow-x: hidden; overflow-y: auto; scrollbar-width: none; }
+.side::-webkit-scrollbar { display: none; }
+.side-link span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.side-group + .side-group { margin-top: var(--space-sm); }
+.side-link { min-height: 34px; }
+.side-label { padding-bottom: var(--space-3xs); }
+
+/* no footnotes: caveats live in the report, not under every list */
+.desk-footnote, .block-note, .map-guide, .coverage-details { display: none !important; }
+.map-source { font-size: var(--text-xs); color: var(--color-muted); margin-top: var(--space-sm); }
+/* spacing on the shared scale: summary, then the action band, then the tool */
+.page-report { margin: 0; }
+.act-head { margin: var(--space-md) 0 var(--space-md) !important; }
+body[data-report="on"] #workspace > section > .page-head:has(button, .secondary),
+body[data-report="on"] #workspace .desk-page-head {
+  position: relative; margin-top: calc(-1 * (var(--space-2xl) + var(--space-xl))) !important; margin-bottom: var(--space-xl) !important;
+  min-height: var(--space-2xl); padding-right: var(--space-lg); display: flex; align-items: center; justify-content: flex-end; pointer-events: none;
+}
+body[data-report="on"] #workspace > section > .page-head:has(button, .secondary) > *,
+body[data-report="on"] #workspace .desk-page-head > * { pointer-events: auto; }

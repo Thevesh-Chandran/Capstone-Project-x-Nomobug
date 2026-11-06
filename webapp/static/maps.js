@@ -23,14 +23,8 @@
       model: 'Historical model by area',
     };
   $('to').value = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kuala_Lumpur' });
-  document.querySelector('footer').textContent =
-    'Source release: ' +
-    (DATA.source.published_release || 'Unknown') +
-    ', Snapshot fetched: ' +
-    (DATA.snapshot_at
-      ? new Date(DATA.snapshot_at).toLocaleString('en-MY', { timeZone: 'Asia/Kuala_Lumpur' })
-      : 'Unknown') +
-    ' Malaysia, Location matching: Geoapify / OpenStreetMap contributors, Model layer: separate frozen historical evaluation.';
+  // Only the attribution the map data's licences require.
+  document.querySelector('footer').textContent = 'Map data © OpenStreetMap contributors, locations by Geoapify';
   function safe(t) {
     return String(t ?? '').replace(
       /[&<>"']/g,

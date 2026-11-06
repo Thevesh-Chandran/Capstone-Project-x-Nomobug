@@ -200,4 +200,3 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
   </DataTable>
 </div>
 
-<p class="note">The client-type filter applies to the segment and salesperson views; the area filter applies to views that carry a district. Unknown or missing values are left out rather than guessed.</p>

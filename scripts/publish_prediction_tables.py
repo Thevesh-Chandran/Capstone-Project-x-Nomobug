@@ -115,17 +115,47 @@ def evaluation_rows(path: Path = RETURN_RISK) -> list[dict]:
         rows.append({
             'method': method, 'chosen': method.endswith('(chosen)'),
             'test_period': ev.get('period'), 'services': ev.get('services'), 'returns': ev.get('returns'),
-            'auc': m.get('auc'), 'capture_10': m.get('capture_10'), 'capture_20': m.get('capture_20'), 'capture_30': m.get('capture_30'),
+            'auc': m.get('auc'), 'ap': m.get('ap'), 'capture_10': m.get('capture_10'), 'capture_20': m.get('capture_20'), 'capture_30': m.get('capture_30'),
+            'precision_10': m.get('precision_10'), 'precision_20': m.get('precision_20'), 'precision_30': m.get('precision_30'),
+            'base_rate': (ev.get('base_rates') or {}).get('all_services'),
+            'gain_vs_rule_low': (ev.get('gain_vs_rule_capture20_ci') or [None, None, None])[0],
+            'gain_vs_rule': (ev.get('gain_vs_rule_capture20_ci') or [None, None, None])[1],
+            'gain_vs_rule_high': (ev.get('gain_vs_rule_capture20_ci') or [None, None, None])[2],
             'auc_low': lo, 'auc_high': hi,
             'expected_returns': expected, 'recorded_returns': actual,
         })
     return rows
 
 
+INPUT_LABELS = {
+    'final_residential': 'Final service of a home programme', 'final_service': 'Final service of any programme',
+    'residential': 'Home (residential) premise', 'three_service_programme': 'Three-service programme',
+    'first_service': 'First service of a programme', 'property_past_claims': 'Earlier returns at this address',
+    'programme_past_claims': 'Earlier returns in this programme', 'property_claims_90d': 'Returns at this address, last 90 days',
+    'gap_missing': 'No earlier service to measure the gap', 'gap_days_capped': 'Days since the last service (per day)',
+    'log_sale_rm': 'Package price (per doubling)', 'cockroach_only': 'Cockroach-only treatment', 'includes_rodent': 'Treatment includes rodents',
+}
+
+
+def input_rows(path: Path = RETURN_RISK) -> list[dict]:
+    """The chosen model's inputs and how each changes the odds of a recorded return visit."""
+    if not path.exists():
+        return []
+    import math
+    d = json.loads(path.read_text(encoding='utf-8'))
+    rows = []
+    for name, log_odds in (d.get('per_unit_log_odds') or {}).items():
+        rows.append({'input': name, 'label': INPUT_LABELS.get(name, name.replace('_', ' ')),
+                     'log_odds': log_odds, 'odds_multiplier': math.exp(log_odds),
+                     'direction': 'raises' if log_odds > 0 else 'lowers'})
+    return sorted(rows, key=lambda r: -abs(r['log_odds']))
+
+
 def build(predictors: dict | None, forecast: dict | None, as_of: date) -> dict[str, list[dict]]:
     models = {m['id']: m for m in json.loads(PLANNING.read_text(encoding='utf-8'))['models']}
     tables = {'return_risk_scores': risk_rows(predictors, as_of) if predictors else None,
-              'model_evaluation': evaluation_rows() or None}
+              'model_evaluation': evaluation_rows() or None,
+              'model_inputs': input_rows() or None}
     if forecast:
         tables['booking_forecast'], tables['forecast_backtest'], tables['staffing_plan'] = forecast_rows(forecast, models)
     return {k: v for k, v in tables.items() if v is not None}

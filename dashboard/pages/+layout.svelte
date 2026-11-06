@@ -81,6 +81,10 @@
 	}
 	:global(article), :global(article *) { font-family: var(--font-body); }
 	:global(h1.title) { display: none; }
+	/* no empty band under the last card: the website's action band follows straight on */
+	:global(article) { padding-bottom: 0 !important; margin-bottom: 0 !important; }
+	:global(main) { padding-bottom: 8px !important; }
+	:global(.table-footer) { display: none !important; }
 	:global(article h2), :global(article h3), :global(.hero h1) { font-family: var(--font-display) !important; }
 	:global(article h2) { font-weight: 500; font-size: 1.3rem; letter-spacing: -0.022em; margin-top: 1.8rem; color: var(--color-ink); }
 

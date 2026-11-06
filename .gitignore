@@ -55,3 +55,6 @@ token.json
 token*.json
 *.bak
 ~$*
+
+# Hallmark design-skill working files (local salt, logs, screenshots)
+.hallmark/

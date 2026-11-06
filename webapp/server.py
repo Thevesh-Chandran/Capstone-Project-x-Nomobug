@@ -95,10 +95,16 @@ class Portal:
                     return int(expiry)>time.time() and hmac.compare_digest(sig,expected)
                 except (ValueError,TypeError):return False
         return False
+    def iap_email(self,assertion):
+        """The verified Google account email behind an IAP assertion, or None."""
+        claims=self.iap_claims(assertion)
+        return claims.get('email') if claims else None
     def iap_authenticated(self,assertion):
-        if not assertion:return False
+        return self.iap_claims(assertion) is not None
+    def iap_claims(self,assertion):
+        if not assertion:return None
         audience=os.environ.get('CP2_IAP_AUDIENCE','')
-        if not audience:return False
+        if not audience:return None
         try:
             from google.auth.transport.requests import Request
             from google.oauth2 import id_token
@@ -110,9 +116,10 @@ class Portal:
                     self.iap_request=Request(session=CacheControl(requests.Session()))
                 claims=id_token.verify_token(assertion,self.iap_request,audience=audience,
                     certs_url='https://www.gstatic.com/iap/verify/public_key')
-            return claims.get('iss')=='https://cloud.google.com/iap' and bool(claims.get('sub'))
+            ok=claims.get('iss')=='https://cloud.google.com/iap' and bool(claims.get('sub'))
+            return claims if ok else None
         except Exception:
-            return False
+            return None
     def state(self):
         uri=os.environ.get('CP2_PORTAL_GCS_URI')
         if uri and (not self.last_storage_check or time.monotonic()-self.last_storage_check>300):
@@ -153,18 +160,46 @@ def handler_for(portal):
     class Handler(BaseHTTPRequestHandler):
         server_version='NomobugPortal'
         def log_message(self, *_):pass # No URLs, questions, cookie or source content in access logs.
-        def headers_secure(self,csp=None):
-            self.send_header('Cache-Control','no-store')
+        def headers_secure(self,csp=None,cache=None):
+            self.send_header('Cache-Control',cache or 'no-store')
             self.send_header('X-Content-Type-Options','nosniff')
-            self.send_header('Referrer-Policy','no-referrer')
+            # OpenStreetMap tiles need the site's origin as the referrer; paths and queries are never sent.
+            self.send_header('Referrer-Policy','strict-origin' if csp else 'no-referrer')
             assets = dashboard_asset_origin() if urlsplit(self.path).path == '/reports' else ''
             extra = ' '+assets if assets else ''
             self.send_header('Content-Security-Policy',csp or f"default-src 'self'; script-src 'self'{extra}; style-src 'self'{extra}; img-src 'self' data:; connect-src 'self'; frame-src 'self' https://datastudio.google.com https://lookerstudio.google.com https://calendar.google.com; frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
         def respond(self,status,body,ctype='application/json; charset=utf-8',cookie=None,csp=None):
             raw=json.dumps(body,default=data.json_default,allow_nan=False).encode() if isinstance(body,(dict,list)) else body
+            static=status==200 and not cookie and not isinstance(body,(dict,list)) and not ctype.startswith('application/json')
+            if static:
+                # Static site files: let the browser keep them and revalidate cheaply, fonts for a year.
+                import hashlib
+                tag='"'+hashlib.sha1(raw).hexdigest()[:20]+'"'
+                cache='public, max-age=31536000, immutable' if ctype.startswith('font/') else 'private, no-cache'
+                if self.headers.get('If-None-Match')==tag:
+                    self.send_response(304);self.headers_secure(csp,cache=cache);self.send_header('ETag',tag);self.end_headers();return None
+                gz=self.wants_gzip(raw,ctype)
+                if gz:raw=self.gzipped(('mem',tag),raw)
+                self.send_response(status);self.headers_secure(csp,cache=cache);self.send_header('Content-Type',ctype);self.send_header('ETag',tag)
+                if gz:self.send_header('Content-Encoding','gzip');self.send_header('Vary','Accept-Encoding')
+                self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw);return None
             self.send_response(status);self.headers_secure(csp);self.send_header('Content-Type',ctype)
             if cookie:self.send_header('Set-Cookie',cookie)
             self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw)
+        def wants_gzip(self,raw,mime):
+            return 'gzip' in self.headers.get('Accept-Encoding','') and len(raw)>1024 and not mime.startswith(('image/png','image/jpeg','font/'))
+        def gzipped(self,key,raw):
+            import gzip
+            with portal.refresh_lock:
+                cache=getattr(portal,'_gz_cache',None)
+                if cache is None:cache=portal._gz_cache={}
+                body=cache.get(key)
+            if body is None:
+                body=gzip.compress(raw,compresslevel=6)
+                with portal.refresh_lock:
+                    if len(cache)>400:cache.clear()
+                    cache[key]=body
+            return body
         def host_ok(self):
             host=urlsplit('//'+self.headers.get('Host','')).hostname
             allowed=set(os.environ.get('CP2_ALLOWED_HOSTS','localhost,127.0.0.1').split(','))
@@ -199,7 +234,21 @@ def handler_for(portal):
             csp=("default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; worker-src 'self' blob:; "
                  "style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.org; font-src 'self' data:; "
                  "connect-src 'self' blob: data: https://extensions.duckdb.org; frame-ancestors 'self'; base-uri 'self'; form-action 'self'")
-            return self.respond(200,p.read_bytes(),mime,csp=csp)
+            st=p.stat();immutable='/_app/immutable/' in path
+            # Daily-rebuilt files revalidate by modified time; hashed build files are kept for a year.
+            tag=f'"{st.st_mtime_ns:x}-{st.st_size:x}"'
+            cache='private, max-age=31536000, immutable' if immutable else 'private, no-cache'
+            if self.headers.get('If-None-Match')==tag:
+                self.send_response(304);self.headers_secure(csp,cache=cache);self.send_header('ETag',tag);self.end_headers();return None
+            raw=p.read_bytes()
+            # Cloud Run caps a response at 32 MiB, and DuckDB's wasm is larger: send it compressed, compressed once.
+            gz=self.wants_gzip(raw,mime)
+            if gz:raw=self.gzipped((str(p),st.st_mtime_ns),raw)
+            self.send_response(200);self.headers_secure(csp,cache=cache)
+            self.send_header('Content-Type',mime);self.send_header('ETag',tag)
+            if gz:self.send_header('Content-Encoding','gzip');self.send_header('Vary','Accept-Encoding')
+            self.send_header('Content-Length',str(len(raw)));self.end_headers();self.wfile.write(raw)
+            return None
         def do_GET(self):
             if not self.host_ok():return self.respond(403,{'error':'Host not allowed'})
             path=urlsplit(self.path).path
@@ -270,6 +319,12 @@ def handler_for(portal):
                     return self.respond(200,payload(business,snapshot,evaluated,boundaries))
                 except (FileNotFoundError,ValueError,KeyError,TypeError):
                     return self.respond(503,{'error':'Map sources are unavailable. The last reporting release remains intact.'})
+            if path=='/api/access':
+                from webapp import access
+                who=portal.iap_email(self.headers.get('X-Goog-IAP-JWT-Assertion'))
+                if not access.is_admin(who):return self.respond(403,{'error':'Only the owner account can manage access'})
+                try:return self.respond(200,{'members':access.members(),'owners':sorted(access.admins()),'you':who})
+                except Exception as e:return self.respond(503,{'error':str(e)})
             if path=='/api/state':return self.respond(200,portal.state())
             if path=='/api/analytics':
                 loaded=self.business_data()
@@ -364,6 +419,15 @@ def handler_for(portal):
                 if not isinstance(payload,dict):raise ValueError()
             except (ValueError,json.JSONDecodeError):return self.respond(400,{'error':'Invalid request'})
             path=urlsplit(self.path).path
+            if path=='/api/access':
+                from webapp import access
+                if not portal.authenticated(self.headers.get('Cookie'),self.headers.get('X-Goog-IAP-JWT-Assertion')):
+                    return self.respond(401,{'error':'Sign in to the staff portal'})
+                who=portal.iap_email(self.headers.get('X-Goog-IAP-JWT-Assertion'))
+                if not access.is_admin(who):return self.respond(403,{'error':'Only the owner account can manage access'})
+                try:return self.respond(200,{'members':access.change(str(payload.get('action','')),str(payload.get('email','')),who)})
+                except ValueError as e:return self.respond(400,{'error':str(e)})
+                except Exception as e:return self.respond(503,{'error':str(e)})
             if path=='/api/login':
                 with portal.login_lock:
                     portal.login_attempts=[t for t in portal.login_attempts if time.monotonic()-t<60]
