@@ -107,7 +107,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
     <BarChart data={sales_period} x=month y=sales_rm yFmt='"RM"#,##0' xFmt="mmm" colorPalette={['#5B63C9']} chartAreaHeight=220 labels=false/>
   </div>
   <div class="card">
-    <h3>Bookings per fortnight</h3>
+    <h3>Bookings every 2 weeks</h3>
     <p class="sub">Bookings recorded in each two-week window</p>
     <AreaChart data={backtest} x=period_start y=actual_bookings xFmt="d mmm" yMin=0 colorPalette={['#2E9CB8']} chartAreaHeight=220 fillOpacity=0.25/>
   </div>
