@@ -1,72 +1,197 @@
 ---
-title: Sales & areas
+title: Sales & customers
 sidebar_position: 4
 ---
 
-```sql area_sales
-select regexp_replace(coalesce(nullif(split_part(district, ' / ', 2), ''), district), '^W\.P\. ', '') as area,
-       sales_rm, sales, sales_rm / nullif(sales, 0) as avg_sale_rm
-from nomobug.area_sales order by sales_rm desc
+```sql detail
+select *,
+  regexp_replace(coalesce(nullif(split_part(district, ' / ', 2), ''), district), '^W\.P\. ', '') as area,
+  case when package ilike 'B2B%' then 'Business ' || coalesce(nullif(regexp_extract(package, '([0-9]+) *[xX]', 1), '') || 'x', 'other')
+       when package ilike 'GPC%' then 'Home ' || coalesce(nullif(regexp_extract(package, '([0-9]+) *[xX]', 1), '') || 'x', 'other')
+       else package end as package_group
+from nomobug.sales_detail
 ```
 
-```sql pest_groups
-select * from nomobug.pest_groups order by sales_rm desc limit 8
+```sql facts
+select *,
+  case when package ilike 'B2B%' then 'Business ' || coalesce(nullif(regexp_extract(package, '([0-9]+) *[xX]', 1), '') || 'x', 'other')
+       when package ilike 'GPC%' then 'Home ' || coalesce(nullif(regexp_extract(package, '([0-9]+) *[xX]', 1), '') || 'x', 'other')
+       else package end as package_group
+from nomobug.sales_facts
 ```
 
-```sql sales_monthly
-select * from nomobug.sales_monthly
-where month >= date_trunc('month', current_date - interval 24 month) and month < date_trunc('month', current_date)
-order by month
+```sql premises
+select distinct premise from ${detail} order by 1
 ```
 
-```sql totals
-select a.sales_rm, a.sales, a.sales_rm / nullif(a.sales, 0) as avg_sale, t.area as top_area
-from (select sum(sales_rm) as sales_rm, sum(sales) as sales from nomobug.area_sales) a
-cross join (select * from ${area_sales} limit 1) t
+```sql areas_list
+select area, sum(sales_rm) from ${detail} where area <> 'Unassigned' group by 1 order by 2 desc
 ```
 
-```sql packages_kpi
-select m.month, m.packages, sum(m.packages) over () as packages_24m from ${sales_monthly} m order by month
+```sql packages_list
+select package_group, sum(sales) from ${detail} group by 1 order by 2 desc
+```
+
+```sql f
+select * from ${detail}
+where month between '${inputs.period.start}' and '${inputs.period.end}'
+  and premise in ${inputs.premise.value}
+  and package_group in ${inputs.package.value}
+  and (area in ${inputs.area.value} or '${inputs.area_mode}' = 'all')
+```
+
+```sql ff
+select * from ${facts}
+where closed_date between '${inputs.period.start}' and '${inputs.period.end}'
+  and premise in ${inputs.premise.value}
+  and package_group in ${inputs.package.value}
+  and client_type like '${inputs.client}'
+```
+
+```sql kpi
+select sum(sales_rm) as sales_rm, sum(sales) as sales, sum(sales_rm) / nullif(sum(sales), 0) as avg_sale,
+  sum(case when premise = 'Residential' then sales_rm end) / nullif(sum(sales_rm), 0) as residential_share
+from ${f}
+```
+
+```sql trend
+select date_trunc('month', month) as month, premise, sum(sales_rm) as sales_rm from ${f} group by 1, 2 order by 1
+```
+
+```sql by_premise
+select premise, sum(sales_rm) as sales_rm, sum(sales) as sales from ${f} group by 1 order by 2 desc
+```
+
+```sql by_area
+select area, sum(sales_rm) as sales_rm, sum(sales) as sales from ${f} where area <> 'Unassigned' group by 1 order by 2 desc limit 12
+```
+
+```sql top_packages
+select package_group as package, sum(sales) as sales, sum(sales_rm) as sales_rm, sum(sales_rm) / nullif(sum(sales), 0) as avg_rm
+from ${f} where package_group <> 'Unspecified' group by 1 order by 3 desc limit 10
+```
+
+```sql pests
+select pest, sum(sales_rm) as sales_rm from ${f} where pest <> 'Unspecified' group by 1 order by 2 desc limit 8
+```
+
+```sql client_mix
+select client_type, count(*) as sales, sum(sale_total_rm) as sales_rm, avg(sale_total_rm) as avg_rm from ${ff} group by 1 order by 2 desc
+```
+
+```sql billing_mix
+select billing, count(*) as sales, sum(sale_total_rm) as sales_rm from ${ff} group by 1 order by 2 desc
+```
+
+```sql salespeople
+select salesperson, count(*) as sales, sum(sale_total_rm) as sales_rm, avg(sale_total_rm) as avg_rm,
+  median(days_first_contact_to_close) as median_days_to_close
+from ${ff} group by 1 order by 3 desc limit 10
+```
+
+```sql segments
+select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0) as sales_per_customer from nomobug.customer_segments order by sales_rm desc
 ```
 
 <div class="hero">
-  <h1>Sales & areas</h1>
-  <p>Where sales come from and what customers buy. Area figures only include sales with a reliable district; the rest are left out rather than guessed.</p>
-  <span class="chip">Recorded package prices, not cash received or profit</span>
+  <h1>Sales & customers</h1>
+  <p>Filter by period, premise, area, package and client type. Every chart below follows the filters. Sales are recorded package prices, not cash received or profit.</p>
+  <span class="chip">Area figures include only sales with a reliable district</span>
+</div>
+
+<div class="card">
+<h3>Filters</h3>
+<DateRange name=period data={detail} dates=month defaultValue="Last 12 Months"/>
+<Dropdown name=premise data={premises} value=premise title="Premise" multiple=true selectAllByDefault=true/>
+<Dropdown name=package data={packages_list} value=package_group title="Package" multiple=true selectAllByDefault=true/>
+<Dropdown name=area data={areas_list} value=area title="Area" multiple=true selectAllByDefault=true/>
+<ButtonGroup name=area_mode title="Include sales without an area">
+  <ButtonGroupItem valueLabel="Yes" value="all" default/>
+  <ButtonGroupItem valueLabel="Only selected areas" value="selected"/>
+</ButtonGroup>
+<ButtonGroup name=client title="Client">
+  <ButtonGroupItem valueLabel="All" value="%" default/>
+  <ButtonGroupItem valueLabel="New" value="New client"/>
+  <ButtonGroupItem valueLabel="Returning" value="Returning client"/>
+</ButtonGroup>
 </div>
 
 <div class="kpis">
-  <BigValue data={totals} value=sales_rm title="Sales with a known area, 12 months" fmt='"RM"#,##0'/>
-  <BigValue data={totals} value=sales title="Purchases with a known area"/>
-  <BigValue data={totals} value=avg_sale title="Average sale" fmt='"RM"#,##0'/>
-  <BigValue data={packages_kpi} value=packages_24m title="Packages sold, 24 months" sparkline=month sparklineColor="#8B54D4"/>
+  <BigValue data={kpi} value=sales_rm title="Sales" fmt='"RM"#,##0'/>
+  <BigValue data={kpi} value=sales title="Packages sold" fmt="#,##0"/>
+  <BigValue data={kpi} value=avg_sale title="Average sale" fmt='"RM"#,##0'/>
+  <BigValue data={kpi} value=residential_share title="Residential share of sales" fmt=pct0/>
+</div>
+
+<div class="card">
+  <h3>Sales by month</h3>
+  <p class="sub">Residential vs commercial, selected period</p>
+  <BarChart data={trend} x=month y=sales_rm series=premise type=stacked yFmt='"RM"#,##0' xFmt="mmm yy" chartAreaHeight=240/>
 </div>
 
 <div class="row2">
   <div class="card">
-    <h3>Sales by area</h3>
-    <p class="sub">Last 12 months · top area: <Value data={totals} column=top_area/></p>
-    <BarChart data={area_sales} x=area y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#2C6BE7']} chartAreaHeight=320/>
+    <h3>Top packages</h3>
+    <p class="sub">By sales, selected filters</p>
+    <DataTable data={top_packages} rowShading=false rows=10>
+      <Column id=package title="Package"/>
+      <Column id=sales title="Sold"/>
+      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#C3E0FD"/>
+      <Column id=avg_rm title="Average" fmt='"RM"#,##0'/>
+    </DataTable>
   </div>
   <div class="card">
-    <h3>Sales by pest group</h3>
-    <p class="sub">Top 8 groups, all recorded sales</p>
-    <BarChart data={pest_groups} x=pest_group y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#009778']} chartAreaHeight=320/>
+    <h3>Sales by area</h3>
+    <p class="sub">Top 12 areas with a known district</p>
+    <BarChart data={by_area} x=area y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#2C6BE7']} chartAreaHeight=280/>
+  </div>
+</div>
+
+<div class="row3">
+  <div class="card">
+    <h3>Residential vs commercial</h3>
+    <BarChart data={by_premise} x=premise y=sales_rm yFmt='"RM"#,##0' colorPalette={['#009778']} chartAreaHeight=200 labels=true/>
+  </div>
+  <div class="card">
+    <h3>New vs returning clients</h3>
+    <BarChart data={client_mix} x=client_type y=sales_rm yFmt='"RM"#,##0' colorPalette={['#8B54D4']} chartAreaHeight=200 labels=true/>
+  </div>
+  <div class="card">
+    <h3>Pests treated</h3>
+    <BarChart data={pests} x=pest y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#E78C08']} chartAreaHeight=200/>
+  </div>
+</div>
+
+## Customer segments
+
+<div class="row2">
+  <div class="card">
+    <h3>Customer groups</h3>
+    <p class="sub">All recorded history. Repeat customers bought more than one programme.</p>
+    <DataTable data={segments} rowShading=false>
+      <Column id=segment title="Segment"/>
+      <Column id=customer_groups title="Customers"/>
+      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#C3E0FD"/>
+      <Column id=sales_per_customer title="Sales per customer" fmt='"RM"#,##0'/>
+    </DataTable>
+  </div>
+  <div class="card">
+    <h3>How customers pay</h3>
+    <p class="sub">Billing arrangement, selected filters</p>
+    <BarChart data={billing_mix} x=billing y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#2C6BE7']} chartAreaHeight=200/>
   </div>
 </div>
 
 <div class="card">
-  <h3>Monthly sales and packages</h3>
-  <p class="sub">Last 24 full months</p>
-  <BarChart data={sales_monthly} x=month y=sales_rm y2=packages y2SeriesType=line yFmt='"RM"#,##0' xFmt="mmm yy" colorPalette={['#2C6BE7','#E78C08']} chartAreaHeight=240/>
-</div>
-
-<div class="card">
-  <h3>Area details</h3>
-  <DataTable data={area_sales} rowShading=false rows=15>
-    <Column id=area title="Area"/>
-    <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#C3E0FD"/>
-    <Column id=sales title="Purchases"/>
-    <Column id=avg_sale_rm title="Average sale" fmt='"RM"#,##0'/>
+  <h3>Sales by salesperson</h3>
+  <p class="sub">Selected filters · days to close = median days from first contact to sale</p>
+  <DataTable data={salespeople} rowShading=false rows=10>
+    <Column id=salesperson title="Salesperson"/>
+    <Column id=sales title="Sales"/>
+    <Column id=sales_rm title="Sales value" fmt='"RM"#,##0' contentType=bar barColor="#C3E0FD"/>
+    <Column id=avg_rm title="Average" fmt='"RM"#,##0'/>
+    <Column id=median_days_to_close title="Days to close" fmt="#,##0"/>
   </DataTable>
 </div>
+
+<p class="note">The client-type filter applies to the segment and salesperson views; the area filter applies to views that carry a district. Unknown or missing values are left out rather than guessed.</p>

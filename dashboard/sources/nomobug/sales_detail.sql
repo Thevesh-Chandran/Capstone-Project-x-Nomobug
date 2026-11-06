@@ -1,0 +1,1 @@
+select date(month_start) as month, initcap(premise) as premise, coalesce(nullif(package, ''), 'Unspecified') as package, coalesce(nullif(pest, ''), 'Unspecified') as pest, coalesce(nullif(district, ''), 'Unassigned') as district, sum(sales_rm) as sales_rm, sum(sale_rows) as sales from `profound-keel-500007-s4.gold.area_sales` where month_start is not null group by 1, 2, 3, 4, 5
