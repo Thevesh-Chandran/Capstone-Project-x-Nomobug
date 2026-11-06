@@ -49,10 +49,12 @@
     {
       label: 'Predictions',
       views: [
-        ['models', 'Return visits & models'],
+        ['models', 'Return-visit model'],
         ['status', 'Technical evidence'],
       ],
     },
+    // Shown only to the owner account (app.js unhides it when /api/access answers).
+    { label: 'Admin', views: [['access', 'Who has access', 'customers']], ownerOnly: true },
   ];
   const TITLES = {};
   NAV.forEach(gp => gp.views.forEach(([r, t]) => (TITLES[r] = t)));
@@ -82,6 +84,10 @@
     NAV.forEach(gp => {
       const box = document.createElement('div');
       box.className = 'side-group';
+      if (gp.ownerOnly) {
+        box.hidden = true;
+        box.dataset.ownerOnly = '1';
+      }
       if (gp.label) {
         const l = document.createElement('div');
         l.className = 'side-label';
