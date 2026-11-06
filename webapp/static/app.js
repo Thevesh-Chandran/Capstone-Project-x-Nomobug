@@ -332,7 +332,20 @@ function embedPageReport(page) {
     f.style.height = '';
     f.src = want;
   }
-  slot.querySelector('.act-head').textContent = page === 'models' ? 'Prediction models' : 'Take action';
+  const sub = {
+    returns: 'Call the customers below, then record what happened.',
+    home: 'Review each reminder and record your progress.',
+    plan: "Check this week's bookings, set your available hours and find a slot.",
+    customers: 'Search a customer to see their full history.',
+    models: 'How the return-visit score works and how reliable it is.',
+  }[page] || '';
+  const ah = slot.querySelector('.act-head');
+  ah.replaceChildren();
+  const t = document.createElement('strong');
+  t.textContent = page === 'models' ? 'Predictions' : 'Take action';
+  const p = document.createElement('span');
+  p.textContent = sub;
+  ah.append(t, p);
 }
 window.embedPageReport = embedPageReport;
 function reportRoute(pathname) {

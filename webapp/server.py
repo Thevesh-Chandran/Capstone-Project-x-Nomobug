@@ -198,7 +198,7 @@ def handler_for(portal):
             if p.suffix=='.wasm':mime='application/wasm'
             csp=("default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob:; worker-src 'self' blob:; "
                  "style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.org; font-src 'self' data:; "
-                 "connect-src 'self' blob: data:; frame-ancestors 'self'; base-uri 'self'; form-action 'self'")
+                 "connect-src 'self' blob: data: https://extensions.duckdb.org; frame-ancestors 'self'; base-uri 'self'; form-action 'self'")
             return self.respond(200,p.read_bytes(),mime,csp=csp)
         def do_GET(self):
             if not self.host_ok():return self.respond(403,{'error':'Host not allowed'})
