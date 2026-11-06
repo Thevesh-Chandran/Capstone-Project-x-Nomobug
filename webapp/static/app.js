@@ -289,6 +289,68 @@ function render() {
     $('global-status').textContent =
       'The last refresh failed. The previous successful snapshot is retained; check source freshness.';
 }
+// Dashboard pages are served by the website at /dashboard and shown in a same-origin frame
+// that grows with its content, so the page scrolls like any other website page.
+function showReport(slug) {
+  const f = $('report-frame');
+  if (!f) return;
+  const want = '/dashboard/' + (slug ? slug + '/' : '');
+  if (f.dataset.want !== want) {
+    f.dataset.want = want;
+    f.src = want;
+  }
+  clearInterval(showReport.timer);
+  showReport.timer = setInterval(() => {
+    try {
+      const d = f.contentDocument;
+      if (!d || !d.body) return;
+      const h = Math.max(d.documentElement.scrollHeight, d.body.scrollHeight);
+      if (h && Math.abs(f.offsetHeight - h) > 4) f.style.height = h + 'px';
+    } catch (e) {}
+  }, 400);
+}
+// Each tool page opens with its dashboard section (the view), then its actions below.
+function sizeFrame(f) {
+  try {
+    const d = f.contentDocument;
+    if (!d || !d.body) return;
+    const h = Math.max(d.documentElement.scrollHeight, d.body.scrollHeight);
+    if (h && Math.abs(f.offsetHeight - h) > 4) f.style.height = h + 'px';
+  } catch (e) {}
+}
+function embedPageReport(page) {
+  const slug = (window.CP2_PAGE_REPORT || {})[page];
+  document.body.dataset.report = slug ? 'on' : '';
+  const slot = $('page-report-slot');
+  if (!slot) return;
+  slot.hidden = !slug;
+  if (!slug) return;
+  const f = slot.querySelector('iframe');
+  const want = '/dashboard/' + slug + '/';
+  if (f.dataset.want !== want) {
+    f.dataset.want = want;
+    f.style.height = '';
+    f.src = want;
+  }
+  slot.querySelector('.act-head').textContent = page === 'models' ? 'Prediction models' : 'Take action';
+}
+window.embedPageReport = embedPageReport;
+function reportRoute(pathname) {
+  const slug = pathname.replace(/^\/dashboard\/?/, '').replace(/\/$/, '');
+  return Object.keys(window.CP2_REPORTS || {}).find(k => window.CP2_REPORTS[k] === slug);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const f = $('report-frame');
+  if (!f) return;
+  // Links inside a report (for example "Open the call list") keep the sidebar in step.
+  f.addEventListener('load', () => {
+    try {
+      const r = reportRoute(f.contentWindow.location.pathname);
+      f.dataset.want = f.contentWindow.location.pathname;
+      if (r && window.cp2Page() !== r) history.replaceState(null, '', '#' + r), window.onRoute && window.onRoute(r, true);
+    } catch (e) {}
+  });
+});
 function navigate() {
   const pages = [
     'overview',
@@ -305,11 +367,17 @@ function navigate() {
     'business',
     'areas',
     'status',
+    ...Object.keys(window.CP2_REPORTS || {}),
   ];
   // Service follow-up is the landing page; the overview now lives in the dashboard.
   let page = window.cp2Page() || 'returns';
   if (!pages.includes(page)) page = 'returns';
-  document.querySelectorAll('[data-view]').forEach(n => (n.hidden = n.dataset.view !== page));
+  const report = (window.CP2_REPORTS || {})[page];
+  document
+    .querySelectorAll('[data-view]')
+    .forEach(n => (n.hidden = !(n.dataset.view === page || (n.dataset.view === 'report' && report !== undefined))));
+  if (report !== undefined) showReport(report);
+  embedPageReport(page);
   document
     .querySelectorAll('[data-page]')
     .forEach(n => n.classList.toggle('active', n.dataset.page === page));
@@ -330,7 +398,7 @@ function navigate() {
       customers: 'Customers & areas',
       payments: 'Payment follow-up',
       status: 'Technical evidence',
-    }[page];
+    }[page] || (window.CP2_TITLES || {})[page] || '';
   if (page === 'business' && state && !businessLoaded) loadBusiness();
   if (window.onRoute) window.onRoute(page, !!state);
   if (state && window.loadWorkspaceTools) window.loadWorkspaceTools(page);

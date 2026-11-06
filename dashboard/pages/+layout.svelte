@@ -16,6 +16,8 @@
 	neverShowQueries={true}
 	hideTOC={true}
 	hideBreadcrumbs={true}
+	hideSidebar={true}
+	hideHeader={true}
 	maxWidth={1320}
 >
 	<slot slot="content" />

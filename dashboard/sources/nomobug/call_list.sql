@@ -1,1 +1,0 @@
-select risk_rank, customer_name, sales_record_id, cast(service_date as date) as service_date, days_since_service, cast(call_from as date) as call_from, chance_of_return, reason_1, reason_2, suggested_action, premise_type, pest_category, service_number, programme_services from `profound-keel-500007-s4.predictions.return_risk_call_list`

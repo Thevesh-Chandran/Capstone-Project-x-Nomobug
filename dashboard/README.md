@@ -2,7 +2,8 @@
 
 Open-source [Evidence](https://evidence.dev) site on the BigQuery `predictions` and `gold` datasets.
 
-- Live (Google sign-in, same people as the portal): https://cp2-dashboard-964813222593.asia-southeast1.run.app
+- Shown inside the staff website (one address, one menu): each website page opens with its dashboard section and has its actions below. Served by the website at `/dashboard`, built with `deployment.basePath: /dashboard`.
+- Website: https://cp2-portal-964813222593.asia-southeast1.run.app
 - Pages: `pages/*.md` (Overview, Service follow-up, Bookings & staffing, Sales & customers, Maps & patterns, Services & warranty, Payments)
 - Queries: `sources/nomobug/*.sql`; colours: `evidence.config.yaml` (website palette)
 
@@ -19,8 +20,8 @@ npm run dev
 - Every day at 06:45 Malaysia time, Cloud Scheduler `cp2-dashboard-refresh-daily` runs the Cloud Run job
   `cp2-dashboard-refresh` (image built from `refresh/`): it runs the queries, builds the site and uploads it to
   `gs://profound-keel-500007-s4-cp2-dashboard/site/`, removing files from the previous build.
-- The `cp2-dashboard` service is nginx only (`refresh/Dockerfile.serve`) with that bucket folder mounted read-only,
-  so new data appears without a redeploy.
+- The website (`cp2-portal`) mounts that bucket folder read-only at `/mnt/dashboard` (`CP2_DASHBOARD_DIR`) and serves it at `/dashboard`
+  to signed-in users only, so new data appears without a redeploy.
 - Refresh now: `powershell -ExecutionPolicy Bypass -File .\publish.ps1`
 - After changing pages or queries, rebuild the job image:
   `gcloud builds submit --config refresh/cloudbuild.yaml --ignore-file=refresh/.gcloudignore --region=asia-southeast1 .`
