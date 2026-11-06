@@ -137,13 +137,9 @@ def test_return_chart_evidence_matches_archived_candidate():
     import hashlib
     saved=json.loads((root/'webapp/models/return30_evidence.json').read_text())
     segment=json.loads(source.read_text())['results']['selected_ap']['segments']['all']
-    raw=source.read_bytes();lf=raw.replace(b'
-',b'
-')
+    raw=source.read_bytes();lf=raw.replace(b'\r\n',b'\n')
     # The checkout may store either line ending; the content is the same.
-    assert saved['source_sha256'] in {hashlib.sha256(x).hexdigest() for x in (raw,lf,lf.replace(b'
-',b'
-'))}
+    assert saved['source_sha256'] in {hashlib.sha256(x).hexdigest() for x in (raw,lf,lf.replace(b'\n',b'\r\n'))}
     for key in ('rows','positive_rows','threshold_TP','threshold_FN','threshold_FP'):
         assert saved[key]==segment[key]
     assert saved['threshold_TP']+saved['threshold_FN']==saved['positive_rows']
