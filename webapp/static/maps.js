@@ -1,5 +1,3 @@
-// Colours come from the stylesheet's tokens, so the map follows the theme.
-const tok = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 (async () => {
   const response = await fetch('/api/spatial', { credentials: 'same-origin' });
   if (!response.ok)
@@ -42,6 +40,26 @@ const tok = name => getComputedStyle(document.documentElement).getPropertyValue(
   function position(lon, lat) {
     return [450 + (lon - centre[0]) * 720 * zoom, 280 - (lat - centre[1]) * 720 * zoom];
   }
+  // Fallback name from the public district boundaries when no record in the group carries a district.
+  function inRing(lon, lat, ring) {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const [xi, yi] = ring[i], [xj, yj] = ring[j];
+      if (yi > lat !== yj > lat && lon < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  }
+  function districtAt(lon, lat) {
+    if (!Number.isFinite(lon) || !Number.isFinite(lat) || !DATA.boundaries) return '';
+    for (const f of DATA.boundaries.features) {
+      const polys = f.geometry.type === 'Polygon' ? [f.geometry.coordinates] : f.geometry.coordinates;
+      if (polys.some(p => inRing(lon, lat, p[0]) && !p.slice(1).some(h => inRing(lon, lat, h)))) {
+        const { state, district } = f.properties;
+        return state === district || !state ? district : state + ' / ' + district;
+      }
+    }
+    return '';
+  }
   function groupLabel(g) {
     let counts = {};
     for (let r of g.rs) {
@@ -49,7 +67,8 @@ const tok = name => getComputedStyle(document.documentElement).getPropertyValue(
       if (name && name !== 'Unassigned') counts[name] = (counts[name] || 0) + 1;
     }
     let label = Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0];
-    if (!label) return 'Area name unavailable';
+    if (!label) label = districtAt(g.lon, g.lat);
+    if (!label) return 'Outside mapped districts';
     let parts = label.split(' / ');
     return parts.length === 2 && parts[0] === parts[1] ? parts[0] : label;
   }
@@ -153,7 +172,6 @@ const tok = name => getComputedStyle(document.documentElement).getPropertyValue(
     const max = Math.max(0, ...grid);
     if (!max) return '';
     const stops = [
-      // Sequential data ramp for the heatmap (a data scale, light to dark blue), kept as numbers to interpolate.
       [219, 234, 254],
       [147, 197, 253],
       [96, 165, 250],
@@ -232,9 +250,9 @@ const tok = name => getComputedStyle(document.documentElement).getPropertyValue(
             layer === 'model'
               ? g.metrics.supported
                 ? g.metrics.accuracy > g.metrics.baseline
-                  ? tok('--color-accent')
-                  : tok('--color-ink')
-                : tok('--color-rule')
+                  ? '#1d4ed8'
+                  : '#0a0a0a'
+                : '#ccd3df'
               : `hsl(${layer === 'sales' ? '224 76%' : '0 0%'} ${92 - (58 * g.value) / max}%)`;
         return `<rect tabindex="0" role="button" aria-label="Proximity group with ${g.rs.length} records" class="cell" data-id="${g.id}" x="${x - w / 2}" y="${y - w / 2}" width="${w}" height="${w}" rx="4" fill="${fill}" opacity=".82"><title>${g.rs.length} records${layer === 'sales' ? ', ' + money(g.value) : ''}</title></rect>`;
       })
@@ -262,7 +280,7 @@ const tok = name => getComputedStyle(document.documentElement).getPropertyValue(
           p[1] > 535
         )
           return '';
-        return `<text x="${p[0]}" y="${p[1]}" text-anchor="middle" fill="${tok('--color-muted')}" font-size="11" pointer-events="none">${safe(f.properties.district)}</text>`;
+        return `<text x="${p[0]}" y="${p[1]}" text-anchor="middle" fill="#475e76" font-size="11" pointer-events="none">${safe(f.properties.district)}</text>`;
       })
       .join('');
     let points =
@@ -270,7 +288,7 @@ const tok = name => getComputedStyle(document.documentElement).getPropertyValue(
         ? rows
             .map((r, i) => {
               let [x, y] = position(r.longitude, r.latitude);
-              return `<circle tabindex="0" role="button" aria-label="Inspect recorded location" class="point" data-point="${i}" cx="${x}" cy="${y}" r="5" fill="${layer === 'visits' ? tok('--color-ink') : tok('--color-accent')}"><title>${safe(layer === 'sales' ? r.id : 'Recorded location')}, approximate mapped location</title></circle>`;
+              return `<circle tabindex="0" role="button" aria-label="Inspect recorded location" class="point" data-point="${i}" cx="${x}" cy="${y}" r="5" fill="${layer === 'visits' ? '#0a0a0a' : '#1d4ed8'}"><title>${safe(layer === 'sales' ? r.id : 'Recorded location')}, approximate mapped location</title></circle>`;
             })
             .join('')
         : '';
@@ -283,7 +301,7 @@ const tok = name => getComputedStyle(document.documentElement).getPropertyValue(
       hitAreas +
       labels +
       points +
-      `<text x="20" y="30" fill="${tok('--color-muted')}" font-size="12">${zoom.toFixed(zoom < 0.1 ? 2 : 1)}×, ${zoom >= 3 ? 'individual locations' : heatMode ? 'heatmap' : 'area groups'}</text>`;
+      `<text x="20" y="30" fill="#737373" font-size="12">${zoom.toFixed(zoom < 0.1 ? 2 : 1)}×, ${zoom >= 3 ? 'individual locations' : heatMode ? 'heatmap' : 'area groups'}</text>`;
     $('legend').innerHTML =
       layer === 'model'
         ? '● Grey: insufficient evidence, Blue: above no-return baseline, Black: at/below baseline'
