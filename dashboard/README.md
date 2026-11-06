@@ -28,11 +28,12 @@ npm run dev
   then `gcloud run jobs update cp2-dashboard-refresh --region=asia-southeast1 --image=<new image>`.
 
 Accounts: `cp2-dashboard-refresh` (BigQuery read, job user, write to the dashboard bucket, may start its own job);
-`cp2-dashboard-runtime` (read the dashboard bucket only).
+`cp2-portal-runtime` (read the dashboard bucket). The separate `cp2-dashboard` nginx service was deleted on 6 November 2026;
+`refresh/Dockerfile.serve` and `nginx.conf` are kept only as history.
 
 ## Privacy
 
-The built site contains the customer call list. It is served only behind Google IAP:
-the service allows `run.invoker` for the IAP service agent only, and IAP access matches `cp2-portal`.
-The runtime account `cp2-dashboard-runtime` has no permissions. Never make it public.
+The built site holds aggregate business figures and risk scores, but no customer names or contact details
+(the call list is shown by the website itself). It is still served only to signed-in users: the website checks
+the Google IAP assertion before returning any `/dashboard` file. Never make the bucket or the site public.
 Built files and query extracts are excluded from git (`.gitignore`).
