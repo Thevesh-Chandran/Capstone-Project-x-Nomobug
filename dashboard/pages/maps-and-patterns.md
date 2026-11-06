@@ -25,7 +25,7 @@ order by return_share desc limit 10
 
 ```sql workload
 select
-  case when team ilike 'TEAM %' then regexp_replace(team, '^TEAM ', '') else team end as team,
+  case when team ilike 'REPLACEMENT%' then 'Replacement' else trim(regexp_replace(regexp_replace(team, '^TEAM ', ''), ' *\(.*\)', '')) end as team,
   ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][cast(dow as integer)] as day,
   cast(dow as integer) as dow,
   bookings, round(bookings / nullif(days, 0), 1) as per_day, return_visits
@@ -54,7 +54,7 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
 <div class="card">
   <h3>Service areas</h3>
   <p class="sub">Bubble size = services; colour = share of visits that were returns. Hover an area for its figures.</p>
-  <BubbleMap data={areas} lat=lat long=lng size=services value=return_share valueFmt=pct0 pointName=area_cell colorPalette={['#E3F3FF','#2C6BE7','#E24A3F']} height=460 maxSize=28 tooltipType=hover tooltip={[
+  <BubbleMap data={areas} lat=lat long=lng size=services value=return_share valueFmt=pct0 pointName=area_cell colorPalette={['#9EC5FE','#E78C08','#E24A3F']} max=0.4 height=460 maxSize=28 startingLat=3.1 startingLong=101.62 startingZoom=10 basemap={`https://tile.openstreetmap.org/{z}/{x}/{y}.png`} attribution='© OpenStreetMap contributors' tooltipType=hover tooltip={[
     {id: 'area_cell', showColumnName: false, valueClass: 'font-bold'},
     {id: 'services', title: 'Services'},
     {id: 'return_visits', title: 'Return visits'},

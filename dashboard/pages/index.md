@@ -91,8 +91,8 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   </div>
   <div class="card">
     <h3>Bookings per fortnight</h3>
-    <p class="sub">Recorded two-week bookings, recent back-test windows</p>
-    <AreaChart data={backtest} x=period_start y=actual_bookings xFmt="d mmm" colorPalette={['#009778']} chartAreaHeight=220 fillOpacity=0.25/>
+    <p class="sub">Bookings recorded in each two-week window</p>
+    <AreaChart data={backtest} x=period_start y=actual_bookings xFmt="d mmm" yMin=0 colorPalette={['#009778']} chartAreaHeight=220 fillOpacity=0.25/>
   </div>
 </div>
 
@@ -109,7 +109,10 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   <div class="card">
     <h3>What customers buy</h3>
     <p class="sub">Sales by pest group, all recorded</p>
-    <BarChart data={pest_top} x=pest_group y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#8B54D4']} chartAreaHeight=200/>
+    <DataTable data={pest_top} rowShading=false>
+      <Column id=pest_group title="Pest group"/>
+      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#E2D4F7"/>
+    </DataTable>
   </div>
 </div>
 

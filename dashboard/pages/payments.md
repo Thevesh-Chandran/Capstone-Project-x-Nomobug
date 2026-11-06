@@ -23,8 +23,9 @@ from ${balances}
 ```
 
 ```sql balance_long
-select billing, 'Recorded as paid' as status, paid_rm as rm from ${balances}
-union all select billing, 'Still to collect', remaining_rm from ${balances}
+select billing, 'Recorded as paid' as status, 1 as o, paid_rm as rm from ${balances}
+union all select billing, 'Still to collect', 2, remaining_rm from ${balances}
+order by o
 ```
 
 ```sql reminders
@@ -41,7 +42,7 @@ from nomobug.reminders
 ```
 
 ```sql upcoming
-select reminder_date, billing_arrangement, reminders,
+select reminder_date, upper(substr(billing_arrangement,1,1)) || lower(substr(billing_arrangement,2)) as billing_arrangement, reminders,
        date_diff('day', current_date, reminder_date) as days_away
 from nomobug.reminders
 where reminder_date >= current_date
@@ -85,7 +86,7 @@ group by 1 order by 2 desc
   <div class="card">
     <h3>Paid vs still to collect</h3>
     <p class="sub">Recurring contracts by billing arrangement</p>
-    <BarChart data={balance_long} x=billing y=rm series=status type=stacked swapXY=true yFmt='"RM"#,##0' colorPalette={['#009778','#E78C08']} chartAreaHeight=220/>
+    <BarChart data={balance_long} x=billing y=rm series=status type=stacked swapXY=true yFmt='"RM"#,##0' seriesOrder={['Recorded as paid','Still to collect']} colorPalette={['#009778','#E78C08']} chartAreaHeight=220/>
   </div>
   <div class="card">
     <h3>Contract balances</h3>
@@ -93,7 +94,6 @@ group by 1 order by 2 desc
     <DataTable data={balances} rowShading=false>
       <Column id=billing title="Billing"/>
       <Column id=contracts title="Contracts"/>
-      <Column id=contract_value_rm title="Value" fmt='"RM"#,##0'/>
       <Column id=paid_rm title="Paid" fmt='"RM"#,##0'/>
       <Column id=remaining_rm title="To collect" fmt='"RM"#,##0' contentType=bar barColor="#F8D9A8"/>
     </DataTable>
@@ -118,7 +118,7 @@ group by 1 order by 2 desc
   <div class="card">
     <h3>Upcoming by arrangement</h3>
     <p class="sub">All future reminder dates</p>
-    <BarChart data={by_arrangement} x=billing_arrangement y=reminders swapXY=true colorPalette={['#2C6BE7']} chartAreaHeight=240 labels=true/>
+    <BarChart data={by_arrangement} x=billing_arrangement y=reminders swapXY=true colorPalette={['#2C6BE7']} chartAreaHeight=240 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...by_arrangement.map(d => d.reminders ?? 0)) * 1.25}/>
   </div>
 </div>
 
@@ -127,7 +127,7 @@ group by 1 order by 2 desc
   <p class="sub">Next dates first</p>
   <DataTable data={upcoming} rows=10 rowShading=false>
     <Column id=reminder_date title="Reminder date" fmt="ddd d mmm yyyy"/>
-    <Column id=days_away title="Days away" contentType=colorscale colorScale={['#2C6BE7','#E3F3FF']}/>
+    <Column id=days_away title="Days away" contentType=colorscale colorScale={['#C3E0FD','#F3F7FA']}/>
     <Column id=billing_arrangement title="Arrangement"/>
     <Column id=reminders title="Reminders"/>
   </DataTable>
