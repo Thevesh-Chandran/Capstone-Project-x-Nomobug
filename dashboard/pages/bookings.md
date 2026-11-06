@@ -33,8 +33,9 @@ from nomobug.backtest
 ```
 
 ```sql team_weekly
-select * from nomobug.team_weekly
-where week >= current_date - interval 12 week
+select * replace (trim(case when team ilike 'REPLACEMENT%' then 'Replacement' else regexp_replace(regexp_replace(team, '^TEAM ', ''), ' *\(.*\)', '') end) as team)
+from nomobug.team_weekly
+where team <> 'SALES TEAM' and week >= current_date - interval 12 week
 order by week
 ```
 
@@ -82,13 +83,13 @@ select team, sum(bookings) as bookings from ${team_weekly} group by 1 order by 2
 <div class="row2">
   <div class="card">
     <h3>Bookings per team</h3>
-    <p class="sub">Last 12 weeks, stacked by team</p>
+    <p class="sub">Last 12 weeks, field teams</p>
     <BarChart data={team_weekly} x=week y=bookings series=team type=stacked xFmt="d mmm" chartAreaHeight=220/>
   </div>
   <div class="card">
     <h3>Team share, last 12 weeks</h3>
     <p class="sub">Total recorded bookings per team</p>
-    <BarChart data={team_total} x=team y=bookings swapXY=true colorPalette={['#2C6BE7']} chartAreaHeight=220 labels=true/>
+    <BarChart data={team_total} x=team y=bookings swapXY=true colorPalette={['#2C6BE7']} chartAreaHeight=220 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...team_total.map(d => d.bookings ?? 0)) * 1.25}/>
   </div>
 </div>
 

@@ -13,7 +13,9 @@ from nomobug.sales_detail
 ```
 
 ```sql facts
-select *,
+select * replace (case when billing ilike 'de%sit' or billing ilike 'deposit%' then 'Deposit'
+                       when billing in ('Op','Gp') or billing is null or billing = '' then 'Other'
+                       else billing end as billing),
   case when package ilike 'B2B%' then 'Business ' || coalesce(nullif(regexp_extract(package, '([0-9]+) *[xX]', 1), '') || 'x', 'other')
        when package ilike 'GPC%' then 'Home ' || coalesce(nullif(regexp_extract(package, '([0-9]+) *[xX]', 1), '') || 'x', 'other')
        else package end as package_group
@@ -143,7 +145,7 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
   <div class="card">
     <h3>Sales by area</h3>
     <p class="sub">Top 12 areas with a known district</p>
-    <BarChart data={by_area} x=area y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#2C6BE7']} chartAreaHeight=280/>
+    <BarChart data={by_area} x=area y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#2C6BE7']} chartAreaHeight=300 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...by_area.map(d => d.sales_rm ?? 0)) * 1.25}/>
   </div>
 </div>
 
@@ -156,9 +158,13 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
     <h3>New vs returning clients</h3>
     <BarChart data={client_mix} x=client_type y=sales_rm yFmt='"RM"#,##0' colorPalette={['#8B54D4']} chartAreaHeight=200 labels=true/>
   </div>
+
   <div class="card">
     <h3>Pests treated</h3>
-    <BarChart data={pests} x=pest y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#E78C08']} chartAreaHeight=200/>
+    <DataTable data={pests} rowShading=false rows=8>
+      <Column id=pest title="Pest" wrap=true/>
+      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#F8D9A8"/>
+    </DataTable>
   </div>
 </div>
 
@@ -171,14 +177,14 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
     <DataTable data={segments} rowShading=false>
       <Column id=segment title="Segment"/>
       <Column id=customer_groups title="Customers"/>
-      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#C3E0FD"/>
-      <Column id=sales_per_customer title="Sales per customer" fmt='"RM"#,##0'/>
+      <Column id=sales_rm title="Sales" fmt='"RM"#,##0'/>
+      <Column id=sales_per_customer title="Per customer" fmt='"RM"#,##0'/>
     </DataTable>
   </div>
   <div class="card">
     <h3>How customers pay</h3>
     <p class="sub">Billing arrangement, selected filters</p>
-    <BarChart data={billing_mix} x=billing y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#2C6BE7']} chartAreaHeight=200/>
+    <BarChart data={billing_mix} x=billing y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#2C6BE7']} chartAreaHeight=200 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...billing_mix.map(d => d.sales_rm ?? 0)) * 1.25}/>
   </div>
 </div>
 

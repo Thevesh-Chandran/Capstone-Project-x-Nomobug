@@ -203,4 +203,10 @@
 			grid-template-columns: 1fr;
 		}
 	}
+
+	/* Sidebar: no white sticky home block, clear active pill */
+	:global(aside a.sticky) { position: static !important; background: transparent !important; box-shadow: none !important; font-weight: 500 !important; padding: 0.3rem 0.75rem !important; margin: 0 !important; color: var(--nb-muted, #5b6472) !important; }
+	:global(aside a) { text-transform: none !important; border-radius: 8px; padding: 0.3rem 0.75rem !important; font-size: 0.9rem; }
+	:global(aside a.text-primary) { background: #e3edfd; color: #1f55c4 !important; font-weight: 600; }
+	:global(aside a:hover) { background: #eaf0f6; text-decoration: none !important; }
 </style>

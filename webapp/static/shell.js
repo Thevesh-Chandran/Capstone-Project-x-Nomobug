@@ -30,6 +30,7 @@
       views: [
         ['returns', 'Service follow-up'],
         ['home', 'Payment reminders'],
+        ['plan', 'Bookings & workload'],
         ['customers', 'Customer history'],
       ],
     },
