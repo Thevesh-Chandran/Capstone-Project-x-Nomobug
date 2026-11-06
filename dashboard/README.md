@@ -14,13 +14,20 @@ npm run sources
 npm run dev
 ```
 
-## Publish fresh data
+## How the live site updates
 
-```
-powershell -ExecutionPolicy Bypass -File .\publish.ps1
-```
+- Every day at 06:45 Malaysia time, Cloud Scheduler `cp2-dashboard-refresh-daily` runs the Cloud Run job
+  `cp2-dashboard-refresh` (image built from `refresh/`): it runs the queries, builds the site and uploads it to
+  `gs://profound-keel-500007-s4-cp2-dashboard/site/`, removing files from the previous build.
+- The `cp2-dashboard` service is nginx only (`refresh/Dockerfile.serve`) with that bucket folder mounted read-only,
+  so new data appears without a redeploy.
+- Refresh now: `powershell -ExecutionPolicy Bypass -File .\publish.ps1`
+- After changing pages or queries, rebuild the job image:
+  `gcloud builds submit --config refresh/cloudbuild.yaml --ignore-file=refresh/.gcloudignore --region=asia-southeast1 .`
+  then `gcloud run jobs update cp2-dashboard-refresh --region=asia-southeast1 --image=<new image>`.
 
-Refreshes the queries, builds the static site, builds the image in Cloud Build and deploys `cp2-dashboard`.
+Accounts: `cp2-dashboard-refresh` (BigQuery read, job user, write to the dashboard bucket, may start its own job);
+`cp2-dashboard-runtime` (read the dashboard bucket only).
 
 ## Privacy
 
