@@ -1,0 +1,1 @@
+select pest_type, package_type, sum(package_rows) as packages, sum(recorded_package_face_value_rm) as sales_rm, safe_divide(sum(warranty_claim_event_rows), sum(scheduled_event_rows)) as return_share, sum(scheduled_event_rows) as visits from `profound-keel-500007-s4.gold.dashboard_package_fit_matrix` where pest_type is not null and package_type is not null group by 1, 2

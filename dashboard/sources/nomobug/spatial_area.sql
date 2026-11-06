@@ -1,0 +1,1 @@
+select area_cell, area_centroid_latitude as lat, area_centroid_longitude as lng, scheduled_service_event_rows as services, matched_sales_records as sales_records, repeat_signal_event_rows as return_visits, repeat_signal_share as return_share from `profound-keel-500007-s4.gold.dashboard_spatial_area` where area_centroid_latitude is not null and area_centroid_longitude is not null

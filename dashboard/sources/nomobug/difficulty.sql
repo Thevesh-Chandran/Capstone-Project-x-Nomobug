@@ -1,0 +1,1 @@
+select pest_type, package_type, sum(scheduled_event_rows) as visits, sum(warranty_claim_event_rows) as return_visits, safe_divide(sum(warranty_claim_event_rows), sum(scheduled_event_rows)) as return_share from `profound-keel-500007-s4.gold.dashboard_treatment_difficulty` where pest_type is not null group by 1, 2

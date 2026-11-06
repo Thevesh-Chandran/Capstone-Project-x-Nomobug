@@ -1,7 +1,31 @@
 ---
 title: Payments
-sidebar_position: 5
+sidebar_position: 7
 ---
+
+```sql balances_all
+select * from nomobug.contract_balances order by remaining_rm desc
+```
+
+```sql billing_list
+select billing from ${balances_all}
+```
+
+```sql balances
+select * from ${balances_all} where billing in ${inputs.billing.value}
+```
+
+```sql balance_kpi
+select sum(contract_value_rm) as value_rm, sum(paid_rm) as paid_rm, sum(remaining_rm) as remaining_rm,
+  sum(contracts) as contracts, sum(contracts_with_balance) as with_balance,
+  sum(paid_rm) / nullif(sum(contract_value_rm), 0) as paid_share
+from ${balances}
+```
+
+```sql balance_long
+select billing, 'Recorded as paid' as status, paid_rm as rm from ${balances}
+union all select billing, 'Still to collect', remaining_rm from ${balances}
+```
 
 ```sql reminders
 select * from nomobug.reminders order by reminder_date
@@ -43,6 +67,40 @@ group by 1 order by 2 desc
   <p>The owner's schedule for contacting clients on recurring contracts. A reminder date does not show that a payment was received or that a reminder was sent.</p>
   <span class="chip">From the Sales sheet reminder schedule</span>
 </div>
+
+## Recurring contracts: still to collect
+
+<div class="card">
+<Dropdown name=billing data={billing_list} value=billing title="Billing arrangement" multiple=true selectAllByDefault=true/>
+</div>
+
+<div class="kpis">
+  <BigValue data={balance_kpi} value=remaining_rm title="Still to collect" fmt='"RM"#,##0'/>
+  <BigValue data={balance_kpi} value=paid_rm title="Recorded as paid" fmt='"RM"#,##0'/>
+  <BigValue data={balance_kpi} value=paid_share title="Share of contract value paid" fmt=pct0/>
+  <BigValue data={balance_kpi} value=with_balance title="Contracts with a balance"/>
+</div>
+
+<div class="row2">
+  <div class="card">
+    <h3>Paid vs still to collect</h3>
+    <p class="sub">Recurring contracts by billing arrangement</p>
+    <BarChart data={balance_long} x=billing y=rm series=status type=stacked swapXY=true yFmt='"RM"#,##0' colorPalette={['#009778','#E78C08']} chartAreaHeight=220/>
+  </div>
+  <div class="card">
+    <h3>Contract balances</h3>
+    <p class="sub">From recorded Sales amounts; confirm with the client record before chasing</p>
+    <DataTable data={balances} rowShading=false>
+      <Column id=billing title="Billing"/>
+      <Column id=contracts title="Contracts"/>
+      <Column id=contract_value_rm title="Value" fmt='"RM"#,##0'/>
+      <Column id=paid_rm title="Paid" fmt='"RM"#,##0'/>
+      <Column id=remaining_rm title="To collect" fmt='"RM"#,##0' contentType=bar barColor="#F8D9A8"/>
+    </DataTable>
+  </div>
+</div>
+
+## Reminder schedule
 
 <div class="kpis">
   <BigValue data={due} value=due_7 title="Due in the next 7 days"/>

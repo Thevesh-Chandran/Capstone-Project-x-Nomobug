@@ -1,0 +1,89 @@
+---
+title: Maps & patterns
+sidebar_position: 5
+---
+
+```sql areas
+select area_cell, lat, lng, services, sales_records, return_visits,
+       return_share,
+       case when services >= 20 then 'Enough visits to compare' else 'Few visits' end as volume
+from nomobug.spatial_area
+order by services desc
+```
+
+```sql area_kpi
+select count(*) as areas, sum(services) as services, sum(return_visits) as return_visits,
+       sum(return_visits) / nullif(sum(services), 0) as return_share
+from nomobug.spatial_area
+```
+
+```sql top_return_areas
+select area_cell, services, return_visits, return_share
+from nomobug.spatial_area where services >= 20
+order by return_share desc limit 10
+```
+
+```sql workload
+select
+  case when team ilike 'TEAM %' then regexp_replace(team, '^TEAM ', '') else team end as team,
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][cast(dow as integer)] as day,
+  cast(dow as integer) as dow,
+  bookings, round(bookings / nullif(days, 0), 1) as per_day, return_visits
+from nomobug.scheduling
+where team not in ('SALES TEAM')
+order by dow
+```
+
+```sql busiest
+select day, sum(bookings) as bookings from ${workload} group by day, dow order by dow
+```
+
+<div class="hero">
+  <h1>Maps & patterns</h1>
+  <p>Where services happen and where return visits cluster, and how bookings spread across teams and days. Areas are grouped cells, never individual customer addresses.</p>
+  <span class="chip">For the interactive heat map and custom radius tool, use the website → Sales & return maps</span>
+</div>
+
+<div class="kpis">
+  <BigValue data={area_kpi} value=areas title="Service areas mapped"/>
+  <BigValue data={area_kpi} value=services title="Services in mapped areas" fmt="#,##0"/>
+  <BigValue data={area_kpi} value=return_visits title="Return visits recorded" fmt="#,##0"/>
+  <BigValue data={area_kpi} value=return_share title="Return-visit share" fmt=pct1/>
+</div>
+
+<div class="card">
+  <h3>Service areas</h3>
+  <p class="sub">Bubble size = services; colour = share of visits that were returns. Hover an area for its figures.</p>
+  <BubbleMap data={areas} lat=lat long=lng size=services value=return_share valueFmt=pct0 pointName=area_cell colorPalette={['#E3F3FF','#2C6BE7','#E24A3F']} height=460 maxSize=28 tooltipType=hover tooltip={[
+    {id: 'area_cell', showColumnName: false, valueClass: 'font-bold'},
+    {id: 'services', title: 'Services'},
+    {id: 'return_visits', title: 'Return visits'},
+    {id: 'return_share', title: 'Return share', fmt: 'pct0'}
+  ]}/>
+</div>
+
+<div class="row2">
+  <div class="card">
+    <h3>Bookings by team and day</h3>
+    <p class="sub">Average bookings per working day, last 26 weeks</p>
+    <Heatmap data={workload} x=day y=team value=per_day xSort=dow colorScale={['#F3F7FA','#2C6BE7']} valueLabels=true chartAreaHeight=240/>
+  </div>
+  <div class="card">
+    <h3>Areas with the highest return share</h3>
+    <p class="sub">Areas with at least 20 services; find each cell on the map above by hovering</p>
+    <DataTable data={top_return_areas} rowShading=false rows=10>
+      <Column id=area_cell title="Map cell"/>
+      <Column id=services title="Services"/>
+      <Column id=return_visits title="Returns"/>
+      <Column id=return_share title="Return share" fmt=pct0 contentType=bar barColor="#F6B8B3"/>
+    </DataTable>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Busiest days</h3>
+  <p class="sub">Total bookings by day of week, all field teams, last 26 weeks</p>
+  <BarChart data={busiest} x=day y=bookings sort=false colorPalette={['#009778']} chartAreaHeight=200 labels=true/>
+</div>
+
+<p class="note">Return visits are calendar entries marked as warranty or return visits; they are not proof of pest recurrence. Areas with few visits can show extreme shares by chance.</p>
