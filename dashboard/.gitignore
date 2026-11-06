@@ -1,0 +1,7 @@
+node_modules/
+.evidence/
+build/
+.svelte-kit/
+# Extracted query results can contain customer names
+sources/**/*.parquet
+static/data/

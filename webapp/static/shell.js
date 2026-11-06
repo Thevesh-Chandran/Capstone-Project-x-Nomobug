@@ -21,33 +21,38 @@
     areas:
       '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/>',
   };
+  // Report pages are dashboard pages shown inside the website (route -> dashboard page).
+  // Only the overview is a report on its own; every other page shows its dashboard section
+  // on top and the website's actions or predictions underneath (see CP2_PAGE_REPORT).
+  window.CP2_REPORTS = { 'r-overview': '' };
+  window.CP2_PAGE_REPORT = {
+    returns: 'follow-up',
+    home: 'payments',
+    plan: 'bookings',
+    customers: 'sales-and-areas',
+    models: 'services-and-warranty',
+    '/maps': 'maps-and-patterns',
+  };
   // Operational tools stay prominent; source browsing and research are secondary.
   const NAV = [
-    { label: 'Management', views: [['overview', 'Management overview']] },
+    { label: '', views: [['r-overview', 'Overview', 'overview']] },
     {
       label: 'Daily work',
       views: [
-        ['today', 'Workspace'],
         ['returns', 'Service follow-up'],
-      ],
-    },
-    {
-      label: 'Supporting tools',
-      views: [
-        ['home', 'Payment reminders'],
+        ['home', 'Payments'],
         ['plan', 'Bookings & workload'],
-        ['/maps', 'Sales & return maps', 'maps'],
-        ['customers', 'Customer history'],
+        ['customers', 'Sales & customers'],
       ],
     },
+    { label: 'Areas', views: [['/maps', 'Maps & patterns', 'maps']] },
     {
       label: 'Predictions',
       views: [
-        ['models', 'Prediction models'],
+        ['models', 'Return visits & models'],
         ['status', 'Technical evidence'],
       ],
     },
-    { label: 'Reporting', views: [['dashboard', 'Business dashboard']] },
   ];
   const TITLES = {};
   NAV.forEach(gp => gp.views.forEach(([r, t]) => (TITLES[r] = t)));
@@ -55,6 +60,9 @@
   Object.assign(
     TITLES,
     {
+      overview: 'Management overview',
+      today: 'Workspace',
+      plan: 'Bookings & workload',
       performance: 'Performance',
       payments: 'Payments',
       business: 'Areas',
@@ -63,6 +71,7 @@
     },
     { ...TITLES },
   );
+  window.CP2_TITLES = TITLES;
   const $ = id => document.getElementById(id);
   const isMaps = location.pathname === '/maps';
   function build() {
@@ -95,7 +104,7 @@
     });
   }
   function render(route) {
-    if (route === 'decisions') route = 'overview';
+    if (route === 'decisions') route = 'returns';
     const t = TITLES[route] || TITLES.today;
     document.querySelectorAll('.side-link').forEach(a => {
       const on = a.dataset.route === route;
@@ -117,12 +126,22 @@
     }
   }
   build();
+  // Dashboard sections grow with their content so the page scrolls as one.
+  setInterval(() => {
+    document.querySelectorAll('.report-frame').forEach(f => {
+      try {
+        const d = f.contentDocument;
+        const h = d && d.body && Math.max(d.documentElement.scrollHeight, d.body.scrollHeight);
+        if (h && f.offsetParent && Math.abs(f.offsetHeight - h) > 4) f.style.height = h + 'px';
+      } catch (e) {}
+    });
+  }, 400);
   window.onRoute = (route, ready) => {
     render(route);
     window.scrollTo({ top: 0, behavior: 'instant' });
-    if (ready && window.loadStage) window.loadStage(route === 'decisions' ? 'overview' : route);
+    if (ready && window.loadStage) window.loadStage(route === 'decisions' ? 'returns' : route);
   };
-  render(isMaps ? '/maps' : (window.cp2Page ? window.cp2Page() : location.hash.slice(1)) || 'overview');
+  render(isMaps ? '/maps' : (window.cp2Page ? window.cp2Page() : location.hash.slice(1)) || 'returns');
   if (isMaps) {
     const lo = $('logout');
     if (lo)

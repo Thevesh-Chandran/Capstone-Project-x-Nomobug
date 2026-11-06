@@ -1,0 +1,1 @@
+select date(service_month) as month, recurrence_reason as reason, sum(recorded_warranty_signal_rows) as returns from `profound-keel-500007-s4.gold.dashboard_recurrence_monthly` group by 1, 2 order by 1
