@@ -28,8 +28,16 @@ union all select billing, 'Still to collect', 2, remaining_rm from ${balances}
 order by o
 ```
 
-```sql reminders
+```sql reminders_all
 select * from nomobug.reminders order by reminder_date
+```
+
+```sql arrangements
+select distinct billing_arrangement from ${reminders_all} order by 1
+```
+
+```sql reminders
+select * from ${reminders_all} where billing_arrangement in ${inputs.pay_arr.value} order by reminder_date
 ```
 
 ```sql due
@@ -38,13 +46,13 @@ select
   coalesce(sum(case when reminder_date between current_date and current_date + interval 30 day then reminders end), 0) as due_30,
   coalesce(sum(case when reminder_date between current_date and current_date + interval 90 day then reminders end), 0) as due_90,
   count(distinct billing_arrangement) as arrangements
-from nomobug.reminders
+from ${reminders}
 ```
 
 ```sql upcoming
 select reminder_date, upper(substr(billing_arrangement,1,1)) || lower(substr(billing_arrangement,2)) as billing_arrangement, reminders,
        date_diff('day', current_date, reminder_date) as days_away
-from nomobug.reminders
+from ${reminders}
 where reminder_date >= current_date
 order by reminder_date
 limit 40
@@ -52,14 +60,14 @@ limit 40
 
 ```sql by_month
 select date_trunc('month', reminder_date) as month, billing_arrangement, sum(reminders) as reminders
-from nomobug.reminders
+from ${reminders}
 where reminder_date >= current_date - interval 3 month and reminder_date < current_date + interval 6 month
 group by 1, 2 order by 1
 ```
 
 ```sql by_arrangement
 select billing_arrangement, sum(reminders) as reminders
-from nomobug.reminders where reminder_date >= current_date
+from ${reminders} where reminder_date >= current_date
 group by 1 order by 2 desc
 ```
 
@@ -101,6 +109,10 @@ group by 1 order by 2 desc
 </div>
 
 ## Reminder schedule
+
+<div class="card filters">
+<Dropdown name=pay_arr data={arrangements} value=billing_arrangement title="Billing arrangement" multiple=true selectAllByDefault=true/>
+</div>
 
 <div class="kpis">
   <BigValue data={due} value=due_7 title="Due in the next 7 days"/>

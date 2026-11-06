@@ -8,6 +8,7 @@ select area_cell, place, lat, lng, services, sales_records, return_visits,
        return_share,
        case when services >= 20 then 'Enough visits to compare' else 'Few visits' end as volume
 from nomobug.spatial_area
+where services >= ${inputs.mp_min}
 order by services desc
 ```
 
@@ -19,11 +20,11 @@ from nomobug.spatial_area
 
 ```sql top_return_areas
 select place, services, return_visits, return_share
-from nomobug.spatial_area where services >= 20
+from nomobug.spatial_area where services >= ${inputs.mp_min}
 order by return_share desc limit 10
 ```
 
-```sql workload
+```sql workload_all
 select
   case when team ilike 'REPLACEMENT%' then 'Replacement' else trim(regexp_replace(regexp_replace(team, '^TEAM ', ''), ' *[(].*[)]', '')) end as team,
   ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][cast(dow as integer)] as day,
@@ -32,6 +33,14 @@ select
 from nomobug.scheduling
 where team not in ('SALES TEAM')
 order by dow
+```
+
+```sql mp_teams
+select distinct team from ${workload_all} order by 1
+```
+
+```sql workload
+select * from ${workload_all} where team in ${inputs.mp_team.value} order by dow
 ```
 
 ```sql busiest
@@ -43,6 +52,17 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
   <p>Where services happen and where return visits cluster, and how bookings spread across teams and days. Areas are grouped cells, never individual customer addresses.</p>
   <span class="chip">The interactive heat map and radius tool are below</span>
 </div>
+
+<div class="card filters">
+<ButtonGroup name=mp_min title="Minimum services per area (map and table)">
+  <ButtonGroupItem valueLabel="Any" value=1/>
+  <ButtonGroupItem valueLabel="10+" value=10/>
+  <ButtonGroupItem valueLabel="20+" value=20 default/>
+  <ButtonGroupItem valueLabel="40+" value=40/>
+</ButtonGroup>
+<Dropdown name=mp_team data={mp_teams} value=team title="Team (heat map and busiest days)" multiple=true selectAllByDefault=true/>
+</div>
+
 
 <div class="kpis">
   <BigValue data={area_kpi} value=areas title="Service areas mapped"/>
@@ -70,7 +90,7 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
   </div>
   <div class="card">
     <h3>Areas with the highest return share</h3>
-    <p class="sub">Areas with at least 20 services; hover the map above to find each one</p>
+    <p class="sub">Areas with at least the selected number of services; hover the map above to find each one</p>
     <DataTable data={top_return_areas} rowShading=false rows=10>
       <Column id=place title="Area"/>
       <Column id=services title="Services"/>
@@ -82,7 +102,7 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
 
 <div class="card">
   <h3>Busiest days</h3>
-  <p class="sub">Total bookings by day of week, all field teams, last 26 weeks</p>
+  <p class="sub">Total bookings by day of week, selected teams, last 26 weeks</p>
   <BarChart data={busiest} x=day y=bookings sort=false colorPalette={['#2E9CB8']} chartAreaHeight=200 labels=true/>
 </div>
 
