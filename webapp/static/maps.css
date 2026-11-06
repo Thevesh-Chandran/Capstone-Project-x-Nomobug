@@ -116,7 +116,7 @@
   width: 180px;
   height: 8px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #dbeafe, #93c5fd, #60a5fa, #2563eb, #1d4ed8, #172554);
+  background: linear-gradient(90deg, #3766bc, #2faad0, #72d3b4, #f4dc63, #ef9a46, #ce4058);
 }
 .maps-page svg#map {
   display: block;
@@ -235,3 +235,8 @@
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* Layer tabs: the three maps read as tabs, as in the October version. */
+.maps-page .tools button[data-layer] { border-color: transparent; background: #eef3fa; color: #3d5a80; font-weight: 600; }
+.maps-page .tools button[data-layer]:hover { background: #e1ebf7; }
+.maps-page .tools button[data-layer].active { background: #2563eb; border-color: #2563eb; color: #fff; }
