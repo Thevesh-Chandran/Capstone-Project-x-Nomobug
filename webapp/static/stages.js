@@ -1590,7 +1590,7 @@
       });
     const bk = (data.predictive.forecasts || []).find(f => f.id === 'booking_entries_h2');
     if (bk && bk.prediction && (bk.baseline || (bk.history && bk.history.length))) {
-      // "Usual" is the simple-average forecast for the same fortnight, so both cover the same dates.
+      // "Usual" is the simple-average forecast for the same 2 weeks, so both cover the same dates.
       const recent = bk.history.slice(-8).map(h => h.actual);
       const usual = bk.baseline || recent.reduce((a, b) => a + b, 0) / recent.length;
       const diff = (bk.prediction - usual) / usual;
@@ -1602,9 +1602,9 @@
           ? `The next two weeks look busier than usual (${nf.format(bk.prediction)} bookings)`
           : quiet
             ? `The next two weeks look quieter than usual (${nf.format(bk.prediction)} bookings)`
-            : `A normal fortnight is expected (${nf.format(bk.prediction)} bookings)`,
+            : `Normal bookings expected for the next 2 weeks (${nf.format(bk.prediction)} bookings)`,
         why:
-          `The booking forecast expects about ${nf.format(bk.prediction)} bookings against ${nf.format(usual)} from a simple average of past fortnights ` +
+          `The booking forecast expects about ${nf.format(bk.prediction)} bookings against ${nf.format(usual)} from a simple average of past 2-week periods ` +
           `(${change(diff)[0]}). It is usually off by about ${nf.format(bk.mae)} bookings. ` +
           (busy
             ? 'Check team cover and backup before the slots fill.'
