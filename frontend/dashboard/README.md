@@ -14,6 +14,6 @@ The page has Overview, Sales, Visits and Payments. Month, district and named-pes
 2. Update each version query and SHA-384 integrity attribute in `webapp/static/reports.html` from the exact asset bytes. Versioned URLs prevent stale browser assets from failing the integrity check during releases.
 3. Deploy these four allowlisted files to Vercel project `cp2-dashboard` (team `thevesh20-3384s-projects`). No dependency installation or container is needed.
 4. Verify unauthenticated JS/CSS responses, CORS headers and byte hashes. Run `tests/test_reporting_dashboard.py` and the portal/IAP checks.
-5. Build the backend with `cloudbuild.portal-web.yaml`, stage a revision with no traffic, and check all report pages before promotion. Preserve IAP, runtime identity, environment and the previous revision.
+5. Build the backend with `deploy/cloudbuild.portal-web.yaml`, stage a revision with no traffic, and check all report pages before promotion. Preserve IAP, runtime identity, environment and the previous revision.
 
 Only the exact Vercel asset origin is allowed by the backend CSP. Changing its hostname requires an explicit allowlist change; arbitrary origins are rejected. The Metabase experiment is separate and is not required.
