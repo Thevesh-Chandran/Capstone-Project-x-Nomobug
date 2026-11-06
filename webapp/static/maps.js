@@ -172,12 +172,12 @@
     const max = Math.max(0, ...grid);
     if (!max) return '';
     const stops = [
-      [219, 234, 254],
-      [147, 197, 253],
-      [96, 165, 250],
-      [37, 99, 235],
-      [29, 78, 216],
-      [23, 37, 84],
+      [55, 102, 188],
+      [47, 170, 208],
+      [114, 211, 180],
+      [244, 220, 99],
+      [239, 154, 70],
+      [206, 64, 88],
     ];
     return Array.from(grid, (v, i) => {
       let ratio = v / max;
@@ -250,10 +250,10 @@
             layer === 'model'
               ? g.metrics.supported
                 ? g.metrics.accuracy > g.metrics.baseline
-                  ? '#1d4ed8'
-                  : '#0a0a0a'
+                  ? '#4277bd'
+                  : '#d98b5b'
                 : '#ccd3df'
-              : `hsl(${layer === 'sales' ? '224 76%' : '0 0%'} ${92 - (58 * g.value) / max}%)`;
+              : `hsl(${layer === 'sales' ? 216 : 12} 68% ${90 - (48 * g.value) / max}%)`;
         return `<rect tabindex="0" role="button" aria-label="Proximity group with ${g.rs.length} records" class="cell" data-id="${g.id}" x="${x - w / 2}" y="${y - w / 2}" width="${w}" height="${w}" rx="4" fill="${fill}" opacity=".82"><title>${g.rs.length} records${layer === 'sales' ? ', ' + money(g.value) : ''}</title></rect>`;
       })
       .join('');
@@ -288,7 +288,7 @@
         ? rows
             .map((r, i) => {
               let [x, y] = position(r.longitude, r.latitude);
-              return `<circle tabindex="0" role="button" aria-label="Inspect recorded location" class="point" data-point="${i}" cx="${x}" cy="${y}" r="5" fill="${layer === 'visits' ? '#0a0a0a' : '#1d4ed8'}"><title>${safe(layer === 'sales' ? r.id : 'Recorded location')}, approximate mapped location</title></circle>`;
+              return `<circle tabindex="0" role="button" aria-label="Inspect recorded location" class="point" data-point="${i}" cx="${x}" cy="${y}" r="5" fill="${layer === 'visits' ? '#d66143' : '#285d9f'}"><title>${safe(layer === 'sales' ? r.id : 'Recorded location')}, approximate mapped location</title></circle>`;
             })
             .join('')
         : '';
@@ -304,7 +304,7 @@
       `<text x="20" y="30" fill="#737373" font-size="12">${zoom.toFixed(zoom < 0.1 ? 2 : 1)}×, ${zoom >= 3 ? 'individual locations' : heatMode ? 'heatmap' : 'area groups'}</text>`;
     $('legend').innerHTML =
       layer === 'model'
-        ? '● Grey: insufficient evidence, Blue: above no-return baseline, Black: at/below baseline'
+        ? '● Grey: insufficient evidence, Blue: above no-return baseline, Orange: at/below baseline'
         : '<span>Lower</span><i></i><span>Higher ' +
           (layer === 'sales' ? 'sales density' : 'visit density') +
           '</span>';
