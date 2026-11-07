@@ -81,7 +81,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   <div class="action">
     <div class="label">Service follow-up</div>
     <div class="big">Call <Value data={headline} column=customers_to_call/> customers</div>
-    <p>Most likely to need a return visit. Top chance <Value data={headline} column=top_chance fmt=pct0/>.</p>
+    <p>Most likely to need a return visit. Highest chance: <Value data={headline} column=top_chance fmt=pct0/></p>
     <a class="go" data-to="returns" role="link" tabindex="0">Open the call list</a>
   </div>
   <div class="action green">
@@ -93,7 +93,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   <div class="action amber">
     <div class="label">Bookings</div>
     <div class="big">About <Value data={headline} column=bookings_next_2_weeks fmt="#,##0"/> bookings</div>
-    <p>Expected in the next two weeks, likely <Value data={headline} column=bookings_likely_range/>.</p>
+    <p>Expected in the next 2 weeks. Likely range: <Value data={headline} column=bookings_likely_range/></p>
     <a class="go" data-to="plan" role="link" tabindex="0">See the forecast</a>
   </div>
 </div>
