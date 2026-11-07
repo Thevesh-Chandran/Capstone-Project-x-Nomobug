@@ -1,5 +1,5 @@
 ---
-title: Services & warranty
+title: Return visits and the model
 sidebar_position: 6
 ---
 
@@ -110,7 +110,7 @@ from ${difficulty}
 ```
 
 <div class="hero">
-  <h1>Services & warranty</h1>
+  <h1>Return visits and the model</h1>
   <p>Which treatments lead to more return visits, how packages compare, and whether rainfall moves with returns. These are observed patterns, not causes.</p>
   <span class="chip">Return visits = warranty claims when pests come back</span>
 </div>
