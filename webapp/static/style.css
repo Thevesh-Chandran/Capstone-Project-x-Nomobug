@@ -4499,3 +4499,4 @@ body[data-report="on"] #workspace .desk-page-head {
 body[data-report="on"] #workspace > section > .page-head:has(button, .secondary) > *,
 body[data-report="on"] #workspace .desk-page-head > * { pointer-events: auto; }
 html { scrollbar-color: var(--color-shell-rule) var(--color-shell); }
+.side-foot { flex-direction: column; align-items: flex-start; gap: var(--space-xs); } .side-foot small { white-space: nowrap; }

@@ -1,0 +1,1 @@
+select coalesce(format_date('%b %Y', refund_month), 'Date needs checking') as refund_period, refund_source_rows, recorded_refund_amount_rm, recorded_complete_rows, status_review_rows, amount_review_rows, date_review_rows from `profound-keel-500007-s4.gold.dashboard_refund_monthly`

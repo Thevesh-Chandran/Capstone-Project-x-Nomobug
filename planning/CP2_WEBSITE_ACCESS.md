@@ -1,3 +1,5 @@
+> Current deployment instructions: [current system](CP2_CURRENT_SYSTEM.md). The dated entries below are historical checkpoints, not current traffic or freshness claims.
+
 > **Resolved — 21 October 2026:** Google now shows **In production**. The same read-only connection was renewed afterward, Secret Manager token version 5 installed, refresh exchange and both approved Sheets metadata checks passed, and cloud source/model check `cp2-planning-weekly-gvqkf` succeeded. Earlier Testing/pending notes below describe the previous state. Evidence: `outputs/oauth_publication/20261021/production_verified.json`. Model weights and workspace permissions were unchanged.
 
 # Website access — Google sign-in only
@@ -23,7 +25,7 @@ Reporting run `202610211016248abea7` stopped before publication because the prog
 
 Recovered the original immutable release manifest from the restricted audit row and resumed the same candidate snapshots locally. This recovery does not reconstruct or backfill model predictions. A corrected reporting container is being prepared for future scheduled runs. The original failed cloud execution remains in its audit history.
 
-Cloud Build source uploads now use the same explicit allowlist as Docker (`.gcloudignore`). This fixes a deployment packaging error: the default Git-derived ignore rules omitted the approved public DOSM district boundary file required by the reporting image. Customer exports, source credentials and private caches remain excluded. Use `cloudbuild.web.yaml` for website-only changes so the unrelated Ollama image is not rebuilt.
+Cloud Build source uploads now use the same explicit allowlist as Docker (`.gcloudignore`). This fixes a deployment packaging error: the default Git-derived ignore rules omitted the approved public DOSM district boundary file required by the reporting image. Customer exports, source credentials and private caches remain excluded. Use `deploy/cloudbuild.portal-web.yaml` for website-only changes.
 
 ## Verified completion
 

@@ -137,7 +137,9 @@
     document.querySelectorAll('.report-frame').forEach(f => {
       try {
         const d = f.contentDocument;
-        const h = d && d.body && Math.max(d.documentElement.scrollHeight, d.body.scrollHeight);
+        // Measure the content itself: scrollHeight never shrinks below the frame's own height.
+        const kids = d && d.body ? [...d.body.children].filter(k => k.offsetHeight) : [];
+        const h = kids.length ? Math.ceil(Math.max(...kids.map(k => k.getBoundingClientRect().bottom)) + (d.defaultView.scrollY || 0)) : 0;
         if (h && f.offsetParent && Math.abs(f.offsetHeight - h) > 4) f.style.height = h + 'px';
       } catch (e) {}
     });
@@ -161,8 +163,28 @@
         } catch (e) {}
         location.assign('/');
       });
+    // Same menu footer and owner-only links as the main pages.
     const d = $('snapshot-date');
-    if (d) d.textContent = 'Heatmap view';
+    if (d) d.textContent = '';
+    fetch('/api/state', { credentials: 'same-origin' })
+      .then(r => (r.ok ? r.json() : null))
+      .then(st => {
+        if (!st) return;
+        if (lo && st.system && st.system.auth_mode === 'iap') lo.textContent = 'Switch Google account';
+        const rows = (st.snapshot && st.snapshot.tables && st.snapshot.tables.freshness) || [];
+        const t = rows
+          .filter(r => ['sales', 'calendar', 'recurring_payments'].includes(r.source_name))
+          .map(r => Date.parse(r.extracted_at_utc))
+          .filter(Number.isFinite);
+        if (d && t.length)
+          d.textContent = 'Source snapshot ' + new Date(Math.min(...t)).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      })
+      .catch(() => {});
+    fetch('/api/access', { credentials: 'same-origin' })
+      .then(r => {
+        if (r.ok) document.querySelectorAll('[data-owner-only]').forEach(n => (n.hidden = false));
+      })
+      .catch(() => {});
   }
 })();
 

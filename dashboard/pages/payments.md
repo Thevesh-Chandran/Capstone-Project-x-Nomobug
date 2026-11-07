@@ -135,3 +135,21 @@ group by 1 order by 2 desc
 </div>
 
 
+
+## Recorded refunds
+
+```sql refund_summary
+select * from nomobug.refunds
+```
+<div class="card">
+<p class="sub">All recorded refund entries, separate from contract balances above. A completed annotation is not proof of bank settlement. Missing dates remain in the table.</p>
+<DataTable data={refund_summary}>
+<Column id=refund_period title="Refund month"/>
+<Column id=refund_source_rows title="Entries"/>
+<Column id=recorded_refund_amount_rm title="Recorded amount" fmt='"RM"#,##0.00'/>
+<Column id=recorded_complete_rows title="Marked complete"/>
+<Column id=status_review_rows title="Status to check"/>
+<Column id=amount_review_rows title="Amounts to check"/>
+<Column id=date_review_rows title="Dates to check"/>
+</DataTable>
+</div>
