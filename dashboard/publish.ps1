@@ -5,4 +5,4 @@
 $ErrorActionPreference = 'Stop'
 gcloud run jobs execute cp2-dashboard-refresh --region=asia-southeast1 --project=profound-keel-500007-s4 --wait
 if ($LASTEXITCODE -ne 0) { throw 'Refresh job failed; see Cloud Run job logs' }
-Write-Host 'Dashboard refreshed: https://cp2-dashboard-964813222593.asia-southeast1.run.app'
+Write-Host 'Dashboard refreshed: https://cp2-portal-fav22krh7q-as.a.run.app/dashboard/'

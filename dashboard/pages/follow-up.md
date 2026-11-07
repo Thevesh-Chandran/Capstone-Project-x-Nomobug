@@ -79,5 +79,13 @@ select * from ${months_all} where month between '${inputs.fu_period.start}' and 
 </div>
 
 <Details title="How reliable is this model?">
-Tested once on <Value data={model_eval} column=services fmt="#,##0"/> later services (<Value data={model_eval} column=test_period/>) with <Value data={model_eval} column=returns fmt="#,##0"/> recorded return visits, the model ranked real return visits above other services <Value data={model_eval} column=auc fmt=pct0/> of the time. Calling the top 20% of services reaches <Value data={model_eval} column=capture_score fmt=pct0/> of returns, against <Value data={model_eval} column=capture_rule fmt=pct0/> for the best simple rule and <Value data={model_eval} column=capture_random fmt=pct0/> picked at random. Its totals ran <Value data={model_eval} column=undercount fmt=pct0/> low, so plan with a buffer. Full method: Return visits & models page.
+Historical assessment on <Value data={model_eval} column=services fmt="#,##0"/> later services (<Value data={model_eval} column=test_period/>) with <Value data={model_eval} column=returns fmt="#,##0"/> recorded return visits, the model ranked real return visits above other services <Value data={model_eval} column=auc fmt=pct0/> of the time. Calling the top 20% of services reaches <Value data={model_eval} column=capture_score fmt=pct0/> of returns, against <Value data={model_eval} column=capture_rule fmt=pct0/> for the best simple rule and <Value data={model_eval} column=capture_random fmt=pct0/> picked at random. Its totals ran <Value data={model_eval} column=undercount fmt=pct0/> low, so plan with a buffer. Full method: Return visits & models page.
+</Details>
+
+<Details title="Historical assessment and the frozen future test">
+
+These ranking results describe historical records. AUC measures ranking, not the percentage of correct yes/no predictions. Top-20% measures are comparison benchmarks, not a requirement to contact only some customers. Staff can continue following up with everyone.
+
+The original frozen 30-day model has a separate prediction log and evaluation protocol. Its future result must include collection coverage, missed windows and complete outcome checks. Historical results here do not replace that test or repair missed predictions.
+
 </Details>

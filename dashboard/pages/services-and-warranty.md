@@ -179,7 +179,7 @@ from ${difficulty}
 
 ## How the return-visit model performs
 
-<p class="note">Tested once on <Value data={model_kpi} column=services fmt="#,##0"/> later services (<Value data={model_kpi} column=test_period/>) that the model never saw while it was built; <Value data={model_kpi} column=returns fmt="#,##0"/> of them had a recorded return visit.</p>
+<p class="note">Historical assessment on <Value data={model_kpi} column=services fmt="#,##0"/> later services (<Value data={model_kpi} column=test_period/>) held out from model fitting; <Value data={model_kpi} column=returns fmt="#,##0"/> of them had a recorded return visit.</p>
 
 <div class="kpis">
   <BigValue data={model_kpi} value=capture_20 title="Returns reached by calling the top 20%" fmt=pct0/>
@@ -230,3 +230,11 @@ from ${difficulty}
 
 </Details>
 
+
+<Details title="Historical assessment and the frozen future test">
+
+These ranking results describe historical records. AUC measures ranking, not the percentage of correct yes/no predictions. Top-20% measures are comparison benchmarks, not a requirement to contact only some customers. Staff can continue following up with everyone.
+
+The original frozen 30-day model has a separate prediction log and evaluation protocol. Its future result must include collection coverage, missed windows and complete outcome checks. Historical results here do not replace that test or repair missed predictions.
+
+</Details>

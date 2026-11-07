@@ -64,7 +64,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 </div>
 
 <div class="card filters">
-<DateRange name=period data={months_all} dates=month defaultValue="Last 12 Months" title="Period for the charts below"/>
+<DateRange name=period data={months_all} dates=month end={new Date()} defaultValue="Last 12 Months" title="Chart period · defaults to 12 completed months"/>
 </div>
 
 

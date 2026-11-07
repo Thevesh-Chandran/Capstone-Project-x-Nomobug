@@ -103,7 +103,7 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
 
 <div class="card">
 <h3>Filters</h3>
-<DateRange name=period data={detail} dates=month defaultValue="Last 12 Months"/>
+<DateRange name=period data={detail} dates=month end={new Date()} defaultValue="Last 12 Months"/>
 <Dropdown name=premise data={premises} value=premise title="Premise" multiple=true selectAllByDefault=true/>
 <Dropdown name=package data={packages_list} value=package_group title="Package" multiple=true selectAllByDefault=true/>
 <Dropdown name=area data={areas_list} value=area title="Area" multiple=true selectAllByDefault=true/>
@@ -200,3 +200,25 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
   </DataTable>
 </div>
 
+
+## Prospect conversations
+
+```sql prospect_months
+select * from nomobug.prospects where month between '${inputs.period.start}' and '${inputs.period.end}' order by month
+```
+```sql prospect_dates
+select sum(undated_first_reply_rows) as undated from nomobug.prospects
+```
+
+<div class="card">
+<p class="sub">Recorded enquiry rows by first-reply month. Repeat conversations can belong to the same person; these are not unique customers or a sales-conversion funnel.</p>
+<BarChart data={prospect_months} x=month y={['recorded_open_rows','recorded_closed_rows']} type=stacked xFmt="mmm yyyy" chartAreaHeight=220/>
+<DataTable data={prospect_months}>
+<Column id=month title="First reply" fmt="mmm yyyy"/>
+<Column id=prospect_candidate_rows title="Enquiry rows"/>
+<Column id=recorded_open_rows title="Open"/>
+<Column id=recorded_closed_rows title="Closed"/>
+<Column id=exact_won_remark_rows title="Marked won"/>
+</DataTable>
+<p class="sub"><Value data={prospect_dates} column=undated/> enquiry rows have no usable first-reply date and are excluded from the date-filtered chart. Closed does not necessarily mean a sale.</p>
+</div>
