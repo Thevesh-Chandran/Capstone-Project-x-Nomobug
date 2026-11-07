@@ -1,0 +1,1 @@
+select first_reply_month as month, prospect_candidate_rows, recorded_open_rows, recorded_closed_rows, exact_won_remark_rows, undated_first_reply_rows, acquisition_review_rows from `profound-keel-500007-s4.gold.prospect_reply_monthly_recorded`

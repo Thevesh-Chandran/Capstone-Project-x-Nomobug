@@ -11,6 +11,8 @@ PAT=re.compile(r'cp2(?:r|qa)_[a-z0-9]+_(?:gold|silver)')
 
 def main():
  parser=argparse.ArgumentParser();parser.add_argument('--apply',action='store_true');args=parser.parse_args()
+ if args.apply:
+  raise RuntimeError('The October cleanup receipt is historical. Build and review a fresh dependency/rollback inventory before any new deletion; this legacy command is dry-run only.')
  records=json.loads((OUT/'inventory_before_private.json').read_text())
  by_name={r['dataset']['datasetReference']['datasetId']:r for r in records}
  protected={n for n in by_name if not n.startswith(('cp2r_','cp2qa_'))}
@@ -41,7 +43,7 @@ def main():
  c=bigquery.Client(project=PROJECT)
  locations={by_name[n]['dataset']['location'] for n in candidates}
  if len(locations)!=1:raise ValueError('Archive candidates must share one location')
- d=bigquery.Dataset(PROJECT+'.'+ARCHIVE);d.location=locations.pop();d.friendly_name='Archive — old reporting releases'
+ d=bigquery.Dataset(PROJECT+'.'+ARCHIVE);d.location=locations.pop();d.friendly_name='Archive â€” old reporting releases'
  d.description='Recovery copies only. Use gold for current management reporting. View definitions and restoration inventory are in CP2 outputs/project_audit/20261016_bigquery_cleanup.'
  c.create_dataset(d,exists_ok=True)
  cfg=bigquery.QueryJobConfig(maximum_bytes_billed=104857600)

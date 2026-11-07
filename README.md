@@ -1,6 +1,6 @@
 # Nomobug Capstone Project
 
-Latest changes: [2 November website and model handover](planning/CP2_PROJECT_HANDOVER_20261102.md). [Remaining verification](planning/CP2_REMAINING_TASKS_20261102.md). The current website source is deployed in revision cp2-portal-00087-cep. The custom dashboard entry is https://cp2-dashboard-thevesh20-3384s-projects.vercel.app/. The separate Vercel Metabase trial has not passed startup.
+Current system: [protected management workspace](https://cp2-portal-fav22krh7q-as.a.run.app/), with the Evidence dashboard at `/dashboard`. See [current architecture and coverage](planning/CP2_CURRENT_SYSTEM.md). Cloud Run refreshes reporting daily; archived handovers describe earlier deployments.
 
 Business reporting, operational follow-up and experimentally evaluated prediction models using Sales, Calendar, contract reminder and environmental data.
 
