@@ -12,7 +12,7 @@ Build a web-based analytics decision-support system that combines Nomobug's Goog
 
 2. What sales were closed, how much money was received, and what outstanding balances remain?
 
-3. What services actually occurred according to Google Calendar, broken down by date, pest, area, package, and team?
+3. What service bookings were recorded in Google Calendar, broken down by date, pest, area, package, and team?
 
 4. Where and when are warranty claims, repeat pest problems, refunds, and spatial hotspots occurring, and what weather patterns are associated with them?
 
@@ -44,7 +44,7 @@ Build a web-based analytics decision-support system that combines Nomobug's Goog
 
 - Google Calendar is authoritative for scheduled/recorded service dates; a confirmed event alone does not prove treatment was completed.
 - SALES is authoritative for sales, package, customer type, payment status, and balance information.
-- PAYMENTS represents individual recorded payments. Its old completion-status column is no longer maintained and must not be used to decide whether money was received; malformed/missing amounts still need review.
+- PAYMENTS is retained for source audit only because it is not reliably maintained. Operational payment follow-up uses SALES and the contract records, with missing or inconsistent amounts flagged; reminder dates and green cells never establish payment.
 - PAYMENT LINK represents customers who were sent a payment link.
 - Repeated prospect phone numbers are not automatically duplicates.
 - Commercial Clients and Recurring Payments must not duplicate SALES facts.
@@ -60,13 +60,15 @@ Build a web-based analytics decision-support system that combines Nomobug's Goog
 - DBSCAN clustering with parameter and sensitivity evidence
 - Cloud Run Jobs with Cloud Scheduler for the production batch pipeline, subject to cost and authentication checks
 - GitHub Actions for CI and deployment
-- Looker Studio for the management dashboard, using approved reporting views
+- Evidence management dashboard embedded in the protected Cloud Run website, using approved reporting views; Looker Studio is a legacy report.
 - Dockerfile for pipeline packaging and reproducibility
 - Automated quality checks
 - Pipeline run logging
 - Privacy-safe dashboard views
 
-## Implementation Constraints — 3 September 2026
+## Historical constraints — 3 September 2026
+
+The following is retained as planning history. Current hosting, coverage and operating status are in `planning/CP2_CURRENT_SYSTEM.md`; the earlier time and spending limits were subsequently removed by the owner.
 
 - User now permits a billing-linked BigQuery design while targeting a $0 bill. Billing-enabled usage carries residual charge risk; query quotas and local guards are not a guaranteed spending cap. Verify billing and cost controls with the user before uploads; no automatic upgrades or trial-dependent hosting.
 - Up to one hour of student time daily, including learning and debugging. Pull work forward when possible; September 30, October 31 and November 30 remain milestone deadlines, subject to explicit feasibility/risk review rather than a guaranteed delivery claim.
