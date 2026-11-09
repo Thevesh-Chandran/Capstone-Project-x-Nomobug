@@ -66,6 +66,13 @@ select team, sum(bookings) as bookings from ${team_view} group by 1 order by 2 d
   <BigValue data={staffing} value=hours_to_keep_open title="Hours to keep open" fmt="#,##0"/>
 </div>
 
+<div class="card">
+<h3>Staffing decision for <Value data={staffing} column=week_start fmt="d mmm"/>–<Value data={staffing} column=week_end fmt="d mmm"/></h3>
+<p>Expected appointment hours <Value data={staffing} column=expected_hours fmt="#,##0"/> · already booked at forecast time <Value data={staffing} column=already_booked_hours fmt="#,##0"/> · allowance <Value data={staffing} column=buffer_hours fmt="#,##0"/> hours.</p>
+<p>Compare the suggested hours with your team's available hours in the staffing planner below, then choose a suitable slot in the booking calendar.</p>
+<a class="go" data-to="bookings" role="link" tabindex="0">Open booking calendar</a>
+</div>
+
 <div class="row3">
   <div class="action">
     <div class="label">Likely range</div>

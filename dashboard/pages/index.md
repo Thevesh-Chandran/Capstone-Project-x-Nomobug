@@ -63,15 +63,13 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   <span class="chip">Data as of <Value data={headline} column=as_of fmt="d mmm yyyy"/></span>
 </div>
 
-<div class="card filters">
-<DateRange name=period data={months_all} dates=month end={new Date()} defaultValue="Last 12 Months" title="Chart period · defaults to 12 completed months"/>
-</div>
+
 
 
 <div class="kpis">
   <BigValue data={sales_kpi2} value=last_12m_rm title="Sales, last 12 months" fmt='"RM"#,##0' comparison=vs_prior comparisonFmt=pct0 comparisonTitle="vs previous 12 months" sparkline=month sparklineType=bar sparklineColor="#4C55B8"/>
   <BigValue data={headline} value=bookings_next_2_weeks title="Bookings expected, next 2 weeks" fmt="#,##0"/>
-  <BigValue data={headline} value=customers_to_call title="Customers to call this week"/>
+  <BigValue data={headline} value=customers_to_call title="Customers needing closer attention"/>
   <BigValue data={headline} value=staff_hours_next_week title="Staff hours, next week" fmt="#,##0"/>
 </div>
 
@@ -80,25 +78,29 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 <div class="row3">
   <div class="action">
     <div class="label">Service follow-up</div>
-    <div class="big">Call <Value data={headline} column=customers_to_call/> customers</div>
-    <p>Most likely to need a return visit. Highest chance: <Value data={headline} column=top_chance fmt=pct0/></p>
+    <div class="big">Review higher-risk customers</div>
+    <p>Check their service history and record the follow-up result.</p>
     <a class="go" data-to="returns" role="link" tabindex="0">Open the call list</a>
   </div>
   <div class="action green">
     <div class="label">Staffing</div>
-    <div class="big">Staff about <Value data={headline} column=staff_hours_next_week fmt="#,##0"/> hours</div>
-    <p>Keep <Value data={headline} column=hours_to_keep_open fmt="#,##0"/> hours open for new bookings next week.</p>
+    <div class="big">Check team capacity</div>
+    <p>Compare expected appointment hours with booked work and available team hours.</p>
     <a class="go" data-to="plan" role="link" tabindex="0">See the staffing plan</a>
   </div>
   <div class="action amber">
     <div class="label">Bookings</div>
-    <div class="big">About <Value data={headline} column=bookings_next_2_weeks fmt="#,##0"/> bookings</div>
-    <p>Expected in the next 2 weeks. Likely range: <Value data={headline} column=bookings_likely_range/></p>
-    <a class="go" data-to="plan" role="link" tabindex="0">See the forecast</a>
+    <div class="big">Find a suitable appointment</div>
+    <p>Check the calendar for team availability and travel before choosing a slot.</p>
+    <a class="go" data-to="bookings" role="link" tabindex="0">Open booking calendar</a>
   </div>
 </div>
 
 ## Performance
+
+<div class="card filters">
+<DateRange name=period data={months_all} dates=month end={new Date()} defaultValue="Last 12 Months" title="Chart period · defaults to 12 completed months"/>
+</div>
 
 <div class="row2">
   <div class="card">
