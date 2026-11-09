@@ -46,19 +46,22 @@ select * from ${months_all} where month between '${inputs.fu_period.start}' and 
 ```
 
 <div class="hero">
-  <h1>Who to call this week</h1>
-  <p>Each recent service gets a chance of a pest-related return visit within 30 days. Call the highest first. These are model estimates for ranking calls, not confirmed problems.</p>
+  <h1>Customers needing closer attention</h1>
+  <p>Each recent service gets a chance of a pest-related return visit within 30 days. Use the estimates to prepare closer checks alongside routine follow-up. These are model estimates for ranking calls, not confirmed problems.</p>
   <span class="chip">The call list and call results are below</span>
 </div>
 
-<div class="card filters">
-<Dropdown name=fu_premise data={fu_premises} value=premise title="Premise" multiple=true selectAllByDefault=true/>
-<DateRange name=fu_period data={months_all} dates=month defaultValue="All Time" title="Period for return visits"/>
+
+
+
+<div class="card">
+<h3>Predicting a recorded return within 30 days</h3>
+<p>Historical assessment · <Value data={model_eval} column=test_period/> · <Value data={model_eval} column=services fmt="#,##0"/> services · <Value data={model_eval} column=returns/> returns</p>
+<p>Ranking AUC <Value data={model_eval} column=auc fmt="0.00"/> · 0.5 represents random ranking and 1.0 perfect ranking. Future evaluation is pending.</p>
 </div>
 
-
 <div class="kpis">
-  <BigValue data={headline} value=customers_to_call title="Customers to call this week"/>
+  <BigValue data={headline} value=customers_to_call title="Customers needing closer attention"/>
   <BigValue data={headline} value=expected_returns_open title="Expected return visits" fmt="#,##0"/>
   <BigValue data={headline} value=top_chance title="Highest chance" fmt=pct0/>
   <BigValue data={headline} value=services_open title="Recent services tracked"/>
@@ -68,11 +71,13 @@ select * from ${months_all} where month between '${inputs.fu_period.start}' and 
 <div class="row2">
   <div class="card">
     <h3>Recent services by chance band</h3>
+<Dropdown name=fu_premise data={fu_premises} value=premise title="Premise · this chart" multiple=true selectAllByDefault=true/>
     <p class="sub">Most services are low risk; a few carry most of the expected returns</p>
     <BarChart data={bands} x=chance_band y=services sort=false swapXY=true colorPalette={['#D9577A']} chartAreaHeight=200 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...bands.map(d => d.services ?? 0)) * 1.25}/>
   </div>
   <div class="card">
     <h3>Return visits actually recorded</h3>
+<DateRange name=fu_period data={months_all} dates=month defaultValue="All Time" title="Period · this chart"/>
     <p class="sub">Monthly warranty/return visits in the calendar, full months only</p>
     <AreaChart data={service_monthly} x=month y=return_visits xFmt="mmm yy" colorPalette={['#D9577A']} chartAreaHeight=200 fillOpacity=0.25/>
   </div>
