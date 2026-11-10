@@ -73,8 +73,7 @@ group by 1 order by 2 desc
 
 <div class="hero">
   <h1>Payment reminders</h1>
-  <p>The owner's schedule for contacting clients on recurring contracts. A reminder date does not show that a payment was received or that a reminder was sent.</p>
-  <span class="chip">From the Sales sheet reminder schedule</span>
+  <p>Reminder dates and recorded contract balances</p>
 </div>
 
 ## Recurring contracts: still to collect
@@ -93,12 +92,12 @@ group by 1 order by 2 desc
 <div class="row2">
   <div class="card">
     <h3>Paid vs still to collect</h3>
-    <p class="sub">Recurring contracts by billing arrangement</p>
+
     <BarChart data={balance_long} x=billing y=rm series=status type=stacked swapXY=true yFmt='"RM"#,##0' seriesOrder={['Recorded as paid','Still to collect']} colorPalette={['#3FA27A','#D97E45']} chartAreaHeight=220/>
   </div>
   <div class="card">
     <h3>Contract balances</h3>
-    <p class="sub">From recorded Sales amounts; confirm with the client record before chasing</p>
+
     <DataTable data={balances} rowShading=false>
       <Column id=billing title="Billing"/>
       <Column id=contracts title="Contracts"/>
@@ -124,12 +123,12 @@ group by 1 order by 2 desc
 <div class="row2">
   <div class="card">
     <h3>Reminders by month</h3>
-    <p class="sub">Three months back to six months ahead</p>
+
     <BarChart data={by_month} x=month y=reminders series=billing_arrangement type=stacked xFmt="mmm yy" chartAreaHeight=240/>
   </div>
   <div class="card">
     <h3>Upcoming by arrangement</h3>
-    <p class="sub">All future reminder dates</p>
+
     <BarChart data={by_arrangement} x=billing_arrangement y=reminders swapXY=true colorPalette={['#B8901A']} chartAreaHeight=240 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...by_arrangement.map(d => d.reminders ?? 0)) * 1.25}/>
   </div>
 </div>
@@ -142,7 +141,7 @@ group by 1 order by 2 desc
 select * from nomobug.refunds
 ```
 <div class="card">
-<p class="sub">All recorded refund entries, separate from contract balances above. A completed annotation is not proof of bank settlement. Missing dates remain in the table.</p>
+
 <DataTable data={refund_summary}>
 <Column id=refund_period title="Refund month"/>
 <Column id=refund_source_rows title="Entries"/>
@@ -153,3 +152,11 @@ select * from nomobug.refunds
 <Column id=date_review_rows title="Dates to check"/>
 </DataTable>
 </div>
+
+<Details title="Definitions and coverage">
+
+Reminder dates do not confirm payment or that a reminder was sent. Balances use recorded Sales amounts.
+
+All recorded refund entries, separate from contract balances above. A completed annotation is not proof of bank settlement. Missing dates remain in the table.
+
+</Details>

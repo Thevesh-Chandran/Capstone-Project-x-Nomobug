@@ -55,8 +55,6 @@ select team, sum(bookings) as bookings from ${team_view} group by 1 order by 2 d
 
 <div class="hero">
   <h1>Bookings & staffing</h1>
-  <p>How busy the next weeks look, and how many staff hours to plan. Every forecast comes with a likely range based on how far past forecasts were off.</p>
-  <span class="chip">Forecast issued weekly · model estimates, not guarantees</span>
 </div>
 
 <div class="kpis">
@@ -69,7 +67,7 @@ select team, sum(bookings) as bookings from ${team_view} group by 1 order by 2 d
 <div class="card">
 <h3>Staffing decision for <Value data={staffing} column=week_start fmt="d mmm"/>–<Value data={staffing} column=week_end fmt="d mmm"/></h3>
 <p>Expected appointment hours <Value data={staffing} column=expected_hours fmt="#,##0"/> · already booked at forecast time <Value data={staffing} column=already_booked_hours fmt="#,##0"/> · allowance <Value data={staffing} column=buffer_hours fmt="#,##0"/> hours.</p>
-<p>Compare the suggested hours with your team's available hours in the staffing planner below, then choose a suitable slot in the booking calendar.</p>
+
 <a class="go" data-to="bookings" role="link" tabindex="0">Open booking calendar</a>
 </div>
 
@@ -93,7 +91,7 @@ select team, sum(bookings) as bookings from ${team_view} group by 1 order by 2 d
 
 <div class="card">
   <h3>Forecast vs actual bookings</h3>
-  <p class="sub">Two-week booking forecasts on past weeks, against what was actually booked</p>
+
   <LineChart data={backtest_long} x=period_start y=bookings series=series xFmt="d mmm" seriesOrder={['Actual','Model forecast','Simple average']} colorPalette={['#2A2F3D','#5B63C9','#D97E45']} chartAreaHeight=240 markers=true/>
 </div>
 
@@ -109,12 +107,12 @@ select team, sum(bookings) as bookings from ${team_view} group by 1 order by 2 d
 <div class="row2">
   <div class="card">
     <h3>Bookings per team</h3>
-    <p class="sub">Selected teams and weeks</p>
+
     <BarChart data={team_view} x=week y=bookings series=team type=stacked xFmt="d mmm" chartAreaHeight=220/>
   </div>
   <div class="card">
     <h3>Team share</h3>
-    <p class="sub">Total recorded bookings per team, selected weeks</p>
+
     <BarChart data={team_total} x=team y=bookings swapXY=true colorPalette={['#2E9CB8']} chartAreaHeight=220 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...team_total.map(d => d.bookings ?? 0)) * 1.25}/>
   </div>
 </div>
