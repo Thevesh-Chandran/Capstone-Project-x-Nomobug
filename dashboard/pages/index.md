@@ -59,7 +59,6 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 
 <div class="hero">
   <h1>Management overview</h1>
-  <p>Where the business stands, what the models expect, and what to do this week.</p>
   <span class="chip">Data as of <Value data={headline} column=as_of fmt="d mmm yyyy"/></span>
 </div>
 
@@ -79,19 +78,19 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   <div class="action">
     <div class="label">Service follow-up</div>
     <div class="big">Review higher-risk customers</div>
-    <p>Check their service history and record the follow-up result.</p>
+
     <a class="go" data-to="returns" role="link" tabindex="0">Open the call list</a>
   </div>
   <div class="action green">
     <div class="label">Staffing</div>
     <div class="big">Check team capacity</div>
-    <p>Compare expected appointment hours with booked work and available team hours.</p>
+
     <a class="go" data-to="plan" role="link" tabindex="0">See the staffing plan</a>
   </div>
   <div class="action amber">
     <div class="label">Bookings</div>
     <div class="big">Find a suitable appointment</div>
-    <p>Check the calendar for team availability and travel before choosing a slot.</p>
+
     <a class="go" data-to="bookings" role="link" tabindex="0">Open booking calendar</a>
   </div>
 </div>
@@ -105,12 +104,12 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 <div class="row2">
   <div class="card">
     <h3>Sales by month</h3>
-    <p class="sub">Recorded package sales, selected period</p>
+
     <BarChart data={sales_period} x=month y=sales_rm yFmt='"RM"#,##0' xFmt="mmm" colorPalette={['#5B63C9']} chartAreaHeight=220 labels=false/>
   </div>
   <div class="card">
     <h3>Bookings every 2 weeks</h3>
-    <p class="sub">Bookings recorded in each two-week window</p>
+
     <AreaChart data={backtest} x=period_start y=actual_bookings xFmt="d mmm" yMin=0 colorPalette={['#2E9CB8']} chartAreaHeight=220 fillOpacity=0.25/>
   </div>
 </div>
@@ -118,7 +117,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 <div class="row2">
   <div class="card">
     <h3>Top areas</h3>
-    <p class="sub">Selected period, areas with a known district</p>
+
     <DataTable data={top_areas} rowShading=false>
       <Column id=area title="Area"/>
       <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#DCDDF4"/>
@@ -127,7 +126,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   </div>
   <div class="card">
     <h3>What customers buy</h3>
-    <p class="sub">Sales by pest group, selected period</p>
+
     <DataTable data={pest_top} rowShading=false>
       <Column id=pest_group title="Pest group"/>
       <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#DCDDF4"/>
@@ -135,3 +134,9 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   </div>
 </div>
 
+
+<Details title="Definitions and coverage">
+
+Selected period, areas with a known district
+
+</Details>

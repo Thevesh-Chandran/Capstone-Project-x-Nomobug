@@ -111,8 +111,6 @@ from ${difficulty}
 
 <div class="hero">
   <h1>Return visits and the model</h1>
-  <p>Which treatments lead to more return visits, how packages compare, and whether rainfall moves with returns. These are observed patterns, not causes.</p>
-  <span class="chip">Return visits = warranty claims when pests come back</span>
 </div>
 
 <div class="card filters">
@@ -131,7 +129,7 @@ from ${difficulty}
 <div class="row2">
   <div class="card">
     <h3>Treatment difficulty by pest</h3>
-    <p class="sub">Share of visits that were return visits, pest mixes with 30+ visits</p>
+
     <DataTable data={difficulty} rowShading=false>
       <Column id=pest title="Pest mix" wrap=true/>
       <Column id=visits title="Visits" fmt="#,##0"/>
@@ -140,7 +138,7 @@ from ${difficulty}
   </div>
   <div class="card">
     <h3>Package fit: return share</h3>
-    <p class="sub">Pest × package, combinations with 15+ visits. Darker = more return visits.</p>
+
     <Heatmap data={fit} x=package y=pest value=return_share valueFmt=pct0 colorScale={['#FBEFF2','#D9577A']} valueLabels=true chartAreaHeight=260/>
   </div>
 </div>
@@ -148,12 +146,12 @@ from ${difficulty}
 <div class="row2">
   <div class="card">
     <h3>Return-visit share by month</h3>
-    <p class="sub">Share of visits that were return visits</p>
+
     <BarChart data={weather2} x=month y="Return-visit share" yFmt=pct0 xFmt="mmm yy" colorPalette={['#D9577A']} chartAreaHeight=220/>
   </div>
   <div class="card">
     <h3>Rain before visits</h3>
-    <p class="sub">Average rainfall in the 7 days before services, mm. Weather data runs to the last loaded month.</p>
+
     <LineChart data={weather2} x=month y="Rain before visits (mm)" yFmt='#,##0.0' xFmt="mmm yy" colorPalette={['#2E9CB8']} chartAreaHeight=220 markers=true/>
   </div>
 </div>
@@ -161,12 +159,12 @@ from ${difficulty}
 <div class="row2">
   <div class="card">
     <h3>Why visits counted as returns</h3>
-    <p class="sub">Return visits by month and how they were identified</p>
+
     <BarChart data={reasons} x=month y=returns series=reason type=stacked xFmt="mmm yy" chartAreaHeight=240/>
   </div>
   <div class="card">
     <h3>Package mix</h3>
-    <p class="sub">Packages sold by pest and package type</p>
+
     <DataTable data={fit} rows=10 rowShading=false>
       <Column id=pest title="Pest"/>
       <Column id=package title="Package"/>
@@ -190,7 +188,7 @@ from ${difficulty}
 
 <div class="card">
     <h3>The model against simpler options</h3>
-    <p class="sub">Same test services for every method. Reached = share of all return visits found by calling that share of services.</p>
+
     <DataTable data={model_cmp} rowShading=false>
       <Column id=method title="Method"/>
       <Column id=capture_10 title="Reached, top 10%" fmt=pct0/>
@@ -204,7 +202,7 @@ from ${difficulty}
 
 <div class="card">
     <h3>What the model looks at</h3>
-    <p class="sub">How much each input changes the odds of a return visit (1.0 = no change; above 1 raises it, below 1 lowers it)</p>
+
     <DataTable data={model_inp} rowShading=false rows=13>
       <Column id=input title="Input"/>
       <Column id=odds_multiplier title="Odds multiplier" fmt="0.00" contentType=colorscale colorScale={['#2E9CB8','#FFFFFF','#D9577A']} colorMid=1/>
@@ -236,5 +234,21 @@ from ${difficulty}
 These ranking results describe historical records. AUC measures ranking, not the percentage of correct yes/no predictions. Top-20% measures are comparison benchmarks, not a requirement to contact only some customers. Staff can continue following up with everyone.
 
 The original frozen 30-day model has a separate prediction log and evaluation protocol. Its future result must include collection coverage, missed windows and complete outcome checks. Historical results here do not replace that test or repair missed predictions.
+
+</Details>
+
+<Details title="Definitions and coverage">
+
+Observed patterns do not establish causes. Recorded return visits are not all verified warranty claims.
+
+Share of visits that were return visits, pest mixes with 30+ visits
+
+Pest × package, combinations with 15+ visits. Darker = more return visits.
+
+Average rainfall in the 7 days before services, mm. Weather data runs to the last loaded month.
+
+Same test services for every method. Reached = share of all return visits found by calling that share of services.
+
+How much each input changes the odds of a return visit (1.0 = no change; above 1 raises it, below 1 lowers it)
 
 </Details>
