@@ -38,14 +38,11 @@ The system combines a protected staff website, an **Evidence.dev dashboard**, a 
 
 **Reading the figures:** sales represent recorded package prices; reminder dates do not prove payment; Calendar bookings do not prove completed treatment. Model estimates do not determine warranty entitlement.
 
-## Feature previews
+## Current workspace
 
-These illustrations show how the workspace presents its tools. Figures and slots are fictional; live records are available only in the protected workspace.
+![Live Nomobug Service follow-up page with return-risk bands and recorded return visits](project_guide/readme/current-service-follow-up.jpg)
 
-| Service follow-up | Bookings & workload |
-| --- | --- |
-| ![Illustration of the service follow-up charts](project_guide/readme/service-follow-up.svg) | ![Illustration of the workload and booking views](project_guide/readme/bookings-workload.svg) |
-| Review risk bands alongside recorded returns, then open the call list to record the outcome. | Compare demand, booked work and available hours before checking a team’s calendar. |
+Service follow-up shows the 30-day model assessment alongside estimated risk and recorded return trends. This capture shows aggregate figures from the deployed workspace.
 
 ## How it works
 
