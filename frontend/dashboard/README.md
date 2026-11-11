@@ -16,4 +16,4 @@ The page has Overview, Sales, Visits and Payments. Month, district and named-pes
 4. Verify unauthenticated JS/CSS responses, CORS headers and byte hashes. Run `tests/test_reporting_dashboard.py` and the portal/IAP checks.
 5. Build the backend with `deploy/cloudbuild.portal-web.yaml`, stage a revision with no traffic, and check all report pages before promotion. Preserve IAP, runtime identity, environment and the previous revision.
 
-Only the exact Vercel asset origin is allowed by the backend CSP. Changing its hostname requires an explicit allowlist change; arbitrary origins are rejected. The Metabase experiment is separate and is not required.
+Only the exact Vercel asset origin is allowed by the backend CSP. Changing its hostname requires an explicit allowlist change; arbitrary origins are rejected.
