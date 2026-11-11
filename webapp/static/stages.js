@@ -768,7 +768,7 @@
         ),
       );
       const saved = work && work.settings && work.settings.capacity_hours;
-      if (saved)
+      if (saved != null && Number.isFinite(Number(saved)))
         cap.append(
           mk(
             'p',
@@ -778,6 +778,8 @@
             'side-text ' + (saved >= plan ? 'good' : 'warn'),
           ),
         );
+      if (saved == null)
+        cap.append(mk('p', 'Enter available team hours in Bookings & workload to calculate the staffing gap.', 'side-text'));
       side.append(cap);
     }
     const readiness = block('Source status');

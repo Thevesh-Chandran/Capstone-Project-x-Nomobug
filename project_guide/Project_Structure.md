@@ -61,7 +61,7 @@ Do not run the whole scripts folder. Some commands publish, request sign-in, dep
 
 The refreshed [file guide](../FILE_GUIDE.html) groups the current source files by project area and links all eleven notebook chapters. [Folder_Sizes.csv](Folder_Sizes.csv) records storage usage. Rebuild navigation without retraining or notebook execution using `python -m scripts.refresh_project_file_guide`; add `--clean-caches` to remove only regenerable Python/test caches outside protected evidence folders.
 
-the separate development session's 2 November changes are in `webapp/analytics.py`, `webapp/warranty_risk.py`, `webapp/static/stages.js`, `webapp/static/shell.js` and `webapp/static/style.css`. The new research scripts and `train_warranty_risk.py` are separate from the original frozen experiment. The redesigned site is not deployed. `infra/metabase` is a blocked hosting trial, not the production dashboard.
+The hosted workspace uses the [Evidence dashboard](../dashboard/README.md). See [current system and coverage](../planning/CP2_CURRENT_SYSTEM.md) for deployment and reporting details.
 
 Python modules, dbt models, bundles, snapshots and cloud resource IDs retain their dependency paths. Their readable names and purposes are in [File_Catalogue.csv](File_Catalogue.csv) and [the searchable guide](../FILE_GUIDE.html).
 

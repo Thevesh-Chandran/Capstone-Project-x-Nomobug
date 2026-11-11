@@ -490,7 +490,6 @@ Tests,tests/test_larger_frozen_split.py,test larger frozen split
 Tests,tests/test_load_prospects_2026_bronze.py,Offline loader tests: no real Google/Neon access or private .env reads.
 Tests,tests/test_manual_geocode_overrides.py,test manual geocode overrides
 Tests,tests/test_matured_cp2_subset.py,test matured cp2 subset
-Tests,tests/test_metabase_proxy.py,test metabase proxy
 Tests,tests/test_named_property_aliases.py,test named property aliases
 Tests,tests/test_named_property_peer_resolution.py,test named property peer resolution
 Tests,tests/test_next_predictor_history.py,test next predictor history
@@ -535,9 +534,6 @@ Hosting,infra/CP2_CLOUD_RESOURCE_MAP.md,CP2 cloud resource map and cleanup recor
 Hosting,infra/CP2_PROSPECTIVE_CLOUD.md,CP2 prospective cloud collector
 Hosting,infra/deploy_planning.ps1,deploy planning
 Hosting,infra/grant_bigquery_dataset_access.py,Grant only the existing CP2 datasets needed by the reporting job.
-Hosting,infra/metabase/proxy.py,Open Vercel's port while the JVM initializes; never claim early readiness.
-Hosting,infra/metabase/README.md,Metabase demo
-Hosting,infra/metabase/vercel.json,vercel
 Hosting,infra/README.md,CP2 reporting job runbook
 Hosting,infra/schedule_cp2.ps1,schedule cp2
 Hosting,infra/seed_cp2_secrets.ps1,seed cp2 secrets
