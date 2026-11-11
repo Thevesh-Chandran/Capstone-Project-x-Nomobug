@@ -1,5 +1,7 @@
 # Dashboard hosting
 
+> Historical Vercel dashboard setup. The current management reports use [Evidence.dev](../dashboard/README.md).
+
 Released 2 November 2026. Evidence: `outputs/dashboard_hosting/20261102/release.json`.
 
 ```mermaid

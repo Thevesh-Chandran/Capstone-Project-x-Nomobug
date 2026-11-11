@@ -10,7 +10,7 @@ The notebooks replay pinned evidence. They do not claim new training, fresh sour
 
 | Folder | Contents | When to open it |
 |---|---|---|
-| `notebooks` | Eight chapters and portable aggregate evidence | Project analysis and model explanation |
+| `notebooks` | Eleven chapters and portable aggregate evidence | Project analysis and model explanation |
 | `notebooks/source_profiles` | Original Sheets and Calendar profiling notebooks | Original live-source exploration; credentials required |
 | `scripts` | Extraction, processing, models, experiments and operations | Reproduce a specific workflow |
 | `dbt/models` | Typing, Calendar classification, links and Silver transformations | Data cleaning |
@@ -18,8 +18,9 @@ The notebooks replay pinned evidence. They do not claim new training, fresh sour
 | `dbt/models/analytics_ml` | Model datasets and historical research SQL | Label and feature lineage |
 | `dbt/tests`, `tests` | SQL and Python checks | Validate a change |
 | `config` | Dictionaries, confirmed mappings, protocols and model pointers | Exact rules and active artifacts |
+| `dashboard` | Evidence.dev report pages, queries and refresh job | Reporting development |
 | `webapp` | Website, customer tools, planner and decision pages | Application development |
-| `infra`, `.github`, root Docker/cloudbuild files | Cloud configuration and containers | Deployment and schedules |
+| `infra`, `.github`, `deploy` | Cloud configuration and containers | Deployment and schedules |
 | `planning` | Policies, specifications and dated records | Context and operations |
 | `outputs/model_validation` | Dated model studies | Chapter 07 evidence |
 | `outputs/cp2-v2` | Frozen bundles, training evidence and prediction receipts | Audit/reproduction; preserve hashes and paths |
