@@ -97,8 +97,6 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
 
 <div class="hero">
   <h1>Sales & customers</h1>
-  <p>Filter by period, premise, area, package and client type. Every chart below follows the filters. Sales are recorded package prices, not cash received or profit.</p>
-  <span class="chip">Area figures include only sales with a reliable district</span>
 </div>
 
 <div class="card">
@@ -127,14 +125,14 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
 
 <div class="card">
   <h3>Sales by month</h3>
-  <p class="sub">Residential vs commercial, selected period</p>
+
   <BarChart data={trend} x=month y=sales_rm series=premise type=stacked yFmt='"RM"#,##0' xFmt="mmm yy" chartAreaHeight=240/>
 </div>
 
 <div class="row2">
   <div class="card">
     <h3>Top packages</h3>
-    <p class="sub">By sales, selected filters</p>
+
     <DataTable data={top_packages} rowShading=false rows=10>
       <Column id=package title="Package"/>
       <Column id=sales title="Sold"/>
@@ -144,7 +142,7 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
   </div>
   <div class="card">
     <h3>Sales by area</h3>
-    <p class="sub">Top 12 areas with a known district</p>
+
     <BarChart data={by_area} x=area y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#5B63C9']} chartAreaHeight=300 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...by_area.map(d => d.sales_rm ?? 0)) * 1.25}/>
   </div>
 </div>
@@ -173,7 +171,7 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
 <div class="row2">
   <div class="card">
     <h3>Customer groups</h3>
-    <p class="sub">All recorded history. Repeat customers bought more than one programme.</p>
+
     <DataTable data={segments} rowShading=false>
       <Column id=segment title="Segment"/>
       <Column id=customer_groups title="Customers"/>
@@ -183,14 +181,14 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
   </div>
   <div class="card">
     <h3>How customers pay</h3>
-    <p class="sub">Billing arrangement, selected filters</p>
+
     <BarChart data={billing_mix} x=billing y=sales_rm swapXY=true yFmt='"RM"#,##0' colorPalette={['#B8901A']} chartAreaHeight=200 labels=true yAxisLabels=false yGridlines=false yMax={Math.max(...billing_mix.map(d => d.sales_rm ?? 0)) * 1.25}/>
   </div>
 </div>
 
 <div class="card">
   <h3>Sales by salesperson</h3>
-  <p class="sub">Selected filters · days to close = median days from first contact to sale</p>
+
   <DataTable data={salespeople} rowShading=false rows=10>
     <Column id=salesperson title="Salesperson"/>
     <Column id=sales title="Sales"/>
@@ -211,7 +209,7 @@ select sum(undated_first_reply_rows) as undated from nomobug.prospects
 ```
 
 <div class="card">
-<p class="sub">Recorded enquiry rows by first-reply month. Repeat conversations can belong to the same person; these are not unique customers or a sales-conversion funnel.</p>
+
 <BarChart data={prospect_months} x=month y={['recorded_open_rows','recorded_closed_rows']} type=stacked xFmt="mmm yyyy" chartAreaHeight=220/>
 <DataTable data={prospect_months}>
 <Column id=month title="First reply" fmt="mmm yyyy"/>
@@ -220,5 +218,21 @@ select sum(undated_first_reply_rows) as undated from nomobug.prospects
 <Column id=recorded_closed_rows title="Closed"/>
 <Column id=exact_won_remark_rows title="Marked won"/>
 </DataTable>
-<p class="sub"><Value data={prospect_dates} column=undated/> enquiry rows have no usable first-reply date and are excluded from the date-filtered chart. Closed does not necessarily mean a sale.</p>
+
 </div>
+
+<Details title="Definitions and coverage">
+
+Sales are recorded package prices. Cash received and profit are separate measures. Area totals include reliably mapped sales.
+
+Top 12 areas with a known district
+
+All recorded history. Repeat customers bought more than one programme.
+
+Selected filters · days to close = median days from first contact to sale
+
+Recorded enquiry rows by first-reply month. Repeat conversations can belong to the same person; these are not unique customers or a sales-conversion funnel.
+
+<Value data={prospect_dates} column=undated/> enquiry rows have no usable first-reply date and are excluded from the date-filtered chart. Closed does not necessarily mean a sale.
+
+</Details>

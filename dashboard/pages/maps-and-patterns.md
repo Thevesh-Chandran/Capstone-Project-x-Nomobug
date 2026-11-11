@@ -49,8 +49,6 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
 
 <div class="hero">
   <h1>Maps & patterns</h1>
-  <p>Where services happen and where return visits cluster, and how bookings spread across teams and days. Areas are grouped cells, never individual customer addresses.</p>
-  <span class="chip">The interactive heat map and radius tool are below</span>
 </div>
 
 <div class="card filters">
@@ -73,7 +71,7 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
 
 <div class="card">
   <h3>Service areas</h3>
-  <p class="sub">Bubble size = services; colour = share of visits that were returns. Hover an area for its figures.</p>
+
   <BubbleMap data={areas} lat=lat long=lng size=services value=return_share valueFmt=pct0 pointName=place colorPalette={['#A3A8E6','#E8A46A','#E24A3F']} max=0.4 height=460 maxSize=28 startingLat=3.1 startingLong=101.62 startingZoom=10 basemap={`https://tile.openstreetmap.org/{z}/{x}/{y}.png`} attribution='© OpenStreetMap contributors' tooltipType=hover tooltip={[
     {id: 'place', showColumnName: false, valueClass: 'font-bold'},
     {id: 'services', title: 'Services'},
@@ -85,12 +83,12 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
 <div class="row2">
   <div class="card">
     <h3>Bookings by team and day</h3>
-    <p class="sub">Average bookings per working day, last 26 weeks</p>
+
     <Heatmap data={workload} x=day y=team value=per_day xSort=dow colorScale={['#EEF0FB','#5B63C9']} valueLabels=true chartAreaHeight=240/>
   </div>
   <div class="card">
     <h3>Areas with the highest return share</h3>
-    <p class="sub">Areas with at least the selected number of services; hover the map above to find each one</p>
+
     <DataTable data={top_return_areas} rowShading=false rows=10>
       <Column id=place title="Area"/>
       <Column id=services title="Services"/>
@@ -102,7 +100,17 @@ select day, sum(bookings) as bookings from ${workload} group by day, dow order b
 
 <div class="card">
   <h3>Busiest days</h3>
-  <p class="sub">Total bookings by day of week, selected teams, last 26 weeks</p>
+
   <BarChart data={busiest} x=day y=bookings sort=false colorPalette={['#2E9CB8']} chartAreaHeight=200 labels=true/>
 </div>
 
+
+<Details title="Definitions and coverage">
+
+Map size shows services; colour shows the share of return visits. Locations are grouped areas, not customer addresses.
+
+Average bookings per working day, last 26 weeks
+
+Areas with at least the selected number of services; hover the map above to find each one
+
+</Details>

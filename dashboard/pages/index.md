@@ -59,19 +59,16 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 
 <div class="hero">
   <h1>Management overview</h1>
-  <p>Where the business stands, what the models expect, and what to do this week.</p>
   <span class="chip">Data as of <Value data={headline} column=as_of fmt="d mmm yyyy"/></span>
 </div>
 
-<div class="card filters">
-<DateRange name=period data={months_all} dates=month end={new Date()} defaultValue="Last 12 Months" title="Chart period · defaults to 12 completed months"/>
-</div>
+
 
 
 <div class="kpis">
   <BigValue data={sales_kpi2} value=last_12m_rm title="Sales, last 12 months" fmt='"RM"#,##0' comparison=vs_prior comparisonFmt=pct0 comparisonTitle="vs previous 12 months" sparkline=month sparklineType=bar sparklineColor="#4C55B8"/>
   <BigValue data={headline} value=bookings_next_2_weeks title="Bookings expected, next 2 weeks" fmt="#,##0"/>
-  <BigValue data={headline} value=customers_to_call title="Customers to call this week"/>
+  <BigValue data={headline} value=customers_to_call title="Customers needing closer attention"/>
   <BigValue data={headline} value=staff_hours_next_week title="Staff hours, next week" fmt="#,##0"/>
 </div>
 
@@ -80,35 +77,39 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 <div class="row3">
   <div class="action">
     <div class="label">Service follow-up</div>
-    <div class="big">Call <Value data={headline} column=customers_to_call/> customers</div>
-    <p>Most likely to need a return visit. Highest chance: <Value data={headline} column=top_chance fmt=pct0/></p>
+    <div class="big">Review higher-risk customers</div>
+
     <a class="go" data-to="returns" role="link" tabindex="0">Open the call list</a>
   </div>
   <div class="action green">
     <div class="label">Staffing</div>
-    <div class="big">Staff about <Value data={headline} column=staff_hours_next_week fmt="#,##0"/> hours</div>
-    <p>Keep <Value data={headline} column=hours_to_keep_open fmt="#,##0"/> hours open for new bookings next week.</p>
+    <div class="big">Check team capacity</div>
+
     <a class="go" data-to="plan" role="link" tabindex="0">See the staffing plan</a>
   </div>
   <div class="action amber">
     <div class="label">Bookings</div>
-    <div class="big">About <Value data={headline} column=bookings_next_2_weeks fmt="#,##0"/> bookings</div>
-    <p>Expected in the next 2 weeks. Likely range: <Value data={headline} column=bookings_likely_range/></p>
-    <a class="go" data-to="plan" role="link" tabindex="0">See the forecast</a>
+    <div class="big">Find a suitable appointment</div>
+
+    <a class="go" data-to="bookings" role="link" tabindex="0">Open booking calendar</a>
   </div>
 </div>
 
 ## Performance
 
+<div class="card filters">
+<DateRange name=period data={months_all} dates=month end={new Date()} defaultValue="Last 12 Months" title="Chart period · defaults to 12 completed months"/>
+</div>
+
 <div class="row2">
   <div class="card">
     <h3>Sales by month</h3>
-    <p class="sub">Recorded package sales, selected period</p>
+
     <BarChart data={sales_period} x=month y=sales_rm yFmt='"RM"#,##0' xFmt="mmm" colorPalette={['#5B63C9']} chartAreaHeight=220 labels=false/>
   </div>
   <div class="card">
     <h3>Bookings every 2 weeks</h3>
-    <p class="sub">Bookings recorded in each two-week window</p>
+
     <AreaChart data={backtest} x=period_start y=actual_bookings xFmt="d mmm" yMin=0 colorPalette={['#2E9CB8']} chartAreaHeight=220 fillOpacity=0.25/>
   </div>
 </div>
@@ -116,7 +117,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 <div class="row2">
   <div class="card">
     <h3>Top areas</h3>
-    <p class="sub">Selected period, areas with a known district</p>
+
     <DataTable data={top_areas} rowShading=false>
       <Column id=area title="Area"/>
       <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#DCDDF4"/>
@@ -125,7 +126,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   </div>
   <div class="card">
     <h3>What customers buy</h3>
-    <p class="sub">Sales by pest group, selected period</p>
+
     <DataTable data={pest_top} rowShading=false>
       <Column id=pest_group title="Pest group"/>
       <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#DCDDF4"/>
@@ -133,3 +134,9 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   </div>
 </div>
 
+
+<Details title="Definitions and coverage">
+
+Selected period, areas with a known district
+
+</Details>
