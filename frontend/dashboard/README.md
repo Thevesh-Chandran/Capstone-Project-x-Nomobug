@@ -1,5 +1,7 @@
 # Business dashboard frontend
 
+> Historical Vercel dashboard setup. The current management reports use [Evidence.dev](../../dashboard/README.md).
+
 Entry: https://cp2-dashboard-thevesh20-3384s-projects.vercel.app/
 
 Vercel Hobby serves only `dashboard.js`, `dashboard.css`, the entry page and routing configuration. There are no credentials, customer records, database connections, model binaries or server functions in this deployment. The entry redirects to the protected Cloud Run `/reports` page.
