@@ -38,6 +38,15 @@ The system combines a protected staff website, an **Evidence.dev dashboard**, a 
 
 **Reading the figures:** sales represent recorded package prices; reminder dates do not prove payment; Calendar bookings do not prove completed treatment. Model estimates do not determine warranty entitlement.
 
+## Feature previews
+
+These illustrations show how the workspace presents its tools. Figures and slots are fictional; live records are available only in the protected workspace.
+
+| Service follow-up | Bookings & workload |
+| --- | --- |
+| ![Illustration of the service follow-up charts](project_guide/readme/service-follow-up.svg) | ![Illustration of the workload and booking views](project_guide/readme/bookings-workload.svg) |
+| Review risk bands alongside recorded returns, then open the call list to record the outcome. | Compare demand, booked work and available hours before checking a team’s calendar. |
+
 ## How it works
 
 ```mermaid
@@ -71,6 +80,19 @@ Candidate reporting releases pass checks before the stable views are published. 
 The return-risk model remains **experimental**. Historical ranking results, classification results and future evaluation describe different assessments and must be read separately. AUC measures ranking ability; it is not classification accuracy. More evaluation records improve confidence in the measurement, not automatically the model's performance.
 
 Future results require timely predictions, complete outcome windows and coverage checks. Missed prediction windows remain recorded. See the [visual model guide](project_guide/models/index.html) and [current system record](planning/CP2_CURRENT_SYSTEM.md) for evidence and limitations.
+
+### Historical performance
+
+| Assessment | Sample | Result | Comparison |
+| --- | --- | --- | --- |
+| Return-risk ranking used in the workspace | 1,270 services, 108 recorded returns | **0.81 ROC AUC** (95% interval: 0.77–0.85). The highest-scoring fifth contained **62%** of returns. | A simple final-residential-service rule found **52%**; random selection found **21%** at the same review size. |
+| Original frozen ExtraTrees model, historical holdout | 100 services, 5 recorded returns | **94% accuracy**, **0.891 ROC AUC**, **0.305 average precision**. The highest-scoring 20 services contained **4 of 5** returns. | Always predicting no return gave **95% accuracy** and detected zero returns. The corrected reference found **3 of 5** in its top 20. |
+| Two-week booking forecast · Extra Trees | 13 overlapping forecast dates | **12.76 bookings MAE** | Historical baseline: **20.73 bookings MAE**. |
+| Next-week booked hours · Ridge | 14 forecast dates | **8.97 hours MAE** | Historical baseline: **11.77 hours MAE**. |
+
+**How to read these results:** AUC describes how well a score ranks services with returns above services without returns. MAE is the average absolute forecast error, in bookings or hours. The top-fifth comparison is a benchmark; staff can still follow up with everyone. The original holdout had only five returns, and the larger ranking assessment undercounted total returns by about 17%. The forecast results are historical and do not establish live performance.
+
+[Return-risk ranking evidence](planning/CP2_PRESENTATION_STORY_20261103.md) · [Frozen model assessment](planning/CP2_CORRECTED_MODEL_CANDIDATES_V5.md) · [Forecast evidence](planning/CP2_MODEL_SEARCH_20261021.md)
 
 ## Explore the analysis
 
