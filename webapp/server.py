@@ -254,6 +254,9 @@ def handler_for(portal):
             path=urlsplit(self.path).path
             if path=='/healthz':return self.respond(200,{'status':'ok'})
             if path=='/nomobug-logo.png':return self.respond(200,(STATIC/'nomobug-logo.png').read_bytes(),'image/png')
+            if path in ("/model-roc.png", "/model-precision-recall.png", "/model-threshold.png",
+                        "/model-booking.png", "/model-hours.png", "/model-input-removal.png"):
+                return self.respond(200, (STATIC / path[1:]).read_bytes(), "image/png")
             if path=='/tools.js':return self.respond(200,(STATIC/'tools.js').read_bytes(),'application/javascript; charset=utf-8')
             if path in ('/maps.js','/maps.css','/guide.js','/workspace.js','/booking.js','/stages.js','/shell.js'):
                 name=path.lstrip('/')
