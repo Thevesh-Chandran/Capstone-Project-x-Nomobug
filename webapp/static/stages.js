@@ -1326,6 +1326,86 @@
     if (use) c.append(link(use, href, 'block-more'));
     return c;
   }
+  function performancePanel(label, description) {
+    const details = mk('details', undefined, 'model-evidence performance-panel');
+    details.append(mk('summary', label), mk('p', description));
+    return details;
+  }
+
+  function performanceFigure(name, caption, alt) {
+    const figure = mk('figure', undefined, 'performance-figure');
+    const img = mk('img');
+    img.src = '/model-' + name + '.png';
+    img.alt = alt;
+    img.loading = 'lazy';
+    figure.append(mk('figcaption', caption), img);
+    return figure;
+  }
+
+  function performanceTable(headers, rows) {
+    const wrapper = mk('div', undefined, 'table-wrap performance-table');
+    wrapper.tabIndex = 0;
+    wrapper.setAttribute('role', 'region');
+    wrapper.setAttribute('aria-label', 'Model performance table');
+    const table = mk('table'), head = table.createTHead().insertRow(), body = table.createTBody();
+    headers.forEach(label => {
+      const cell = mk('th', label);
+      cell.scope = 'col';
+      head.append(cell);
+    });
+    rows.forEach(values => {
+      const row = body.insertRow();
+      values.forEach(value => row.append(mk('td', value)));
+    });
+    wrapper.append(table);
+    return wrapper;
+  }
+
+  function returnPerformance(evaluation) {
+    const panel = performancePanel('View performance charts', 'Historical comparison of the return-risk score, service rule and random order.');
+    if (evaluation?.compare) {
+      const methods = Object.entries(evaluation.compare).filter(([, result]) => Number.isFinite(result.auc));
+      panel.append(mk('p', nf.format(evaluation.services) + ' services · ' + nf.format(evaluation.returns) + ' recorded returns'));
+      panel.append(compareBars(methods.map(([name, result], index) => [
+        name, result.auc, [C.blue, C.amber, C.grey][index % 3], result.auc.toFixed(2),
+      ]), 1));
+      panel.append(performanceTable(['Method', 'ROC AUC', 'Average precision', 'Returns in top 20%'],
+        methods.map(([name, result]) => [
+          name, result.auc.toFixed(2), Number.isFinite(result.ap) ? result.ap.toFixed(3) : '—',
+          Number.isFinite(result.capture_20) ? pct(result.capture_20) : '—',
+        ])));
+    }
+    return panel;
+  }
+
+  function forecastPerformance(forecast, image, unit) {
+    const panel = performancePanel('View performance charts', 'Recorded outcomes and predictions from the historical assessment.');
+    panel.append(performanceFigure(image, 'Forecast versus recorded outcomes',
+      'Historical ' + unit + ' by forecast date for the model, baseline and recorded outcomes.'));
+    panel.append(performanceTable(['Method', 'Mean absolute error'], [
+      ['Model', nf.format(forecast.mae) + ' ' + unit],
+      ['Simple average', nf.format(forecast.baseline_mae) + ' ' + unit],
+    ]));
+    return panel;
+  }
+
+  function originalModelPerformance() {
+    const panel = performancePanel('Original ExtraTrees holdout charts', 'Historical assessment on 100 services with five recorded returns. The classification threshold was 19%.');
+    const figures = mk('div', undefined, 'performance-grid');
+    figures.append(
+      performanceFigure('roc', 'ROC curve · AUC 0.891', 'True positive rate versus false positive rate across score thresholds.'),
+      performanceFigure('precision-recall', 'Precision–recall curve · AP 0.305', 'Precision versus recall across score thresholds, with a 5% prevalence baseline.'),
+      performanceFigure('threshold', 'Classification metrics at the saved threshold', 'Accuracy 94%, precision 40%, recall 40%, F1 40%. Always predicting no return gives 95% accuracy.'),
+      performanceFigure('input-removal', 'Input-removal study · development folds', 'The eight largest changes in average precision after removing one input. Positive values mean the score improved after removal. These are validation effects.'),
+    );
+    panel.append(figures, performanceTable(['Measure', 'Result'], [
+      ['Accuracy', '94%'], ['Always predict no return', '95% accuracy'],
+      ['Precision / recall / F1', '40% / 40% / 40%'],
+      ['True / false positives', '2 / 3'], ['True / false negatives', '92 / 3'],
+    ]));
+    return panel;
+  }
+
   function renderModels(root) {
     root.replaceChildren();
     const intro = block('Predictions: choose what you need help with');
@@ -1333,29 +1413,31 @@
     root.append(intro);
     const E = (data.return_risk || {}).evaluation;
     const forecasts = data.predictive.forecasts || [];
-    const add = (title, question, result, reliability, action, href, steps) => {
+    const add = (title, question, result, reliability, action, href, steps, performance) => {
       const card = block(title, { cls: 'model-decision' });
       card.append(mk('p', question, 'decision-question'));
       for (const [label, text] of [['What you get', result], ['How reliable is it?', reliability], ['What to do next', steps]]) {
         const section = mk('div', undefined, 'decision-section');
         section.append(mk('h3', label), mk('p', text)); card.append(section);
       }
-      card.append(link(action, href, 'btn primary')); root.append(card);
+      card.append(link(action, href, 'btn primary'), performance); root.append(card);
     };
     add('1. Which customers may need another visit?',
       'After a paid service, could this customer need a pest-related return visit within 30 days?',
       'A risk estimate beside each recent service in Service follow-up. For example, 20% means an estimated chance, not a confirmed problem or warranty entitlement.',
       E ? `Historical assessment: ${nf.format(E.services)} services, including ${nf.format(E.returns)} recorded returns. This is a ranking model, so it has no single yes/no accuracy percentage. Its historical ranking score was ${E.compare["Return-risk score (chosen)"].auc.toFixed(2)} out of 1; this is not a percentage of correctly predicted customers. Reliability on future services is still being checked.` : 'Assessment unavailable for this release.',
       'Open customer follow-up', '#returns',
-      'Review the service history, contact the customer using normal company practice, record the response, and open the booking calendar if another visit is needed. Everyone remains available for follow-up; the score is supporting context.');
+      'Review the service history, contact the customer using normal company practice, record the response, and open the booking calendar if another visit is needed. Everyone remains available for follow-up; the score is supporting context.', returnPerformance(E));
     for (const [id, title, question, unit, action] of [
       ['booking_entries_h2', '2. How busy might the next two weeks be?', 'How many appointment bookings are expected over the next two weeks?', 'bookings', 'Open workload planning'],
       ['booked_hours_h1', '3. How many appointment hours should we plan for?', 'How many appointment hours are expected next week?', 'hours', 'Compare workload and team capacity']]) {
       const f = forecasts.find(x => x.id === id); if (!f) continue;
       add(title, question, `Latest saved estimate: about ${nf.format(f.prediction)} ${unit}. Open planning to check its forecast dates and source freshness before using it.`,
         `In historical tests, the forecast missed by ${nf.format(f.mae)} ${unit} on average, compared with ${nf.format(f.baseline_mae)} for a simple average. Lower error is better. This is not a guaranteed range or a classification accuracy percentage.`,
-        'Open weekly workload', '#plan', 'Compare the forecast with bookings already in the calendar and the capacity staff have confirmed. Use that comparison to discuss cover; no roster or booking is changed automatically.');
+        'Open weekly workload', '#plan', 'Compare the forecast with bookings already in the calendar and the capacity staff have confirmed. Use that comparison to discuss cover; no roster or booking is changed automatically.',
+        forecastPerformance(f, id === 'booking_entries_h2' ? 'booking' : 'hours', unit));
     }
+    root.append(originalModelPerformance());
     const evidence = mk('details', undefined, 'model-evidence');
     evidence.append(mk('summary', 'See test results, older experiments and monthly checks'));
     const body = mk('div'); renderModelsEvidence(body); evidence.append(body); root.append(evidence);
