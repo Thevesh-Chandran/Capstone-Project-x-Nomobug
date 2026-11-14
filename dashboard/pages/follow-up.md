@@ -3,19 +3,6 @@ title: Service follow-up
 sidebar_position: 2
 ---
 
-```sql model_eval
-select
-  max(case when chosen then services end) as services,
-  max(case when chosen then returns end) as returns,
-  max(case when chosen then test_period end) as test_period,
-  max(case when chosen then auc end) as auc,
-  max(case when chosen then capture_20 end) as capture_score,
-  max(case when method like 'Rule%' then capture_20 end) as capture_rule,
-  max(case when method like 'Random%' then capture_20 end) as capture_random,
-  1 - max(case when chosen then expected_returns / nullif(recorded_returns, 0) end) as undercount
-from nomobug.model_eval
-```
-
 ```sql headline
 select * from nomobug.headline
 ```
@@ -54,12 +41,6 @@ select * from ${months_all} where month between '${inputs.fu_period.start}' and 
 
 
 
-<div class="card">
-<h3>Predicting a recorded return within 30 days</h3>
-<p>Historical assessment · <Value data={model_eval} column=test_period/> · <Value data={model_eval} column=services fmt="#,##0"/> services · <Value data={model_eval} column=returns/> returns</p>
-<p>Ranking AUC <Value data={model_eval} column=auc fmt="0.00"/> · 0.5 represents random ranking and 1.0 perfect ranking. Future evaluation is pending.</p>
-</div>
-
 <div class="kpis">
   <BigValue data={headline} value=customers_to_call title="Customers needing closer attention"/>
   <BigValue data={headline} value=expected_returns_open title="Expected return visits" fmt="#,##0"/>
@@ -82,15 +63,3 @@ select * from ${months_all} where month between '${inputs.fu_period.start}' and 
     <AreaChart data={service_monthly} x=month y=return_visits xFmt="mmm yy" colorPalette={['#D9577A']} chartAreaHeight=200 fillOpacity=0.25/>
   </div>
 </div>
-
-<Details title="How reliable is this model?">
-Historical assessment on <Value data={model_eval} column=services fmt="#,##0"/> later services (<Value data={model_eval} column=test_period/>) with <Value data={model_eval} column=returns fmt="#,##0"/> recorded return visits, the model ranked real return visits above other services <Value data={model_eval} column=auc fmt=pct0/> of the time. Calling the top 20% of services reaches <Value data={model_eval} column=capture_score fmt=pct0/> of returns, against <Value data={model_eval} column=capture_rule fmt=pct0/> for the best simple rule and <Value data={model_eval} column=capture_random fmt=pct0/> picked at random. Its totals ran <Value data={model_eval} column=undercount fmt=pct0/> low, so plan with a buffer. Full method: Return visits & models page.
-</Details>
-
-<Details title="Historical assessment and the frozen future test">
-
-These ranking results describe historical records. AUC measures ranking, not the percentage of correct yes/no predictions. Top-20% measures are comparison benchmarks, not a requirement to contact only some customers. Staff can continue following up with everyone.
-
-The original frozen 30-day model has a separate prediction log and evaluation protocol. Its future result must include collection coverage, missed windows and complete outcome checks. Historical results here do not replace that test or repair missed predictions.
-
-</Details>

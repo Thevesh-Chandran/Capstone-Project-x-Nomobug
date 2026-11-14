@@ -1,10 +1,10 @@
 'use strict';
 // Readable page addresses. Internal view names stay as they were, so older links
 // (#home, #today, #returns, #plan) keep working.
-window.CP2_ALIAS = { workspace: 'today', 'follow-up': 'returns', reminders: 'home', bookings: 'plan' };
+window.CP2_ALIAS = { overview: 'r-overview', workspace: 'today', 'follow-up': 'returns', reminders: 'home', bookings: 'plan', risk: 'models', areas: 'models' };
 window.cp2Page = () => {
   const h = location.hash.slice(1);
-  return window.CP2_ALIAS[h] || h;
+  return window.CP2_ALIAS[h] || h || 'r-overview';
 };
 let state, boundaries;
 const $ = id => document.getElementById(id);
@@ -332,20 +332,14 @@ function embedPageReport(page) {
     f.style.height = '';
     f.src = want;
   }
-  const sub = {
-    returns: 'Call the customers below, then record what happened.',
-    home: 'Review each reminder and record your progress.',
-    plan: "Check this week's bookings, set your available hours and find a slot.",
-    customers: 'Search a customer to see their full history.',
-    models: 'How the return-visit score works and how reliable it is.',
-  }[page] || '';
   const ah = slot.querySelector('.act-head');
   ah.replaceChildren();
   const t = document.createElement('strong');
-  t.textContent = page === 'models' ? 'Predictions' : 'Take action';
-  const p = document.createElement('span');
-  p.textContent = sub;
-  ah.append(t, p);
+  t.textContent = {
+    returns: 'Customer follow-up', home: 'Payment reminders', plan: 'Booking calendar',
+    customers: 'Customer history', models: 'Model details',
+  }[page] || 'Workspace';
+  ah.append(t);
 }
 window.embedPageReport = embedPageReport;
 function reportRoute(pathname) {
@@ -438,7 +432,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 function navigate() {
   const pages = [
-    'overview',
     'today',
     'returns',
     'models',
@@ -455,9 +448,8 @@ function navigate() {
     ...Object.keys(window.CP2_REPORTS || {}),
     'access',
   ];
-  // Service follow-up is the landing page; the overview now lives in the dashboard.
   let page = window.cp2Page() || 'returns';
-  if (!pages.includes(page)) page = 'returns';
+  if (!pages.includes(page)) page = 'r-overview';
   const report = (window.CP2_REPORTS || {})[page];
   document
     .querySelectorAll('[data-view]')
@@ -469,11 +461,10 @@ function navigate() {
     .forEach(n => n.classList.toggle('active', n.dataset.page === page));
   $('breadcrumb').textContent =
     'Nomobug / ' +
-    {
-      overview: 'Management overview',
+    ({
       today: 'Workspace',
       returns: 'Service follow-up',
-      models: 'Prediction models',
+      models: 'Model performance',
       risk: 'Warranty risk',
       performance: 'Performance',
       home: 'Follow-up queue',
@@ -483,8 +474,8 @@ function navigate() {
       business: 'Area explorer',
       customers: 'Customers & areas',
       payments: 'Payment follow-up',
-      status: 'Technical evidence',
-    }[page] || (window.CP2_TITLES || {})[page] || '';
+      status: 'System status',
+    }[page] || (window.CP2_TITLES || {})[page] || 'Workspace');
   if (page === 'business' && state && !businessLoaded) loadBusiness();
   if (window.onRoute) window.onRoute(page, !!state);
   if (state && window.loadWorkspaceTools) window.loadWorkspaceTools(page);
@@ -604,8 +595,9 @@ document.addEventListener('pointerover', e => {
 let businessLoaded = false;
 async function loadBusiness() {
   const form = $('business-filter');
-  if (!form.elements.end.value)
-    form.elements.end.value = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kuala_Lumpur' });
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kuala_Lumpur' });
+  if (!form.elements.start.value) form.elements.start.value = today.slice(0, 4) + '-01-01';
+  if (!form.elements.end.value) form.elements.end.value = today;
   try {
     const r = await api('/api/business?' + new URLSearchParams(new FormData(form)));
     businessLoaded = true;

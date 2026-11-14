@@ -69,28 +69,33 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   <BigValue data={sales_kpi2} value=last_12m_rm title="Sales, last 12 months" fmt='"RM"#,##0' comparison=vs_prior comparisonFmt=pct0 comparisonTitle="vs previous 12 months" sparkline=month sparklineType=bar sparklineColor="#4C55B8"/>
   <BigValue data={headline} value=bookings_next_2_weeks title="Bookings expected, next 2 weeks" fmt="#,##0"/>
   <BigValue data={headline} value=customers_to_call title="Customers needing closer attention"/>
-  <BigValue data={headline} value=staff_hours_next_week title="Staff hours, next week" fmt="#,##0"/>
+  <BigValue data={headline} value=staff_hours_next_week title="Hours to plan, next week" fmt="#,##0"/>
 </div>
 
-## This week: what to do
+## Staff workspace
 
 <div class="row3">
   <div class="action">
     <div class="label">Service follow-up</div>
-    <div class="big">Review higher-risk customers</div>
-
-    <a class="go" data-to="returns" role="link" tabindex="0">Open the call list</a>
+    {#if headline[0]?.customers_to_call > 0}
+    <div class="big"><Value data={headline} column=customers_to_call fmt="#,##0"/> higher-risk services in the published snapshot</div>
+    {:else}
+    <div class="big">Check the current follow-up queue</div>
+    {/if}
+    <a class="go" data-to="returns" role="link" tabindex="0">Open service follow-up</a>
   </div>
   <div class="action green">
     <div class="label">Staffing</div>
-    <div class="big">Check team capacity</div>
-
-    <a class="go" data-to="plan" role="link" tabindex="0">See the staffing plan</a>
+    {#if headline[0]?.hours_to_keep_open > 0}
+    <div class="big"><Value data={headline} column=hours_to_keep_open fmt="#,##0"/> hours to keep open in the published plan</div>
+    {:else}
+    <div class="big">Check current team capacity</div>
+    {/if}
+    <a class="go" data-to="plan" role="link" tabindex="0">Open staffing plan</a>
   </div>
   <div class="action amber">
     <div class="label">Bookings</div>
-    <div class="big">Find a suitable appointment</div>
-
+    <div class="big">Check the team calendars</div>
     <a class="go" data-to="bookings" role="link" tabindex="0">Open booking calendar</a>
   </div>
 </div>
@@ -137,6 +142,8 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 
 <Details title="Definitions and coverage">
 
-Selected period, areas with a known district
+Hours to plan include the appointment-hour forecast plus an allowance equal to historical mean absolute error. This is a planning allowance, not a measured confidence interval.
+
+Area totals cover records with a known district for the selected period.
 
 </Details>

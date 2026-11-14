@@ -6,6 +6,7 @@ Updated 6 November 2026. Deployment revisions and source freshness are runtime f
 
 - Website: https://cp2-portal-fav22krh7q-as.a.run.app/
 - Evidence dashboard: the same protected website at `/dashboard/`. Google IAP protects both the website and embedded reporting files.
+- Home, the Nomobug logo and Overview open the same management overview. Follow-up counts and staffing figures use the published snapshot. Booking availability uses the team calendars in the booking tool.
 - Reporting: Cloud Run `cp2-reporting-daily`, scheduled at 06:00 Malaysia time. Candidate Silver/Gold releases are checked before stable views are published.
 - Dashboard: `cp2-dashboard-refresh`, scheduled at 06:45. Build configuration: `dashboard/refresh/cloudbuild.yaml`; run `dashboard/publish.ps1` to refresh with the installed image. Rebuild and update the job image when changing dashboard source.
 - Website build: `deploy/cloudbuild.portal-web.yaml` and `deploy/Dockerfile.web`.
@@ -21,7 +22,7 @@ Updated 6 November 2026. Deployment revisions and source freshness are runtime f
 | Contract follow-up | Payments and website reminders | Recorded paid totals and balances; dates are reminder dates, not proof an instalment was paid |
 | Refunds | Payments | Aggregate recorded refund amounts and review counts; no bank details and no bank-settlement inference |
 | Operations | Bookings and staffing; booking calendar | Recorded bookings and capacity estimates; Calendar presence alone does not prove completion |
-| Warranty and returns | Services & warranty | Separate recorded warranty visits and pest returns; no automatic entitlement decision |
+| Warranty and returns | Return visits and the model | Separate recorded warranty visits and pest returns; no automatic entitlement decision |
 | Weather and geography | Maps & patterns | Recorded spatial/weather associations and coverage limits; no causal claims |
 | Predictions | Model pages and operational actions | Historical assessment, current estimates and frozen future collection are separate evidence |
 | Data quality | Status page and source coverage notes | Freshness, collection gaps and unresolved source facts remain visible |

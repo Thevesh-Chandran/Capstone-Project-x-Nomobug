@@ -1,3 +1,5 @@
+> Review note, 12 November: this is a dated talk track, not the current operating policy. See CP2_PROJECT_REVIEW_20261112.md for corrected claims. Staff follow up with all customers; recorded returns are not automatically free warranty claims.
+
 # Presentation story: problem, decision, model, proof
 
 A talk track for the CP2 presentation. One problem runs through it; every part of the system appears only where it serves that problem.
@@ -23,7 +25,7 @@ A talk track for the CP2 presentation. One problem runs through it; every part o
 
 - **Return-visit risk score:** for every paid service, the chance that the same customer needs a return visit within 30 days.
 - A logistic regression on 13 inputs known before the visit (programme position, premise, package, earlier returns, gap since the last service, pest group). It is chosen because it is explainable: each factor has a clear multiplier staff can understand, and it beat a 90-input random forest anyway.
-- Built properly: inputs and settings chosen on November 2025 to March 2026 only, model frozen, then tested once on May to October 2026, with 30-day gaps and no sale in two periods.
+- Built properly: inputs and settings chosen on November 2025 to March 2026 only, model frozen, then assessed on May to October 2026, held out from this model fitting, with 30-day gaps and no sale in two periods.
 
 ## 5. Proof (2 minutes): the one chart to show
 
@@ -37,7 +39,7 @@ A talk track for the CP2 presentation. One problem runs through it; every part o
 
 - AUC 0.81 (95% range 0.77 to 0.85) on 1,270 services and 108 returns.
 - Why not "accuracy": predicting "no return" every time is already 91% accurate and catches nothing. The question that matters is how many returns the team can reach with limited effort.
-- Calibrated well enough for planning: the top fifth predicted 21% and recorded 26%. It undercounted total returns by about 17%, so capacity plans keep a buffer.
+- Calibration remains limited: the top fifth predicted 21% and recorded 26%. It undercounted total returns by about 17%, so predicted totals must not be used as a reliable staffing forecast.
 
 ## 6. How Nomobug uses it (1 minute)
 
