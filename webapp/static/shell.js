@@ -30,7 +30,6 @@
     home: 'payments',
     plan: 'bookings',
     customers: 'sales-and-areas',
-    models: 'services-and-warranty',
     '/maps': 'maps-and-patterns',
   };
   // Operational tools stay prominent; source browsing and research are secondary.
@@ -47,10 +46,10 @@
     },
     { label: 'Areas', views: [['/maps', 'Maps & patterns', 'maps']] },
     {
-      label: 'Predictions',
+      label: 'Evidence',
       views: [
-        ['models', 'Return-visit model'],
-        ['status', 'Technical evidence'],
+        ['models', 'Model performance'],
+        ['status', 'System status'],
       ],
     },
     // Shown only to the owner account (app.js unhides it when /api/access answers).
@@ -62,7 +61,6 @@
   Object.assign(
     TITLES,
     {
-      overview: 'Management overview',
       today: 'Workspace',
       plan: 'Bookings & workload',
       performance: 'Performance',
@@ -98,7 +96,7 @@
         const a = document.createElement('a');
         a.className = 'side-link';
         a.dataset.route = route;
-        const alias = Object.keys(window.CP2_ALIAS || {}).find(k => window.CP2_ALIAS[k] === route);
+        const alias = route === 'r-overview' ? 'overview' : Object.keys(window.CP2_ALIAS || {}).find(k => window.CP2_ALIAS[k] === route);
         a.href = route.startsWith('/') ? route : (isMaps ? '/#' : '#') + (alias || route);
         a.innerHTML = `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${I[icon || route]}</svg>`;
         const sp = document.createElement('span');
@@ -149,7 +147,7 @@
     window.scrollTo({ top: 0, behavior: 'instant' });
     if (ready && window.loadStage) window.loadStage(route === 'decisions' ? 'returns' : route);
   };
-  render(isMaps ? '/maps' : (window.cp2Page ? window.cp2Page() : location.hash.slice(1)) || 'returns');
+  render(isMaps ? '/maps' : (window.cp2Page ? window.cp2Page() : location.hash.slice(1)) || 'r-overview');
   if (isMaps) {
     const lo = $('logout');
     if (lo)

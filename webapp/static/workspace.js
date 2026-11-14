@@ -656,24 +656,6 @@ function renderWeekPlan(r) {
         ),
       );
     }
-    const evidence = el('details');
-    evidence.append(el('summary', 'Check historical evidence'));
-    evidence.append(
-      el(
-        'p',
-        model.test_windows +
-          ' windows, average error ' +
-          model.mae.toFixed(1) +
-          ' ' +
-          model.unit +
-          ' vs ' +
-          model.baseline_mae.toFixed(1) +
-          ' for the simple baseline.',
-        'desk-footnote',
-      ),
-    );
-    forecastTrend(evidence, model.history, model.title + ' historical comparison');
-    card.append(evidence);
     cards.append(card);
   }
   forecast.append(
@@ -761,7 +743,7 @@ function renderWeekPlan(r) {
   capacity.append(form);
   side.append(capacity);
   grid.append(main, side);
-  root.append(grid, deskLink('Inspect all model evidence', '#status', 'desk-text-link'));
+  root.append(grid);
   if (window.attachBookingTools) attachBookingTools(root);
 }
 window.loadWorkspaceTools = async page => {

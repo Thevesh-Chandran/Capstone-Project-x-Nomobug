@@ -19,19 +19,6 @@ select * from nomobug.staffing
 select * from nomobug.forecast
 ```
 
-```sql backtest_long
-select period_start, 'Actual' as series, actual_bookings as bookings from nomobug.backtest
-union all select period_start, 'Model forecast', model_forecast_bookings from nomobug.backtest
-union all select period_start, 'Simple average', simple_average_bookings from nomobug.backtest
-order by period_start
-```
-
-```sql accuracy
-select avg(abs(model_forecast_bookings - actual_bookings)) as model_error,
-       avg(abs(simple_average_bookings - actual_bookings)) as simple_error
-from nomobug.backtest
-```
-
 ```sql team_weekly
 select * replace (trim(case when team ilike 'REPLACEMENT%' then 'Replacement' else regexp_replace(regexp_replace(team, '^TEAM ', ''), ' *[(].*[)]', '') end) as team)
 from nomobug.team_weekly
@@ -71,9 +58,9 @@ select team, sum(bookings) as bookings from ${team_view} group by 1 order by 2 d
 <a class="go" data-to="bookings" role="link" tabindex="0">Open booking calendar</a>
 </div>
 
-<div class="row3">
+<div class="row2">
   <div class="action">
-    <div class="label">Likely range</div>
+    <div class="label">Forecast ± typical error</div>
     <div class="big"><Value data={bookings} column=likely_low fmt="#,##0"/> to <Value data={bookings} column=likely_high fmt="#,##0"/> bookings</div>
     <p><Value data={bookings} column=already_booked fmt="#,##0"/> were already booked when the forecast was made.</p>
   </div>
@@ -82,17 +69,6 @@ select team, sum(bookings) as bookings from ${team_view} group by 1 order by 2 d
     <div class="big"><Value data={staffing} column=suggested_action/></div>
     <p>Includes a buffer of <Value data={staffing} column=buffer_hours fmt="#,##0"/> hours for forecast error.</p>
   </div>
-  <div class="action amber">
-    <div class="label">Accuracy</div>
-    <div class="big">Off by about <Value data={accuracy} column=model_error fmt="#,##0"/> bookings</div>
-    <p>A simple average was off by <Value data={accuracy} column=simple_error fmt="#,##0"/> on the same weeks.</p>
-  </div>
-</div>
-
-<div class="card">
-  <h3>Forecast vs actual bookings</h3>
-
-  <LineChart data={backtest_long} x=period_start y=bookings series=series xFmt="d mmm" seriesOrder={['Actual','Model forecast','Simple average']} colorPalette={['#2A2F3D','#5B63C9','#D97E45']} chartAreaHeight=240 markers=true/>
 </div>
 
 <div class="card filters">

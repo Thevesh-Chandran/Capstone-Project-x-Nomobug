@@ -22,7 +22,11 @@
       visits: 'Recorded warranty visits',
       model: 'Historical model by area',
     };
-  $('to').value = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kuala_Lumpur' });
+  // Default to the full dated range in the loaded sales and visit snapshot.
+  const dates = [...DATA.sales, ...DATA.visits].map(row => row.date)
+    .filter(date => typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)).sort();
+  $('from').value = dates[0] || '';
+  $('to').value = dates.at(-1) || '';
   // Only the attribution the map data's licences require.
   document.querySelector('footer').textContent = 'Map data © OpenStreetMap contributors, locations by Geoapify';
   function safe(t) {
@@ -108,7 +112,7 @@
   function currentRows() {
     if (layer === 'model')
       return DATA.model.filter(r => Number.isFinite(r.latitude) && Number.isFinite(r.longitude));
-    return DATA[layer].filter(r => r.date && r.date >= $('from').value && r.date <= $('to').value);
+    return DATA[layer].filter(r => r.date && (!$('from').value || r.date >= $('from').value) && (!$('to').value || r.date <= $('to').value));
   }
   function groupRows() {
     let k = Number($('size').value),
