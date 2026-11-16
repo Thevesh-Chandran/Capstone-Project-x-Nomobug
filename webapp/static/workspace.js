@@ -84,7 +84,7 @@ function renderDesk(r) {
   });
   refresh.textContent = 'Refresh';
   const actions = el('div', undefined, 'desk-header-actions');
-  actions.append(refresh, deskLink('Team calendars', '#plan', 'secondary'));
+  actions.append(refresh, deskLink('Team calendar', '#bookings', 'secondary'));
   deskRoot.replaceChildren(deskHeader('Customer follow-up', '', actions));
   const source = el('div', undefined, 'desk-source');
   source.append(
@@ -204,7 +204,7 @@ function renderDeskTasks(r, list) {
   rows.slice(0, 40).forEach(t => {
     const row = el('tr', undefined, 'desk-task'),
       customer = el('td'),
-      name = deskButton(t.name, () => openDeskTask(t, r), 'desk-record-name');
+      name = deskButton(t.name, event => openDeskTask(t, r, event.currentTarget), 'desk-record-name');
     const identity = el('div', undefined, 'desk-customer-identity'),
       text = el('div');
     const initials = el(
@@ -246,7 +246,7 @@ function renderDeskTasks(r, list) {
     const progress = el('td');
     progress.append(el('span', deskStatus(t.status), 'desk-status ' + t.status));
     const action = el('td');
-    action.append(deskButton('Review', () => openDeskTask(t, r), 'desk-review-button'));
+    action.append(deskButton('Review', event => openDeskTask(t, r, event.currentTarget), 'desk-review-button'));
     row.append(customer, reason, date, balance, progress, action);
     body.append(row);
   });
@@ -269,19 +269,27 @@ function renderDeskTasks(r, list) {
     );
 }
 let deskDrawer;
-function closeDeskDrawer() {
-  if (deskDrawer) {
-    deskDrawer.remove();
-    deskDrawer = null;
-    document.body.classList.remove('desk-drawer-open');
+let deskDrawerTrigger;
+function closeDeskDrawer(restoreFocus = true) {
+  if (!deskDrawer) return;
+  deskDrawer.remove();
+  deskDrawer = null;
+  document.body.classList.remove('desk-drawer-open');
+  if (restoreFocus) {
+    const trigger = deskDrawerTrigger?.isConnected
+      ? deskDrawerTrigger
+      : deskRoot.querySelector('.desk-inbox-controls input');
+    trigger?.focus();
   }
+  deskDrawerTrigger = null;
 }
-function openDeskTask(t, r) {
-  closeDeskDrawer();
+function openDeskTask(t, r, trigger) {
+  closeDeskDrawer(false);
+  deskDrawerTrigger = trigger;
   selectedDeskTask = t;
   deskDrawer = el('div', undefined, 'desk-drawer-shell');
   const shade = deskButton('Close review', closeDeskDrawer, 'desk-drawer-shade');
-  shade.setAttribute('aria-label', 'Close review');
+  shade.tabIndex = -1;
   const panel = el('section', undefined, 'desk-drawer');
   panel.setAttribute('role', 'dialog');
   panel.setAttribute('aria-modal', 'true');
@@ -420,7 +428,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Tab' && deskDrawer) {
     const nodes = Array.from(
       deskDrawer.querySelector('.desk-drawer').querySelectorAll('button,input,select,textarea,a[href]'),
-    ).filter(n => !n.disabled);
+    ).filter(n => !n.disabled && n.getClientRects().length > 0);
     const first = nodes[0],
       last = nodes[nodes.length - 1];
     if (e.shiftKey && document.activeElement === first) {
@@ -513,8 +521,8 @@ function renderWeekPlan(r) {
   const root = $('week-planner');
   root.replaceChildren(
     deskHeader(
-      'Bookings & workload',
-      'How busy the coming weeks look, and the team Google Calendars.',
+      'Bookings & staffing',
+      '',
       deskButton('Refresh', async () => renderWeekPlan(await deskLoad(true))),
     ),
   );
@@ -764,6 +772,6 @@ window.loadWorkspaceTools = async page => {
 if (state && window.cp2Page() === 'home') window.loadWorkspaceTools('home');
 
 window.addEventListener('hashchange', () => {
-  closeDeskDrawer();
+  closeDeskDrawer(false);
   window.scrollTo({ top: 0, behavior: 'instant' });
 });

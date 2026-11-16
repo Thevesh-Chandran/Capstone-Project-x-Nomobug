@@ -6,9 +6,9 @@
   gap: 10px;
   padding: 12px 14px;
   margin: 0 0 16px;
-  background: #fff;
+  background: var(--color-paper-3);
   border: 1px solid var(--line);
-  border-radius: var(--r-lg);
+  border-radius: var(--radius-card);
 }
 .maps-page .tools label {
   display: grid;
@@ -55,7 +55,7 @@
   gap: 0;
   margin: 0 0 16px;
   border: 1px solid var(--line);
-  border-radius: var(--r-lg);
+  border-radius: var(--radius-card);
   overflow: hidden;
 }
 .maps-page .metric {
@@ -240,3 +240,8 @@
 .maps-page .tools button[data-layer] { border-color: transparent; background: #eef3fa; color: #3d5a80; font-weight: 600; }
 .maps-page .tools button[data-layer]:hover { background: #e1ebf7; }
 .maps-page .tools button[data-layer].active { background: #2563eb; border-color: #2563eb; color: #fff; }
+
+.maps-page .tools button,
+.maps-page .maphead button {
+  transition: background-color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out);
+}

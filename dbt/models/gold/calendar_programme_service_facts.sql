@@ -14,14 +14,7 @@ select f.* except (sales_record_id, event_category, extra_visit_candidate),
     p.warranty_policy_rule as programme_warranty_policy_rule,
     o.event_identity_hash is not null as owner_confirmed_paid_stage
 from {{ ref('calendar_service_event_facts') }} f
-join {{ ref('calendar_events') }} e using (calendar_event_row)
-left join {{ ref('paid_programme_visit_overrides') }} o
-    on o.event_identity_hash = lower(to_hex(sha256(concat(e.calendar_id, '|', e.event_id))))
-   and f.event_date_local = cast(o.expected_event_date as date)
-   and f.sales_record_id = o.expected_matched_sales_record_id
-   and f.session_current = o.expected_session_current
-   and f.session_total = o.expected_session_total
-   and not f.warranty_claim_candidate
+left join {{ ref('active_paid_programme_visit_overrides') }} o using (calendar_event_row)
 left join {{ ref('service_programme_memberships') }} m
     on f.sales_record_id = m.sales_record_id
 left join {{ ref('service_programme_facts') }} p

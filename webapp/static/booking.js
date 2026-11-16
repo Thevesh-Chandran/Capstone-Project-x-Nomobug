@@ -3,17 +3,22 @@
 // the weekly workload forecast and the team calendars. The slot finder below is kept in the code
 // (renderBookingTools) but no longer shown on the page.
 let bookingView = 'demand';
+let bookingHash;
+
 function attachBookingTools(root) {
+  if (bookingHash !== location.hash) {
+    bookingHash = location.hash;
+    bookingView = bookingHash === '#bookings' ? 'google' : 'demand';
+  }
   const demand = el('div'),
     children = Array.from(root.children);
   children.slice(1).forEach(n => demand.append(n));
-  const bookingRoot = el('div', undefined, 'booking-workspace'),
-    googleRoot = el('div', undefined, 'google-calendar-view'),
+  const googleRoot = el('div', undefined, 'google-calendar-view'),
     tabs = el('div', undefined, 'context-tabs booking-tabs');
   const buttons = [];
   [
-    ['demand', 'Weekly workload'],
-    ['google', 'Google Calendar'],
+    ['demand', 'Weekly staffing'],
+    ['google', 'Team calendar'],
   ].forEach(([key, label]) => {
     const b = deskButton(
       label,
@@ -27,7 +32,6 @@ function attachBookingTools(root) {
     tabs.append(b);
   });
   function sync() {
-    bookingRoot.hidden = bookingView !== 'booking';
     googleRoot.hidden = bookingView !== 'google';
     demand.hidden = bookingView !== 'demand';
     if (bookingView === 'google') renderGoogleCalendar(googleRoot);
@@ -68,7 +72,7 @@ function renderGoogleCalendar(root) {
   const url = typeof state !== 'undefined' && state ? state.google_calendar_url : null;
   const head = el('div', undefined, 'google-calendar-head');
   head.append(
-    el('p', 'View the team calendars here. Use Open Google Calendar to create or change bookings.', 'desk-muted'),
+    el('p', 'Create or change bookings in Google Calendar.', 'desk-muted'),
   );
   const open = el('a', 'Open Google Calendar', 'secondary');
   open.href = 'https://calendar.google.com/calendar/r/week';

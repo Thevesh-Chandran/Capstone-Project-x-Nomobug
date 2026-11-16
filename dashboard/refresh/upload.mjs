@@ -1,12 +1,15 @@
-// Upload ./build to gs://<bucket>/site/ and remove files the new build no longer has.
+// Publish a complete build by updating the release pointer after all uploads succeed.
 // Runs inside the Cloud Run job; credentials come from the job's service account
 // via the metadata server, so no key file is used.
 import { readdir, readFile } from 'node:fs/promises';
 import { join, relative, extname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const bucket = process.env.DASHBOARD_BUCKET;
-const prefix = 'site/';
-const root = new URL('../build/', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
+const release = process.env.DASHBOARD_RELEASE;
+if (!/^[a-f0-9]{32}$/.test(release || '')) throw new Error('Invalid DASHBOARD_RELEASE');
+const prefix = `site/releases/${release}/`;
+const root = fileURLToPath(new URL('../build/', import.meta.url));
 if (!bucket) throw new Error('DASHBOARD_BUCKET is not set');
 
 const types = {
@@ -36,49 +39,26 @@ async function* walk(dir) {
 const auth = { Authorization: `Bearer ${await token()}` };
 const files = [];
 for await (const f of walk(root)) files.push(f);
-const keep = new Set();
+if (!files.includes(join(root, 'index.html'))) throw new Error('Missing dashboard index.html');
 
-async function put(file) {
-	const name = prefix + relative(root, file).split('\\').join('/');
-	keep.add(name);
+async function put(name, body, contentType) {
 	const url = `https://storage.googleapis.com/upload/storage/v1/b/${bucket}/o?uploadType=media&name=${encodeURIComponent(name)}`;
 	for (let attempt = 1; attempt <= 3; attempt++) {
 		const r = await fetch(url, {
 			method: 'POST',
-			headers: { ...auth, 'Content-Type': types[extname(file)] || 'application/octet-stream' },
-			body: await readFile(file)
+			headers: { ...auth, 'Content-Type': contentType },
+			body
 		});
 		if (r.ok) return;
 		if (attempt === 3) throw new Error(`upload ${name}: ${r.status} ${await r.text()}`);
 	}
 }
 
-// Upload in small parallel batches; html last so pages never point at missing assets.
-const html = files.filter((f) => f.endsWith('.html'));
-const assets = files.filter((f) => !f.endsWith('.html'));
-for (const group of [assets, html]) {
-	for (let i = 0; i < group.length; i += 16) await Promise.all(group.slice(i, i + 16).map(put));
+for (let i = 0; i < files.length; i += 16) {
+	await Promise.all(files.slice(i, i + 16).map(async (file) => {
+		const name = prefix + relative(root, file).replaceAll('\\', '/');
+		await put(name, await readFile(file), types[extname(file)] || 'application/octet-stream');
+	}));
 }
-
-// Remove objects from older builds.
-let pageToken = '';
-let removed = 0;
-do {
-	const r = await fetch(
-		`https://storage.googleapis.com/storage/v1/b/${bucket}/o?prefix=${prefix}&fields=items(name),nextPageToken${pageToken ? `&pageToken=${pageToken}` : ''}`,
-		{ headers: auth }
-	);
-	const body = await r.json();
-	for (const { name } of body.items || []) {
-		if (!keep.has(name)) {
-			await fetch(`https://storage.googleapis.com/storage/v1/b/${bucket}/o/${encodeURIComponent(name)}`, {
-				method: 'DELETE',
-				headers: auth
-			});
-			removed++;
-		}
-	}
-	pageToken = body.nextPageToken || '';
-} while (pageToken);
-
-console.log(JSON.stringify({ status: 'PUBLISHED', uploaded: files.length, removed, at: new Date().toISOString() }));
+await put('site/current-release.txt', release, 'text/plain');
+console.log(JSON.stringify({ status: 'PUBLISHED', release, uploaded: files.length, at: new Date().toISOString() }));

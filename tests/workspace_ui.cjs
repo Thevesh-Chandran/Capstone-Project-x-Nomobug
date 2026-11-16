@@ -10,7 +10,7 @@ const data={counts:{total:3,upcoming:1,missing:1,unknown:0,status:0,reviewed:1},
 ctx.renderDesk(data);const walk=(e)=>[e,...e.children.flatMap(walk)],all=()=>walk(home),queue=()=>all().filter(e=>e.className==='desk-task');
 assert.equal(queue().length,3);assert(all().some(e=>e.textContent==='Customer follow-up'));
 all().find(e=>e.className.includes('desk-queue-option')&&e.children[0].textContent==='Due in 7 days').handlers.click();assert.equal(queue().length,1);
-all().find(e=>e.textContent==='Review').handlers.click();assert.equal(ctx.opened,'1');
+all().find(e=>e.textContent==='Review').handlers.click({currentTarget:null});assert.equal(ctx.opened,'1');
 all().find(e=>e.className.includes('desk-queue-option')&&e.children[0].textContent==='All records').handlers.click();const search=all().find(e=>e.tag==='input');search.value='SALE2';search.handlers.input();assert.equal(queue().length,1);assert(all().some(e=>e.textContent==='Missing date customer'));
-assert(all().some(e=>e.href==='#plan'));assert(all().some(e=>e.href==='#payments'));
+assert(all().some(e=>e.href==='#bookings'));assert(all().some(e=>e.href==='#payments'));
 console.log('Work queue passed: retained follow-ups, view filters, search, review action, booking and payment navigation.');

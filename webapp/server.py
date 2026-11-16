@@ -224,6 +224,25 @@ def handler_for(portal):
             root=Path(os.environ.get('CP2_DASHBOARD_DIR','')).resolve() if os.environ.get('CP2_DASHBOARD_DIR') else None
             if not root or not root.is_dir():return self.respond(503,{'error':'Reports are not available right now'})
             rel=unquote(path[len('/dashboard'):]).lstrip('/')
+            if not rel.startswith('releases/'):
+                try:
+                    release = (root / 'current-release.txt').read_text(encoding='ascii').strip()
+                except FileNotFoundError:
+                    release = None
+                if release is not None:
+                    if len(release) != 32 or any(c not in '0123456789abcdef' for c in release):
+                        return self.respond(503, {'error': 'Reports are not available right now'})
+                    request = urlsplit(self.path)
+                    suffix = request.path[len('/dashboard'):].lstrip('/')
+                    target = f'/dashboard/releases/{release}/{suffix}'
+                    if request.query:
+                        target += '?' + request.query
+                    self.send_response(302)
+                    self.headers_secure(cache='private, no-store')
+                    self.send_header('Location', target)
+                    self.send_header('Content-Length', '0')
+                    self.end_headers()
+                    return
             for cand in (rel, rel.rstrip('/')+'/index.html' if rel else 'index.html', rel.rstrip('/')+'.html'):
                 p=(root/cand).resolve()
                 if p.is_file() and (p==root or root in p.parents):break

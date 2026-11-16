@@ -20,7 +20,7 @@ npm run dev
 
 - Every day at 06:45 Malaysia time, Cloud Scheduler `cp2-dashboard-refresh-daily` runs the Cloud Run job
   `cp2-dashboard-refresh` (image built from `refresh/`): it runs the queries, builds the site and uploads it to
-  `gs://profound-keel-500007-s4-cp2-dashboard/site/`, removing files from the previous build.
+  `gs://profound-keel-500007-s4-cp2-dashboard/site/` and promotes the completed build.
 - The website (`cp2-portal`) mounts that bucket folder read-only at `/mnt/dashboard` (`CP2_DASHBOARD_DIR`) and serves it at `/dashboard`
   to signed-in users only, so new data appears without a redeploy.
 - Refresh now: `powershell -ExecutionPolicy Bypass -File .\publish.ps1`
@@ -37,3 +37,9 @@ The built site holds aggregate business figures and risk scores, but no customer
 (the call list is shown by the website itself). It is still served only to signed-in users: the website checks
 the Google IAP assertion before returning any `/dashboard` file. Never make the bucket or the site public.
 Built files and query extracts are excluded from git (`.gitignore`).
+
+## Versioned publishing
+
+Deploy the portal reader before updating the refresh job. The reader serves the previous layout until the first versioned build is published. A refresh uploads to `site/releases/<release>/`, then writes that release ID to `site/current-release.txt` after all files succeed. Each report uses URLs tied to its build.
+
+To roll back, restore the pointer to a previously verified complete release. Record the current pointer before changing it. Keep the current and rollback builds available, plus any builds used by open browser sessions. Review older builds for storage cleanup independently of publishing.

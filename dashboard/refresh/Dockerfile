@@ -10,4 +10,4 @@ COPY sources ./sources
 COPY static ./static
 COPY refresh ./refresh
 ENV NODE_OPTIONS=--max-old-space-size=3072
-CMD ["sh", "-c", "npx evidence sources && npx evidence build && node refresh/upload.mjs"]
+CMD ["sh", "refresh/publish.sh"]

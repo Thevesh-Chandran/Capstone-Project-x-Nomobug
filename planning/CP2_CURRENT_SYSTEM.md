@@ -49,3 +49,7 @@ Do not rename referenced release datasets or delete them using an old inventory.
 - The historical B2B source annotations reconcile, but no verified prospect-to-sale conversion linkage exists. The gap remains explicit; a funnel would imply facts the sources do not establish.
 
 Dashboard refresh `cp2-dashboard-refresh-6b92t` succeeded on 6 November at 14:49 UTC using build `2b530bfa-050e-4eba-92c7-b34fcfef61a5`. Live Chrome checks confirmed the default range of 1 November 2025–31 October 2026, populated prospect/refund tables and the separate historical/future explanation. The inspected pages logged no browser errors.
+
+## Private Calendar transfer matching
+
+The public paid-visit seed contains an empty transfer-hash column. Keep the complete production seed in Secret Manager and mount it as a file on the reporting job. Point `CP2_PRIVATE_PAID_VISIT_SEED` to that file. For local reporting, the same seed may be placed in the ignored `secrets/` folder. The Python reconciliation and dbt build use the same private seed when available. The hosted release stops before promotion if the file is missing.

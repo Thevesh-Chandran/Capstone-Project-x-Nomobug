@@ -58,52 +58,19 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 ```
 
 <div class="hero">
-  <h1>Management overview</h1>
+  <h1>Business performance</h1>
   <span class="chip">Data as of <Value data={headline} column=as_of fmt="d mmm yyyy"/></span>
 </div>
-
-
-
 
 <div class="kpis">
   <BigValue data={sales_kpi2} value=last_12m_rm title="Sales, last 12 months" fmt='"RM"#,##0' comparison=vs_prior comparisonFmt=pct0 comparisonTitle="vs previous 12 months" sparkline=month sparklineType=bar sparklineColor="#4C55B8"/>
   <BigValue data={headline} value=bookings_next_2_weeks title="Bookings expected, next 2 weeks" fmt="#,##0"/>
-  <BigValue data={headline} value=customers_to_call title="Customers needing closer attention"/>
-  <BigValue data={headline} value=staff_hours_next_week title="Hours to plan, next week" fmt="#,##0"/>
+  <BigValue data={headline} value=customers_to_call title="Higher-risk services"/>
+  <BigValue data={headline} value=staff_hours_next_week title="Staff hours to plan next week" fmt="#,##0"/>
 </div>
-
-## Staff workspace
-
-<div class="row3">
-  <div class="action">
-    <div class="label">Service follow-up</div>
-    {#if headline[0]?.customers_to_call > 0}
-    <div class="big"><Value data={headline} column=customers_to_call fmt="#,##0"/> higher-risk services in the published snapshot</div>
-    {:else}
-    <div class="big">Check the current follow-up queue</div>
-    {/if}
-    <a class="go" data-to="returns" role="link" tabindex="0">Open service follow-up</a>
-  </div>
-  <div class="action green">
-    <div class="label">Staffing</div>
-    {#if headline[0]?.hours_to_keep_open > 0}
-    <div class="big"><Value data={headline} column=hours_to_keep_open fmt="#,##0"/> hours to keep open in the published plan</div>
-    {:else}
-    <div class="big">Check current team capacity</div>
-    {/if}
-    <a class="go" data-to="plan" role="link" tabindex="0">Open staffing plan</a>
-  </div>
-  <div class="action amber">
-    <div class="label">Bookings</div>
-    <div class="big">Check the team calendars</div>
-    <a class="go" data-to="bookings" role="link" tabindex="0">Open booking calendar</a>
-  </div>
-</div>
-
-## Performance
 
 <div class="card filters">
-<DateRange name=period data={months_all} dates=month end={new Date()} defaultValue="Last 12 Months" title="Chart period · defaults to 12 completed months"/>
+<DateRange name=period data={months_all} dates=month end={new Date()} defaultValue="Last 12 Months" title="Chart dates"/>
 </div>
 
 <div class="row2">
@@ -130,7 +97,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
     </DataTable>
   </div>
   <div class="card">
-    <h3>What customers buy</h3>
+    <h3>Sales by pest group</h3>
 
     <DataTable data={pest_top} rowShading=false>
       <Column id=pest_group title="Pest group"/>

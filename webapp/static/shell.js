@@ -21,32 +21,27 @@
     areas:
       '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/>',
   };
-  // Report pages are dashboard pages shown inside the website (route -> dashboard page).
-  // Only the overview is a report on its own; every other page shows its dashboard section
-  // on top and the website's actions or predictions underneath (see CP2_PAGE_REPORT).
   window.CP2_REPORTS = { 'r-overview': '' };
   window.CP2_PAGE_REPORT = {
-    returns: 'follow-up',
-    home: 'payments',
-    plan: 'bookings',
-    customers: 'sales-and-areas',
-    '/maps': 'maps-and-patterns',
+    returns: { slug: 'follow-up', title: 'Return visit charts' },
+    home: { slug: 'payments', title: 'Payment and refund charts' },
+    plan: { slug: 'bookings', title: 'Booking and workload charts' },
+    customers: { slug: 'sales-and-areas', title: 'Sales and customer charts' },
   };
-  // Operational tools stay prominent; source browsing and research are secondary.
   const NAV = [
     { label: '', views: [['r-overview', 'Overview', 'overview']] },
     {
       label: 'Daily work',
       views: [
         ['returns', 'Service follow-up'],
-        ['home', 'Payments'],
-        ['plan', 'Bookings & workload'],
-        ['customers', 'Sales & customers'],
+        ['home', 'Payment reminders'],
+        ['plan', 'Bookings & staffing'],
+        ['customers', 'Customer search'],
       ],
     },
-    { label: 'Areas', views: [['/maps', 'Maps & patterns', 'maps']] },
+    { label: 'Reports', views: [['/maps', 'Sales & pest maps', 'maps']] },
     {
-      label: 'Evidence',
+      label: 'System',
       views: [
         ['models', 'Model performance'],
         ['status', 'System status'],
@@ -119,6 +114,15 @@
         if (dd) dd.open = true;
       } else a.removeAttribute('aria-current');
     });
+    const nav = document.querySelector('.side-nav');
+    const selected = nav?.querySelector('[aria-current="page"]');
+    if (selected && nav.scrollWidth > nav.clientWidth) {
+      const bounds = nav.getBoundingClientRect();
+      const link = selected.getBoundingClientRect();
+      if (link.left < bounds.left + 3 || link.right > bounds.right - 3) {
+        nav.scrollLeft += link.left - bounds.left - 8;
+      }
+    }
     document.title = `${t}, Nomobug`;
     document.body.dataset.route = route.replace('/', '');
     const head = $('page-header');
@@ -138,7 +142,7 @@
         // Measure the content itself: scrollHeight never shrinks below the frame's own height.
         const kids = d && d.body ? [...d.body.children].filter(k => k.offsetHeight) : [];
         const h = kids.length ? Math.ceil(Math.max(...kids.map(k => k.getBoundingClientRect().bottom)) + (d.defaultView.scrollY || 0)) : 0;
-        if (h && f.offsetParent && Math.abs(f.offsetHeight - h) > 4) f.style.height = h + 'px';
+        if (h && f.getClientRects().length && Math.abs(f.offsetHeight - h) > 4) f.style.height = h + 'px';
       } catch (e) {}
     });
   }, 400);

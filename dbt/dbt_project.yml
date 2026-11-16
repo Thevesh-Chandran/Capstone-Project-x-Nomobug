@@ -13,6 +13,9 @@ seeds:
   nomobug:
     +schema: gold
     +tags: ['gold']
+    paid_programme_visit_overrides:
+      +column_types:
+        ical_uid_hash: string
     calendar_appointment_overrides:
       +column_types:
         expected_start_at_utc: string

@@ -13,6 +13,8 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
+from tempfile import TemporaryDirectory
 import subprocess
 import sys
 import uuid
@@ -23,6 +25,7 @@ from google.api_core.exceptions import NotFound
 from scripts import cp2_pipeline
 from scripts import operational_bronze_core
 from scripts import validate_business_kpis
+from scripts.service_programme_policy import PAID_VISIT_SEED, private_paid_visit_seed
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -258,7 +261,15 @@ def dbt_build(variables: dict, run_dir: Path) -> None:
         "--target-path", str(run_dir / "dbt_target")]
     environment = os.environ.copy()
     environment["NOMOBUG_BQ_MAX_BYTES_BILLED"] = str(LIMIT)
-    with (run_dir / "dbt.log").open("w", encoding="utf-8") as log:
+    private_seed = private_paid_visit_seed()
+    if os.environ.get("CLOUD_RUN_JOB") and not private_seed:
+        raise ValueError("Hosted reporting requires the private paid-visit seed")
+    with TemporaryDirectory() as scratch, (run_dir / "dbt.log").open("w", encoding="utf-8") as log:
+        if private_seed:
+            project = Path(scratch) / "dbt"
+            shutil.copytree(ROOT / "dbt", project, ignore=shutil.ignore_patterns("target", "logs", ".user.yml"))
+            shutil.copyfile(private_seed, project / "seeds" / PAID_VISIT_SEED)
+            command[command.index("--project-dir") + 1] = str(project)
         finished = subprocess.run(command, cwd=ROOT, env=environment, stdout=log,
             stderr=subprocess.STDOUT, timeout=840, check=False)
     if finished.returncode:
@@ -410,6 +421,7 @@ def finish_release(client: bigquery.Client, run_dir: Path, manifest: dict) -> di
         serials_table=manifest["snapshot_tables"]["payments_date_serials"])
     if validation["status"] != "pass_with_business_caveats":
         raise ValueError("Candidate KPI reconciliation failed")
+    manifest["programme_booking_review_issues"] = validation["programme_booking_review_issues"]
     verify_live_warranty_reviews(client, stage_prefix)
     inventory = view_inventory(client, stage_prefix)
     verify_management_privacy(client, inventory)

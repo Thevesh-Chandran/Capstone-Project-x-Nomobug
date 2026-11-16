@@ -1,7 +1,7 @@
 'use strict';
 // Readable page addresses. Internal view names stay as they were, so older links
 // (#home, #today, #returns, #plan) keep working.
-window.CP2_ALIAS = { overview: 'r-overview', workspace: 'today', 'follow-up': 'returns', reminders: 'home', bookings: 'plan', risk: 'models', areas: 'models' };
+window.CP2_ALIAS = { overview: 'r-overview', workspace: 'today', 'follow-up': 'returns', reminders: 'home', bookings: 'plan', staffing: 'plan', risk: 'models', areas: 'models' };
 window.cp2Page = () => {
   const h = location.hash.slice(1);
   return window.CP2_ALIAS[h] || h || 'r-overview';
@@ -309,41 +309,27 @@ function showReport(slug) {
     } catch (e) {}
   }, 400);
 }
-// Each tool page opens with its dashboard section (the view), then its actions below.
-function sizeFrame(f) {
-  try {
-    const d = f.contentDocument;
-    if (!d || !d.body) return;
-    const h = Math.max(d.documentElement.scrollHeight, d.body.scrollHeight);
-    if (h && Math.abs(f.offsetHeight - h) > 4) f.style.height = h + 'px';
-  } catch (e) {}
-}
+const relatedReport = $('page-report-slot');
 function embedPageReport(page) {
-  const slug = (window.CP2_PAGE_REPORT || {})[page];
-  document.body.dataset.report = slug ? 'on' : '';
-  const slot = $('page-report-slot');
-  if (!slot) return;
-  slot.hidden = !slug;
-  if (!slug) return;
-  const f = slot.querySelector('iframe');
-  const want = '/dashboard/' + slug + '/';
-  if (f.dataset.want !== want) {
-    f.dataset.want = want;
-    f.style.height = '';
-    f.src = want;
-  }
-  const ah = slot.querySelector('.act-head');
-  ah.replaceChildren();
-  const t = document.createElement('strong');
-  t.textContent = {
-    returns: 'Customer follow-up', home: 'Payment reminders', plan: 'Booking calendar',
-    customers: 'Customer history', models: 'Model details',
-  }[page] || 'Workspace';
-  ah.append(t);
+  if (!relatedReport) return;
+  const report = (window.CP2_PAGE_REPORT || {})[page];
+  relatedReport.hidden = !report;
+  if (!report || relatedReport.dataset.slug === report.slug) return;
+  relatedReport.open = false;
+  relatedReport.dataset.slug = report.slug;
+  relatedReport.querySelector('summary').textContent = report.title;
+  const frame = relatedReport.querySelector('iframe');
+  frame.title = report.title;
+  frame.removeAttribute('src');
+  frame.style.height = '';
 }
-window.embedPageReport = embedPageReport;
+relatedReport?.addEventListener('toggle', () => {
+  if (!relatedReport.open || relatedReport.hidden) return;
+  const frame = relatedReport.querySelector('iframe');
+  if (!frame.hasAttribute('src')) frame.src = '/dashboard/' + relatedReport.dataset.slug + '/';
+});
 function reportRoute(pathname) {
-  const slug = pathname.replace(/^\/dashboard\/?/, '').replace(/\/$/, '');
+  const slug = pathname.replace(/^\/dashboard(?:\/releases\/[a-f0-9]{32})?\/?/, '').replace(/\/$/, '');
   return Object.keys(window.CP2_REPORTS || {}).find(k => window.CP2_REPORTS[k] === slug);
 }
 document.addEventListener('DOMContentLoaded', () => {
@@ -353,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
   f.addEventListener('load', () => {
     try {
       const r = reportRoute(f.contentWindow.location.pathname);
-      f.dataset.want = f.contentWindow.location.pathname;
+      if (r) f.dataset.want = '/dashboard/' + (window.CP2_REPORTS[r] ? window.CP2_REPORTS[r] + '/' : '');
       if (r && window.cp2Page() !== r) history.replaceState(null, '', '#' + r), window.onRoute && window.onRoute(r, true);
     } catch (e) {}
   });
@@ -459,23 +445,7 @@ function navigate() {
   document
     .querySelectorAll('[data-page]')
     .forEach(n => n.classList.toggle('active', n.dataset.page === page));
-  $('breadcrumb').textContent =
-    'Nomobug / ' +
-    ({
-      today: 'Workspace',
-      returns: 'Service follow-up',
-      models: 'Model performance',
-      risk: 'Warranty risk',
-      performance: 'Performance',
-      home: 'Follow-up queue',
-      plan: 'Plan',
-      dashboard: 'Dashboard',
-      areas: 'Model test by area',
-      business: 'Area explorer',
-      customers: 'Customers & areas',
-      payments: 'Payment follow-up',
-      status: 'System status',
-    }[page] || (window.CP2_TITLES || {})[page] || 'Workspace');
+  $('breadcrumb').textContent = (window.CP2_TITLES || {})[page] || 'Nomobug';
   if (page === 'business' && state && !businessLoaded) loadBusiness();
   if (window.onRoute) window.onRoute(page, !!state);
   if (state && window.loadWorkspaceTools) window.loadWorkspaceTools(page);
@@ -641,8 +611,14 @@ async function loadBusiness() {
 async function loadCustomers() {
   try {
     const r = await jsonPost('/api/customers', Object.fromEntries(new FormData($('customer-search'))));
-    $('customer-summary').textContent =
-      `Showing the first ${Math.min(50, r.matching_groups)} of ${number(r.matching_groups)} customer groups. Exact customer matching; unresolved identities remain separate.`;
+    const summary = $('customer-summary');
+    if (!r.matching_groups) {
+      summary.textContent = 'No customers match. Try another search or change the filter.';
+      $('customer-stats').replaceChildren();
+      $('customer-results').replaceChildren();
+      return;
+    }
+    summary.textContent = `Showing ${number(r.customers.length)} of ${number(r.matching_groups)} matching customer groups.`;
     // Summary row: one tile per figure, describing every matching customer group.
     const sm = r.summary || {};
     $('customer-stats').replaceChildren(

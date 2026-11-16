@@ -1046,7 +1046,7 @@
   ];
   function renderReturns(root) {
     root.replaceChildren();
-    const pl = block("Service check-in plan", {
+    const pl = block("Service call list", {
       note: 'All eligible services are shown by default. Use the score as context while staff continue their normal customer follow-up.',
     });
     const ctl = mk('div', undefined, 'plan-ctl');
@@ -1075,8 +1075,8 @@
       stats.replaceChildren();
       if (p && p.status === 'live') {
         [
-          [nf.format(p.check_ins.length), 'services ready to review'],
-          [nf.format((p.done || []).length), 'contacts already completed'],
+          [nf.format(p.check_ins.length), 'services to review'],
+          [nf.format((p.done || []).length), 'contacts logged'],
         ].forEach(([v, l]) => {
           const d = mk('div');
           d.append(mk('strong', v), mk('span', l));
@@ -1347,11 +1347,19 @@
 
   function renderModels(root) {
     root.replaceChildren();
-    const header = block('Model performance');
+    const header = block('Choose a model');
     const label = mk('label', undefined, 'model-selector');
-    label.append(mk('span', 'Choose a model'));
+    label.append(mk('span', 'Model', 'sr-only'));
     const select = mk('select');
-    MODEL_OPTIONS.forEach(([id, name]) => select.append(new Option(name, id)));
+    const inUse = mk('optgroup');
+    inUse.label = 'Used in the workspace';
+    const research = mk('optgroup');
+    research.label = 'Research';
+    MODEL_OPTIONS.forEach(([id, name, status]) => {
+      const group = ['Frozen experiment', 'Earlier research'].includes(status) ? research : inUse;
+      group.append(new Option(name, id));
+    });
+    select.append(inUse, research);
     select.value = selectedModel;
     label.append(select);
     header.append(label);
@@ -1363,7 +1371,7 @@
       g('model-area-evidence').hidden = selectedModel !== 'frozen';
       const [id, name, status] = MODEL_OPTIONS.find(([key]) => key === selectedModel);
       const card = block(name);
-      card.append(mk('p', status, 'block-note'));
+      card.append(mk('p', status, 'model-use'));
       evidence.replaceChildren(card);
       const R = data.return_risk || {};
       let panel;
