@@ -155,3 +155,41 @@ def test_featured_research_candidate_is_highest_supported_f1():
     assert saved['candidate']==expected
     assert expected['TP']+expected['FN']==expected['positive_windows']
     assert expected['TP']+expected['FN']+expected['FP']+expected['TN']==expected['services']
+
+
+def test_dashboard_keeps_open_pages_on_their_release_after_rollback(tmp_path, monkeypatch):
+    monkeypatch.setenv('CP2_PORTAL_TOKEN', 'test-staff-access-code-long-enough')
+    dashboard = tmp_path / 'dashboard'
+    dashboard.mkdir()
+    monkeypatch.setenv('CP2_DASHBOARD_DIR', str(dashboard))
+    (dashboard / 'index.html').write_text('legacy')
+    first, second = 'a' * 32, 'b' * 32
+    for release in (first, second):
+        folder = dashboard / 'releases' / release
+        folder.mkdir(parents=True)
+        (folder / 'index.html').write_text(release)
+    pointer = dashboard / 'current-release.txt'
+    portal = Portal(tmp_path)
+    server = ThreadingHTTPServer(('127.0.0.1', 0), handler_for(portal))
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    base = f'http://127.0.0.1:{server.server_port}'
+
+    def read(path):
+        request = urllib.request.Request(base + path, headers={'Cookie': 'cp2_session=' + portal.session()})
+        with urllib.request.urlopen(request) as response:
+            return response.geturl(), response.read().decode()
+
+    try:
+        assert read('/dashboard/') == (base + '/dashboard/', 'legacy')
+        pointer.write_text(second)
+        second_url, content = read('/dashboard/?view=all')
+        assert second_url == f'{base}/dashboard/releases/{second}/?view=all'
+        assert content == second
+        pointer.write_text(first)
+        assert read('/dashboard/') == (f'{base}/dashboard/releases/{first}/', first)
+        assert read(second_url.removeprefix(base)) == (second_url, second)
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join()
