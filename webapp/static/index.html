@@ -10,7 +10,9 @@
 <label for="access-code">Password</label><input id="access-code" type="password" autocomplete="current-password" required>
 <button class="primary btn-block">Sign in</button><p id="login-message" role="alert"></p></form><div class="login-aside"><strong>Staff workspace</strong><span>Service follow-up, payment reminders, bookings and customer history in one place.</span></div><p class="login-foot">Customer records in this portal are confidential.</p></div></section>
 <div id="workspace">
-<header class="page-header" id="page-header"></header>
+<header class="page-header" id="page-header">
+  <button type="button" class="page-charts-link" id="page-charts-link" aria-controls="page-report-slot" hidden></button>
+</header>
 <section data-view="today" hidden class="stage-view" id="view-today"><div class="st-loading"><span></span><span></span><span></span></div></section>
 <section data-view="returns" hidden class="stage-view" id="view-returns"><div class="st-loading"><span></span><span></span><span></span></div></section>
 <section data-view="risk" hidden class="stage-view" id="view-risk"><div class="st-loading"><span></span><span></span><span></span></div></section>
@@ -38,8 +40,12 @@
 <section data-view="status" hidden><div class="page-head"><div class="title-row"><h1>System status</h1><span class="help-wrap"><button type="button" class="help" aria-label="About system status" aria-describedby="status-help" aria-expanded="false">i</button><span class="tooltip" id="status-help" role="tooltip">Website status describes this workspace. They do not prove that the separate prospective collector has logged every prediction.</span></span></div><span class="tag">Source evidence</span></div><div id="system-cards" class="kpis"></div><article class="panel"><div class="panel-head"><h2>Data flow</h2><span class="help-wrap"><button type="button" class="help" aria-label="About the data pipeline" aria-describedby="flow-help" aria-expanded="false">i</button><span class="tooltip" id="flow-help" role="tooltip">Approved aggregate views feed reporting and the management workspace. A separate cloud collector runs the frozen prediction experiment; website use does not log or backfill prospective predictions.</span></span></div><div class="pipeline"><span>Sheets &amp; Calendar</span><b></b><span>BigQuery</span><b></b><span>Dashboard &amp; website</span></div></article></section>
 
 
-<details id="page-report-slot" class="page-report related-report" hidden>
-  <summary>View report</summary>
-  <iframe class="report-frame" title="Related report" loading="lazy"></iframe>
-</details>
+<section id="page-report-slot" class="page-report related-report" aria-labelledby="page-charts-title" hidden>
+  <h2 id="page-charts-title" tabindex="-1"></h2>
+  <iframe class="report-frame" loading="lazy"></iframe>
+</section>
+<section id="return-visit-breakdown" class="page-report related-report" aria-labelledby="return-visit-breakdown-title" hidden>
+  <h2 id="return-visit-breakdown-title">Return visits by pest and package</h2>
+  <iframe class="report-frame" title="Return visits by pest and package" loading="lazy"></iframe>
+</section>
 </div></main></body></html>

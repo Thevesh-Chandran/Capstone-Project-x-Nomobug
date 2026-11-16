@@ -551,16 +551,16 @@ body[data-route="risk"] .page-header {
   display: none;
 }
 @media (min-width: 901px) {
-  #workspace > section > .page-head:has(button, .secondary),
-  #workspace .desk-page-head {
+  #workspace:not(:has(> .page-header .page-charts-link:not([hidden]))) > section > .page-head:has(button, .secondary),
+  #workspace:not(:has(> .page-header .page-charts-link:not([hidden]))) .desk-page-head {
     margin-top: -60px;
     margin-bottom: var(--space-lg);
     min-height: 36px;
     justify-content: flex-end;
     pointer-events: none;
   }
-  #workspace > section > .page-head:has(button, .secondary) > *,
-  #workspace .desk-page-head > * {
+  #workspace:not(:has(> .page-header .page-charts-link:not([hidden]))) > section > .page-head:has(button, .secondary) > *,
+  #workspace:not(:has(> .page-header .page-charts-link:not([hidden]))) .desk-page-head > * {
     pointer-events: auto;
   }
 }
@@ -4466,45 +4466,40 @@ input, select, textarea { border-radius: var(--radius-input) !important; border:
 }
 .overview-tools a:first-child { background: var(--color-shell); color: var(--color-shell-ink); }
 .overview-tools a,
-.related-report > summary,
 .secondary:not(:disabled),
 .context-tabs button:not(:disabled) {
   transition: background-color var(--dur-short) var(--ease-out),
     border-color var(--dur-short) var(--ease-out), box-shadow var(--dur-short) var(--ease-out);
 }
 .overview-tools a:hover,
-.related-report > summary:hover,
 .secondary:not(:disabled):hover {
   background-color: var(--color-signal-soft);
   border-color: color-mix(in oklab, var(--color-focus) 35%, var(--color-rule));
 }
 .overview-tools a:first-child:hover { background-color: var(--color-accent); border-color: var(--color-accent); }
-.overview-tools a:active,
-.related-report > summary:active { box-shadow: inset 0 1px 3px color-mix(in oklab, var(--color-ink) 16%, transparent); }
-.related-report { margin: var(--space-lg) 0 0; }
-.related-report > summary {
-  cursor: pointer;
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--color-rule);
-  border-radius: var(--radius-card);
-  background: var(--color-paper-3);
-  color: var(--color-ink);
+.overview-tools a:active { box-shadow: inset 0 1px 3px color-mix(in oklab, var(--color-ink) 16%, transparent); }
+.page-header:has(.page-charts-link:not([hidden])) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+}
+.page-charts-link {
+  min-height: 44px;
+  padding: 8px 18px;
+  background: #254779;
+  border: 1px solid #254779;
+  color: #fff;
   font-weight: 600;
 }
-.related-report > summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); }
-.related-report > summary::-webkit-details-marker { display: none; }
-.related-report > summary::after {
-  content: "";
-  flex: 0 0 8px;
-  height: 8px;
-  margin-right: 3px;
-  border-right: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
-  transform: rotate(45deg);
-  transition: transform var(--dur-micro) var(--ease-out);
+.page-charts-link:hover { background: #1a355f; }
+.page-charts-link:focus-visible { outline-offset: 3px; }
+.related-report { margin-block-start: var(--space-xl); }
+.related-report > h2 {
+  margin: 0 0 var(--space-sm);
+  scroll-margin-top: 100px;
 }
-.related-report[open] > summary { margin-bottom: var(--space-sm); }
-.related-report[open] > summary::after { transform: rotate(225deg); }
 @media (max-width: 560px) {
   .overview-tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .overview-tools a { padding-inline: 12px; }

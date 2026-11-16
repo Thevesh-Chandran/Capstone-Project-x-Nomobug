@@ -310,24 +310,29 @@ function showReport(slug) {
   }, 400);
 }
 const relatedReport = $('page-report-slot');
+const pageChartsTitle = $('page-charts-title');
+const pageChartsLink = $('page-charts-link');
+
 function embedPageReport(page) {
   if (!relatedReport) return;
   const report = (window.CP2_PAGE_REPORT || {})[page];
   relatedReport.hidden = !report;
+  pageChartsLink.hidden = !report;
+  const breakdown = $('return-visit-breakdown');
+  breakdown.hidden = page !== 'returns';
+  const breakdownFrame = breakdown.querySelector('iframe');
+  if (page === 'returns' && !breakdownFrame.hasAttribute('src')) {
+    breakdownFrame.src = '/dashboard/services-and-warranty/';
+  }
   if (!report || relatedReport.dataset.slug === report.slug) return;
-  relatedReport.open = false;
   relatedReport.dataset.slug = report.slug;
-  relatedReport.querySelector('summary').textContent = report.title;
+  pageChartsTitle.textContent = report.title;
+  pageChartsLink.textContent = report.title + ' ↓';
   const frame = relatedReport.querySelector('iframe');
   frame.title = report.title;
-  frame.removeAttribute('src');
   frame.style.height = '';
+  frame.src = '/dashboard/' + report.slug + '/';
 }
-relatedReport?.addEventListener('toggle', () => {
-  if (!relatedReport.open || relatedReport.hidden) return;
-  const frame = relatedReport.querySelector('iframe');
-  if (!frame.hasAttribute('src')) frame.src = '/dashboard/' + relatedReport.dataset.slug + '/';
-});
 function reportRoute(pathname) {
   const slug = pathname.replace(/^\/dashboard(?:\/releases\/[a-f0-9]{32})?\/?/, '').replace(/\/$/, '');
   return Object.keys(window.CP2_REPORTS || {}).find(k => window.CP2_REPORTS[k] === slug);

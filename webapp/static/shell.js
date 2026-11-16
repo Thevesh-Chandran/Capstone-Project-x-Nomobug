@@ -127,13 +127,21 @@
     document.body.dataset.route = route.replace('/', '');
     const head = $('page-header');
     if (head) {
-      head.replaceChildren();
-      const h = document.createElement('h1');
+      let h = head.querySelector('h1');
+      if (!h) {
+        h = document.createElement('h1');
+        head.prepend(h);
+      }
       h.textContent = t;
-      head.append(h);
     }
   }
   build();
+  $('page-charts-link')?.addEventListener('click', event => {
+    const section = $(event.currentTarget.getAttribute('aria-controls'));
+    const title = $(section.getAttribute('aria-labelledby'));
+    title.focus({ preventScroll: true });
+    title.scrollIntoView({ block: 'start' });
+  });
   // Dashboard sections grow with their content so the page scrolls as one.
   setInterval(() => {
     document.querySelectorAll('.report-frame').forEach(f => {
