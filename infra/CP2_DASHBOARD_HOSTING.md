@@ -20,7 +20,7 @@ flowchart LR
 - Backend revision: `cp2-portal-00087-cep`, 100% normal service traffic. Previous `cp2-portal-00066-dk6` remains available for rollback and through the existing planning tag.
 - Cloud Build: `6d0f51d6-e3f3-4e7a-bf2a-267353625f77`.
 
-This release includes the current website source, including Claude's design and research-candidate pages. It does not promote those candidates into the frozen experiment or validate their outstanding modelling issues. The original Looker report remains accessible and unchanged.
+This release includes the current website source, including the redesigned workspace and research-candidate pages. It does not promote those candidates into the frozen experiment or validate their outstanding modelling issues. The original Looker report remains accessible and unchanged.
 
 ## Verification and limits
 
