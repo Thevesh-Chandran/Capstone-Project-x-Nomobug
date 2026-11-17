@@ -31,7 +31,7 @@ The notebooks replay pinned evidence. They do not claim new training, fresh sour
 | `secrets`, `.env` | Credentials | Private; never share |
 | `.venv` | Python environment | Runtime |
 | `docs` | Original documents and CP2 report copies | Report writing |
-| `tmp`, `.codex-tmp` | Working artifacts | Not a reading entry point |
+| `tmp` | Temporary working files | Local troubleshooting |
 
 ## Main executable files
 
