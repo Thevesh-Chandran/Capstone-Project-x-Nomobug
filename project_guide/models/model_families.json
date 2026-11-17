@@ -27,7 +27,7 @@
     "source": "../../outputs/model_validation/20261102_return_probability/results.json"
   },
   {
-    "name": "Claude\u2019s property warranty risk",
+    "name": "Property warranty risk",
     "status": "Local candidate; needs revision",
     "question": "After a non-warranty appointment, will the same rounded-coordinate group have a warranty signal within 30 days?",
     "inputs": "8 visit-history inputs; 200 Extra Trees plus Platt calibration.",
