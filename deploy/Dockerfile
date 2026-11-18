@@ -28,6 +28,7 @@ COPY --chown=cp2:cp2 \
     scripts/callback_evaluation.py \
     scripts/warranty_validation_splits.py \
     scripts/cp2_pipeline.py \
+    scripts/sheet_cell_dates.py \
     scripts/profile_b2b_sales_payments.py \
     scripts/load_calendar_bronze.py \
     scripts/operational_bronze_core.py \

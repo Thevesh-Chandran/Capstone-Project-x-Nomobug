@@ -4,11 +4,15 @@
 with parsed as (
     select
         r.*,
-        coalesce(
+        coalesce(source_refund_date,
             safe.parse_date('%d %b %Y', trim(refund_date_raw)),
             safe.parse_date('%d %B %Y', trim(refund_date_raw))
-        ) as parsed_refund_date
+        ) as candidate_date
     from {{ ref('refund_record_facts') }} r
+), reviewed as (
+    select *, if(candidate_date <= current_date('Asia/Kuala_Lumpur')
+        and (source_purchase_date is null or candidate_date >= source_purchase_date),
+        candidate_date, null) as parsed_refund_date from parsed
 )
 select
     date_trunc(parsed_refund_date, month) as refund_month,
@@ -21,5 +25,5 @@ select
     countif(parsed_refund_date is null) as date_review_rows,
     sum(recorded_refund_amount_rm) as recorded_refund_amount_rm,
     'refund_source_record_denominator_not_cash_settlement_proof' as denominator_evidence
-from parsed
+from reviewed
 group by refund_month

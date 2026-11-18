@@ -16,6 +16,10 @@ def prepare_snapshot(tab, df, header_map, lineage, expected_headers, prefix):
     if df['source_sheet_row'].tolist() != list(range(lineage['header_row'] + 1, lineage['header_row'] + 1 + len(df))):
         raise ValueError('Source row positions changed')
     records = df.to_dict('records')
+    date_rows = lineage.get("cell_dates")
+    if date_rows is not None:
+        for record, dates in zip(records, date_rows, strict=True):
+            record.update(dates)
     payload = {'version': 1, 'tab': tab, 'source': lineage['spreadsheet_id'],
         'header_row': lineage['header_row'], 'headers': header_map, 'records': records}
     encoded = json.dumps(payload, ensure_ascii=False, separators=(',', ':')).encode()
@@ -24,6 +28,8 @@ def prepare_snapshot(tab, df, header_map, lineage, expected_headers, prefix):
     digest = hashlib.sha256(encoded).hexdigest()
     schema = [bigquery.SchemaField('source_sheet_row', 'INTEGER', mode='REQUIRED')]
     schema += [bigquery.SchemaField(c, 'STRING', mode='REQUIRED', description=header_map[c]) for c in columns]
+    if date_rows:
+        schema += [bigquery.SchemaField(name, 'STRING', mode='REQUIRED') for name in date_rows[0]]
     metadata = {'format_version': 1, 'snapshot_id': digest, 'source_tab': tab,
         'workbook': lineage['workbook'], 'header_row': lineage['header_row'],
         'source_column_count': len(columns), 'source_row_count': len(df),

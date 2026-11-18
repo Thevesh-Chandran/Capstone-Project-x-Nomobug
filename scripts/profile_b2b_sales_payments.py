@@ -5,6 +5,7 @@ No raw exports, warehouse uploads, source edits or automatic sign-in.
 import json
 import os
 from pathlib import Path
+from scripts.sheet_cell_dates import DATE_COLUMNS, read_dated_tab
 from datetime import datetime, timezone
 
 import pandas as pd
@@ -77,13 +78,19 @@ try:
         if live['properties']['title'] != workbook or tab not in live_titles:
             raise SystemExit('Live workbook/tab changed; stop for review.')
         started_at = datetime.now(timezone.utc).isoformat()
-        values = service.spreadsheets().values().get(spreadsheetId=source_id,
-            range="'" + tab.replace("'", "''") + "'", valueRenderOption='FORMATTED_VALUE',
-            majorDimension='ROWS').execute(num_retries=2).get('values', [])
+        dates = None
+        if requested_tab in DATE_COLUMNS:
+            values, dates = read_dated_tab(service, source_id, tab, header_row)
+        else:
+            values = service.spreadsheets().values().get(spreadsheetId=source_id,
+                range="'" + tab.replace("'", "''") + "'", valueRenderOption='FORMATTED_VALUE',
+                majorDimension='ROWS').execute(num_retries=2).get('values', [])
         source_lineage[requested_tab] = {'spreadsheet_id': source_id, 'workbook': workbook,
             'source_tab': tab,
             'header_row': header_row, 'started_at': started_at,
             'extracted_at': datetime.now(timezone.utc).isoformat()}
+        if dates is not None:
+            source_lineage[requested_tab]["cell_dates"] = dates
         if len(values) < header_row:
             raise SystemExit('Expected header row missing.')
         width = max(map(len, values))
