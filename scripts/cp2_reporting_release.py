@@ -33,7 +33,7 @@ MANAGEMENT_GOLD_VIEWS = frozenset({
     "sales_monthly_recorded", "payments_monthly_recorded", "prospect_reply_monthly_recorded",
     "dashboard_service_monthly", "dashboard_scheduling_capacity", "dashboard_recurrence_monthly",
     "dashboard_spatial_area", "dashboard_spatial_cluster_summary", "dashboard_weather_monthly",
-    "dashboard_package_fit_matrix", "dashboard_payment_link_monthly", "dashboard_refund_monthly",
+    "dashboard_b2b_sales_linkage", "dashboard_package_fit_matrix", "dashboard_payment_link_monthly", "dashboard_refund_monthly",
     "dashboard_source_freshness", "dashboard_data_quality", "dashboard_ml_evaluation",
     "dashboard_recurring_payment_quality", "dashboard_recurring_reminder_schedule",
     "dashboard_model_review", "dashboard_feature_comparison",

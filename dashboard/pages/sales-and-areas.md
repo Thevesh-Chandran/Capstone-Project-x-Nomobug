@@ -236,3 +236,17 @@ Recorded enquiry rows by first-reply month. Repeat conversations can belong to t
 <Value data={prospect_dates} column=undated/> enquiry rows have no usable first-reply date and are excluded from the date-filtered chart. Closed does not necessarily mean a sale.
 
 </Details>
+
+## B2B enquiries linked to sales
+
+```sql b2b_links
+select * from nomobug.b2b_sales_linkage
+```
+
+<DataTable data={b2b_links}>
+<Column id=prospect_rows title="Enquiries with a name or phone"/>
+<Column id=corroborated_sales title="Won enquiries matched to one sale"/>
+<Column id=unresolved_rows title="Outcome unverified"/>
+</DataTable>
+
+All dates. A match requires the same business name, phone number and full closing date, with one enquiry and one sale. Other enquiries may still have resulted in sales.

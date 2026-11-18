@@ -157,6 +157,6 @@ select * from nomobug.refunds
 
 Reminder dates do not confirm payment or that a reminder was sent. Balances use recorded Sales amounts.
 
-All recorded refund entries, separate from contract balances above. A completed annotation is not proof of bank settlement. Missing dates remain in the table.
+All recorded refund entries, separate from contract balances above. A completed annotation is not proof of bank settlement. Entries with missing dates or dates that fail the chronology check appear under “Date needs checking”.
 
 </Details>
