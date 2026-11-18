@@ -22,6 +22,8 @@ select
          else 'unmatched_source_id' end as sale_link_status,
     r.refund_date_raw,
     r.refund_date_shape,
+    safe_cast(json_value(to_json_string(r), '$.refund_cell_date') as date) as source_refund_date,
+    safe_cast(json_value(to_json_string(r), '$.purchase_cell_date') as date) as source_purchase_date,
     r.refund_amount_raw,
     r.parsed_refund_amount_rm as recorded_refund_amount_rm,
     r.parsed_refund_amount_rm is null as refund_amount_needs_review,

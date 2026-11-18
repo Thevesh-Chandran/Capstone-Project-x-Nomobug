@@ -390,7 +390,11 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
         "refund": [1, 2, 7, 10], "claims": [1, 2, 7], "prospects": [2, 8, 12, 13], "b2b": [3, 7],
     }
     for source, positions in selections.items():
-        raw[source] = reader.read(source_names[source], ["source_sheet_row"] + [f"source_column_{p:03}" for p in positions])
+        columns = ["source_sheet_row"] + [f"source_column_{p:03}" for p in positions]
+        if source == "refund" and isinstance(reader, Reader):
+            fields = {field.name for field in reader.client.get_table(source_names[source]).schema}
+            columns.extend(name for name in ("refund_cell_date", "purchase_cell_date") if name in fields)
+        raw[source] = reader.read(source_names[source], columns)
     raw["calendar"] = reader.read(source_names["calendar"], ["calendar_event_row", "calendar_id", "event_id", "status", "summary", "start_raw", "end_raw", "ical_uid", "recurring_event_id"])
     raw["serials"] = reader.read(source_names["serials"], ["source_sheet_row", "payment_date_display_raw", "unformatted_value", "unformatted_type"])
     with (ROOT / "dbt/seeds/sale_disposition_overrides.csv").open(encoding="utf-8", newline="") as stream:
@@ -442,13 +446,18 @@ def run_validation(reader: Reader, today: date) -> tuple[dict, dict]:
         checks[f"{name}_source_to_reporting_rows"] = compare_rows(prepared, actual[name], "source_sheet_row", fields, name)
     refund_monthly = defaultdict(Counter)
     for source_row, row in zip(raw["refund"], expected["refund"]):
-        group = refund_monthly[month(named_date(source_row["source_column_001"]))]
+        refund_date = (date.fromisoformat(source_row["refund_cell_date"]) if source_row.get("refund_cell_date")
+                       else named_date(source_row["source_column_001"]))
+        purchase = source_row.get("purchase_cell_date")
+        if refund_date and (refund_date > today or (purchase and refund_date < date.fromisoformat(purchase))):
+            refund_date = None
+        group = refund_monthly[month(refund_date)]
         group["refund_source_rows"] += 1
         group["linked_refund_rows"] += int(row["sale_link_status"] == "exact_sale_id")
         group["unmatched_refund_rows"] += int(row["sale_link_status"] == "unmatched_source_id")
         group["recorded_complete_rows"] += int(row["recorded_refund_status"] == "recorded_complete")
         group["amount_review_rows"] += int(row["refund_amount_needs_review"])
-        group["date_review_rows"] += int(named_date(source_row["source_column_001"]) is None)
+        group["date_review_rows"] += int(refund_date is None)
     names = ["refund_source_rows", "linked_refund_rows", "unmatched_refund_rows", "recorded_complete_rows", "amount_review_rows", "date_review_rows"]
     expected["refund_monthly"] = [{"month": key, **{name: count[name] for name in names}} for key, count in refund_monthly.items()]
     monthly = reader.read(f"{reader.project}.{reader.gold_schema}.dashboard_refund_monthly", ["refund_month"] + names)
