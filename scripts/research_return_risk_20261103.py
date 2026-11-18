@@ -41,7 +41,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import make_pipeline
 import warnings;warnings.filterwarnings('ignore')
 df=load()
-def feats(df):
+def feats(df, weather_medians):
     F=pd.DataFrame(index=df.index)
     F['final_residential']=df.res_final
     F['final_service']=df.final
@@ -56,14 +56,13 @@ def feats(df):
     F['property_claims_90d']=df.prior_property_claims_90d.fillna(0).clip(0,3)
     F['area_claim_rate_90d']=(df.prior_area_claims_90d/(df.prior_area_services_90d.replace(0,np.nan))).fillna(0).clip(0,1)
     F['area_services_90d']=np.log1p(df.prior_area_services_90d.fillna(0))
-    F['rain_30d_mm']=df.prior_30d_precipitation_mm.fillna(df.prior_30d_precipitation_mm.median())
-    F['humidity_30d']=df.prior_30d_relative_humidity_mean_pct.fillna(df.prior_30d_relative_humidity_mean_pct.median())
+    F['rain_30d_mm']=df.prior_30d_precipitation_mm.fillna(weather_medians['prior_30d_precipitation_mm'])
+    F['humidity_30d']=df.prior_30d_relative_humidity_mean_pct.fillna(weather_medians['prior_30d_relative_humidity_mean_pct'])
     F['month_sin']=df.anchor_month_sin;F['month_cos']=df.anchor_month_cos
     pc=df.pest_category.fillna('').str.lower()
     F['cockroach_only']=(pc.str.strip().isin(['lipas']) ).astype(float)
     F['includes_rodent']=pc.str.contains('tikus').astype(float)
     return F
-F=feats(df)
 SETS={'structure':['final_residential','final_service','residential','three_service_programme','first_service'],
  'history':['property_past_claims','programme_past_claims','property_claims_90d','gap_missing','gap_days_capped','log_sale_rm'],
  'context':['area_claim_rate_90d','area_services_90d','rain_30d_mm','humidity_30d','month_sin','month_cos'],
@@ -73,6 +72,12 @@ CAND={'S1 structure':SETS['structure'],'S2 +history':SETS['structure']+SETS['his
 dev=df.anchor_date<='2025-09-30';val=(df.anchor_date>='2025-11-01')&(df.anchor_date<='2026-03-31');test=df.anchor_date>='2026-05-01'
 g=df.sales_record_id;dev=dev&~g.isin(g[val|test]);val=val&~g.isin(g[test])
 assert df.outcome_end_date[dev].max()<pd.Timestamp('2025-11-01') and df.outcome_end_date[val].max()<pd.Timestamp('2026-05-01')
+# Fit missing-value replacements only on the rows available to the fitting stage.
+weather_columns=['prior_30d_precipitation_mm','prior_30d_relative_humidity_mean_pct']
+def weather_fill(mask):
+    return df.loc[mask,weather_columns].median().fillna(0).to_dict()
+validation_weather=weather_fill(dev)
+F=feats(df, validation_weather)
 y=df[Y].values
 def cap(yy,p,f):k=max(1,int(round(len(p)*f)));i=np.argsort(-p,kind='stable')[:k];return float(yy[i].sum()/yy.sum()),float(yy[i].mean())
 def fit(cols,C,mask):
@@ -89,6 +94,11 @@ print('CHOSEN',best['set'],best['C'])
 sel=json.load(open('selection.json'));cols=CAND[sel['chosen_set']];C=sel['C']
 fitmask=(dev|val)
 assert df.outcome_end_date[fitmask].max()<pd.Timestamp('2026-05-01')
+assessment_weather=weather_fill(fitmask)
+F=feats(df, assessment_weather)
+json.dump({'validation_fill_from':'development only','assessment_fill_from':'development plus validation',
+           'validation_weather_medians':validation_weather,'assessment_weather_medians':assessment_weather},
+          open('preprocessing.json','w'),indent=1)
 m=fit(cols,C,fitmask)
 # freeze before test
 coef=dict(zip(cols,m[-1].coef_[0]));frozen={'features':cols,'C':C,'scaler_mean':m[0].mean_.tolist(),'scaler_scale':m[0].scale_.tolist(),'coef':m[-1].coef_[0].tolist(),'intercept':float(m[-1].intercept_[0]),'fit_rows':int(fitmask.sum()),'fit_positives':int(y[fitmask].sum()),'fit_period':'2024-03-08 to 2026-03-31 (development + validation, sale groups disjoint from test)','frozen_at_utc':datetime.datetime.now(datetime.timezone.utc).isoformat(timespec='seconds'),'source_sha256':hashlib.sha256(open(DATA,'rb').read()).hexdigest()}
@@ -110,9 +120,9 @@ p=P['Return-risk score (chosen)']
 print('brier model',round(brier_score_loss(yt,p),4),'constant',round(brier_score_loss(yt,np.full_like(p,y[fitmask].mean())),4))
 dec=pd.qcut(p,5,labels=False,duplicates='drop');cal=pd.DataFrame({'band':dec,'p':p,'y':yt}).groupby('band').agg(services=('y','size'),predicted=('p','mean'),actual=('y','mean'));print(cal.round(3))
 mon=pd.DataFrame({'m':T.anchor_date.dt.to_period('M').astype(str).values,'p':p,'y':yt}).groupby('m').agg(services=('y','size'),expected=('p','sum'),actual=('y','sum'));print(mon.round(1))
-# untouched slice: anchors after 2026-08-27 (not examined by earlier studies)
+# Later historical slice (not a new independent test): anchors after 2026-08-27
 u=(T.anchor_date>'2026-08-27').values
-if u.sum() and 0<yt[u].sum()<u.sum():print('UNTOUCHED slice',u.sum(),'services',yt[u].sum(),'returns auc',round(roc_auc_score(yt[u],p[u]),3),'rule auc',round(roc_auc_score(yt[u],P['Rule: final residential service'][u]),3),'cap20',cap(yt[u],p[u],.2))
+if u.sum() and 0<yt[u].sum()<u.sum():print('LATER HISTORICAL slice',u.sum(),'services',yt[u].sum(),'returns auc',round(roc_auc_score(yt[u],p[u]),3),'rule auc',round(roc_auc_score(yt[u],P['Rule: final residential service'][u]),3),'cap20',cap(yt[u],p[u],.2))
 # bootstrap by sale group: capture20 model - rule
 gr=T.sales_record_id.values;ug=np.unique(gr);rs=np.random.RandomState(7);diffs=[];aucs=[]
 idx={k:np.where(gr==k)[0] for k in ug}

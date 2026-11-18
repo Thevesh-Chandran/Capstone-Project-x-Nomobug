@@ -1,1 +1,33 @@
-<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=FILE_GUIDE.html"><title>Nomobug Project</title></head><body><a href="FILE_GUIDE.html">Open the project file guide</a></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nomobug Capstone Project</title>
+  <style>
+    body { font: 1rem/1.6 system-ui, sans-serif; color: #182333; background: #f5f7fa; margin: 0; }
+    main { max-width: 42rem; margin: 3rem auto; padding: 0 1.25rem; }
+    h1 { line-height: 1.2; }
+    ul { padding: 0; list-style: none; }
+    li { background: white; padding: .8rem 1rem; margin: .6rem 0; border: 1px solid #dae0e7; border-radius: .5rem; }
+    a { color: #23477c; text-underline-offset: .2em; }
+    li > a:first-child { font-weight: 650; }
+    small { display: block; color: #4d5c6e; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Nomobug Capstone Project</h1>
+    <h2>Project files</h2>
+    <ul>
+      <li><a href="README.md">Project overview and model results</a></li>
+      <li><a href="project_guide/models/index.html">Explore the model evidence</a></li>
+      <li id="submission" hidden><a href="outputs/submission/20261118/Submission%20files.html">Report, logbook, presentation and poster</a><small>Local submission folder</small></li>
+    </ul>
+    <script>
+      if (location.protocol === 'file:') document.getElementById('submission').hidden = false;
+    </script>
+    <p><a href="notebooks/README.md">Model and data notebooks</a> · <a href="FILE_GUIDE.html">Search all project files</a></p>
+  </main>
+</body>
+</html>
