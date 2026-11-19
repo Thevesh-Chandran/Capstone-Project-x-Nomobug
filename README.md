@@ -18,11 +18,13 @@ A capstone project connecting sales, service bookings, payment reminders and pre
 
 ---
 
-## The project
+## The workspace
 
-Nomobug's sales and service records live across Google Sheets and Google Calendar. This project brings those records together so management can understand business performance, prepare customer follow-ups and plan appointments with clearer evidence.
+Built in collaboration with Nomobug, a Malaysian pest-control business, this capstone brings sales, payments and appointment records into one staff workspace. Managers can review performance and capacity, while staff can check service history and record follow-up outcomes.
 
-The system combines a protected staff website, an **Evidence.dev dashboard**, a validated BigQuery reporting pipeline and experimental prediction models. Customer records and credentials are kept outside the public repository.
+![Nomobug workspace showing service follow-up statistics and Evidence.dev charts](project_guide/readme/current-service-follow-up.jpg)
+
+*Service follow-up in the deployed workspace. This dated capture shows aggregate return-risk bands and recorded visits.*
 
 ## What management can do
 
@@ -37,12 +39,6 @@ The system combines a protected staff website, an **Evidence.dev dashboard**, a 
 | **Model evidence** | Historical assessments, comparison methods, inputs and evaluation limitations |
 
 **Reading the figures:** sales represent recorded package prices; reminder dates do not prove payment; Calendar bookings do not prove completed treatment. Model estimates do not determine warranty entitlement.
-
-## Current workspace
-
-![Live Nomobug Service follow-up page with return-risk bands and recorded return visits](project_guide/readme/current-service-follow-up.jpg)
-
-Service follow-up shows the 30-day model assessment alongside estimated risk and recorded return trends. This capture shows aggregate figures from the deployed workspace.
 
 ## How it works
 
@@ -79,6 +75,20 @@ The return-risk model remains **experimental**. Historical ranking results, clas
 Future results require timely predictions, complete outcome windows and coverage checks. Missed prediction windows remain recorded. See the [visual model guide](project_guide/models/index.html) and [current system record](planning/CP2_CURRENT_SYSTEM.md) for evidence and limitations.
 
 ### Historical performance
+
+![Horizontal bar chart comparing the share of recorded returns captured in the top fifth: logistic regression 62%, programme rule 52%, random order 21%](project_guide/readme/return-ranking.png)
+
+The deployed **logistic regression** ranks completed services by the chance of a recorded pest-related return within 30 days. The comparison above uses 1,270 historical services with 108 recorded returns. About 26% of the highest-ranked fifth had a recorded return. Staff use the ranking to decide where to look more closely during routine follow-up.
+
+<details>
+<summary>See the booking and appointment-hour forecast charts</summary>
+
+| Two-week bookings · Extra Trees | Next-week appointment hours · Ridge |
+| --- | --- |
+| ![Historical booking forecasts compared with actual bookings and the baseline](project_guide/readme/model-booking.png) | ![Historical appointment-hour forecasts compared with actual hours and the baseline](project_guide/readme/model-hours.png) |
+
+</details>
+
 
 | Assessment | Sample | Result | Comparison |
 | --- | --- | --- | --- |
