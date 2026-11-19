@@ -39,7 +39,10 @@ select * from ${detail}
 where month between '${inputs.period.start}' and '${inputs.period.end}'
   and premise in ${inputs.premise.value}
   and package_group in ${inputs.package.value}
-  and (area in ${inputs.area.value} or '${inputs.area_mode}' = 'all')
+  and (
+    area in ${inputs.area.value}
+    or ('${inputs.area_mode}' = 'all' and (area is null or area = 'Unassigned'))
+  )
 ```
 
 ```sql ff
@@ -109,7 +112,7 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
   <ButtonGroupItem valueLabel="Yes" value="all" default/>
   <ButtonGroupItem valueLabel="Only selected areas" value="selected"/>
 </ButtonGroup>
-<ButtonGroup name=client title="Client">
+<ButtonGroup name=client title="Client · customer, billing and salesperson breakdowns">
   <ButtonGroupItem valueLabel="All" value="%" default/>
   <ButtonGroupItem valueLabel="New" value="New client"/>
   <ButtonGroupItem valueLabel="Returning" value="Returning client"/>
