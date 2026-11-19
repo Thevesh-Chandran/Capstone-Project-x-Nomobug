@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nomobug project files</title>
+<style>body{margin:0;background:#f3f5f9;color:#172033;font:15px/1.6 system-ui}main{max-width:1180px;margin:auto;padding:40px 28px}h1{font-size:36px}h2{margin-top:36px}a{color:#1f4fe0}header{border-bottom:2px solid #172033;padding-bottom:22px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}.card{background:white;border:1px solid #dde1ea;padding:18px;text-decoration:none;color:inherit}.card b,.card code{display:block}.card code{color:#1f4fe0}input,select{padding:12px;border:1px solid #cbd2e0;margin:8px 8px 16px 0}input{width:55%}table{width:100%;border-collapse:collapse;background:white;font-size:13px}th,td{text-align:left;vertical-align:top;padding:12px;border-bottom:1px solid #e3e7ee;overflow-wrap:anywhere}th{background:#e7edf9}.note{padding:16px;background:#e7edf9}</style>
+<main>
+<header>
+<p>NOMOBUG / CAPSTONE PROJECT</p>
+<h1>Project files</h1>
+<p>Data → cleaning → experiments → application → cloud operation</p>
+<a href="START_HERE.md">Start here</a> · <a href="project_guide/Project_Structure.md">Folder guide</a> · <a href="project_guide/File_Catalogue.csv">File list</a> · <a href="project_guide/Folder_Sizes.csv">Folder sizes</a>
+</header>
+<h2>Prediction models</h2>
+<p>
+<a href="project_guide/models/index.html">Open the visual model guide</a>: current model, candidates, inputs, results and experiment search.</p>
+<h2>Current website</h2>
+<div class="note">
+<a href="https://cp2-portal-fav22krh7q-as.a.run.app/">Hosted workspace</a> · <a href="dashboard/README.md">Evidence dashboard</a> · <a href="planning/CP2_CURRENT_SYSTEM.md">System documentation</a>
+</div>
+<h2>Folders</h2>
+<div class="grid">$folder_cards</div>
+<h2>Analysis notebooks</h2>
+<p>Saved historical evidence; opening a notebook does not refresh sources or establish a new model result.</p>
+<ol>$notebooks</ol>
+<p>
+<a href="planning/CP2_PROJECT_HANDOVER_20261102.md">2 November handover</a> · <a href="planning/CP2_OPERATIONAL_MODEL_SEARCH_20261102.md">2 November model study</a> · <a href="planning/CP2_REMAINING_TASKS_20261102.md">2 November verification notes</a>
+</p>
+<h2>Search source files</h2>
+<p>Imports and evidence paths remain stable. Research scripts are not automatically active models. Do not run every script.</p>
+<input id="search" aria-label="Search files" placeholder="Search a file or purpose">
+<select id="area" aria-label="Project area">
+<option value="">All areas</option>$area_options</select>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>$file_rows</tbody>
+</table>
+<p>Private data, credentials and raw evidence are excluded from this source index.</p>
+</main>
+<script>
+  const search = document.querySelector('#search');
+  const area = document.querySelector('#area');
+  const rows = document.querySelectorAll('tbody tr');
+
+  function filterFiles() {
+    const query = search.value.toLowerCase();
+    for (const row of rows) {
+      const matchesText = row.textContent.toLowerCase().includes(query);
+      const matchesArea = !area.value || row.cells[0].textContent === area.value;
+      row.hidden = !(matchesText && matchesArea);
+    }
+  }
+
+  search.addEventListener('input', filterFiles);
+  area.addEventListener('change', filterFiles);
+</script>
+</html>

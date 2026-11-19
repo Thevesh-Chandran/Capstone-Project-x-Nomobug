@@ -2,6 +2,8 @@
 
 The project workflow starts in [notebooks/00_Project_Overview.ipynb](../notebooks/00_Project_Overview.ipynb). The notebooks cover sources, cleaning, labels/partitions, predictors, training configuration, evaluation, planning and experiments. Python and SQL modules remain the implementation used by automation.
 
+For the current report, logbook, slides and poster, open [the project launcher](../OPEN_PROJECT.html) locally. The October submission-pack script rebuilds a historical handover.
+
 ## Current entry points
 
 Use [FILE_GUIDE.html](../FILE_GUIDE.html) to search by purpose. `python -m scripts.refresh_project_file_guide` refreshes it without executing notebooks or training models.
