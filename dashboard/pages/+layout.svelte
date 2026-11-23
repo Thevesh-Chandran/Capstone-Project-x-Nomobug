@@ -52,12 +52,11 @@
 		font-display: swap;
 	}
 	:global(:root) {
-		--color-well: oklch(95.5% 0.008 75);
-		--color-card: oklch(99.5% 0.003 75);
+		--color-card: #fff;
 		--color-ink: oklch(21% 0.016 268);
 		--color-ink-2: oklch(30% 0.016 268);
 		--color-muted: oklch(47% 0.016 265);
-		--color-rule: oklch(87.5% 0.009 75);
+		--color-rule: oklch(89% 0.015 250);
 		--color-shell: oklch(17.5% 0.014 268);
 		--color-shell-ink: oklch(96% 0.006 75);
 		--color-shell-muted: oklch(70% 0.016 262);
@@ -67,14 +66,10 @@
 		--font-body: 'Wix Madefor Text', ui-sans-serif, system-ui, sans-serif;
 		--radius-card: 18px;
 		--radius-inner: 10px;
-		--series-1: #5B63C9;
-		--series-2: #D97E45;
-		--series-3: #2E9CB8;
-		--series-4: #D9577A;
 	}
-	:global(html), :global(body) { overflow-x: clip; }
+	:global(html), :global(body) { overflow-x: clip; background: transparent !important; }
 	:global(body), :global(main), :global(header) {
-		background: var(--color-well) !important;
+		background: transparent !important;
 		color: var(--color-ink);
 		font-family: var(--font-body) !important;
 		font-variant-numeric: tabular-nums;
@@ -97,24 +92,33 @@
 		background: var(--color-card); border: 1px solid var(--color-rule); color: var(--color-ink-2); font-size: 0.8rem; font-weight: 500;
 	}
 
-	/* Figures in one ruled white card per figure */
-	:global(.kpis) { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+	/* Keep headline figures on a shared surface so they read as one summary. */
+	:global(.kpis) {
+		display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 12px; margin-bottom: 20px;
+	}
 	:global(.kpis.three) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 	:global(.kpis.two) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 	:global(.kpis > *) {
-		background: var(--color-card); border: 1px solid var(--color-rule); border-radius: var(--radius-card);
-		padding: 16px 18px 12px; margin: 0 !important; min-width: 0 !important; width: auto !important;
+		background: color-mix(in srgb, var(--kpi-color) 9%, var(--color-card)); padding: 18px;
+		border: 1px solid var(--color-rule); border-radius: 12px;
+		box-shadow: 0 1px 3px rgb(25 38 62 / 6%);
+		margin: 0 !important; min-width: 0 !important; width: auto !important;
+		overflow-wrap: anywhere;
 	}
+	:global(.kpis > *) { --kpi-color: #5B63C9; }
+	:global(.kpis > :nth-child(4n+2)) { --kpi-color: #D97E45; }
+	:global(.kpis > :nth-child(4n+3)) { --kpi-color: #2E9CB8; }
+	:global(.kpis > :nth-child(4n+4)) { --kpi-color: #D9577A; }
 	:global(.kpis > * p) { margin: 0; }
-	/* a thin colour edge per figure, in the chart order: periwinkle, apricot, teal, rose */
-	:global(.kpis > *:nth-child(4n+1)) { border-top: 3px solid var(--series-1); }
-	:global(.kpis > *:nth-child(4n+2)) { border-top: 3px solid var(--series-2); }
-	:global(.kpis > *:nth-child(4n+3)) { border-top: 3px solid var(--series-3); }
-	:global(.kpis > *:nth-child(4n+4)) { border-top: 3px solid var(--series-4); }
+	:global(.card.filters) {
+		display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+		padding: 0; border: 0; background: transparent; box-shadow: none;
+	}
 
 	/* Charts and tables: white cards on the well */
-	:global(.card) { background: var(--color-card); border: 1px solid var(--color-rule); border-radius: var(--radius-card); padding: 18px 20px 12px; margin-bottom: 16px; min-width: 0; }
-	:global(.card h3) { font-family: var(--font-display); font-size: 1.05rem; font-weight: 500; letter-spacing: -0.015em; margin: 0 0 2px; color: var(--color-ink); }
+	:global(.card) { background: var(--color-card); border: 1px solid var(--color-rule); border-radius: var(--radius-card); padding: 18px 20px 12px; margin-bottom: 16px; min-width: 0; box-shadow: 0 2px 5px rgb(25 38 62 / 6%); }
+	:global(.card h3) { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; letter-spacing: -0.015em; margin: 0 0 8px; color: var(--color-ink); }
 	:global(.card .sub) { font-size: 0.82rem; color: var(--color-muted); margin: 0 0 10px; }
 	:global(.row2) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 	:global(.row3) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
@@ -136,6 +140,10 @@
 		:global(.kpis), :global(.kpis.three), :global(.row2), :global(.row3) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 	}
 	@media (max-width: 560px) {
-		:global(.kpis), :global(.kpis.three), :global(.kpis.two), :global(.row2), :global(.row3) { grid-template-columns: 1fr; }
+		:global(.row2), :global(.row3) { grid-template-columns: 1fr; }
+		:global(.kpis > *) { padding: 12px; }
+	}
+	@media (max-width: 360px) {
+		:global(.kpis), :global(.kpis.two), :global(.kpis.three) { grid-template-columns: 1fr; }
 	}
 </style>

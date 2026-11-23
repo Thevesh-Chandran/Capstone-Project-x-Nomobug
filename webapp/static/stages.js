@@ -1066,7 +1066,8 @@
     const stats = mk('div', undefined, 'plan-stats');
     ctl.append(stats);
     pl.append(ctl);
-    const note = mk('p', '', 'block-note');
+    const note = mk('p', '', 'side-text service-call-status');
+    note.setAttribute('role', 'status');
     const listHost = mk('div');
     const logHost = mk('div', undefined, 'checkin-log');
     pl.append(note, listHost, logHost);
@@ -1084,14 +1085,16 @@
         });
       }
       note.textContent = planNote(p);
+      listHost.hidden = !p || p.status !== 'live';
+      logHost.hidden = listHost.hidden;
       listHost.replaceChildren(
-        p && p.status === 'live'
-          ? checkInManage(p, async () => {
+        ...(p && p.status === 'live'
+          ? [checkInManage(p, async () => {
               try {
                 paint(await loadPlan(rcalls));
               } catch (e) {}
-            })
-          : mk('p', '', 'block-empty'),
+            })]
+          : []),
       );
       logHost.replaceChildren();
       if (p && p.status === 'live') {

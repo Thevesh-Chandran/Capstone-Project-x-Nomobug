@@ -63,7 +63,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 </div>
 
 <div class="kpis">
-  <BigValue data={sales_kpi2} value=last_12m_rm title="Sales, last 12 months" fmt='"RM"#,##0' comparison=vs_prior comparisonFmt=pct0 comparisonTitle="vs previous 12 months" sparkline=month sparklineType=bar sparklineColor="#4C55B8"/>
+  <BigValue data={sales_kpi2} value=last_12m_rm title="Sales, last 12 months" fmt='"RM"#,##0' comparison=vs_prior comparisonFmt=pct0 comparisonTitle="vs previous 12 months" sparkline=month sparklineType=bar sparklineColor="#356E65"/>
   <BigValue data={headline} value=bookings_next_2_weeks title="Bookings expected, next 2 weeks" fmt="#,##0"/>
   <BigValue data={headline} value=customers_to_call title="Higher-risk services"/>
   <BigValue data={headline} value=staff_hours_next_week title="Staff hours to plan next week" fmt="#,##0"/>
@@ -77,12 +77,12 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   <div class="card">
     <h3>Sales by month</h3>
 
-    <BarChart data={sales_period} x=month y=sales_rm yFmt='"RM"#,##0' xFmt="mmm" colorPalette={['#5B63C9']} chartAreaHeight=220 labels=false/>
+    <BarChart data={sales_period} x=month y=sales_rm yFmt='"RM"#,##0' xFmt="mmm" colorPalette={['#356E65']} chartAreaHeight=220 labels=false/>
   </div>
   <div class="card">
     <h3>Bookings every 2 weeks</h3>
 
-    <AreaChart data={backtest} x=period_start y=actual_bookings xFmt="d mmm" yMin=0 colorPalette={['#2E9CB8']} chartAreaHeight=220 fillOpacity=0.25/>
+    <AreaChart data={backtest} x=period_start y=actual_bookings xFmt="d mmm" yMin=0 colorPalette={['#4C6187']} chartAreaHeight=220 fillOpacity=0.14/>
   </div>
 </div>
 
@@ -92,7 +92,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 
     <DataTable data={top_areas} rowShading=false>
       <Column id=area title="Area"/>
-      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#DCDDF4"/>
+      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#C4DCD6"/>
       <Column id=sales title="Purchases"/>
     </DataTable>
   </div>
@@ -101,7 +101,7 @@ select max(extracted_at_utc) as latest from nomobug.freshness
 
     <DataTable data={pest_top} rowShading=false>
       <Column id=pest_group title="Pest group"/>
-      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#DCDDF4"/>
+      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#C4DCD6"/>
     </DataTable>
   </div>
 </div>
