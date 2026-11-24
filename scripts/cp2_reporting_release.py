@@ -438,7 +438,21 @@ def finish_release(client: bigquery.Client, run_dir: Path, manifest: dict) -> di
             from webapp import data as portal_data, storage as portal_storage
             portal_folder = run_dir / "portal_aggregate"
             from scripts.release_business_analytics import run as release_business
-            release_business(portal_folder, publish=True)
+            approved = None
+            bucket, prefix = portal_storage.location(portal_uri)
+            if os.getenv("CP2_APPROVED_DISTRICTS") == "yes":
+                from urllib.parse import quote
+                object_name = "/".join(filter(None, (prefix, "approved_sales_districts.csv")))
+                with portal_storage.authorized_session() as session:
+                    response = session.get(
+                        f"https://storage.googleapis.com/storage/v1/b/{quote(bucket, safe='')}/o/{quote(object_name, safe='')}?alt=media",
+                        timeout=30,
+                    )
+                    response.raise_for_status()
+                portal_folder.mkdir(parents=True, exist_ok=True)
+                approved = portal_folder / "approved_sales_districts.csv"
+                approved.write_bytes(response.content)
+            release_business(portal_folder, publish=True, approved_districts=approved)
             portal_data.refresh(portal_folder, client=client)
             portal_storage.publish_business(portal_uri, portal_folder)
             portal_storage.publish_business(portal_uri,portal_folder,name='business_tools_private.json')

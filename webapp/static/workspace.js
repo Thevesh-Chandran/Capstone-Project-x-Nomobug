@@ -193,14 +193,20 @@ function renderDeskTasks(r, list) {
     thead = el('thead'),
     heading = el('tr');
   table.setAttribute('aria-label', 'Customer payment follow-ups');
-  ['Customer', 'Check', 'Reminder', 'Contract balance', 'Progress', ''].forEach(title => {
+  const columns = ['Customer', 'Check', 'Reminder', 'Contract balance', 'Progress', 'Action'];
+  table.setAttribute('role', 'table');
+  thead.setAttribute('role', 'rowgroup');
+  heading.setAttribute('role', 'row');
+  columns.forEach(title => {
     const th = el('th', title);
     th.scope = 'col';
+    th.setAttribute('role', 'columnheader');
     heading.append(th);
   });
   thead.append(heading);
   table.append(thead);
   const body = el('tbody');
+  body.setAttribute('role', 'rowgroup');
   rows.slice(0, 40).forEach(t => {
     const row = el('tr', undefined, 'desk-task'),
       customer = el('td'),
@@ -247,7 +253,16 @@ function renderDeskTasks(r, list) {
     progress.append(el('span', deskStatus(t.status), 'desk-status ' + t.status));
     const action = el('td');
     action.append(deskButton('Review', event => openDeskTask(t, r, event.currentTarget), 'desk-review-button'));
-    row.append(customer, reason, date, balance, progress, action);
+    row.setAttribute('role', 'row');
+    [customer, reason, date, balance, progress, action].forEach((cell, index) => {
+      cell.setAttribute('role', 'cell');
+      if (index > 0 && index < columns.length - 1) {
+        const label = el('span', columns[index], 'desk-mobile-label');
+        label.setAttribute('aria-hidden', 'true');
+        cell.prepend(label);
+      }
+      row.append(cell);
+    });
     body.append(row);
   });
   table.append(body);
@@ -543,7 +558,7 @@ function renderWeekPlan(r) {
   root.append(ribbon);
   const decision = el('article');
   renderPlanDecision(decision, r);
-  root.append(decision);
+
   const grid = el('div', undefined, 'desk-planner-grid'),
     main = el('div'),
     side = el('div');
@@ -607,6 +622,9 @@ function renderWeekPlan(r) {
     });
     heat.append(body);
     const wrap = el('div', undefined, 'desk-heatmap-wrap');
+    wrap.tabIndex = 0;
+    wrap.setAttribute('role', 'region');
+    wrap.setAttribute('aria-label', 'Weekly bookings by team and day');
     wrap.append(heat);
     schedule.append(
       wrap,
@@ -633,7 +651,7 @@ function renderWeekPlan(r) {
     );
   }
   schedule.append(daySummary);
-  main.append(schedule);
+
   const forecast = deskPanel('Demand forecast', 'Experimental, saved before the week');
   const cards = el('div', undefined, 'desk-demand-grid');
   for (const model of r.planning.evidence.models) {
@@ -674,7 +692,7 @@ function renderWeekPlan(r) {
       'desk-footnote',
     ),
   );
-  main.append(forecast);
+  main.append(decision, forecast);
   const capacity = deskPanel('Set the working plan', 'Staff assumptions');
   const form = el('form', undefined, 'desk-capacity-form');
   const input = el('input');
@@ -751,7 +769,7 @@ function renderWeekPlan(r) {
   capacity.append(form);
   side.append(capacity);
   grid.append(main, side);
-  root.append(grid);
+  root.append(grid, schedule);
   if (window.attachBookingTools) attachBookingTools(root);
 }
 window.loadWorkspaceTools = async page => {

@@ -6,13 +6,17 @@ let queueView = 'all';
 const customerForm = $('customer-search');
 if (customerForm) {
   const article = customerForm.closest('article');
-  $('customer-history-slot').append(article);
+  const layout = el('div', undefined, 'customer-workspace');
+  const filters = el('div', undefined, 'panel customer-filters');
+  const results = el('div', undefined, 'panel customer-directory');
+  filters.append(el('h2', 'Find a customer'), customerForm);
+  results.append(el('h2', 'Customer directory'), $('customer-stats'), $('customer-summary'), $('customer-results'));
+  layout.append(filters, results);
+  $('customer-history-slot').append(layout);
+  article.remove();
 }
 const businessFirst = $('business-filter')?.closest('.panel');
 if (businessFirst) businessFirst.hidden = true;
-const systemDetails = el('details', undefined, 'panel research-details');
-systemDetails.append(el('summary', 'System status'), $('system-cards'));
-document.querySelector('[data-view="status"]').append(systemDetails);
 // Keep the custom-area date controls visible without duplicating Looker charts.
 const areaForm = $('business-radius');
 if (areaForm) areaForm.before($('business-filter'));

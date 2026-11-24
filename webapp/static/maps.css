@@ -245,3 +245,9 @@
 .maps-page .maphead button {
   transition: background-color var(--dur-short) var(--ease-out), border-color var(--dur-short) var(--ease-out);
 }
+
+.maps-page .layout > .tools { margin: 0; }
+.maps-page .layout > * { min-width: 0; }
+
+.maps-page .layout > .tools { grid-column: 1 / -1; }
+.maps-page .layout > .tools:disabled { opacity: 0.55; }

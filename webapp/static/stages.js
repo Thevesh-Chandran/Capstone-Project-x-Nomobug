@@ -1065,12 +1065,17 @@
     ctl.append(lab);
     const stats = mk('div', undefined, 'plan-stats');
     ctl.append(stats);
-    pl.append(ctl);
     const note = mk('p', '', 'side-text service-call-status');
     note.setAttribute('role', 'status');
     const listHost = mk('div');
     const logHost = mk('div', undefined, 'checkin-log');
-    pl.append(note, listHost, logHost);
+    const layout = mk('div', undefined, 'call-workspace');
+    const controls = mk('div', undefined, 'call-controls');
+    const queue = mk('div', undefined, 'call-queue');
+    controls.append(ctl);
+    queue.append(note, listHost);
+    layout.append(controls, queue, logHost);
+    pl.append(layout);
     root.append(pl);
     const paint = p => {
       stats.replaceChildren();
@@ -1350,27 +1355,14 @@
 
   function renderModels(root) {
     root.replaceChildren();
-    const header = block('Choose a model');
-    const label = mk('label', undefined, 'model-selector');
-    label.append(mk('span', 'Model', 'sr-only'));
-    const select = mk('select');
-    const inUse = mk('optgroup');
-    inUse.label = 'Used in the workspace';
-    const research = mk('optgroup');
-    research.label = 'Research';
-    MODEL_OPTIONS.forEach(([id, name, status]) => {
-      const group = ['Frozen experiment', 'Earlier research'].includes(status) ? research : inUse;
-      group.append(new Option(name, id));
-    });
-    select.append(inUse, research);
-    select.value = selectedModel;
-    label.append(select);
-    header.append(label);
-    const evidence = mk('div');
-    root.append(header, evidence);
+    const layout = mk('div', undefined, 'model-workspace');
+    const choices = mk('fieldset', undefined, 'panel model-choices');
+    choices.append(mk('legend', 'Choose a model', 'sr-only'), mk('h2', 'Models'));
+    const evidence = mk('div', undefined, 'model-output');
+    layout.append(choices, evidence);
+    root.append(layout);
 
     const show = () => {
-      selectedModel = select.value;
       g('model-area-evidence').hidden = selectedModel !== 'frozen';
       const [id, name, status] = MODEL_OPTIONS.find(([key]) => key === selectedModel);
       const card = block(name);
@@ -1401,7 +1393,22 @@
       }
       if (panel) panel.open = true;
     };
-    select.addEventListener('change', show);
+    MODEL_OPTIONS.forEach(([id, name, status]) => {
+      const label = mk('label', undefined, 'model-choice');
+      const radio = mk('input');
+      radio.type = 'radio';
+      radio.name = 'workspace-model';
+      radio.value = id;
+      radio.checked = id === selectedModel;
+      radio.addEventListener('change', () => {
+        selectedModel = radio.value;
+        show();
+      });
+      const text = mk('span');
+      text.append(mk('strong', name), mk('small', status));
+      label.append(radio, text);
+      choices.append(label);
+    });
     show();
   }
 
@@ -1474,7 +1481,7 @@
   window.addEventListener('resize', () => {
     clearTimeout(rt);
     rt = setTimeout(() => {
-      if (data && (current === 'performance' || current === 'returns') && !g('view-' + current).hidden)
+      if (data && current === 'performance' && !g('view-' + current).hidden)
         draw(current);
     }, 200);
   });

@@ -53,13 +53,15 @@ where pest <> 'Unspecified' and month between '${inputs.period.start}' and '${in
 group by 1 order by 2 desc limit 6
 ```
 
-```sql freshness
-select max(extracted_at_utc) as latest from nomobug.freshness
-```
+<div class="overview-toolbar">
+  <div class="hero">
+    <h1>Business performance</h1>
+    <span class="chip">Data as of <Value data={headline} column=as_of fmt="d mmm yyyy"/></span>
+  </div>
 
-<div class="hero">
-  <h1>Business performance</h1>
-  <span class="chip">Data as of <Value data={headline} column=as_of fmt="d mmm yyyy"/></span>
+  <div class="card filters">
+    <DateRange name=period data={months_all} dates=month end={new Date()} defaultValue="Last 12 Months" title="Chart dates"/>
+  </div>
 </div>
 
 <div class="kpis">
@@ -69,43 +71,38 @@ select max(extracted_at_utc) as latest from nomobug.freshness
   <BigValue data={headline} value=staff_hours_next_week title="Staff hours to plan next week" fmt="#,##0"/>
 </div>
 
-<div class="card filters">
-<DateRange name=period data={months_all} dates=month end={new Date()} defaultValue="Last 12 Months" title="Chart dates"/>
-</div>
-
-<div class="row2">
+<div class="row2 overview-charts">
   <div class="card">
     <h3>Sales by month</h3>
 
-    <BarChart data={sales_period} x=month y=sales_rm yFmt='"RM"#,##0' xFmt="mmm" colorPalette={['#356E65']} chartAreaHeight=220 labels=false/>
+    <BarChart data={sales_period} x=month y=sales_rm yFmt='"RM"#,##0' xFmt="mmm" colorPalette={['#465cbc']} chartAreaHeight=255 labels=false/>
   </div>
   <div class="card">
-    <h3>Bookings every 2 weeks</h3>
-
-    <AreaChart data={backtest} x=period_start y=actual_bookings xFmt="d mmm" yMin=0 colorPalette={['#4C6187']} chartAreaHeight=220 fillOpacity=0.14/>
-  </div>
-</div>
-
-<div class="row2">
-  <div class="card">
-    <h3>Top areas</h3>
+    <h3>Top sales areas</h3>
 
     <DataTable data={top_areas} rowShading=false>
       <Column id=area title="Area"/>
-      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#C4DCD6"/>
+      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#dfe6fa"/>
       <Column id=sales title="Purchases"/>
     </DataTable>
+  </div>
+</div>
+
+<div class="row2 overview-charts">
+  <div class="card">
+    <h3>Bookings every 2 weeks</h3>
+
+    <AreaChart data={backtest} x=period_start y=actual_bookings xFmt="d mmm" yMin=0 colorPalette={['#397b79']} chartAreaHeight=235 fillOpacity=0.15/>
   </div>
   <div class="card">
     <h3>Sales by pest group</h3>
 
     <DataTable data={pest_top} rowShading=false>
       <Column id=pest_group title="Pest group"/>
-      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#C4DCD6"/>
+      <Column id=sales_rm title="Sales" fmt='"RM"#,##0' contentType=bar barColor="#d8ece9"/>
     </DataTable>
   </div>
 </div>
-
 
 <Details title="Definitions and coverage">
 

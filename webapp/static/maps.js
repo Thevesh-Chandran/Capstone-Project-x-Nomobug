@@ -499,6 +499,7 @@
     drag = null;
   });
   paint();
+  document.querySelector('.map-workbench .tools').disabled = false;
 })().catch(error => {
   document.querySelector('.map-workbench').replaceChildren();
   const p = document.createElement('p');

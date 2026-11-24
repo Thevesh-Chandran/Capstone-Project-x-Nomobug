@@ -102,8 +102,7 @@ select segment, customer_groups, sales_rm, sales_rm / nullif(customer_groups, 0)
   <h1>Sales & customers</h1>
 </div>
 
-<div class="card">
-<h3>Filters</h3>
+<div class="card filters" role="group" aria-label="Sales filters">
 <DateRange name=period data={detail} dates=month end={new Date()} defaultValue="Last 12 Months"/>
 <Dropdown name=premise data={premises} value=premise title="Premise" multiple=true selectAllByDefault=true/>
 <Dropdown name=package data={packages_list} value=package_group title="Package" multiple=true selectAllByDefault=true/>

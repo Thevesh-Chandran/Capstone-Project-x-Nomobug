@@ -21,6 +21,7 @@
 	});
 </script>
 
+<div class="embedded-report">
 <EvidenceDefaultLayout
 	{data}
 	title="Nomobug"
@@ -35,6 +36,7 @@
 >
 	<slot slot="content" />
 </EvidenceDefaultLayout>
+</div>
 
 <style>
 	/* Hallmark · Dusk, shared with the staff website: a bone well for the working surface, white cards,
@@ -56,7 +58,7 @@
 		--color-ink: oklch(21% 0.016 268);
 		--color-ink-2: oklch(30% 0.016 268);
 		--color-muted: oklch(47% 0.016 265);
-		--color-rule: oklch(89% 0.015 250);
+		--color-rule: #dce3ec;
 		--color-shell: oklch(17.5% 0.014 268);
 		--color-shell-ink: oklch(96% 0.006 75);
 		--color-shell-muted: oklch(70% 0.016 262);
@@ -64,7 +66,7 @@
 		--color-apricot: oklch(83% 0.095 62);
 		--font-display: 'Wix Madefor Display', ui-sans-serif, system-ui, sans-serif;
 		--font-body: 'Wix Madefor Text', ui-sans-serif, system-ui, sans-serif;
-		--radius-card: 18px;
+		--radius-card: 12px;
 		--radius-inner: 10px;
 	}
 	:global(html), :global(body) { overflow-x: clip; background: transparent !important; }
@@ -85,7 +87,7 @@
 
 	/* Page title: quiet display weight on the well, no box */
 	:global(.hero) { padding: 4px 0 4px; margin: 0 0 22px; }
-	:global(.hero h1) { font-size: 2.2rem; font-weight: 500; letter-spacing: -0.022em; line-height: 1.05; margin: 0 0 8px; color: var(--color-ink); overflow-wrap: break-word; min-width: 0; }
+	:global(.hero h1) { font-size: clamp(1.4rem, 2.8vw, 1.9rem); font-weight: 650; letter-spacing: -0.022em; line-height: 1.05; margin: 0 0 8px; color: var(--color-ink); overflow-wrap: break-word; min-width: 0; }
 	:global(.hero p) { margin: 0; color: var(--color-muted); max-width: 62ch; line-height: 1.55; font-size: 1rem; }
 	:global(.hero .chip) {
 		display: inline-block; margin-top: 12px; padding: 4px 12px; border-radius: 999px;
@@ -100,9 +102,9 @@
 	:global(.kpis.three) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 	:global(.kpis.two) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 	:global(.kpis > *) {
-		background: color-mix(in srgb, var(--kpi-color) 9%, var(--color-card)); padding: 18px;
+		background: var(--color-card); padding: 16px 18px;
 		border: 1px solid var(--color-rule); border-radius: 12px;
-		box-shadow: 0 1px 3px rgb(25 38 62 / 6%);
+		box-shadow: inset 0 3px color-mix(in srgb, var(--kpi-color) 50%, var(--color-card));
 		margin: 0 !important; min-width: 0 !important; width: auto !important;
 		overflow-wrap: anywhere;
 	}
@@ -117,10 +119,18 @@
 	}
 
 	/* Charts and tables: white cards on the well */
-	:global(.card) { background: var(--color-card); border: 1px solid var(--color-rule); border-radius: var(--radius-card); padding: 18px 20px 12px; margin-bottom: 16px; min-width: 0; box-shadow: 0 2px 5px rgb(25 38 62 / 6%); }
+	:global(.card) { background: var(--color-card); border: 1px solid var(--color-rule); border-radius: var(--radius-card); padding: 18px 20px 12px; margin-bottom: 16px; min-width: 0; box-shadow: none; }
 	:global(.card h3) { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; letter-spacing: -0.015em; margin: 0 0 8px; color: var(--color-ink); }
 	:global(.card .sub) { font-size: 0.82rem; color: var(--color-muted); margin: 0 0 10px; }
 	:global(.row2) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+	:global(.overview-charts) { grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr); }
+	:global(.overview-toolbar) {
+		display: flex; align-items: center; justify-content: space-between;
+		flex-wrap: wrap; gap: 8px 16px; margin-block: 0 16px;
+	}
+	:global(.overview-toolbar .hero) { margin: 0; }
+	:global(.overview-toolbar .card.filters) { margin: 0; }
+
 	:global(.row3) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
 
 	/* This week: slate cards, the figure in fog, the next step in periwinkle */
@@ -136,14 +146,33 @@
 	:global(a.go:focus-visible) { outline: 2px solid var(--color-signal); outline-offset: 2px; }
 	:global(.note) { font-size: 0.8rem; color: var(--color-muted); margin: 4px 2px 18px; }
 
+
+	:global(.embedded-report div:has(> main > article.markdown)) {
+		max-width: none !important;
+		padding-inline: 0 !important;
+	}
+	:global(.embedded-report main:has(> article.markdown)) { margin-top: 0 !important; }
+	:global(.kpis > *) { background: color-mix(in srgb, var(--kpi-color) 10%, var(--color-card)); }
+	:global(.report-split) { display: grid; gap: 16px; align-items: start; }
+	:global(.report-split > *) { min-width: 0; }
+	:global(.report-follow-up-charts) { display: grid; gap: 0; }
+	@media (min-width: 800px) {
+		:global(.report-split) { grid-template-columns: minmax(210px, 27%) minmax(0, 1fr); }
+		:global(.report-follow-up-charts) { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 16px; }
+		:global(.report-warranty-matrix) { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+	}
+
 	@media (max-width: 900px) {
 		:global(.kpis), :global(.kpis.three), :global(.row2), :global(.row3) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	}
+	@media (max-width: 760px) {
+		:global(.overview-charts) { grid-template-columns: minmax(0, 1fr); }
 	}
 	@media (max-width: 560px) {
 		:global(.row2), :global(.row3) { grid-template-columns: 1fr; }
 		:global(.kpis > *) { padding: 12px; }
 	}
-	@media (max-width: 360px) {
+	@media (max-width: 329px) {
 		:global(.kpis), :global(.kpis.two), :global(.kpis.three) { grid-template-columns: 1fr; }
 	}
 </style>

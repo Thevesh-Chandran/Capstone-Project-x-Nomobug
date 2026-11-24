@@ -78,7 +78,7 @@ group by 1 order by 2 desc
 
 ## Recurring contracts: still to collect
 
-<div class="card">
+<div class="card filters">
 <Dropdown name=billing data={billing_list} value=billing title="Billing arrangement" multiple=true selectAllByDefault=true/>
 </div>
 

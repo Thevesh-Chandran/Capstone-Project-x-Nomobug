@@ -130,7 +130,19 @@ def source_stage(run_dir):
             if actual != headers[0]:
                 headers[0] = actual
                 header_variations.append('source_column_001')
-        snapshot = core.prepare_snapshot(tab, frame, source['header_maps'][tab],
+        header_map = source['header_maps'][tab]
+        if tab == 'SALES':
+            # The live sheet added two payment summaries after column AG.
+            # Keep the original Bronze positions so downstream SQL reads the same fields.
+            actual_headers = [' '.join(value.split()) for value in header_map.values()]
+            extra = ['TOTAL PAID (PAYMENTS)', 'BALANCE']
+            if actual_headers == headers[:33] + extra + headers[33:]:
+                retained = list(header_map)[:33] + list(header_map)[35:]
+                columns = [f'source_column_{index:03d}' for index in range(1, len(headers) + 1)]
+                frame = frame[['source_sheet_row', *retained]].rename(columns=dict(zip(retained, columns, strict=True)))
+                header_map = dict(zip(columns, (header_map[key] for key in retained), strict=True))
+                header_variations.append('sales_payment_summary_columns')
+        snapshot = core.prepare_snapshot(tab, frame, header_map,
             source['source_lineage'][tab], headers, prefix)
         snapshot['metadata']['nonsemantic_header_variations'] = header_variations
         snapshot['schema'] = [field.to_api_repr() for field in snapshot['schema']]

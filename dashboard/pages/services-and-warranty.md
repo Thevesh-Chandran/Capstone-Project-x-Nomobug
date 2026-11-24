@@ -102,7 +102,7 @@ from ${difficulty}
   <BigValue data={kpi} value=hardest title="Highest return share (100+ visits)"/>
 </div>
 
-<div class="row2">
+<div class="row2 report-warranty-matrix">
   <div class="card">
     <h3>Recorded returns by pest</h3>
 

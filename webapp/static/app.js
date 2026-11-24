@@ -299,15 +299,6 @@ function showReport(slug) {
     f.dataset.want = want;
     f.src = want;
   }
-  clearInterval(showReport.timer);
-  showReport.timer = setInterval(() => {
-    try {
-      const d = f.contentDocument;
-      if (!d || !d.body) return;
-      const h = Math.max(d.documentElement.scrollHeight, d.body.scrollHeight);
-      if (h && Math.abs(f.offsetHeight - h) > 4) f.style.height = h + 'px';
-    } catch (e) {}
-  }, 400);
 }
 const relatedReport = $('page-report-slot');
 const pageChartsTitle = $('page-charts-title');
@@ -333,22 +324,6 @@ function embedPageReport(page) {
   frame.style.height = '';
   frame.src = '/dashboard/' + report.slug + '/';
 }
-function reportRoute(pathname) {
-  const slug = pathname.replace(/^\/dashboard(?:\/releases\/[a-f0-9]{32})?\/?/, '').replace(/\/$/, '');
-  return Object.keys(window.CP2_REPORTS || {}).find(k => window.CP2_REPORTS[k] === slug);
-}
-document.addEventListener('DOMContentLoaded', () => {
-  const f = $('report-frame');
-  if (!f) return;
-  // Links inside a report (for example "Open the call list") keep the sidebar in step.
-  f.addEventListener('load', () => {
-    try {
-      const r = reportRoute(f.contentWindow.location.pathname);
-      if (r) f.dataset.want = '/dashboard/' + (window.CP2_REPORTS[r] ? window.CP2_REPORTS[r] + '/' : '');
-      if (r && window.cp2Page() !== r) history.replaceState(null, '', '#' + r), window.onRoute && window.onRoute(r, true);
-    } catch (e) {}
-  });
-});
 // Owner-only: who can sign in (Google IAP access list for this website).
 async function accessCall(method, body) {
   const r = await fetch('/api/access', {

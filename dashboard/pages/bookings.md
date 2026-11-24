@@ -51,12 +51,20 @@ select team, sum(bookings) as bookings from ${team_view} group by 1 order by 2 d
   <BigValue data={staffing} value=hours_to_keep_open title="Hours to keep open" fmt="#,##0"/>
 </div>
 
+<div class="report-split ">
+
+<div>
+
 <div class="card">
 <h3>Staffing decision for <Value data={staffing} column=week_start fmt="d mmm"/>–<Value data={staffing} column=week_end fmt="d mmm"/></h3>
 <p>Expected appointment hours <Value data={staffing} column=expected_hours fmt="#,##0"/> · already booked at forecast time <Value data={staffing} column=already_booked_hours fmt="#,##0"/> · allowance <Value data={staffing} column=buffer_hours fmt="#,##0"/> hours.</p>
 
 <a class="go" data-to="bookings" role="link" tabindex="0">Open booking calendar</a>
 </div>
+
+</div>
+
+<div>
 
 <div class="row2">
   <div class="action">
@@ -69,6 +77,10 @@ select team, sum(bookings) as bookings from ${team_view} group by 1 order by 2 d
     <div class="big"><Value data={staffing} column=suggested_action/></div>
     <p>Includes a buffer of <Value data={staffing} column=buffer_hours fmt="#,##0"/> hours for forecast error.</p>
   </div>
+</div>
+
+</div>
+
 </div>
 
 <div class="card filters">

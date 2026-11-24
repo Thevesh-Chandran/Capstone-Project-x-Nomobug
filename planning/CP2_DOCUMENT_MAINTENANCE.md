@@ -44,3 +44,22 @@ The revised deck and Canva poster draft are indexed in outputs/submission/202611
 ## 18 November 2026 checkpoint
 
 Use the 16 November report and the Weeks 1–8 logbook dated 18 November. Week 8 records work through Wednesday only. The editable university poster, its A1 print proof and the current submission files are linked from the local project launcher. The report and slides rendered to 94 pages and 15 slides. Supervisor approval and formal submission are pending.
+
+## 22 November 2026 checkpoint
+
+Cut-off: completed work through Sunday 22 November 2026, Malaysia time. Week 8 runs from 17 to 23 November and remains partial. Weeks 1–7 are preserved without new entries or duplicated activity.
+
+Next maintenance sources:
+
+- `docs/2 Final Report/Final Report CP2 Thevesh Chandran 24017717 Updated 20261122.docx`
+- `docs/3 Logbook/Logbook CP2 Thevesh Chandran 24017717 Weeks 1-8 Updated 20261122.docx`
+
+The source documents were the 19 November Submission Draft report and 18 November Weeks 1–8 logbook. The examiner-review report and all previous dated deliverables remain intact. The historical CP1 proposal was not changed. Writing follows `planning/WRITING_VOICE_GUIDE.md` and the evidence-led-writing skill, retaining the CP1 formatting and Dr Nauman Ali Khan as supervisor.
+
+Added the dated map-coverage review and the source changes for unavailable-forecast verification and sales-area filtering. Corrected stale descriptions of the staff-first workspace, the repaired reporting blockage and the evidence-register cut-off. Week 8 now includes the later report, persistence and location-review work. The existing refund/B2B results and save-persistence findings remain attributed to the earlier verified release; no new live acceptance result is claimed. Tightened repeated abstract and future-work wording to avoid isolated spill pages.
+
+Sources inspected: the CP2 v2 chat's 19–20 November review and subsequent clean-sync status; `outputs/project_audit/20261118_source_linkage/Review.md`; `planning/CP2_CURRENT_SYSTEM.md`; `planning/CP2_COMPLETION_STATUS.md` (dated historical status, not new verification); `planning/CODEX_TASKS_20261102.md`; `outputs/project_audit/20261119_script_replay_inventory.csv`; source commits `cae2dba`, `1ef7cd8`, `ff77dc7` and `cf40614`; and the latest submission report and logbook. Map counts are the dated review of November 2025–October 2026 purchases, separate from the 28-record follow-up over the full sales history.
+
+Verification evidence is in `.codex-tmp/weekly_docs_20261122`: native Word PDF exports, `render_docx.py` page images, page maps, validation and visual-review records. Only `word/document.xml` changes in either Word package; all 14 report media parts and the logbook media part remain byte-identical to their source. The earlier report's research graphs are retained; the four assets absent from the newer source are an old architecture diagram, a literature taxonomy and two proposal Gantt charts. The report has 99 pages, including 59 main-body pages. Its 151 distinct contents/caption targets were checked against the final PDF. The logbook has 18 pages, with blank feedback and signature spaces preserved.
+
+No model evaluation, backfill, model/protocol/receipt change, deployment, source-data repair or external message was performed for document maintenance. Prospective results, formal staff acceptance, supervisor approval and submission remain unconfirmed unless separately evidenced later.

@@ -49,7 +49,7 @@ select * from ${months_all} where month between '${inputs.fu_period.start}' and 
 </div>
 
 
-<div class="row2">
+<div class="report-follow-up-charts">
   <div class="card">
     <h3>Recent services by chance band</h3>
 <Dropdown name=fu_premise data={fu_premises} value=premise title="Premise · this chart" multiple=true selectAllByDefault=true/>

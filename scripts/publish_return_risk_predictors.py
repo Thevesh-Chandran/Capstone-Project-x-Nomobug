@@ -93,8 +93,12 @@ def from_release(run_dir: Path, uri: str, client=None) -> dict:
     run_dir = Path(run_dir)
     if os.getenv('CP2_FEATURE_ARTIFACT_BUCKET'):
         hydrate_feature_inputs(os.environ['CP2_FEATURE_ARTIFACT_BUCKET'])
-    receipt = derive(cp2_pipeline.read(run_dir / 'calendar_private.json'),
-                     cp2_pipeline.read(run_dir / 'sheets_private.json')['snapshots'],
+    sheets = cp2_pipeline.read(run_dir / 'sheets_private.json')['snapshots']
+    # The reporting snapshot carries a typed date alongside the original Sales
+    # cell. Only the positional cell belongs to the pinned prediction inputs.
+    for row in sheets['SALES']['records']:
+        row.pop('sale_close_cell_date', None)
+    receipt = derive(cp2_pipeline.read(run_dir / 'calendar_private.json'), sheets,
                      run_dir / 'return_risk_features', client=client)
     raw = json.loads((run_dir / 'return_risk_features/predictors/dataset_input.json').read_text(encoding='utf-8'))
     exported = prepare(raw)
