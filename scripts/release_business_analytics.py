@@ -79,7 +79,7 @@ def corroborated_district(address, point_district):
     return point_district if point_district and matches == {point_district} else None
 
 
-def run(folder, publish=False, approved_districts=None):
+def run(folder, publish=False, approved_districts=None, reviewed_appointments=None):
     root = Path(__file__).resolve().parents[1]
     folder = Path(folder).resolve()
     if not folder.is_relative_to(root/'outputs'): raise ValueError('Private exports require ignored outputs')
@@ -150,7 +150,7 @@ def run(folder, publish=False, approved_districts=None):
         changed = set()
         evidence = {'sales_locality': 0, 'calendar_exact_address': 0, 'calendar_locality': 0, 'sales_exact_peer': 0, 'calendar_exact_peer': 0, 'sales_public_locality': 0, 'calendar_public_locality': 0}
         calendar_addresses = {}
-        if approved_districts:
+        if approved_districts or reviewed_appointments:
             run_id = prefix.removeprefix('cp2r_')
             calendar_table = query(f'''SELECT JSON_VALUE(manifest_json, '$.snapshot_tables.calendar') AS name
               FROM `{PROJECT}.audit.release_runs`
@@ -166,6 +166,17 @@ def run(folder, publish=False, approved_districts=None):
                     raw = calendar_address(event)
                     if raw:
                         calendar_addresses[key] = raw
+        reviewed = {}
+        matched_appointments = set()
+        if reviewed_appointments:
+            canonical_districts = {f"{f['properties']['state']} / {f['properties']['district']}" for f in features}
+            with Path(reviewed_appointments).open(encoding='utf-8-sig', newline='') as handle:
+                for entry in csv.DictReader(handle):
+                    key = (entry['Calendar'], entry['Event ID'])
+                    label = entry['District']
+                    if not all(key) or key in reviewed or label not in canonical_districts:
+                        raise ValueError('Invalid or duplicate reviewed appointment district')
+                    reviewed[key] = label
         if approved_districts:
             labels = {}
             for feature in features:
@@ -228,6 +239,10 @@ def run(folder, publish=False, approved_districts=None):
                         changed.add(sale_id)
                     return entry[1]
             else:
+                event_key = (row['calendar_name'], row['event_id'])
+                if event_key in reviewed:
+                    matched_appointments.add(event_key)
+                    return reviewed[event_key]
                 raw = calendar_addresses.get((row['calendar_name'], row['event_id']), '')
                 keys = {key for key in (address_key(raw), row.get('address_hash')) if key}
                 direct = set().union(*(approved_by_address.get(key, set()) for key in keys))
@@ -276,7 +291,8 @@ def run(folder, publish=False, approved_districts=None):
                    'sales_location_status': 'Reviewed district labels and validated coordinates use separate evidence',
                    'approved_district_rows': len(approved),
                    'matched_district_rows': len(matched),
-                   'changed_district_rows': len(changed), 'additional_district_evidence': evidence}
+                   'changed_district_rows': len(changed), 'additional_district_evidence': evidence,
+                   'reviewed_appointment_rows': len(reviewed), 'matched_appointment_rows': len(matched_appointments)}
         segments={}
         for c in customers:
             segment='Identity needs review' if c['identity_status']=='needs_review' else 'Repeat customer' if c['repeat_customer'] else 'One programme'
@@ -328,4 +344,5 @@ def run(folder, publish=False, approved_districts=None):
 if __name__ == '__main__':
     p=argparse.ArgumentParser();p.add_argument('--output',default='outputs/business_implementation/current');p.add_argument('--publish',action='store_true')
     p.add_argument('--approved-districts', type=Path)
-    args=p.parse_args();run(args.output,args.publish,args.approved_districts)
+    p.add_argument('--reviewed-appointments', type=Path)
+    args=p.parse_args();run(args.output,args.publish,args.approved_districts,args.reviewed_appointments)

@@ -14,6 +14,8 @@ Updated 6 November 2026. Deployment revisions and source freshness are runtime f
 
 ## Business coverage
 
+On 25 November 2026 the district review reconciled 3,936 verified records and two exclusions. The reporting release applies Sales overrides by sale ID and address hash and Calendar overrides by calendar and event ID. The live business views and portal snapshot matched all 942 newly reviewed sales and all 2,994 reviewed appointments. Reporting coverage after publication was 2,596 of 2,599 sales and 8,365 of 8,365 appointments. The three unassigned sales remain in the sales totals. Reviewed district labels support district reporting without changing the point-based map and radius inputs.
+
 | Question | Current surface | Meaning and limits |
 |---|---|---|
 | Sales and customers | Sales & customers | Package sales, customer segments and area comparisons; not profit or cash receipts |
